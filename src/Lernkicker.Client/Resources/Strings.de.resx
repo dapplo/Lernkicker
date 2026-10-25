@@ -208,4 +208,56 @@
   <data name="Issue.gapNotInWordBank" xml:space="preserve"><value>Keine Antwort dieser Lücke steht in der Wortliste (wordBank).</value></data>
   <data name="Issue.answerNotInOptions" xml:space="preserve"><value>„{answer}“ ist keine der Auswahlmöglichkeiten (options).</value></data>
   <data name="Issue.correctOutOfRange" xml:space="preserve"><value>correct verweist auf eine Option, die es nicht gibt.</value></data>
+  <data name="Home.NextDates" xml:space="preserve"><value>Demnächst</value></data>
+  <data name="Calendar.Title" xml:space="preserve"><value>Termine</value></data>
+  <data name="Calendar.Empty" xml:space="preserve"><value>In den nächsten Wochen stehen keine Termine an.</value></data>
+  <data name="Calendar.Kind" xml:space="preserve"><value>Art</value></data>
+  <data name="Calendar.Kind.test" xml:space="preserve"><value>Probe</value></data>
+  <data name="Calendar.Kind.football" xml:space="preserve"><value>Fußball</value></data>
+  <data name="Calendar.Kind.other" xml:space="preserve"><value>Sonstiges</value></data>
+  <data name="Calendar.Source.imported" xml:space="preserve"><value>abonniert</value></data>
+  <data name="Calendar.Source.assignment" xml:space="preserve"><value>zum Üben</value></data>
+  <data name="Calendar.Edit" xml:space="preserve"><value>Ändern</value></data>
+  <data name="Calendar.AddDate" xml:space="preserve"><value>Termin eintragen</value></data>
+  <data name="Calendar.EditDate" xml:space="preserve"><value>Termin ändern</value></data>
+  <data name="Calendar.What" xml:space="preserve"><value>Was</value></data>
+  <data name="Calendar.WhatExample" xml:space="preserve"><value>z. B. Probe Mathe</value></data>
+  <data name="Calendar.Date" xml:space="preserve"><value>Tag</value></data>
+  <data name="Calendar.From" xml:space="preserve"><value>Von (optional)</value></data>
+  <data name="Calendar.To" xml:space="preserve"><value>Bis (optional)</value></data>
+  <data name="Calendar.TimeHint" xml:space="preserve"><value>Ohne Uhrzeit gilt der Termin den ganzen Tag.</value></data>
+  <data name="Calendar.Where" xml:space="preserve"><value>Wo (optional)</value></data>
+  <data name="Calendar.Subscriptions" xml:space="preserve"><value>Abonnierte Kalender</value></data>
+  <data name="Calendar.SubscriptionsHint" xml:space="preserve"><value>Termine aus einem anderen Kalender, z. B. von der Fußballmannschaft oder der Schule, werden übernommen und alle paar Stunden aktualisiert. Füge die Adresse des Kalenders ein (webcal:// oder https://, eine ICS-Datei).</value></data>
+  <data name="Calendar.DateCount" xml:space="preserve"><value>{0} Termine</value></data>
+  <data name="Calendar.UpdatedAt" xml:space="preserve"><value>aktualisiert am {0}</value></data>
+  <data name="Calendar.UpdateNow" xml:space="preserve"><value>Aktualisieren</value></data>
+  <data name="Calendar.Subscribe" xml:space="preserve"><value>Kalender abonnieren</value></data>
+  <data name="Calendar.Label" xml:space="preserve"><value>Name</value></data>
+  <data name="Calendar.LabelExample" xml:space="preserve"><value>z. B. Spiele E1</value></data>
+  <data name="Calendar.Url" xml:space="preserve"><value>Adresse des Kalenders</value></data>
+  <data name="Calendar.DatesAre" xml:space="preserve"><value>Die Termine sind</value></data>
+  <data name="Calendar.SubscribeButton" xml:space="preserve"><value>Abonnieren</value></data>
+  <data name="Calendar.Subscribed" xml:space="preserve"><value>Abonniert: {0} Termine übernommen.</value></data>
+  <data name="Calendar.Feed" xml:space="preserve"><value>In deiner Kalender-App</value></data>
+  <data name="Calendar.FeedHint" xml:space="preserve"><value>Mit einem geheimen Link zeigt deine Kalender-App (Handy, Outlook, Google) alle Termine von {0}, auch die Probentermine. Wer den Link hat, kann die Termine sehen.</value></data>
+  <data name="Calendar.FeedOnce" xml:space="preserve"><value>Kopiere den Link jetzt und füge ihn in deiner Kalender-App als Abo hinzu; er wird nur einmal angezeigt. Ein neuer Link schaltet den alten ab.</value></data>
+  <data name="Calendar.CreateFeed" xml:space="preserve"><value>Neuen Link erstellen</value></data>
+  <data name="Calendar.RemoveFeed" xml:space="preserve"><value>Link abschalten</value></data>
+  <data name="Calendar.FeedRemoved" xml:space="preserve"><value>Der Link funktioniert nicht mehr.</value></data>
+  <data name="Error.calendar.kindInvalid" xml:space="preserve"><value>Bitte wähle aus, was für ein Termin es ist.</value></data>
+  <data name="Error.calendar.titleInvalid" xml:space="preserve"><value>Bitte gib an, was für ein Termin es ist (höchstens 200 Zeichen).</value></data>
+  <data name="Error.calendar.locationInvalid" xml:space="preserve"><value>Der Ort darf höchstens 200 Zeichen haben.</value></data>
+  <data name="Error.calendar.timeInvalid" xml:space="preserve"><value>Das Ende muss nach dem Beginn liegen und braucht eine Anfangszeit.</value></data>
+  <data name="Error.calendar.eventNotFound" xml:space="preserve"><value>Diesen Termin gibt es nicht mehr.</value></data>
+  <data name="Error.calendar.eventReadOnly" xml:space="preserve"><value>Dieser Termin kommt aus einem abonnierten Kalender und kann nur dort geändert werden.</value></data>
+  <data name="Error.calendar.urlInvalid" xml:space="preserve"><value>Das ist keine Kalender-Adresse. Sie muss mit webcal:// oder https:// beginnen.</value></data>
+  <data name="Error.calendar.labelInvalid" xml:space="preserve"><value>Bitte gib dem Kalender einen Namen (höchstens 100 Zeichen).</value></data>
+  <data name="Error.calendar.subscriptionNotFound" xml:space="preserve"><value>Dieser Kalender ist nicht mehr abonniert.</value></data>
+  <data name="Error.calendar.tooManySubscriptions" xml:space="preserve"><value>Ein Kind kann höchstens 5 abonnierte Kalender haben.</value></data>
+  <data name="Error.calendar.unreachable" xml:space="preserve"><value>Der Kalender konnte nicht geladen werden. Stimmt die Adresse?</value></data>
+  <data name="Error.calendar.addressNotAllowed" xml:space="preserve"><value>Lernkicker lädt nur Kalender aus dem Internet, nicht aus dem Heimnetz.</value></data>
+  <data name="Error.calendar.tooLarge" xml:space="preserve"><value>Der Kalender ist größer als 2 MB.</value></data>
+  <data name="Error.calendar.notACalendar" xml:space="preserve"><value>Unter dieser Adresse ist kein Kalender (ICS). Vielleicht ist es eine Webseite?</value></data>
+  <data name="Error.calendar.rangeInvalid" xml:space="preserve"><value>Dieser Zeitraum ist zu lang.</value></data>
 </root>

@@ -13,6 +13,7 @@ public class ArchitectureTests
     private static readonly Assembly Contracts = typeof(Contracts.ApiError).Assembly;
     private static readonly Assembly QuizFormat = typeof(QuizFormat.QuizJson).Assembly;
     private static readonly Assembly Persistence = typeof(Persistence.LernkickerDbContext).Assembly;
+    private static readonly Assembly Calendar = typeof(Calendar.IcsCalendarSource).Assembly;
 
     [Fact]
     public void Domain_depends_only_on_the_bcl() =>
@@ -33,6 +34,10 @@ public class ArchitectureTests
     [Fact]
     public void Persistence_adapter_does_not_know_other_adapters() =>
         Assert.DoesNotContain(NonBcl(Persistence), n => n is "Lernkicker.Web" or "Lernkicker.QuizFormat" or "Lernkicker.Contracts");
+
+    [Fact]
+    public void Calendar_adapter_knows_only_the_core_and_its_calendar_libraries() =>
+        Assert.Equal(["Ical.Net", "Lernkicker.Application", "Lernkicker.Domain", "NodaTime"], NonBcl(Calendar));
 
     [Fact]
     public void Client_upload_limit_matches_the_domain() =>

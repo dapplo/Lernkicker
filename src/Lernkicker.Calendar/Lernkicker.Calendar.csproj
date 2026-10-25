@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Driven adapter for calendars: imports ICS subscriptions (with SSRF protection) and writes the children's ICS feeds -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lernkicker.Application\Lernkicker.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ical.Net" Version="5.2.3" />
+  </ItemGroup>
+
+</Project>

@@ -1,5 +1,6 @@
 using Lernkicker.Application;
 using Lernkicker.Contracts;
+using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Quizzes;
 
 namespace Lernkicker.Web.Endpoints;
@@ -26,6 +27,14 @@ public static class Mapping
         new(a.AssignmentId, a.Title, a.Subject, a.Topic, a.MaxPoints, a.DueOn, a.Attempts, a.BestPercent, a.Stars);
 
     public static DeviceStatusResponse ToDto(this DeviceStatus s) => new(s.Paired, s.ChildName, s.Locked);
+
+    public static CalendarEntryDto ToDto(this CalendarEntry e) =>
+        new(e.Uid, e.Kind, e.Title, e.Date, e.StartTime, e.EndTime, e.Location, e.Source, e.EventId);
+
+    public static SubscriptionOverview ToDto(this SubscriptionSummary s) =>
+        new(s.Id, s.Label, s.Host, s.Kind, s.LastSyncedAt, s.LastError, s.EventCount);
+
+    public static EventDetails ToDomain(this EventRequest r) => new(r.Kind, r.Title, r.Date, r.StartTime, r.EndTime, r.Location);
 
     public static SheetDto ToDto(this QuizSheet s) =>
         new(s.Id, s.Title, s.Subject, s.GradeLevel, s.Language, s.Topic, s.DurationMinutes, s.MaxPoints, s.Exercises.Select(ToDto).ToList());

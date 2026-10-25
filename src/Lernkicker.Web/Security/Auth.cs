@@ -29,6 +29,9 @@ public static class Policies
     public const string Parent = nameof(Parent);
     public const string Admin = nameof(Admin);
     public const string Child = nameof(Child);
+
+    /// <summary>Calendar feeds and subscription imports (which fetch from the internet).</summary>
+    public const string Calendar = nameof(Calendar);
 }
 
 public static class Schemes
@@ -49,7 +52,21 @@ public static class Cookies
 /// <summary>The family from the logged-in user's claims; drives the persistence adapter's query filters.</summary>
 public sealed class HttpFamilyScope(IHttpContextAccessor accessor) : IFamilyScope
 {
-    public Guid? FamilyId => accessor.HttpContext?.User.Family();
+    private Guid? _entered;
+
+    public Guid? FamilyId => _entered ?? LoggedIn;
+
+    private Guid? LoggedIn => accessor.HttpContext?.User.Family();
+
+    public void Enter(Guid familyId)
+    {
+        if (LoggedIn is { } family && family != familyId)
+        {
+            throw new InvalidOperationException("Another family is logged in.");
+        }
+
+        _entered = familyId;
+    }
 }
 
 /// <summary>Adds the family id to a parent's login, so query filters and endpoints know the family.</summary>
@@ -86,4 +103,7 @@ public static class RateLimits
 {
     public const string Login = nameof(Login);
     public const string Child = nameof(Child);
+
+    /// <summary>Calendar feeds and subscription imports (which fetch from the internet).</summary>
+    public const string Calendar = nameof(Calendar);
 }

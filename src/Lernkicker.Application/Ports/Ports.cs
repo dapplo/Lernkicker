@@ -14,6 +14,12 @@ namespace Lernkicker.Application.Ports;
 public interface IFamilyScope
 {
     Guid? FamilyId { get; }
+
+    /// <summary>
+    /// For callers that are authenticated another way than a login: a calendar feed token, a background job.
+    /// Fails when a different family is already logged in.
+    /// </summary>
+    void Enter(Guid familyId);
 }
 
 /// <summary>Reads and writes the quiz/v1 JSON format.</summary>
