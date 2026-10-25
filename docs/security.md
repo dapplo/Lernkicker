@@ -33,7 +33,7 @@ Items marked *(planned)* are not built yet.
 
 | Who | How | Protection |
 | --- | --- | --- |
-| Admin | Email + password; passkey or TOTP 2FA *(planned)* | The admin API only answers inside the tailnet: requests through Funnel carry the `Tailscale-Funnel-Request` header, and `TailnetOnlyFilter` answers them with 404. |
+| Admin | Email + password; passkey or TOTP 2FA *(planned)* | With the Tailscale sidecar the admin API only answers inside the tailnet: requests through Funnel carry the `Tailscale-Funnel-Request` header, and `TailnetOnlyFilter` answers them with 404. TSDProxy does not send that header, so behind TSDProxy with Funnel on the admin API is protected by the login alone. |
 | Parent | Invitation link (single use, valid 7 days), then email + password (at least 12 characters; check against leaked passwords *(planned)*) | Locked for 15 minutes after 5 failed attempts, rate limit per IP |
 | Child | A parent shows a QR code; scanning it **pairs** the child's phone (single-use code, valid 10 minutes). Then a 4-digit PIN. | A PIN is useless without a paired device. After 5 wrong PINs the device is locked until a parent unlocks it. Parents see paired devices and can remove them; a removed or locked device ends the child's session at once. |
 
