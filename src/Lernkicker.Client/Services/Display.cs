@@ -20,6 +20,14 @@ public sealed class Display(IStringLocalizer<Strings> l)
 
     public string Time(DateTimeOffset time) => time.ToLocalTime().ToString("t", CultureInfo.CurrentCulture);
 
+    /// <summary>"main · 8f86d6d · 25.10.2026 21:40": version, short commit and build time, as far as known.</summary>
+    public string Build(BuildInfoDto build) => string.Join(" · ", new[]
+    {
+        build.Version,
+        build.Commit is { Length: > 7 } commit ? commit[..7] : build.Commit,
+        build.BuiltAt is { } builtAt ? Date(builtAt) : null,
+    }.Where(part => !string.IsNullOrEmpty(part)));
+
     /// <summary>"today", "tomorrow", "in 3 days" or the date, for a due date.</summary>
     public string Due(DateOnly date)
     {

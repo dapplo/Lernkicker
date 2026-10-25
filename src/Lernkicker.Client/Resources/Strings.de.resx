@@ -385,6 +385,9 @@
   <data name="Setup.RestoreHint" xml:space="preserve"><value>Wähl eine Sicherung von der Verwaltungsseite deines alten Lernkickers. Alles kommt zurück: Familien, Kinder, Proben, Ergebnisse und Anmeldungen. Der Server startet dabei einmal neu.</value></data>
   <data name="Setup.ChooseBackup" xml:space="preserve"><value>Sicherung auswählen</value></data>
   <data name="Setup.Restoring" xml:space="preserve"><value>Wird wiederhergestellt und neu gestartet, einen Moment…</value></data>
+  <data name="Admin.Version.Title" xml:space="preserve"><value>Version</value></data>
+  <data name="Admin.Version.Server" xml:space="preserve"><value>Läuft auf dem Server: {0}</value></data>
+  <data name="Admin.Version.Outdated" xml:space="preserve"><value>Dieses Gerät hat noch eine ältere Version der App ({0}). Schließ die App ganz und öffne sie neu, dann wird sie aktualisiert.</value></data>
   <data name="Admin.Backup.Title" xml:space="preserve"><value>Sicherung</value></data>
   <data name="Admin.Backup.Intro" xml:space="preserve"><value>Alles in einer Datei: alle Familien, Kinder, Proben, Ergebnisse, Anmeldungen und der Telegram-Bot.</value></data>
   <data name="Admin.Backup.Download" xml:space="preserve"><value>Sicherung herunterladen</value></data>

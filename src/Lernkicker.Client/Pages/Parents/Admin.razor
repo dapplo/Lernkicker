@@ -76,6 +76,18 @@ else
         <p class="hint">@L["Admin.Backup.Hint"]</p>
     </section>
 
+    @if (_server is { } server)
+    {
+        <section class="box">
+            <h2>@L["Admin.Version.Title"]</h2>
+            <p>@L["Admin.Version.Server", Display.Build(server)]</p>
+            @if (server.Version != _client.Version || server.Commit != _client.Commit)
+            {
+                <p class="hint">@L["Admin.Version.Outdated", Display.Build(_client)]</p>
+            }
+        </section>
+    }
+
     @if (_bot is { } bot)
     {
         <section class="box">
@@ -120,6 +132,8 @@ else
     private Guid? _deleting;
     private IReadOnlyList<string>? _errors, _botErrors;
     private TelegramBotDto? _bot;
+    private BuildInfoDto? _server;
+    private readonly BuildInfoDto _client = BuildInfoDto.Of(typeof(Admin).Assembly);
     private string _token = "";
     private bool _busy;
 
@@ -129,6 +143,7 @@ else
         {
             _families = await Api.Families();
             _bot = await Api.TelegramBot();
+            _server = await Api.ServerVersion();
         }
         catch (ApiException e)
         {

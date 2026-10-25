@@ -214,6 +214,9 @@ app.MapFallbackToFile("index.html", new StaticFileOptions
     OnPrepareResponse = context => context.Context.Response.Headers.CacheControl = "no-cache",
 });
 
+var build = BuildInfoDto.Of(typeof(Program).Assembly);
+app.Logger.LogInformation("Lernkicker {Version}, commit {Commit}, built {BuiltAt}", build.Version, build.Commit ?? "unknown", build.BuiltAt?.ToString("u") ?? "unknown");
+
 await PersistenceSetup.InitializeAsync(app.Services, app.Configuration.GetSection("Admin").Get<AdminOptions>() ?? new(), app.Logger);
 await using (var scope = app.Services.CreateAsyncScope())
 {

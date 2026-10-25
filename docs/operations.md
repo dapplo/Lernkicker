@@ -103,6 +103,8 @@ To change the hour of the reminder, set `Lernkicker__Telegram__ReminderHour` (0�
 
 Container Manager → Project → `lernkicker` → Action → Build (pulls `latest`), or pin `LERNKICKER_TAG` to a version and change it. The database is migrated on start.
 
+To see what runs: the admin page shows the server's version, commit and build time, and the container log starts with the same line (`Lernkicker main, commit …, built …`). If the app on a device is older than the server, the admin page says so; closing the app and opening it again loads the new one.
+
 ## Backup
 
 As admin, open `/admin` → **Sicherung herunterladen**. The zip holds everything: the database (all families, children, quizzes, results), the Data Protection keys (logins, the encrypted Telegram token). Keep it somewhere safe, e.g. in an encrypted Hyper Backup task of the folder you save it to: whoever has the file can read all the data. (Hyper Backup cannot see Docker volumes directly, hence the download.)
