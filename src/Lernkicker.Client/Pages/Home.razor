@@ -71,7 +71,22 @@ else
         </ul>
     }
     <p class="tip">@L["Home.FocusTip"]</p>
-    <button class="btn quiet" @onclick="Logout">@L["Common.Logout"]</button>
+    @* Tucked away with a second step, so a child does not log out by accident *@
+    <details class="grown-ups">
+        <summary>@L["Home.ForParents"]</summary>
+        @if (_confirmLogout)
+        {
+            <p>@L["Home.LogoutQuestion"]</p>
+            <span class="buttons">
+                <button class="btn danger" @onclick="Logout">@L["Home.LogoutYes"]</button>
+                <button class="btn quiet" @onclick="() => _confirmLogout = false">@L["Common.Cancel"]</button>
+            </span>
+        }
+        else
+        {
+            <button class="btn quiet" @onclick="() => _confirmLogout = true">@L["Common.Logout"]</button>
+        }
+    </details>
 }
 
 @code {
@@ -80,6 +95,7 @@ else
     private List<CalendarEntryDto>? _dates;
     private string? _error;
     private bool _busy;
+    private bool _confirmLogout;
 
     protected override Task OnInitializedAsync() => Reload();
 
@@ -116,6 +132,7 @@ else
 
     private async Task Logout()
     {
+        _confirmLogout = false;
         await Api.ChildLogout();
         await Reload();
     }

@@ -20,6 +20,9 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
 
     public int LimitPerMinute { get; init; } = 10_000;
 
+    /// <summary>Lernkicker:PublicUrl, if set.</summary>
+    public string? PublicUrl { get; init; }
+
     /// <summary>What the subscribed calendars "on the internet" return.</summary>
     public FakeCalendarSource Calendars { get; } = new();
 
@@ -39,6 +42,10 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
         builder.UseSetting("Lernkicker:Limits:ChildLoginsPerMinute", LimitPerMinute.ToString());
         builder.UseSetting("Lernkicker:Limits:CalendarRequestsPerMinute", LimitPerMinute.ToString());
         builder.UseSetting("Lernkicker:Calendar:SyncHours", "0");
+        if (PublicUrl is not null)
+        {
+            builder.UseSetting("Lernkicker:PublicUrl", PublicUrl);
+        }
         builder.ConfigureTestServices(services => services.AddSingleton<ICalendarSource>(Calendars));
     }
 

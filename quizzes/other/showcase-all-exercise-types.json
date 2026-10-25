@@ -1,0 +1,108 @@
+{
+  "$schema": "../../schema/quiz-v1.schema.json",
+  "format": "quiz/v1",
+  "id": "showcase-all-exercise-types",
+  "title": "Alle Aufgabentypen zum Ausprobieren",
+  "subject": "other",
+  "gradeLevel": 4,
+  "language": "de",
+  "topic": "Beispiel",
+  "description": "Zeigt jeden Aufgabentyp und jede Option des Formats quiz/v1 (docs/quiz-format.md). Zum Ausprobieren und als Vorlage für eigene Proben.",
+  "durationMinutes": 10,
+  "source": "Beispiel aus dem Lernkicker-Repository",
+  "shuffle": true,
+  "exercises": [
+    {
+      "id": "cloze-word-bank",
+      "type": "cloze",
+      "instruction": "1. Setze die passenden Wörter ein.",
+      "hint": "Mit Wortliste: Jede Lücke ist ein Auswahlfeld.",
+      "points": 3,
+      "wordBank": ["Wolken", "verdunstet", "Niederschlag", "Grundwasser"],
+      "text": "Die Sonne erwärmt das Wasser im Meer, es ___. Der Wasserdampf steigt auf und bildet ___. Daraus fällt ___ auf die Erde.",
+      "gaps": [
+        { "answers": ["verdunstet"] },
+        { "answers": ["Wolken"] },
+        { "answers": ["Niederschlag"] }
+      ],
+      "explanation": "Merke: verdunsten → kondensieren (Wolken) → Niederschlag → versickern."
+    },
+    {
+      "id": "cloze-typed",
+      "type": "cloze",
+      "instruction": "2. Ergänze die Lücken.",
+      "hint": "Ohne Wortliste: Hier wird getippt. Groß- und Kleinschreibung zählt nicht.",
+      "text": "Bayern hat ___ Regierungsbezirke. Die Landeshauptstadt ist ___.",
+      "gaps": [
+        { "answers": ["7", "sieben"] },
+        { "answers": ["München"] }
+      ]
+    },
+    {
+      "id": "matching",
+      "type": "matching",
+      "instruction": "3. Ordne zu: Ist das ein Laubbaum oder ein Nadelbaum?",
+      "options": ["Laubbaum", "Nadelbaum"],
+      "rows": [
+        { "text": "Eiche", "answer": "Laubbaum" },
+        { "text": "Fichte", "answer": "Nadelbaum", "explanation": "Die Fichte hat kurze, spitze Nadeln." },
+        { "text": "Buche", "answer": "Laubbaum" },
+        { "text": "Kiefer", "answer": "Nadelbaum" }
+      ],
+      "explanation": "Eine Option darf zu mehreren Zeilen passen."
+    },
+    {
+      "id": "ordering",
+      "type": "ordering",
+      "instruction": "4. Bringe die Schritte in die richtige Reihenfolge.",
+      "hint": "Tippe die Schritte der Reihe nach an.",
+      "points": 2,
+      "steps": ["Säen", "Wachsen lassen", "Ernten", "Dreschen", "Mahlen", "Backen"],
+      "solutionText": "Säen → Wachsen lassen → Ernten → Dreschen → Mahlen → Backen"
+    },
+    {
+      "id": "true-false",
+      "type": "trueFalse",
+      "instruction": "5. Richtig oder falsch? Kreuze an.",
+      "statements": [
+        { "text": "Wasser gefriert bei 0 °C.", "isTrue": true },
+        { "text": "Die Sonne dreht sich um die Erde.", "isTrue": false, "explanation": "Die Erde dreht sich um die Sonne." },
+        { "text": "Ein Jahr hat 12 Monate.", "isTrue": true }
+      ]
+    },
+    {
+      "id": "free-text-labels",
+      "type": "freeText",
+      "instruction": "6. Schreibe die Antworten auf.",
+      "fields": [
+        { "label": "Hauptstadt von Deutschland:", "answers": ["Berlin"] },
+        { "label": "Längster Fluss in Bayern:", "answers": ["Donau", "die Donau"] }
+      ]
+    },
+    {
+      "id": "free-text-any-order",
+      "type": "freeText",
+      "instruction": "7. Welche drei Farben hat die deutsche Flagge?",
+      "hint": "Die Reihenfolge ist egal (anyOrder), aber jede Farbe zählt nur einmal.",
+      "anyOrder": true,
+      "fields": [
+        { "answers": ["Schwarz"] },
+        { "answers": ["Rot"] },
+        { "answers": ["Gold", "Gelb"] }
+      ],
+      "solutionText": "Schwarz, Rot, Gold"
+    },
+    {
+      "id": "multiple-choice",
+      "type": "multipleChoice",
+      "instruction": "8. Kreuze die richtige Antwort an.",
+      "hint": "Bei der zweiten Frage sind mehrere Antworten richtig.",
+      "points": 2,
+      "questions": [
+        { "text": "Wie viele Beine hat eine Spinne?", "options": ["6", "8", "10"], "correct": 1, "explanation": "Insekten haben 6 Beine, Spinnen 8." },
+        { "text": "Welche Tiere sind Säugetiere?", "options": ["Hund", "Forelle", "Fledermaus", "Amsel"], "correct": [0, 2] }
+      ],
+      "explanation": "Fledermäuse können fliegen, sind aber Säugetiere: Sie säugen ihre Jungen."
+    }
+  ]
+}
