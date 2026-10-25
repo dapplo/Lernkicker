@@ -385,6 +385,9 @@
   <data name="Setup.RestoreHint" xml:space="preserve"><value>Choose a backup from the administration page of your old Lernkicker. Everything comes back: families, children, quizzes, results and logins. The server restarts once.</value></data>
   <data name="Setup.ChooseBackup" xml:space="preserve"><value>Choose backup file</value></data>
   <data name="Setup.Restoring" xml:space="preserve"><value>Restoring and restarting, this takes a moment…</value></data>
+  <data name="Admin.Version.Title" xml:space="preserve"><value>Version</value></data>
+  <data name="Admin.Version.Server" xml:space="preserve"><value>Running on the server: {0}</value></data>
+  <data name="Admin.Version.Outdated" xml:space="preserve"><value>This device still has an older version of the app ({0}). Close the app completely and open it again to update it.</value></data>
   <data name="Admin.Backup.Title" xml:space="preserve"><value>Backup</value></data>
   <data name="Admin.Backup.Intro" xml:space="preserve"><value>Everything in one file: all families, children, quizzes, results, logins and the Telegram bot.</value></data>
   <data name="Admin.Backup.Download" xml:space="preserve"><value>Download backup</value></data>

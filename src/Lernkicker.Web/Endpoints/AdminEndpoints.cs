@@ -31,6 +31,9 @@ public static class AdminEndpoints
         admin.MapDelete("/telegram", async (TelegramBotUseCases bot) =>
             (await bot.RemoveTokenAsync()).ToHttp());
 
+        // Which build runs on the server; the client compares it with its own to spot a stale app
+        admin.MapGet("/version", () => Results.Json(BuildInfoDto.Of(typeof(AdminEndpoints).Assembly), ApiJson.Options));
+
         // Everything as one zip, for backups when the data lives in a Docker volume
         admin.MapGet("/backup", (DataBackup backup, TimeProvider time) =>
         {

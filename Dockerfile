@@ -20,7 +20,13 @@ RUN dotnet restore src/Lernkicker.Web/Lernkicker.Web.csproj -a $TARGETARCH
 
 COPY schema/ schema/
 COPY src/ src/
-RUN dotnet publish src/Lernkicker.Web/Lernkicker.Web.csproj -a $TARGETARCH --no-restore -c Release -o /app
+# Shown on the admin page and in the log; declared after the restore so they don't invalidate its cache.
+# Not named VERSION: build args are environment variables, and MSBuild would take that as $(Version).
+ARG APP_VERSION=dev
+ARG APP_REVISION=
+ARG APP_BUILD_DATE=
+RUN dotnet publish src/Lernkicker.Web/Lernkicker.Web.csproj -a $TARGETARCH --no-restore -c Release -o /app \
+    -p:InformationalVersion=$APP_VERSION -p:SourceRevisionId=$APP_REVISION -p:BuildDate=$APP_BUILD_DATE
 # The final image has no shell; create the data folder here so it can be copied with the right owner
 RUN mkdir /data
 
