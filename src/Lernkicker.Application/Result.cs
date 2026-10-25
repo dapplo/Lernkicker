@@ -87,6 +87,10 @@ public static class ErrorCodes
     public const string SharedNotFound = "shared.notFound";
     public const string TelegramDisabled = "telegram.disabled";
     public const string TelegramUnavailable = "telegram.unavailable";
+    public const string TelegramTokenInvalid = "telegram.tokenInvalid";
+    public const string TelegramTokenRejected = "telegram.tokenRejected";
+    public const string TelegramUnreachable = "telegram.unreachable";
+    public const string TelegramTokenFromFile = "telegram.tokenFromFile";
     public const string LanguageInvalid = "language.invalid";
 
     public const string EventKindInvalid = "calendar.kindInvalid";

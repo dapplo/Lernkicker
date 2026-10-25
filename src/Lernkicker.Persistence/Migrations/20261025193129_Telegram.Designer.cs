@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lernkicker.Persistence.Migrations
 {
     [DbContext(typeof(LernkickerDbContext))]
-    [Migration("20261025173931_Telegram")]
+    [Migration("20261025193129_Telegram")]
     partial class Telegram
     {
         /// <inheritdoc />
@@ -585,6 +585,24 @@ namespace Lernkicker.Persistence.Migrations
                     b.HasIndex("ChildId", "SubmittedAt");
 
                     b.ToTable("Attempts");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Settings.ServerSecret", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProtectedValue")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("ServerSecrets");
                 });
 
             modelBuilder.Entity("Lernkicker.Persistence.ParentUser", b =>

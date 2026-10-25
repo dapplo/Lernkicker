@@ -53,7 +53,7 @@ Then open http://localhost:5208. On first start the server creates the database 
 | `Lernkicker:TrustedProxies` | – | Networks of reverse proxies (CIDR, comma-separated) whose `X-Forwarded-For` is trusted; loopback is always trusted |
 | `Lernkicker:TimeZone` | `Europe/Berlin` | Time zone of all dates (IANA name) |
 | `Lernkicker:Calendar:SyncHours` | `6` | How often subscribed calendars are imported again; `0` turns it off |
-| `Lernkicker:Telegram:BotTokenFile` | – | File with the bot token from BotFather (a Docker secret). Without a token Telegram is off |
+| `Lernkicker:Telegram:BotTokenFile` | – | File with the bot token from BotFather (a Docker secret). Usually not needed: the admin sets the token on `/admin`. A token from the configuration wins |
 | `Lernkicker:Telegram:BotToken` | – | The token itself, for development only (user secrets) |
 | `Lernkicker:Telegram:ReminderHour` | `18` | Local hour of the evening reminder with the next day's dates |
 
@@ -84,7 +84,7 @@ Then open http://localhost:8080 and log in under **I am a parent / Ich bin ein E
 | `/parents/library` | parent | Shared library: what other families shared, with preview (`/parents/library/<kind>/<id>`) and copy |
 | `/parents/children/<id>` | parent | Assign quizzes and learning material (with progress), dates, subscribed calendars, feed link, results, QR code for pairing, devices, settings |
 | `/invitation#<code>` | new parent | Create an account from an invitation |
-| `/admin` | admin | Invite families, delete families (tailnet only) |
+| `/admin` | admin | Invite families, delete families, set the Telegram bot token (tailnet only) |
 | `/privacy` | everyone | Privacy notice |
 
 ## API
@@ -94,7 +94,7 @@ All endpoints are under `/api`, take and return JSON, and answer errors with `{ 
 | Endpoint | Who |
 | --- | --- |
 | `POST /api/account/login`, `POST /api/account/logout`, `GET /api/account/me`, `PUT /api/account/language`, `POST /api/account/invitation`, `GET/DELETE /api/account/telegram`, `POST /api/account/telegram/link` | parents |
-| `POST /api/admin/invitations`, `GET /api/admin/families`, `DELETE /api/admin/families/{id}` | admin, tailnet only |
+| `POST /api/admin/invitations`, `GET /api/admin/families`, `DELETE /api/admin/families/{id}`, `GET/PUT/DELETE /api/admin/telegram` (bot token, write-only) | admin, tailnet only |
 | `GET /api/quizzes`, `POST /api/quizzes` (raw JSON body), `GET /api/quizzes/{quizId}`, `GET …/{quizId}/preview`, `PUT …/{quizId}/shared`, `DELETE /api/quizzes/{quizId}` | parents |
 | `GET /api/lessons`, `POST /api/lessons` (raw JSON body), `GET /api/lessons/{lessonId}`, `GET …/{lessonId}/preview`, `PUT …/{lessonId}/shared`, `DELETE /api/lessons/{lessonId}`, `GET/POST /api/children/{id}/lessons`, `DELETE …/lessons/{assignmentId}` | parents |
 | `GET /api/library`, `GET /api/library/{quizzes\|lessons}/{id}` (preview), `POST /api/library/{quizzes\|lessons}/{id}/copy` | parents |

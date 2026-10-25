@@ -68,6 +68,42 @@ else
         </table>
         <p class="hint">@L["Admin.TailnetOnly"]</p>
     </section>
+
+    @if (_bot is { } bot)
+    {
+        <section class="box">
+            <h2>@L["Admin.Bot.Title"]</h2>
+            @if (bot.FromFile)
+            {
+                <p>@(bot.BotUsername is { } name ? L["Admin.Bot.Running", name] : L["Admin.Bot.Starting"])</p>
+                <p class="hint">@L["Admin.Bot.FromFile"]</p>
+            }
+            else
+            {
+                @if (bot.Configured)
+                {
+                    <p>@(bot.BotUsername is { } name ? L["Admin.Bot.Running", name] : L["Admin.Bot.Starting"])</p>
+                    <p class="hint">@L["Admin.Bot.SetAt", Display.Date(bot.SetAt!.Value)]</p>
+                }
+                else
+                {
+                    <p>@L["Admin.Bot.Intro"]</p>
+                }
+                <form class="form" @onsubmit="SetToken" @onsubmit:preventDefault>
+                    <label>@L["Admin.Bot.Token"] <input type="password" autocomplete="off" @bind="_token" placeholder="123456789:AA…" required /></label>
+                    <p class="hint">@L["Admin.Bot.TokenHint"]</p>
+                    <Messages Errors="@_botErrors" />
+                    <p>
+                        <button class="btn" type="submit" disabled="@_busy">@(bot.Configured ? L["Admin.Bot.Replace"] : L["Admin.Bot.Save"])</button>
+                        @if (bot.Configured)
+                        {
+                            <button class="btn quiet" type="button" @onclick="RemoveToken" disabled="@_busy">@L["Admin.Bot.Remove"]</button>
+                        }
+                    </p>
+                </form>
+            }
+        </section>
+    }
 }
 
 @code {
@@ -75,13 +111,17 @@ else
     private string _familyId = "", _newFamily = "";
     private InvitationCreatedResponse? _invitation;
     private Guid? _deleting;
-    private IReadOnlyList<string>? _errors;
+    private IReadOnlyList<string>? _errors, _botErrors;
+    private TelegramBotDto? _bot;
+    private string _token = "";
+    private bool _busy;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             _families = await Api.Families();
+            _bot = await Api.TelegramBot();
         }
         catch (ApiException e)
         {
@@ -100,6 +140,51 @@ else
         catch (ApiException e)
         {
             _errors = Display.Errors(e);
+        }
+    }
+
+    private async Task SetToken()
+    {
+        _busy = true;
+        _botErrors = null;
+        try
+        {
+            await Api.SetBotToken(_token);
+            _token = "";
+            _bot = await Api.TelegramBot();
+            // The bot needs a moment to start with the new token
+            if (_bot.BotUsername is null)
+            {
+                await Task.Delay(1500);
+                _bot = await Api.TelegramBot();
+            }
+        }
+        catch (ApiException e)
+        {
+            _botErrors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RemoveToken()
+    {
+        _busy = true;
+        _botErrors = null;
+        try
+        {
+            await Api.RemoveBotToken();
+            _bot = await Api.TelegramBot();
+        }
+        catch (ApiException e)
+        {
+            _botErrors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
         }
     }
 

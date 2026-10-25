@@ -53,6 +53,23 @@ public class TelegramTextsTests
         Assert.Contains("17:30 ASV Zirndorf – SpVgg (Sportpark)", dates);
     }
 
+    [Fact]
+    public void The_admin_token_turns_the_bot_on_and_off_unless_a_file_sets_it()
+    {
+        var fromApp = new TelegramMessenger(null);
+        Assert.False(fromApp.IsEnabled);
+        Assert.False(fromApp.TokenFromConfiguration);
+        fromApp.UseToken("1:abc");
+        Assert.True(fromApp.IsEnabled);
+        fromApp.UseToken(null);
+        Assert.False(fromApp.IsEnabled);
+
+        var fromFile = new TelegramMessenger("1:abc");
+        Assert.True(fromFile.TokenFromConfiguration);
+        fromFile.UseToken(null);
+        Assert.True(fromFile.IsEnabled);
+    }
+
     [Theory]
     [InlineData("de-DE", "de")]
     [InlineData("en-GB", "en")]

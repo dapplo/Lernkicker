@@ -347,7 +347,7 @@
   <data name="Error.shared.notFound" xml:space="preserve"><value>This is no longer shared.</value></data>
   <data name="Telegram.Title" xml:space="preserve"><value>Telegram</value></data>
   <data name="Telegram.Intro" xml:space="preserve"><value>Get your children's results and a reminder the evening before a test or due date in Telegram.</value></data>
-  <data name="Telegram.Disabled" xml:space="preserve"><value>Telegram is not set up on this Lernkicker. The administrator can add a bot (see the operations guide).</value></data>
+  <data name="Telegram.Disabled" xml:space="preserve"><value>Telegram is not set up on this Lernkicker. The administrator can add a bot on the administration page.</value></data>
   <data name="Telegram.Linked" xml:space="preserve"><value>Connected with @{0} since {1}.</value></data>
   <data name="Telegram.Commands" xml:space="preserve"><value>In the chat: /next shows the next 7 days, /stop disconnects.</value></data>
   <data name="Telegram.Connect" xml:space="preserve"><value>Connect with Telegram</value></data>
@@ -356,6 +356,21 @@
   <data name="Telegram.Open" xml:space="preserve"><value>Open Telegram</value></data>
   <data name="Telegram.Check" xml:space="preserve"><value>I pressed Start</value></data>
   <data name="Telegram.Unlink" xml:space="preserve"><value>Disconnect</value></data>
+  <data name="Admin.Bot.Title" xml:space="preserve"><value>Telegram bot</value></data>
+  <data name="Admin.Bot.Intro" xml:space="preserve"><value>No bot yet. Create one with @BotFather in Telegram (/newbot) and paste its token here. Then every parent can connect Telegram on the parents' page.</value></data>
+  <data name="Admin.Bot.Running" xml:space="preserve"><value>The bot @{0} is running.</value></data>
+  <data name="Admin.Bot.Starting" xml:space="preserve"><value>The bot is starting or cannot reach Telegram right now.</value></data>
+  <data name="Admin.Bot.SetAt" xml:space="preserve"><value>Token saved on {0}. It is stored encrypted and never shown again.</value></data>
+  <data name="Admin.Bot.FromFile" xml:space="preserve"><value>The token comes from the server's configuration (file) and can only be changed there.</value></data>
+  <data name="Admin.Bot.Token" xml:space="preserve"><value>Bot token</value></data>
+  <data name="Admin.Bot.TokenHint" xml:space="preserve"><value>In @BotFather, also send /setjoingroups and choose Disable, so nobody can add the bot to a group.</value></data>
+  <data name="Admin.Bot.Save" xml:space="preserve"><value>Save and start</value></data>
+  <data name="Admin.Bot.Replace" xml:space="preserve"><value>Replace token</value></data>
+  <data name="Admin.Bot.Remove" xml:space="preserve"><value>Stop the bot</value></data>
+  <data name="Error.telegram.tokenInvalid" xml:space="preserve"><value>This does not look like a bot token. It looks like 123456789:AA… and comes from @BotFather.</value></data>
+  <data name="Error.telegram.tokenRejected" xml:space="preserve"><value>Telegram does not know this token. Copy it again from @BotFather.</value></data>
+  <data name="Error.telegram.unreachable" xml:space="preserve"><value>Telegram cannot be reached from the server, so the token could not be checked. Please try again later.</value></data>
+  <data name="Error.telegram.tokenFromFile" xml:space="preserve"><value>The token is set in the server's configuration and can only be changed there.</value></data>
   <data name="Error.telegram.unavailable" xml:space="preserve"><value>The bot cannot reach Telegram right now. Please try again in a few minutes.</value></data>
   <data name="Error.telegram.disabled" xml:space="preserve"><value>Telegram is not set up on this Lernkicker.</value></data>
 </root>

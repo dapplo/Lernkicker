@@ -28,14 +28,14 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 
 | Project | Role | May reference |
 | --- | --- | --- |
-| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed`, `TelegramLink`, `TelegramLinkCode` | the BCL only |
+| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed`, `TelegramLink`, `TelegramLinkCode`, `ServerSecret` | the BCL only |
 | `Lernkicker.Application` | Use cases (`*UseCases`), ports (`Ports/Ports.cs`), `Result`/`AppError` and the stable `ErrorCodes` | Domain |
 | `Lernkicker.QuizFormat` | Driven adapter for `IQuizFormat` and `ILessonFormat`: reads `quiz/v1` and `lesson/v1` JSON, validates against the embedded schemas | Application, Domain, JsonSchema.Net |
 | `Lernkicker.Calendar` | Driven adapter for `ICalendarSource` (fetches ICS over HTTP, only from public addresses), `ICalendarWriter` (the ICS feed) and `ILocalClock` (today in the family's time zone) | Application, Domain, Ical.Net, NodaTime |
-| `Lernkicker.Telegram` | Adapter for Telegram: drives `TelegramUseCases` with the commands parents send (long polling), implements `IMessenger` (a queue that sends results and reminders) and the daily reminder; the bot's texts in `Resources/Messages*.resx` | Application, Domain, Telegram.Bot |
+| `Lernkicker.Telegram` | Adapter for Telegram: drives `TelegramUseCases` with the commands parents send (long polling), implements `IMessenger` (a queue that sends results and reminders; restarts the bot when the admin changes the token) and the daily reminder; the bot's texts in `Resources/Messages*.resx` | Application, Domain, Telegram.Bot |
 | `Lernkicker.Persistence` | Driven adapter for the repositories, `IUnitOfWork`, `IParentAccounts`, `IPinHasher`: EF Core, SQLite, ASP.NET Core Identity, migrations | Application, Domain |
 | `Lernkicker.Contracts` | Request and response DTOs of the HTTP API | nothing |
-| `Lernkicker.Web` | Driving adapter (Minimal API endpoints, cookies, rate limits, security headers) and composition root; hosts the client | everything above |
+| `Lernkicker.Web` | Driving adapter (Minimal API endpoints, cookies, rate limits, security headers, `ISecretProtector` with Data Protection) and composition root; hosts the client | everything above |
 | `Lernkicker.Client` | Driving adapter for people: the Blazor WebAssembly PWA, localized UI | Contracts |
 
 `ArchitectureTests` in `tests/Lernkicker.Web.Tests` check these references, so a wrong dependency fails the build in CI.

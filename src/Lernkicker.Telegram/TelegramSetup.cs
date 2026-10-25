@@ -7,8 +7,9 @@ namespace Lernkicker.Telegram;
 public static class TelegramSetup
 {
     /// <summary>
-    /// The bot, when <c>Lernkicker:Telegram:BotToken</c> or <c>Lernkicker:Telegram:BotTokenFile</c> (a Docker
-    /// secret) is set; otherwise Telegram stays off and the parents' page says so.
+    /// The bot. Its token comes from <c>Lernkicker:Telegram:BotToken</c> or <c>Lernkicker:Telegram:BotTokenFile</c>
+    /// (a Docker secret) or, when neither is set, from the admin page. Without a token Telegram stays off and
+    /// the parents' page says so.
     /// </summary>
     public static IServiceCollection AddTelegram(this IServiceCollection services, IConfiguration configuration)
     {
@@ -19,11 +20,8 @@ public static class TelegramSetup
 
         services.AddSingleton(new TelegramMessenger(token));
         services.AddSingleton<IMessenger>(sp => sp.GetRequiredService<TelegramMessenger>());
-        if (token is not null)
-        {
-            services.AddHostedService(sp => ActivatorUtilities.CreateInstance<TelegramBot>(sp, token));
-            services.AddHostedService(sp => ActivatorUtilities.CreateInstance<TelegramReminders>(sp, section.GetValue("ReminderHour", 18)));
-        }
+        services.AddHostedService<TelegramBot>();
+        services.AddHostedService(sp => ActivatorUtilities.CreateInstance<TelegramReminders>(sp, section.GetValue("ReminderHour", 18)));
 
         return services;
     }

@@ -107,7 +107,8 @@ public sealed class TelegramUseCases(
         await SendToFamilyAsync(new ResultNotification(childName, quizTitle, result.Points, result.MaxPoints, result.Percent, result.Mark));
     }
 
-    public Task<IReadOnlyList<Guid>> FamiliesForRemindersAsync() => telegram.FamiliesWithLinksAnyFamilyAsync();
+    public async Task<IReadOnlyList<Guid>> FamiliesForRemindersAsync() =>
+        messenger.IsEnabled ? await telegram.FamiliesWithLinksAnyFamilyAsync() : [];
 
     /// <summary>The evening reminder: tomorrow's dates of all children, when there are any.</summary>
     public async Task SendRemindersAsync(Guid familyId)

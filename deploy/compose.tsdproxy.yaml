@@ -21,9 +21,6 @@ services:
       Lernkicker__PublicUrl: ${PUBLIC_URL}
       # TSDProxy connects from a Docker network; trust its X-Forwarded-For so rate limits see the real client
       Lernkicker__TrustedProxies: ${TRUSTED_PROXIES:-172.16.0.0/12}
-      # Telegram bot (optional): put the token from BotFather into secrets/telegram-bot-token. Without the file
-      # Telegram stays off. See docs/operations.md, "Telegram".
-      Lernkicker__Telegram__BotTokenFile: /run/secrets/telegram-bot-token
       # Only read on the first start, when the admin account is created; remove them afterwards
       Admin__Email: ${ADMIN_EMAIL:-}
       Admin__Password: ${ADMIN_PASSWORD:-}
@@ -33,8 +30,6 @@ services:
     volumes:
       # Must belong to uid 1654 (the app user of the image)
       - ./data:/data
-      # Secrets such as the Telegram bot token, readable by uid 1654, never in the image or the repository
-      - ./secrets:/run/secrets:ro
     read_only: true
     tmpfs:
       - /tmp

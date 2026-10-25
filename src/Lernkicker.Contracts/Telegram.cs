@@ -5,3 +5,8 @@ public sealed record TelegramStatusDto(bool Enabled, string? BotUsername, DateTi
 
 /// <summary>Opens the bot with a one-time code, valid until <c>ExpiresAt</c>.</summary>
 public sealed record TelegramLinkDto(string Url, DateTimeOffset ExpiresAt);
+
+/// <summary>The bot as the admin sees it; the token itself is never returned.</summary>
+public sealed record TelegramBotDto(bool Configured, bool FromFile, string? BotUsername, DateTimeOffset? SetAt);
+
+public sealed record SetBotToken(string Token);

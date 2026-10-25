@@ -30,6 +30,7 @@ public static class PersistenceSetup
         services.AddScoped<ICalendarRepository, CalendarRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<ITelegramRepository, TelegramRepository>();
+        services.AddScoped<IServerSecrets, ServerSecrets>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IParentAccounts, ParentAccounts>();
         services.AddSingleton<IPinHasher, PinHasher>();

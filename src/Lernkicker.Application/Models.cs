@@ -105,3 +105,6 @@ public sealed record TelegramLinkCreated(string Url, DateTimeOffset ExpiresAt);
 
 /// <summary>What the bot answers, in the parent's (or the Telegram user's) language.</summary>
 public sealed record BotReply(string Language, Notification Notification);
+
+/// <summary>The bot as the admin sees it. <c>FromFile</c>: the token is configured outside the app and cannot be changed here.</summary>
+public sealed record TelegramBotSettings(bool Configured, bool FromFile, string? BotUsername, DateTimeOffset? SetAt);

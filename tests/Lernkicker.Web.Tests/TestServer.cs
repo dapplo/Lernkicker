@@ -177,6 +177,33 @@ public sealed class FakeMessenger : IMessenger
 
     public void Send(long chatId, string language, Notification notification) => Sent.Enqueue((chatId, language, notification));
 
+    public bool TokenFromConfiguration { get; set; } = true;
+
+    /// <summary>Tokens Telegram knows, with the bot's username; any other is rejected.</summary>
+    public Dictionary<string, string> KnownTokens { get; } = [];
+
+    public bool Reachable { get; set; } = true;
+
+    /// <summary>What the admin set last; null after removing it.</summary>
+    public string? Token { get; private set; }
+
+    public Task<BotTokenCheck> CheckTokenAsync(string token, CancellationToken cancellationToken = default) =>
+        Task.FromResult(!Reachable ? new BotTokenCheck(BotTokenCheckResult.Unreachable)
+            : KnownTokens.TryGetValue(token, out var username) ? new BotTokenCheck(BotTokenCheckResult.Valid, username)
+            : new BotTokenCheck(BotTokenCheckResult.Rejected));
+
+    public void UseToken(string? token)
+    {
+        if (TokenFromConfiguration)
+        {
+            return;
+        }
+
+        Token = token;
+        IsEnabled = token is not null;
+        Username = token is not null && KnownTokens.TryGetValue(token, out var username) ? username : null;
+    }
+
     public IEnumerable<T> SentTo<T>(long chatId) where T : Notification =>
         Sent.Where(m => m.ChatId == chatId).Select(m => m.Notification).OfType<T>();
 }

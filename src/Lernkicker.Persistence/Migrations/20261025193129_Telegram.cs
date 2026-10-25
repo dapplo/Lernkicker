@@ -12,6 +12,19 @@ namespace Lernkicker.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "ServerSecrets",
+                columns: table => new
+                {
+                    Name = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
+                    ProtectedValue = table.Column<string>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServerSecrets", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TelegramLinkCodes",
                 columns: table => new
                 {
@@ -80,6 +93,9 @@ namespace Lernkicker.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ServerSecrets");
+
             migrationBuilder.DropTable(
                 name: "TelegramLinkCodes");
 

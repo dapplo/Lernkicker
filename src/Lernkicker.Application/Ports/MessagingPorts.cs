@@ -1,4 +1,5 @@
 using Lernkicker.Domain.Messaging;
+using Lernkicker.Domain.Settings;
 
 namespace Lernkicker.Application.Ports;
 
@@ -16,6 +17,37 @@ public interface IMessenger
     string? BotUsername { get; }
 
     void Send(long chatId, string language, Notification notification);
+
+    /// <summary>True when the token comes from the configuration (a file); then it cannot be changed in the app.</summary>
+    bool TokenFromConfiguration { get; }
+
+    /// <summary>Asks Telegram whether <paramref name="token"/> belongs to a bot.</summary>
+    Task<BotTokenCheck> CheckTokenAsync(string token, CancellationToken cancellationToken = default);
+
+    /// <summary>(Re)starts the bot with this token, or stops it with null. Ignored while <see cref="TokenFromConfiguration"/>.</summary>
+    void UseToken(string? token);
+}
+
+public enum BotTokenCheckResult { Valid, Rejected, Unreachable }
+
+/// <summary>The answer of Telegram to a token, with the bot's username when it is valid.</summary>
+public sealed record BotTokenCheck(BotTokenCheckResult Result, string? Username = null);
+
+/// <summary>Encrypts secrets before they are stored (ASP.NET Core Data Protection in the web adapter).</summary>
+public interface ISecretProtector
+{
+    string Protect(string value);
+
+    /// <summary>The plain value, or null when it cannot be decrypted any more (e.g. the keys were lost).</summary>
+    string? Unprotect(string protectedValue);
+}
+
+/// <summary>Secrets of the whole installation, not of a family.</summary>
+public interface IServerSecrets
+{
+    Task<ServerSecret?> FindAsync(string name);
+    void Add(ServerSecret secret);
+    void Remove(ServerSecret secret);
 }
 
 /// <summary>The Telegram links of the logged-in family, plus the lookups the bot needs before it knows the family.</summary>

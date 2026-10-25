@@ -64,7 +64,7 @@ Technology: ASP.NET Core Identity. The device token is 256 random bits and store
 - Messages contain only what the parent sees on the parents' page anyway: child names, quiz titles, points, marks and dates. They are sent as plain text, never Markdown or HTML, so names and titles cannot inject formatting or links. Telegram stores these messages on its servers (privacy notice).
 - `/stop` in the chat or "Trennen" on the parents' page removes the link at once; deleting a parent or family removes it too.
 - In BotFather: disable joining groups (`/setjoingroups` → Disable).
-- The bot token is a file in `secrets/` (`Lernkicker:Telegram:BotTokenFile`), never in the repository, the image or `.env`. Without it Telegram is off.
+- The bot token is set by the admin on the admin page (tailnet only), checked with Telegram and stored encrypted with ASP.NET Core Data Protection (the keys in `data/keys`, like the cookies). It is write-only: the API never returns it. Whoever has the `data` folder can decrypt it, so backups of it must be encrypted (Hyper Backup with encryption, docs/operations.md). Alternatively it comes from a file (`Lernkicker:Telegram:BotTokenFile`, a Docker secret), which then wins. Never in the repository, the image or `.env`. Without a token Telegram is off.
 - Long polling: Telegram never needs to reach the app, and no port is opened. Outgoing connections only go to `api.telegram.org`.
 - Children on Telegram *(planned)*: only when a parent has turned on "Telegram allowed"; turning it off unlinks at once.
 

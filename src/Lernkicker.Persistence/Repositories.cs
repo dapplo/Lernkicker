@@ -1,11 +1,12 @@
-using Lernkicker.Application;
 using Lernkicker.Application.Ports;
+using Lernkicker.Application;
 using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
 using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
 using Lernkicker.Domain.Messaging;
 using Lernkicker.Domain.Practice;
+using Lernkicker.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lernkicker.Persistence;
@@ -258,4 +259,13 @@ internal sealed class TelegramRepository(LernkickerDbContext db) : ITelegramRepo
 
     public async Task<IReadOnlyList<Guid>> FamiliesWithLinksAnyFamilyAsync() =>
         await db.TelegramLinks.IgnoreQueryFilters().Select(l => l.FamilyId).Distinct().ToListAsync();
+}
+
+internal sealed class ServerSecrets(LernkickerDbContext db) : IServerSecrets
+{
+    public Task<ServerSecret?> FindAsync(string name) => db.ServerSecrets.FirstOrDefaultAsync(s => s.Name == name);
+
+    public void Add(ServerSecret secret) => db.ServerSecrets.Add(secret);
+
+    public void Remove(ServerSecret secret) => db.ServerSecrets.Remove(secret);
 }

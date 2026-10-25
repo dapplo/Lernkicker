@@ -51,6 +51,8 @@ builder.Services.AddScoped<CalendarUseCases>();
 builder.Services.AddScoped<LessonUseCases>();
 builder.Services.AddScoped<SharedLibraryUseCases>();
 builder.Services.AddScoped<TelegramUseCases>();
+builder.Services.AddScoped<TelegramBotUseCases>();
+builder.Services.AddSingleton<ISecretProtector, DataProtectionSecrets>();
 
 // Keys for cookies survive restarts and image updates
 builder.Services.AddDataProtection()

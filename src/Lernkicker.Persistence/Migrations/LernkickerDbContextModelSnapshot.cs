@@ -584,6 +584,24 @@ namespace Lernkicker.Persistence.Migrations
                     b.ToTable("Attempts");
                 });
 
+            modelBuilder.Entity("Lernkicker.Domain.Settings.ServerSecret", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProtectedValue")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("ServerSecrets");
+                });
+
             modelBuilder.Entity("Lernkicker.Persistence.ParentUser", b =>
                 {
                     b.Property<Guid>("Id")

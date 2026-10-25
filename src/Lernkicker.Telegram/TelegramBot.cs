@@ -12,22 +12,77 @@ namespace Lernkicker.Telegram;
 /// Long polling (Telegram never connects to the app) and sending the queued messages. Only private chats are
 /// read; groups and channels are ignored.
 /// </summary>
-internal sealed class TelegramBot(string token, TelegramMessenger messenger, IServiceScopeFactory scopes, ILogger<TelegramBot> logger) : BackgroundService
+internal sealed class TelegramBot(TelegramMessenger messenger, IServiceScopeFactory scopes, ILogger<TelegramBot> logger) : BackgroundService
 {
     private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(15);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var bot = new TelegramBotClient(token);
         try
         {
-            await StartAsync(bot, stoppingToken);
-            await Task.WhenAll(ReceiveAsync(bot, stoppingToken), SendAsync(bot, stoppingToken));
+            if (!messenger.TokenFromConfiguration)
+            {
+                await LoadStoredTokenAsync();
+            }
+
+            // Runs the bot with the current token until the admin changes or removes it
+            while (true)
+            {
+                var (token, changed) = messenger.Current();
+                if (token is null)
+                {
+                    await changed.WaitAsync(stoppingToken);
+                    continue;
+                }
+
+                using var run = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+                var running = RunAsync(new TelegramBotClient(token), run.Token);
+                await Task.WhenAny(running, changed.WaitAsync(stoppingToken));
+                await run.CancelAsync();
+                try
+                {
+                    await running;
+                }
+                catch (OperationCanceledException) when (run.IsCancellationRequested)
+                {
+                    // Restarting with the new token
+                }
+                catch (Exception e)
+                {
+                    // Never take the app down with the bot
+                    logger.LogError(e, "Telegram bot stopped; starting again");
+                    await Task.Delay(RetryDelay, stoppingToken);
+                    continue;
+                }
+
+                stoppingToken.ThrowIfCancellationRequested();
+                logger.LogInformation("Telegram bot token changed; restarting");
+            }
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {
             // Shutting down
         }
+    }
+
+    private async Task LoadStoredTokenAsync()
+    {
+        try
+        {
+            using var scope = scopes.CreateScope();
+            var token = await scope.ServiceProvider.GetRequiredService<TelegramBotUseCases>().StoredTokenAsync();
+            messenger.UseToken(token);
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning(e, "The stored Telegram bot token could not be read");
+        }
+    }
+
+    private async Task RunAsync(TelegramBotClient bot, CancellationToken stoppingToken)
+    {
+        await StartAsync(bot, stoppingToken);
+        await Task.WhenAll(ReceiveAsync(bot, stoppingToken), SendAsync(bot, stoppingToken));
     }
 
     private async Task StartAsync(TelegramBotClient bot, CancellationToken stoppingToken)

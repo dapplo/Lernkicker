@@ -36,6 +36,9 @@ public sealed class Api(HttpClient http)
     public Task<InvitationCreatedResponse> CreateInvitation(NewInvitation request) => Send<InvitationCreatedResponse>(HttpMethod.Post, "api/admin/invitations", request);
     public Task<List<FamilyOverview>> Families() => Get<List<FamilyOverview>>("api/admin/families");
     public Task DeleteFamily(Guid id) => Send(HttpMethod.Delete, $"api/admin/families/{id}");
+    public Task<TelegramBotDto> TelegramBot() => Get<TelegramBotDto>("api/admin/telegram");
+    public Task SetBotToken(string token) => Send(HttpMethod.Put, "api/admin/telegram", new SetBotToken(token));
+    public Task RemoveBotToken() => Send(HttpMethod.Delete, "api/admin/telegram");
 
     // Quizzes
     public Task<List<QuizOverview>> Quizzes() => Get<List<QuizOverview>>("api/quizzes");
