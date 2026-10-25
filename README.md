@@ -23,6 +23,7 @@ It runs as a Docker container on a Synology NAS and is reachable through Tailsca
 | `src/Lernkicker.Application` | Use cases, ports and error codes |
 | `src/Lernkicker.QuizFormat` | Adapter: `quiz/v1` and `lesson/v1` JSON and schema validation |
 | `src/Lernkicker.Calendar` | Adapter: ICS import (only from public addresses) and feed with Ical.Net, local time with NodaTime |
+| `src/Lernkicker.Telegram` | Adapter: the Telegram bot for parents (long polling) and its messages in German and English |
 | `src/Lernkicker.Persistence` | Adapter: EF Core + SQLite, ASP.NET Core Identity, migrations |
 | `src/Lernkicker.Contracts` | DTOs of the HTTP API, shared by server and client |
 | `src/Lernkicker.Web` | Adapter: Minimal API, cookies, security headers; composition root; hosts the client |
@@ -52,6 +53,9 @@ Then open http://localhost:5208. On first start the server creates the database 
 | `Lernkicker:TrustedProxies` | – | Networks of reverse proxies (CIDR, comma-separated) whose `X-Forwarded-For` is trusted; loopback is always trusted |
 | `Lernkicker:TimeZone` | `Europe/Berlin` | Time zone of all dates (IANA name) |
 | `Lernkicker:Calendar:SyncHours` | `6` | How often subscribed calendars are imported again; `0` turns it off |
+| `Lernkicker:Telegram:BotTokenFile` | – | File with the bot token from BotFather (a Docker secret). Without a token Telegram is off |
+| `Lernkicker:Telegram:BotToken` | – | The token itself, for development only (user secrets) |
+| `Lernkicker:Telegram:ReminderHour` | `18` | Local hour of the evening reminder with the next day's dates |
 
 ## Trying the Docker image
 
@@ -73,7 +77,7 @@ Then open http://localhost:8080 and log in under **I am a parent / Ich bin ein E
 | `/pair#<code>` | child | Opened from the QR code |
 | `/practice/<assignment>` | child | One exercise per screen, hand in, result with solutions |
 | `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, facts; mark parts as known |
-| `/parents` | parent | Login, children, add a child |
+| `/parents` | parent | Login, children, add a child, connect Telegram |
 | `/parents/quizzes` | parent | Upload (file or paste), preview, share and delete quizzes |
 | `/parents/lessons` | parent | Upload (file or paste), preview, share and delete learning material |
 | `/parents/preview/<quiz\|lesson>/<id>` | parent | Preview as the child sees it |
@@ -89,7 +93,7 @@ All endpoints are under `/api`, take and return JSON, and answer errors with `{ 
 
 | Endpoint | Who |
 | --- | --- |
-| `POST /api/account/login`, `POST /api/account/logout`, `GET /api/account/me`, `PUT /api/account/language`, `POST /api/account/invitation` | parents |
+| `POST /api/account/login`, `POST /api/account/logout`, `GET /api/account/me`, `PUT /api/account/language`, `POST /api/account/invitation`, `GET/DELETE /api/account/telegram`, `POST /api/account/telegram/link` | parents |
 | `POST /api/admin/invitations`, `GET /api/admin/families`, `DELETE /api/admin/families/{id}` | admin, tailnet only |
 | `GET /api/quizzes`, `POST /api/quizzes` (raw JSON body), `GET /api/quizzes/{quizId}`, `GET …/{quizId}/preview`, `PUT …/{quizId}/shared`, `DELETE /api/quizzes/{quizId}` | parents |
 | `GET /api/lessons`, `POST /api/lessons` (raw JSON body), `GET /api/lessons/{lessonId}`, `GET …/{lessonId}/preview`, `PUT …/{lessonId}/shared`, `DELETE /api/lessons/{lessonId}`, `GET/POST /api/children/{id}/lessons`, `DELETE …/lessons/{assignmentId}` | parents |

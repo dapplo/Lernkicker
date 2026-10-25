@@ -5,6 +5,7 @@ using Lernkicker.Calendar;
 using Lernkicker.Contracts;
 using Lernkicker.Persistence;
 using Lernkicker.QuizFormat;
+using Lernkicker.Telegram;
 using Lernkicker.Web;
 using Lernkicker.Web.Endpoints;
 using Lernkicker.Web.Security;
@@ -36,6 +37,7 @@ builder.Services.AddSingleton<ICalendarSource>(_ => new IcsCalendarSource(timeZo
 builder.Services.AddSingleton<ICalendarWriter>(_ => new IcsCalendarWriter(timeZone));
 builder.Services.AddSingleton<ILocalClock>(sp => new ZonedClock(sp.GetRequiredService<TimeProvider>(), timeZone));
 builder.Services.AddHostedService<CalendarSync>();
+builder.Services.AddTelegram(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration.GetConnectionString("Lernkicker") ?? $"Data Source={Path.Combine(dataPath, "lernkicker.db")}");
 
 // Use cases
@@ -48,6 +50,7 @@ builder.Services.AddScoped<PracticeUseCases>();
 builder.Services.AddScoped<CalendarUseCases>();
 builder.Services.AddScoped<LessonUseCases>();
 builder.Services.AddScoped<SharedLibraryUseCases>();
+builder.Services.AddScoped<TelegramUseCases>();
 
 // Keys for cookies survive restarts and image updates
 builder.Services.AddDataProtection()

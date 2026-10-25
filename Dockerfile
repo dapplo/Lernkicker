@@ -12,6 +12,7 @@ COPY src/Lernkicker.Application/Lernkicker.Application.csproj src/Lernkicker.App
 COPY src/Lernkicker.QuizFormat/Lernkicker.QuizFormat.csproj src/Lernkicker.QuizFormat/
 COPY src/Lernkicker.Calendar/Lernkicker.Calendar.csproj src/Lernkicker.Calendar/
 COPY src/Lernkicker.Persistence/Lernkicker.Persistence.csproj src/Lernkicker.Persistence/
+COPY src/Lernkicker.Telegram/Lernkicker.Telegram.csproj src/Lernkicker.Telegram/
 COPY src/Lernkicker.Contracts/Lernkicker.Contracts.csproj src/Lernkicker.Contracts/
 COPY src/Lernkicker.Client/Lernkicker.Client.csproj src/Lernkicker.Client/
 COPY src/Lernkicker.Web/Lernkicker.Web.csproj src/Lernkicker.Web/

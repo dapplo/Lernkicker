@@ -7,6 +7,7 @@
     <Project Path="src/Lernkicker.Persistence/Lernkicker.Persistence.csproj" />
     <Project Path="src/Lernkicker.Contracts/Lernkicker.Contracts.csproj" />
     <Project Path="src/Lernkicker.Client/Lernkicker.Client.csproj" />
+    <Project Path="src/Lernkicker.Telegram/Lernkicker.Telegram.csproj" />
     <Project Path="src/Lernkicker.Web/Lernkicker.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">

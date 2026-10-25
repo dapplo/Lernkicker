@@ -11,7 +11,11 @@ public sealed class ZonedClock(TimeProvider time, string timeZone) : ILocalClock
 {
     private readonly DateTimeZone _zone = DateTimeZoneProviders.Tzdb[timeZone];
 
-    public DateOnly Today => Instant.FromDateTimeOffset(time.GetUtcNow()).InZone(_zone).Date.ToDateOnly();
+    public DateOnly Today => Now.Date.ToDateOnly();
+
+    public TimeOnly TimeOfDay => Now.TimeOfDay.ToTimeOnly();
+
+    private ZonedDateTime Now => Instant.FromDateTimeOffset(time.GetUtcNow()).InZone(_zone);
 
     /// <summary>Whether NodaTime knows the zone, e.g. "Europe/Berlin".</summary>
     public static bool IsKnown(string timeZone) => DateTimeZoneProviders.Tzdb.GetZoneOrNull(timeZone) is not null;

@@ -20,6 +20,11 @@ public sealed class Api(HttpClient http)
     public Task RedeemInvitation(RedeemInvitationRequest request) => Send(HttpMethod.Post, "api/account/invitation", request);
     public Task SetLanguage(string language) => Send(HttpMethod.Put, "api/account/language", new SetLanguage(language));
 
+    // Telegram for the logged-in parent
+    public Task<TelegramStatusDto> TelegramStatus() => Get<TelegramStatusDto>("api/account/telegram");
+    public Task<TelegramLinkDto> CreateTelegramLink() => Send<TelegramLinkDto>(HttpMethod.Post, "api/account/telegram/link");
+    public Task UnlinkTelegram() => Send(HttpMethod.Delete, "api/account/telegram");
+
     /// <summary>The logged-in parent, or null.</summary>
     public async Task<Me?> Me()
     {

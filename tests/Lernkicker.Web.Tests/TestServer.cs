@@ -23,6 +23,11 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
     /// <summary>Lernkicker:PublicUrl, if set.</summary>
     public string? PublicUrl { get; init; }
 
+    /// <summary>Records what the bot would send; a bot is "configured" unless TelegramEnabled is false.</summary>
+    public FakeMessenger Messenger { get; } = new();
+
+    public bool TelegramEnabled { init => Messenger.IsEnabled = value; }
+
     /// <summary>What the subscribed calendars "on the internet" return.</summary>
     public FakeCalendarSource Calendars { get; } = new();
 
@@ -46,7 +51,11 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
         {
             builder.UseSetting("Lernkicker:PublicUrl", PublicUrl);
         }
-        builder.ConfigureTestServices(services => services.AddSingleton<ICalendarSource>(Calendars));
+        builder.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<ICalendarSource>(Calendars);
+            services.AddSingleton<IMessenger>(Messenger);
+        });
     }
 
     /// <summary>A browser-like client with its own cookies.</summary>
@@ -152,4 +161,22 @@ public static class TestData
             Order = a.Value.Order,
             Choices = a.Value.Choices,
         });
+}
+
+/// <summary>A bot that does not talk to Telegram: it keeps what it was asked to send.</summary>
+public sealed class FakeMessenger : IMessenger
+{
+    public bool IsEnabled { get; set; } = true;
+
+    /// <summary>Null until the real bot has reached Telegram.</summary>
+    public string? Username { get; set; } = "LernkickerTestBot";
+
+    public string? BotUsername => IsEnabled ? Username : null;
+
+    public ConcurrentQueue<(long ChatId, string Language, Notification Notification)> Sent { get; } = new();
+
+    public void Send(long chatId, string language, Notification notification) => Sent.Enqueue((chatId, language, notification));
+
+    public IEnumerable<T> SentTo<T>(long chatId) where T : Notification =>
+        Sent.Where(m => m.ChatId == chatId).Select(m => m.Notification).OfType<T>();
 }

@@ -61,4 +61,7 @@ public interface ICalendarWriter
 public interface ILocalClock
 {
     DateOnly Today { get; }
+
+    /// <summary>The time of day in the family's time zone, e.g. for daily reminders.</summary>
+    TimeOnly TimeOfDay { get; }
 }

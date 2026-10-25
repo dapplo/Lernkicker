@@ -84,6 +84,7 @@
   <data name="Privacy.Who" xml:space="preserve"><value>Only the parents of a family see that family's children, tests and results. Other families see none of it. The person who runs Lernkicker manages families but does not see other children's results.</value></data>
   <data name="Privacy.SharingHeading" xml:space="preserve"><value>No sharing</value></data>
   <data name="Privacy.Sharing" xml:space="preserve"><value>There are no ads, no analytics and no external fonts. Data is not passed on to anyone.</value></data>
+  <data name="Privacy.Telegram" xml:space="preserve"><value>Telegram is optional. If a parent connects Telegram, the messages to that parent (child names, quiz titles, results and dates) go through Telegram's servers and are stored there under Telegram's privacy policy. Disconnecting stops this at once.</value></data>
   <data name="Privacy.DeletingHeading" xml:space="preserve"><value>Deleting</value></data>
   <data name="Privacy.Deleting" xml:space="preserve"><value>Parents can delete a child with all results at any time. To delete the whole family, contact the person who runs Lernkicker. Deleted data is gone at once; backups expire after their retention time.</value></data>
   <data name="Parents.Title" xml:space="preserve"><value>Parents</value></data>
@@ -344,4 +345,17 @@
   <data name="Share.Badge" xml:space="preserve"><value>Shared with all families</value></data>
   <data name="Share.Hint" xml:space="preserve"><value>Shared items are visible to all families on this Lernkicker. They can preview and copy them; they do not see your name, your children or any results. Copies already made stay when you stop sharing.</value></data>
   <data name="Error.shared.notFound" xml:space="preserve"><value>This is no longer shared.</value></data>
+  <data name="Telegram.Title" xml:space="preserve"><value>Telegram</value></data>
+  <data name="Telegram.Intro" xml:space="preserve"><value>Get your children's results and a reminder the evening before a test or due date in Telegram.</value></data>
+  <data name="Telegram.Disabled" xml:space="preserve"><value>Telegram is not set up on this Lernkicker. The administrator can add a bot (see the operations guide).</value></data>
+  <data name="Telegram.Linked" xml:space="preserve"><value>Connected with @{0} since {1}.</value></data>
+  <data name="Telegram.Commands" xml:space="preserve"><value>In the chat: /next shows the next 7 days, /stop disconnects.</value></data>
+  <data name="Telegram.Connect" xml:space="preserve"><value>Connect with Telegram</value></data>
+  <data name="Telegram.Reconnect" xml:space="preserve"><value>Connect another chat</value></data>
+  <data name="Telegram.OpenLink" xml:space="preserve"><value>Open @{0} in Telegram and press Start. The link works once, until {1}.</value></data>
+  <data name="Telegram.Open" xml:space="preserve"><value>Open Telegram</value></data>
+  <data name="Telegram.Check" xml:space="preserve"><value>I pressed Start</value></data>
+  <data name="Telegram.Unlink" xml:space="preserve"><value>Disconnect</value></data>
+  <data name="Error.telegram.unavailable" xml:space="preserve"><value>The bot cannot reach Telegram right now. Please try again in a few minutes.</value></data>
+  <data name="Error.telegram.disabled" xml:space="preserve"><value>Telegram is not set up on this Lernkicker.</value></data>
 </root>

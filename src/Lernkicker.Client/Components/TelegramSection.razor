@@ -1,0 +1,94 @@
+@inject Api Api
+
+@if (_status is { } status)
+{
+    <section class="box">
+        <h2>@L["Telegram.Title"]</h2>
+        <p>@L["Telegram.Intro"]</p>
+        @if (!status.Enabled)
+        {
+            <p class="hint">@L["Telegram.Disabled"]</p>
+        }
+        else
+        {
+            @if (status.LinkedAt is { } linkedAt)
+            {
+                <p>@L["Telegram.Linked", status.BotUsername ?? "", Display.Date(linkedAt)]</p>
+                <p class="hint">@L["Telegram.Commands"]</p>
+            }
+            @if (_link is { } link)
+            {
+                <p>@L["Telegram.OpenLink", status.BotUsername ?? "", Display.Time(link.ExpiresAt)]</p>
+                <p>
+                    <a class="btn" href="@link.Url" target="_blank" rel="noopener">@L["Telegram.Open"]</a>
+                    <button class="btn quiet" @onclick="Load">@L["Telegram.Check"]</button>
+                </p>
+            }
+            else
+            {
+                <p>
+                    <button class="btn" @onclick="Connect" disabled="@_busy">@(status.LinkedAt is null ? L["Telegram.Connect"] : L["Telegram.Reconnect"])</button>
+                    @if (status.LinkedAt is not null)
+                    {
+                        <button class="btn quiet" @onclick="Unlink" disabled="@_busy">@L["Telegram.Unlink"]</button>
+                    }
+                </p>
+            }
+        }
+        <Messages Errors="@_errors" />
+    </section>
+}
+
+@code {
+    private TelegramStatusDto? _status;
+    private TelegramLinkDto? _link;
+    private IReadOnlyList<string>? _errors;
+    private bool _busy;
+
+    protected override Task OnInitializedAsync() => Load();
+
+    private async Task Load()
+    {
+        _errors = null;
+        try
+        {
+            var previous = _status?.LinkedAt;
+            _status = await Api.TelegramStatus();
+            if (_status.LinkedAt != previous)
+            {
+                _link = null;
+            }
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+
+    private Task Connect() => Run(async () => _link = await Api.CreateTelegramLink());
+
+    private Task Unlink() => Run(async () =>
+    {
+        await Api.UnlinkTelegram();
+        _link = null;
+        _status = await Api.TelegramStatus();
+    });
+
+    private async Task Run(Func<Task> action)
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            await action();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

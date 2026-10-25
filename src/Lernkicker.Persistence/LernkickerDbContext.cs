@@ -4,6 +4,7 @@ using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
 using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
+using Lernkicker.Domain.Messaging;
 using Lernkicker.Domain.Practice;
 using Lernkicker.Domain.Quizzes;
 using Microsoft.AspNetCore.Identity;
@@ -43,6 +44,8 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
     public DbSet<CalendarFeed> CalendarFeeds => Set<CalendarFeed>();
     public DbSet<StoredLesson> Lessons => Set<StoredLesson>();
     public DbSet<LessonAssignment> LessonAssignments => Set<LessonAssignment>();
+    public DbSet<TelegramLink> TelegramLinks => Set<TelegramLink>();
+    public DbSet<TelegramLinkCode> TelegramLinkCodes => Set<TelegramLinkCode>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -173,6 +176,22 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
                 v => JsonSerializer.Serialize(v, Json),
                 v => JsonSerializer.Deserialize<List<string>>(v, Json)!,
                 new ValueComparer<IReadOnlyList<string>>((a, b) => a!.SequenceEqual(b!), v => v.Aggregate(0, (h, s) => HashCode.Combine(h, s)), v => v.ToList()));
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        builder.Entity<TelegramLink>(e =>
+        {
+            e.HasIndex(x => x.ParentId).IsUnique();
+            e.HasIndex(x => x.ChatId).IsUnique();
+            e.HasOne<ParentUser>().WithMany().HasForeignKey(x => x.ParentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        builder.Entity<TelegramLinkCode>(e =>
+        {
+            e.HasIndex(x => x.CodeHash).IsUnique();
+            e.Property(x => x.CodeHash).HasMaxLength(64);
+            e.HasOne<ParentUser>().WithMany().HasForeignKey(x => x.ParentId).OnDelete(DeleteBehavior.Cascade);
             e.HasQueryFilter(x => x.FamilyId == FamilyId);
         });
 

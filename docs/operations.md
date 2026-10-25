@@ -46,12 +46,13 @@ Create a folder, e.g. `/volume1/docker/lernkicker`, with
 
 - `compose.yaml` and `serve.json` from [`deploy/`](../deploy/),
 - `.env`, copied from [`deploy/.env.example`](../deploy/.env.example) and filled in (auth key, admin email and password),
-- two empty folders `data` and `tailscale`.
+- three empty folders `data`, `secrets` and `tailscale`.
 
 `data` must belong to the app user. DSM has no UI for numeric owners, so run this once as root: Control Panel → Task Scheduler → Create → Scheduled task → User-defined script, user `root`, script:
 
 ```bash
-chown -R 1654:1654 /volume1/docker/lernkicker/data
+chown -R 1654:1654 /volume1/docker/lernkicker/data /volume1/docker/lernkicker/secrets
+chmod 700 /volume1/docker/lernkicker/secrets
 ```
 
 Run it once ("Run") and delete the task afterwards. (Over SSH: `sudo chown -R 1654:1654 …`.)
@@ -88,6 +89,18 @@ Other families need to reach the app: either share the node with them in Tailsca
 ## 5. Funnel (public access)
 
 Read the [security concept](security.md) first. To make the app public, set `AllowFunnel` in `serve.json` to `true` and restart the project. Turning it back to `false` (and restarting) makes the app private again at once. The admin API stays tailnet-only either way.
+
+## 6. Telegram (optional)
+
+The bot sends parents their children's results after each quiz and, at 18:00, the dates of the next day (tests, due dates, football). It uses long polling, so Telegram never needs to reach the NAS.
+
+1. In Telegram, talk to [@BotFather](https://t.me/BotFather): `/newbot`, pick a name and a username (e.g. `LernkickerKromBot`). It answers with the token.
+2. Still in BotFather: `/setjoingroups` → your bot → **Disable**, so nobody can add it to a group. The bot only answers private chats anyway.
+3. Save the token as `secrets/telegram-bot-token` in the project folder (one line, nothing else). It must be readable by uid 1654: run the `chown` from step 2 again. Never put the token into `.env`, the compose file or the repository.
+4. Restart the project. The log shows `Telegram bot @<username> started`.
+5. Each parent opens **Eltern → Telegram → Mit Telegram verbinden** and presses *Start* in the bot. The link works once and for 10 minutes. `/next` shows the next 7 days, `/stop` disconnects.
+
+To change the hour of the reminder, set `Lernkicker__Telegram__ReminderHour` (0–23, default 18). To turn the bot off, delete the token file and restart; a new token from BotFather (`/revoke`) makes the old one useless.
 
 ## Updates
 

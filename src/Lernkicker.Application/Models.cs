@@ -96,3 +96,12 @@ public sealed record SubscriptionSummary(Guid Id, string Label, string Host, str
 }
 
 public sealed record FeedCreated(string Token);
+
+/// <summary><c>Enabled</c>: a bot is configured on the server. <c>LinkedAt</c>: when this parent linked a chat.</summary>
+public sealed record TelegramStatus(bool Enabled, string? BotUsername, DateTimeOffset? LinkedAt);
+
+/// <summary>The link that opens the bot with a one-time code.</summary>
+public sealed record TelegramLinkCreated(string Url, DateTimeOffset ExpiresAt);
+
+/// <summary>What the bot answers, in the parent's (or the Telegram user's) language.</summary>
+public sealed record BotReply(string Language, Notification Notification);

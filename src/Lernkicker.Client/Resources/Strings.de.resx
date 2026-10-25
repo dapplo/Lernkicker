@@ -84,6 +84,7 @@
   <data name="Privacy.Who" xml:space="preserve"><value>Nur die Eltern der eigenen Familie sehen die Kinder, Proben und Ergebnisse dieser Familie. Andere Familien sehen nichts davon. Die Person, die Lernkicker betreibt, verwaltet Familien, sieht aber keine Ergebnisse fremder Kinder.</value></data>
   <data name="Privacy.SharingHeading" xml:space="preserve"><value>Keine Weitergabe</value></data>
   <data name="Privacy.Sharing" xml:space="preserve"><value>Es gibt keine Werbung, keine Analyse-Dienste und keine externen Schriften. Daten werden nicht an Dritte weitergegeben.</value></data>
+  <data name="Privacy.Telegram" xml:space="preserve"><value>Telegram ist freiwillig. Wenn ein Elternteil Telegram verbindet, laufen die Nachrichten an dieses Elternteil (Namen der Kinder, Titel der Proben, Ergebnisse und Termine) über die Server von Telegram und werden dort nach den Datenschutzregeln von Telegram gespeichert. Trennen beendet das sofort.</value></data>
   <data name="Privacy.DeletingHeading" xml:space="preserve"><value>Löschen</value></data>
   <data name="Privacy.Deleting" xml:space="preserve"><value>Eltern können Kinder mit allen Ergebnissen jederzeit löschen. Um die ganze Familie zu löschen, wende dich an die Person, die Lernkicker betreibt. Gelöschte Daten verschwinden sofort; Sicherungskopien laufen nach ihrer Aufbewahrungszeit ab.</value></data>
   <data name="Parents.Title" xml:space="preserve"><value>Eltern</value></data>
@@ -344,4 +345,17 @@
   <data name="Share.Badge" xml:space="preserve"><value>Mit allen Familien geteilt</value></data>
   <data name="Share.Hint" xml:space="preserve"><value>Geteiltes sehen alle Familien auf diesem Lernkicker. Sie können es ansehen und kopieren; deinen Namen, deine Kinder und Ergebnisse sehen sie nicht. Schon gemachte Kopien bleiben, wenn du nicht mehr teilst.</value></data>
   <data name="Error.shared.notFound" xml:space="preserve"><value>Das ist nicht mehr geteilt.</value></data>
+  <data name="Telegram.Title" xml:space="preserve"><value>Telegram</value></data>
+  <data name="Telegram.Intro" xml:space="preserve"><value>Bekomm die Ergebnisse deiner Kinder und eine Erinnerung am Abend vor einer Probe oder Abgabe in Telegram.</value></data>
+  <data name="Telegram.Disabled" xml:space="preserve"><value>Telegram ist auf diesem Lernkicker nicht eingerichtet. Die Verwaltung kann einen Bot hinzufügen (siehe Betriebsanleitung).</value></data>
+  <data name="Telegram.Linked" xml:space="preserve"><value>Verbunden mit @{0} seit {1}.</value></data>
+  <data name="Telegram.Commands" xml:space="preserve"><value>Im Chat: /next zeigt die nächsten 7 Tage, /stop trennt die Verbindung.</value></data>
+  <data name="Telegram.Connect" xml:space="preserve"><value>Mit Telegram verbinden</value></data>
+  <data name="Telegram.Reconnect" xml:space="preserve"><value>Anderen Chat verbinden</value></data>
+  <data name="Telegram.OpenLink" xml:space="preserve"><value>Öffne @{0} in Telegram und drück auf Starten. Der Link gilt einmal, bis {1}.</value></data>
+  <data name="Telegram.Open" xml:space="preserve"><value>Telegram öffnen</value></data>
+  <data name="Telegram.Check" xml:space="preserve"><value>Ich habe auf Starten gedrückt</value></data>
+  <data name="Telegram.Unlink" xml:space="preserve"><value>Trennen</value></data>
+  <data name="Error.telegram.unavailable" xml:space="preserve"><value>Der Bot erreicht Telegram gerade nicht. Bitte versuch es in ein paar Minuten noch einmal.</value></data>
+  <data name="Error.telegram.disabled" xml:space="preserve"><value>Telegram ist auf diesem Lernkicker nicht eingerichtet.</value></data>
 </root>
