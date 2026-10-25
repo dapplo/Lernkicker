@@ -8,3 +8,5 @@ obj/
 /ts-state/
 .env
 node_modules/
+deploy/data/
+deploy/tailscale/

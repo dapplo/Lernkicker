@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Use cases and the ports they need. Depends only on the domain; adapters implement the ports. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lernkicker.Domain\Lernkicker.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Lernkicker.Domain/Lernkicker.Domain.csproj" />
+    <Project Path="src/Lernkicker.Application/Lernkicker.Application.csproj" />
+    <Project Path="src/Lernkicker.QuizFormat/Lernkicker.QuizFormat.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Lernkicker.Domain.Tests/Lernkicker.Domain.Tests.csproj" />
+    <Project Path="tests/Lernkicker.QuizFormat.Tests/Lernkicker.QuizFormat.Tests.csproj" />
+  </Folder>
+</Solution>

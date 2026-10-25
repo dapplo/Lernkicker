@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Driven adapter: reads the quiz/v1 JSON format and validates it against the schema -->
+
+  <ItemGroup>
+    <PackageReference Include="JsonSchema.Net" Version="9.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lernkicker.Application\Lernkicker.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Single source of truth for the format: the schema in /schema -->
+    <EmbeddedResource Include="..\..\schema\quiz-v1.schema.json" LogicalName="quiz-v1.schema.json" />
+  </ItemGroup>
+
+</Project>

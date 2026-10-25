@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The core of the hexagon: no package references, no framework beyond the BCL -->
+
+</Project>
