@@ -35,14 +35,31 @@ public sealed class TelegramTests(LernkickerFactory factory) : IClassFixture<Ler
     }
 
     [Fact]
-    public async Task Unknown_chats_only_get_an_answer_to_start()
+    public async Task Unknown_chats_get_a_hint_how_to_connect()
     {
         var chat = NewChat();
 
         Assert.IsType<WelcomeNotification>((await BotAsync(chat, "/start"))!.Notification);
         Assert.IsType<LinkInvalidNotification>((await BotAsync(chat, "/start not-a-code"))!.Notification);
-        Assert.Null(await BotAsync(chat, "/next"));
-        Assert.Null(await BotAsync(chat, "hello"));
+        Assert.IsType<WelcomeNotification>((await BotAsync(chat, "/next"))!.Notification);
+        Assert.IsType<WelcomeNotification>((await BotAsync(chat, "hello"))!.Notification);
+        Assert.IsType<LinkInvalidNotification>((await BotAsync(chat, new string('x', 43)))!.Notification);
+    }
+
+    [Theory]
+    [InlineData("{0}")]
+    [InlineData("  {0}\n")]
+    [InlineData("https://t.me/LernkickerTestBot?start={0}")]
+    public async Task Without_a_start_button_the_code_can_be_sent_as_a_message(string message)
+    {
+        var parent = await factory.NewFamilyAsync($"telegram-code-{message.Length}@example.org");
+        var link = await LernkickerFactory.Json<TelegramLinkDto>(await parent.PostAsync("/api/account/telegram/link", null));
+        Assert.EndsWith($"?start={link.Code}", link.Url);
+
+        var reply = await BotAsync(NewChat(), string.Format(message, link.Code));
+
+        Assert.IsType<LinkedNotification>(reply!.Notification);
+        Assert.NotNull((await LernkickerFactory.Json<TelegramStatusDto>(await parent.GetAsync("/api/account/telegram"))).LinkedAt);
     }
 
     [Fact]
@@ -69,7 +86,8 @@ public sealed class TelegramTests(LernkickerFactory factory) : IClassFixture<Ler
 
         Assert.IsType<HelpNotification>((await BotAsync(chat, "what?"))!.Notification);
         Assert.IsType<UnlinkedNotification>((await BotAsync(chat, "/stop"))!.Notification);
-        Assert.Null(await BotAsync(chat, "/next"));
+        // An unlinked chat only gets the hint how to connect
+        Assert.IsType<WelcomeNotification>((await BotAsync(chat, "/next"))!.Notification);
         Assert.Null((await LernkickerFactory.Json<TelegramStatusDto>(await parent.GetAsync("/api/account/telegram"))).LinkedAt);
     }
 
@@ -119,7 +137,8 @@ public sealed class TelegramTests(LernkickerFactory factory) : IClassFixture<Ler
         Assert.NotNull((await LernkickerFactory.Json<TelegramStatusDto>(await b.GetAsync("/api/account/telegram"))).LinkedAt);
 
         Assert.Equal(HttpStatusCode.NoContent, (await b.DeleteAsync("/api/account/telegram")).StatusCode);
-        Assert.Null(await BotAsync(chat, "/next"));
+        // An unlinked chat only gets the hint how to connect
+        Assert.IsType<WelcomeNotification>((await BotAsync(chat, "/next"))!.Notification);
     }
 
     [Fact]

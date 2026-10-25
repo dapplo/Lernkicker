@@ -61,7 +61,7 @@ Technology: ASP.NET Core Identity. The device token is 256 random bits and store
 
 ## 5. Telegram
 
-- The bot only reads private chats. A chat that is not linked only gets an answer to `/start`; nothing about it is stored. Linked chats get the commands `/next` and `/stop`.
+- The bot only reads private chats. A chat that is not linked can send a link code (as `/start <code>`, as the bare code or as the whole link) and otherwise only gets a fixed hint how to connect; nothing about it is stored. Linked chats get the commands `/next` and `/stop`.
 - Link codes are random (like the pairing codes), single use, valid 10 minutes, stored only as a hash and only created from the logged-in parent view. Creating a new one removes the old ones. Linking moves a chat that was linked before, so one chat belongs to one parent.
 - Messages contain only what the parent sees on the parents' page anyway: child names, quiz titles, points, marks and dates. They are sent as plain text, never Markdown or HTML, so names and titles cannot inject formatting or links. Telegram stores these messages on its servers (privacy notice).
 - `/stop` in the chat or "Trennen" on the parents' page removes the link at once; deleting a parent or family removes it too.

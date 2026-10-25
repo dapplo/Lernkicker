@@ -23,6 +23,8 @@
                     <a class="btn" href="@link.Url" target="_blank" rel="noopener">@L["Telegram.Open"]</a>
                     <button class="btn quiet" @onclick="Load">@L["Telegram.Check"]</button>
                 </p>
+                <p class="hint">@L["Telegram.NoStart", status.BotUsername ?? ""]</p>
+                <p><input class="link" readonly value="@link.Code" aria-label="@L["Telegram.Code"]" onfocus="this.select()" /></p>
             }
             else
             {

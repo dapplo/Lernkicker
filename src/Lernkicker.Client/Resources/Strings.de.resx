@@ -354,6 +354,8 @@
   <data name="Telegram.Reconnect" xml:space="preserve"><value>Anderen Chat verbinden</value></data>
   <data name="Telegram.OpenLink" xml:space="preserve"><value>Öffne @{0} in Telegram und drück auf Starten. Der Link gilt einmal, bis {1}.</value></data>
   <data name="Telegram.Open" xml:space="preserve"><value>Telegram öffnen</value></data>
+  <data name="Telegram.NoStart" xml:space="preserve"><value>Kein Starten-Knopf in Telegram? Schick @{0} diesen Code als Nachricht:</value></data>
+  <data name="Telegram.Code" xml:space="preserve"><value>Code für den Bot</value></data>
   <data name="Telegram.Check" xml:space="preserve"><value>Ich habe auf Starten gedrückt</value></data>
   <data name="Telegram.Unlink" xml:space="preserve"><value>Trennen</value></data>
   <data name="Admin.Bot.Title" xml:space="preserve"><value>Telegram-Bot</value></data>

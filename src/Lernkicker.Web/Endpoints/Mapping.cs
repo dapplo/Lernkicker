@@ -45,7 +45,7 @@ public static class Mapping
 
     public static TelegramBotDto ToDto(this TelegramBotSettings s) => new(s.Configured, s.FromFile, s.BotUsername, s.SetAt);
 
-    public static TelegramLinkDto ToDto(this TelegramLinkCreated l) => new(l.Url, l.ExpiresAt);
+    public static TelegramLinkDto ToDto(this TelegramLinkCreated l) => new(l.Url, l.Code, l.ExpiresAt);
 
     public static SharedOverview ToDto(this SharedSummary s) =>
         new(s.Id, s.Kind, s.ItemId, s.Title, s.Subject, s.GradeLevel, s.Topic, s.Size, s.SharedAt, s.InMyLibrary);
