@@ -24,16 +24,10 @@ services:
     network_mode: service:tailscale
     depends_on:
       - tailscale
-    environment:
-      # Only read on the first start, when the admin account is created; remove them afterwards
-      Admin__Email: ${ADMIN_EMAIL:-}
-      Admin__Password: ${ADMIN_PASSWORD:-}
-      Admin__Name: ${ADMIN_NAME:-Admin}
-      Admin__Family: ${ADMIN_FAMILY:-My family}
-      Admin__Language: ${ADMIN_LANGUAGE:-de}
+    # No admin settings needed: the first visit from the tailnet opens the setup page (docs/operations.md)
     volumes:
-      # Must belong to uid 1654 (the app user of the image)
-      - ./data:/data
+      # A named volume: Docker creates it, already writable for the app. Back it up from the admin page.
+      - lernkicker-data:/data
     read_only: true
     tmpfs:
       - /tmp
@@ -42,3 +36,6 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+
+volumes:
+  lernkicker-data:

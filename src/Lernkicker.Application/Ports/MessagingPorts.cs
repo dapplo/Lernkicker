@@ -42,6 +42,13 @@ public interface ISecretProtector
     string? Unprotect(string protectedValue);
 }
 
+/// <summary>Settings of the whole installation, not of a family.</summary>
+public interface IServerSettings
+{
+    Task<ServerSetting?> FindAsync(string name);
+    void Add(ServerSetting setting);
+}
+
 /// <summary>Secrets of the whole installation, not of a family.</summary>
 public interface IServerSecrets
 {

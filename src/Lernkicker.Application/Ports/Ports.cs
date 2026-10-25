@@ -54,6 +54,10 @@ public interface IParentAccounts
     Task<ParentAccount?> FindAsync(Guid id);
 
     Task SetLanguageAsync(Guid id, string language);
+
+    Task<bool> AdminExistsAsync();
+
+    Task MakeAdminAsync(Guid id);
 }
 
 public sealed record NewParent(string Email, string Password, string DisplayName, Guid FamilyId, string Language);

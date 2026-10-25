@@ -14,6 +14,30 @@ public sealed class ApiException(HttpStatusCode status, ApiError? error) : Excep
 /// <summary>Typed calls to the Lernkicker server. Cookies are sent automatically (same origin).</summary>
 public sealed class Api(HttpClient http)
 {
+    // First-run setup
+    public async Task<bool> SetupNeeded() => (await Get<SetupStatus>("api/setup")).Needed;
+    public Task CompleteSetup(SetupRequest request) => Send(HttpMethod.Post, "api/setup", request);
+
+    public async Task RestoreBackup(Stream zip)
+    {
+        using var content = new StreamContent(zip);
+        content.Headers.ContentType = new("application/zip");
+        await Check(await http.PostAsync("api/setup/restore", content));
+    }
+
+    /// <summary>True when the server answers, e.g. again after a restart.</summary>
+    public async Task<bool> IsUp()
+    {
+        try
+        {
+            return (await http.GetAsync("api/status")).IsSuccessStatusCode;
+        }
+        catch (HttpRequestException)
+        {
+            return false;
+        }
+    }
+
     // Account
     public Task Login(string email, string password) => Send(HttpMethod.Post, "api/account/login", new Login(email, password));
     public Task Logout() => Send(HttpMethod.Post, "api/account/logout");

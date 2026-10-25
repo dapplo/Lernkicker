@@ -1,0 +1,115 @@
+@page "/setup"
+@inject Api Api
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Setup.Title"] · Lernkicker</PageTitle>
+
+<h1>@L["Setup.Heading"]</h1>
+
+@if (_needed is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else if (_needed == false)
+{
+    <p>@L["Setup.Done"]</p>
+    <p><a class="btn" href="parents">@L["Setup.ToParents"]</a></p>
+}
+else
+{
+    <p>@L["Setup.Intro"]</p>
+    <form class="form" @onsubmit="Complete" @onsubmit:preventDefault>
+        <label>@L["Invitation.YourName"] <input @bind="_name" autocomplete="name" maxlength="100" required /></label>
+        <label>@L["Setup.Family"] <input @bind="_family" maxlength="100" placeholder="@L["Admin.FamilyNamePlaceholder"]" required /></label>
+        <label>@L["Common.Email"] <input type="email" @bind="_email" autocomplete="username" required /></label>
+        <label>@L["Invitation.Password"] <input type="password" @bind="_password" autocomplete="new-password" minlength="12" required /></label>
+        @if (_address.StartsWith("https://", StringComparison.Ordinal))
+        {
+            <p class="hint">@L["Setup.Address", _address]</p>
+        }
+        else
+        {
+            <p class="hint">@L["Setup.NotHttps"]</p>
+        }
+        <Messages Errors="@_errors" />
+        <button class="btn" type="submit" disabled="@_busy">@L["Setup.Create"]</button>
+    </form>
+
+    <details class="box">
+        <summary>@L["Setup.Restore"]</summary>
+        <p>@L["Setup.RestoreHint"]</p>
+        @if (_restoring)
+        {
+            <p class="loading-text">@L["Setup.Restoring"]</p>
+        }
+        else
+        {
+            <label class="btn quiet">@L["Setup.ChooseBackup"] <InputFile accept=".zip,application/zip" OnChange="Restore" /></label>
+        }
+        <Messages Errors="@_restoreErrors" />
+    </details>
+}
+
+@code {
+    private bool? _needed;
+    private string _name = "", _family = "", _email = "", _password = "";
+    private string _address = "";
+    private bool _busy;
+    private IReadOnlyList<string>? _errors, _restoreErrors;
+    private bool _restoring;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _address = new Uri(Navigation.BaseUri).GetLeftPart(UriPartial.Authority);
+        _needed = await Api.SetupNeeded();
+    }
+
+    private async Task Restore(InputFileChangeEventArgs e)
+    {
+        _restoreErrors = null;
+        _restoring = true;
+        try
+        {
+            await using var zip = e.File.OpenReadStream(ApiLimits.BackupMaxBytes);
+            await Api.RestoreBackup(zip);
+
+            // The server restarts with the restored data; wait until it answers again
+            await Task.Delay(3000);
+            for (var i = 0; i < 60 && !await Api.IsUp(); i++)
+            {
+                await Task.Delay(2000);
+            }
+
+            Navigation.NavigateTo("parents", forceLoad: true);
+        }
+        catch (IOException)
+        {
+            _restoreErrors = [L["Error.backup.invalid"]];
+            _restoring = false;
+        }
+        catch (ApiException ex)
+        {
+            _restoreErrors = ex.Status == System.Net.HttpStatusCode.NotFound ? [L["Setup.TailnetOnly"]] : Display.Errors(ex);
+            _restoring = false;
+        }
+    }
+
+    private async Task Complete()
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            await Api.CompleteSetup(new SetupRequest(_email, _password, _name, _family, UiLanguage.Current, _address));
+            Navigation.NavigateTo("parents", replace: true);
+        }
+        catch (ApiException e)
+        {
+            _errors = e.Status == System.Net.HttpStatusCode.NotFound ? [L["Setup.TailnetOnly"]] : Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

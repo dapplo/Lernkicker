@@ -31,6 +31,7 @@ public static class PersistenceSetup
         services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<ITelegramRepository, TelegramRepository>();
         services.AddScoped<IServerSecrets, ServerSecrets>();
+        services.AddScoped<IServerSettings, ServerSettings>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IParentAccounts, ParentAccounts>();
         services.AddSingleton<IPinHasher, PinHasher>();
@@ -58,7 +59,7 @@ public static class PersistenceSetup
 
         if (string.IsNullOrWhiteSpace(admin.Email) || string.IsNullOrWhiteSpace(admin.Password))
         {
-            logger.LogWarning("No admin exists yet. Set Admin__Email and Admin__Password to create one.");
+            logger.LogWarning("No admin exists yet. Open the app from a device in your tailnet to set it up (or set Admin__Email and Admin__Password).");
             return;
         }
 

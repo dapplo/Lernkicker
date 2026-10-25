@@ -45,39 +45,34 @@ Then create an **auth key** (Settings → Keys): reusable off, ephemeral off, ta
 Create a folder, e.g. `/volume1/docker/lernkicker`, with
 
 - `compose.yaml` and `serve.json` from [`deploy/`](../deploy/),
-- `.env`, copied from [`deploy/.env.example`](../deploy/.env.example) and filled in (auth key, admin email and password),
-- two empty folders `data` and `tailscale`.
+- `.env`, copied from [`deploy/.env.example`](../deploy/.env.example) and filled in (the Tailscale auth key).
 
-`data` must belong to the app user. DSM has no UI for numeric owners, so run this once as root: Control Panel → Task Scheduler → Create → Scheduled task → User-defined script, user `root`, script:
-
-```bash
-chown -R 1654:1654 /volume1/docker/lernkicker/data
-```
-
-Run it once ("Run") and delete the task afterwards. (Over SSH: `sudo chown -R 1654:1654 …`.)
+That is all: the data lives in the Docker volume `lernkicker-data`, which Docker creates on the first start, already writable for the app (no folder, no `chown`). The `tailscale` folder for the node state is created automatically too.
 
 ## 3. Start
 
 Container Manager → Project → Create: name `lernkicker`, path `/volume1/docker/lernkicker`, "Use existing docker-compose.yml". Start it.
 
-After a minute the node `lernkicker` shows up in the Tailscale console. Open `https://lernkicker.<tailnet>.ts.net` on a device in your tailnet, go to **I am a parent / Ich bin ein Elternteil**, and log in with the admin email and password from `.env`.
+After a minute the node `lernkicker` shows up in the Tailscale console. Open `https://lernkicker.<tailnet>.ts.net` on a device in your tailnet. A fresh Lernkicker shows the **setup page**: enter your name, your family's name, email and password. You become the admin, and the address you used is kept for links in QR codes, invitations and the feed. The setup page only works from inside the tailnet (never through Funnel) and only until the first account exists.
 
-Then remove `ADMIN_PASSWORD` (and `TS_AUTHKEY`) from `.env`: the account and the Tailscale node state are stored, and the values are not needed any more.
+Then remove `TS_AUTHKEY` from `.env`: the node state is stored and the key is not needed any more.
+
+For an unattended setup (scripts, tests), `Admin__Email` and `Admin__Password` (plus `Admin__Name`, `Admin__Family`, `Admin__Language`) create the admin at start instead.
 
 ## Option B: an existing TSDProxy
 
 If the NAS already runs [TSDProxy](https://almeidapaulopt.github.io/tsdproxy/), use [`deploy/compose.tsdproxy.yaml`](../deploy/compose.tsdproxy.yaml) instead of `compose.yaml` (no `serve.json`, no `tailscale` folder, no `TS_AUTHKEY`):
 
-1. Copy it as `compose.yaml` into the project folder, next to `.env` and the `data` folder (step 2, including the `chown`).
-2. In `.env`, set `PUBLIC_URL=https://lernkicker.<tailnet>.ts.net` (the node TSDProxy will create) and, if 8080 is taken on the NAS, another `LERNKICKER_PORT`.
-3. Start the project. TSDProxy sees the `tsdproxy.*` labels and creates the node `lernkicker`; it shows up in its dashboard and in the Tailscale console.
+1. Create the project from it (paste it or copy it as `compose.yaml` into the project folder). A `.env` is only needed if 8080 is taken on the NAS (`LERNKICKER_PORT`).
+2. Start the project. TSDProxy sees the `tsdproxy.*` labels and creates the node `lernkicker`; it shows up in its dashboard and in the Tailscale console.
+3. Open `https://lernkicker.<tailnet>.ts.net` and fill in the setup page (step 3). Open it through that address, not the NAS port: the address is kept for links.
 
 Differences to the sidecar:
 
 - The node gets TSDProxy's tags or none: `tsdproxy.tags` only works when TSDProxy logs in with OAuth. Give the node the restricted tag from step 1 that way, or check in the Tailscale console that it cannot reach your other devices.
 - The app publishes a port on the NAS, so it is reachable over plain HTTP in the LAN. Logging in only works over HTTPS, so this gives nobody access, but a NAS firewall rule (Control Panel → Security → Firewall) can limit the port to Docker's networks (`172.16.0.0/12`).
 - `Lernkicker__TrustedProxies` (default `172.16.0.0/12`) lets the app see the real client address behind TSDProxy, for the rate limits. If TSDProxy runs in `network_mode: host`, the requests come from the NAS's own address; set it to that address.
-- Funnel: set the label `tsdproxy.funnel` to `"true"` (read the [security concept](security.md) first). The admin pages stay tailnet-only only if TSDProxy passes Tailscale's `Tailscale-Funnel-Request` header; otherwise keep Funnel off.
+- Funnel: set the label `tsdproxy.funnel` to `"true"` (read the [security concept](security.md) first). TSDProxy does not pass Tailscale's `Tailscale-Funnel-Request` header, so with TSDProxy and Funnel the admin pages, the backup download and the setup page of a fresh server are reachable from the internet too, protected by the admin login only. Do the setup before turning Funnel on.
 
 ## 4. Invite families
 
@@ -110,13 +105,17 @@ Container Manager → Project → `lernkicker` → Action → Build (pulls `late
 
 ## Backup
 
-Back up `/volume1/docker/lernkicker/data` with Hyper Backup (encrypted). It holds everything: database and the cookie keys. Without the keys, everybody just has to log in again.
+As admin, open `/admin` → **Sicherung herunterladen**. The zip holds everything: the database (all families, children, quizzes, results), the Data Protection keys (logins, the encrypted Telegram token). Keep it somewhere safe, e.g. in an encrypted Hyper Backup task of the folder you save it to: whoever has the file can read all the data. (Hyper Backup cannot see Docker volumes directly, hence the download.)
+
+**Restore or move:** start a new, empty Lernkicker (a new project, or delete the volume `lernkicker-data` of the old one), open it, and on the setup page choose **Mit einer Sicherung starten**. The app checks the file, restarts once (the restart policy brings it back) and is then exactly where the backup was. The data it replaced is kept in the volume as `before-restore-<time>`. Restoring only works on a server without an account, from inside the tailnet.
+
+**With a folder instead of the volume:** replace `lernkicker-data:/data` by `./data:/data` and give the folder to the app user once (`chown -R 1654:1654 data`, e.g. as a root task in Task Scheduler). Then Hyper Backup can back up the folder directly.
 
 ## Troubleshooting
 
 | Symptom | Cause |
 | --- | --- |
-| App container restarts, log says "unable to open database file" or access denied in `/data` | `data` does not belong to uid 1654 (step 2) |
+| App container restarts, log says "unable to open database file" or access denied in `/data` | With a folder instead of the volume: it does not belong to uid 1654 (see Backup) |
 | Node does not appear in Tailscale | Auth key expired or not tagged; check the tailscale container's log |
 | `https://lernkicker…` has a certificate error | HTTPS certificates not enabled in the tailnet |
 | `/admin` says it only works in the tailnet | You came through Funnel; use a device in your tailnet |

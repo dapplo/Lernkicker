@@ -27,11 +27,13 @@ Items marked *(planned)* are not built yet.
 
 ## 2. Login
 
-**No open registration.** Accounts only come from invitations.
+**No open registration.** Accounts only come from invitations, except the very first one: on a fresh server (no admin yet) the setup page creates the admin. It only answers inside the tailnet (`TailnetOnlyFilter`), only while no admin exists (checked under a lock, so two visitors at once cannot both become admin), and is rate limited like the login. Funnel is off by default, so between starting the container and filling in the page only devices in your own tailnet can reach it. Do the setup right after the first start, before turning on Funnel. A fresh server can also start from a backup (`POST /api/setup/restore`, same rules): the zip must carry the backup manifest and a SQLite database with Lernkicker's migrations; key files are only taken as flat `keys/*.xml` names, so no path from the zip reaches the file system.
+
+**Backups** (`GET /api/admin/backup`, admin, tailnet only) contain the whole database and the Data Protection keys, i.e. everything needed to read all data and decrypt the Telegram token. Treat the file like the `data` folder: store it encrypted.
 
 | Who | How | Protection |
 | --- | --- | --- |
-| Admin | Email + password; passkey or TOTP 2FA *(planned)* | The admin API only answers inside the tailnet: requests through Funnel carry the `Tailscale-Funnel-Request` header, and `TailnetOnlyFilter` answers them with 404. |
+| Admin | Email + password; passkey or TOTP 2FA *(planned)* | With the Tailscale sidecar the admin API only answers inside the tailnet: requests through Funnel carry the `Tailscale-Funnel-Request` header, and `TailnetOnlyFilter` answers them with 404. TSDProxy does not send that header, so behind TSDProxy with Funnel on the admin API is protected by the login alone. |
 | Parent | Invitation link (single use, valid 7 days), then email + password (at least 12 characters; check against leaked passwords *(planned)*) | Locked for 15 minutes after 5 failed attempts, rate limit per IP |
 | Child | A parent shows a QR code; scanning it **pairs** the child's phone (single-use code, valid 10 minutes). Then a 4-digit PIN. | A PIN is useless without a paired device. After 5 wrong PINs the device is locked until a parent unlocks it. Parents see paired devices and can remove them; a removed or locked device ends the child's session at once. |
 
