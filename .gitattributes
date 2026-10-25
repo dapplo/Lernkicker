@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.cs text diff=csharp
+*.png binary
+*.jpg binary

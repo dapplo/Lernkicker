@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+/data/
+/ts-state/
+.env
+node_modules/
