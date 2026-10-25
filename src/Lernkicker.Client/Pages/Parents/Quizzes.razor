@@ -1,0 +1,132 @@
+@page "/parents/quizzes"
+@inject Api Api
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Quizzes.Title"] · Lernkicker</PageTitle>
+
+<p><a href="parents">← @L["Common.Back"]</a></p>
+<h1>@L["Quizzes.Title"]</h1>
+
+<section class="box">
+    <h2>@L["Quizzes.Upload"]</h2>
+    <p class="hint">@((MarkupString)L["Quizzes.UploadHint"].Value)</p>
+    <label class="file">
+        @L["Quizzes.ChooseFile"]
+        <InputFile accept=".json,application/json" OnChange="FileChosen" />
+    </label>
+    <details>
+        <summary>@L["Quizzes.OrPaste"]</summary>
+        <textarea rows="8" @bind="_json" @bind:event="oninput" spellcheck="false" placeholder='{ "format": "quiz/v1", … }'></textarea>
+        <button class="btn" disabled="@(_busy || string.IsNullOrWhiteSpace(_json))" @onclick="() => Upload(_json)">@L["Quizzes.UploadButton"]</button>
+    </details>
+    @if (_uploaded is { } uploaded)
+    {
+        <p class="ok" role="status">@L["Quizzes.Saved", uploaded.Title, uploaded.Version, uploaded.MaxPoints]</p>
+    }
+    <Messages Errors="@_errors" />
+</section>
+
+@if (_quizzes is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else if (_quizzes.Count == 0)
+{
+    <p>@L["Quizzes.None"]</p>
+}
+else
+{
+    <ul class="list">
+        @foreach (var quiz in _quizzes)
+        {
+            <li class="@Display.SubjectClass(quiz.Subject)">
+                <div>
+                    <b>@quiz.Title</b>
+                    <small>@L["Quizzes.Details", Display.Subject(quiz.Subject), quiz.GradeLevel, quiz.MaxPoints, quiz.Version, Display.Date(quiz.UploadedAt)]</small>
+                </div>
+                @if (_deleting == quiz.QuizId)
+                {
+                    <span class="buttons">
+                        <button class="btn danger" @onclick="() => Delete(quiz.QuizId)">@L["Quizzes.ReallyDelete"]</button>
+                        <button class="btn quiet" @onclick="() => _deleting = null">@L["Common.Cancel"]</button>
+                    </span>
+                }
+                else
+                {
+                    <button class="btn quiet" @onclick="() => _deleting = quiz.QuizId">@L["Common.Delete"]</button>
+                }
+            </li>
+        }
+    </ul>
+    <p class="hint">@L["Quizzes.ArchiveHint"]</p>
+}
+
+@code {
+    private List<QuizOverview>? _quizzes;
+    private string _json = "";
+    private QuizOverview? _uploaded;
+    private IReadOnlyList<string>? _errors;
+    private string? _deleting;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _quizzes = await Api.Quizzes();
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("parents");
+        }
+    }
+
+    private async Task FileChosen(InputFileChangeEventArgs e)
+    {
+        _errors = null;
+        try
+        {
+            using var reader = new StreamReader(e.File.OpenReadStream(ApiLimits.QuizMaxBytes));
+            await Upload(await reader.ReadToEndAsync());
+        }
+        catch (IOException)
+        {
+            _errors = [L["Error.quiz.tooLarge"]];
+        }
+    }
+
+    private async Task Upload(string json)
+    {
+        _busy = true;
+        _uploaded = null;
+        _errors = null;
+        try
+        {
+            _uploaded = await Api.UploadQuiz(json);
+            _json = "";
+            _quizzes = await Api.Quizzes();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task Delete(string quizId)
+    {
+        _deleting = null;
+        try
+        {
+            await Api.DeleteQuiz(quizId);
+            _quizzes = await Api.Quizzes();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+}

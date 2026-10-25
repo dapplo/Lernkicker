@@ -1,0 +1,25 @@
+@* Error messages, as a list. *@
+
+@if (Errors is { Count: > 0 })
+{
+    <div class="error" role="alert">
+        @if (Errors.Count == 1)
+        {
+            <p>@Errors[0]</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var message in Errors)
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<string>? Errors { get; set; }
+}

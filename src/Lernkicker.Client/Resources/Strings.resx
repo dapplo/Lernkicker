@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common.OneMoment" xml:space="preserve"><value>One moment …</value></data>
+  <data name="Common.Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Common.Login" xml:space="preserve"><value>Log in</value></data>
+  <data name="Common.Logout" xml:space="preserve"><value>Log out</value></data>
+  <data name="Common.Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Common.Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Common.Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Common.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Common.Saved" xml:space="preserve"><value>Saved.</value></data>
+  <data name="Common.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Common.DeleteEllipsis" xml:space="preserve"><value>Delete …</value></data>
+  <data name="Common.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Common.Grade" xml:space="preserve"><value>Grade {0}</value></data>
+  <data name="Format.Date" xml:space="preserve"><value>MMMM d, yyyy</value></data>
+  <data name="Format.DateTime" xml:space="preserve"><value>MMM d, yyyy, h:mm tt</value></data>
+  <data name="Language.Choose" xml:space="preserve"><value>Language</value></data>
+  <data name="Home.Welcome" xml:space="preserve"><value>Welcome to Lernkicker!</value></data>
+  <data name="Home.NotPaired" xml:space="preserve"><value>This phone is not connected yet. Ask your parents to show you the QR code, or type in the code here.</value></data>
+  <data name="Home.IAmAParent" xml:space="preserve"><value>I am a parent</value></data>
+  <data name="Home.Hello" xml:space="preserve"><value>Hello {0}!</value></data>
+  <data name="Home.Locked" xml:space="preserve"><value>The PIN was wrong too often. Your parents can unlock this phone in Lernkicker.</value></data>
+  <data name="Home.TryAgain" xml:space="preserve"><value>Try again</value></data>
+  <data name="Home.EnterPin" xml:space="preserve"><value>Enter your PIN.</value></data>
+  <data name="Home.NothingToDo" xml:space="preserve"><value>Nothing to practise right now. Time to play football!</value></data>
+  <data name="Home.WhatToPractice" xml:space="preserve"><value>What would you like to practise?</value></data>
+  <data name="Home.TestOn" xml:space="preserve"><value>Test {0}</value></data>
+  <data name="Home.FocusTip" xml:space="preserve"><value>Tip: turn on “Do not disturb” on your phone, so you can concentrate better.</value></data>
+  <data name="Due.Past" xml:space="preserve"><value>was on {0}</value></data>
+  <data name="Due.Today" xml:space="preserve"><value>today</value></data>
+  <data name="Due.Tomorrow" xml:space="preserve"><value>tomorrow</value></data>
+  <data name="Due.InDays" xml:space="preserve"><value>in {0} days</value></data>
+  <data name="Stars.Label" xml:space="preserve"><value>{0} of 3 stars</value></data>
+  <data name="Pin.Entered" xml:space="preserve"><value>{0} of 4 digits entered</value></data>
+  <data name="Pin.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Pair.Title" xml:space="preserve"><value>Connect phone</value></data>
+  <data name="Pair.AlmostThere" xml:space="preserve"><value>You can start in a moment.</value></data>
+  <data name="Pair.Code" xml:space="preserve"><value>Code</value></data>
+  <data name="Pair.CodePlaceholder" xml:space="preserve"><value>e.g. K7M2QX9P</value></data>
+  <data name="Pair.Connect" xml:space="preserve"><value>Connect</value></data>
+  <data name="Pair.DeviceLabel" xml:space="preserve"><value>Phone, connected {0}</value></data>
+  <data name="Practice.Title" xml:space="preserve"><value>Practice</value></data>
+  <data name="Practice.Loading" xml:space="preserve"><value>Loading the exercise …</value></data>
+  <data name="Practice.Again" xml:space="preserve"><value>Practise again</value></data>
+  <data name="Practice.ToOverview" xml:space="preserve"><value>Back to the overview</value></data>
+  <data name="Practice.Counter" xml:space="preserve"><value>Exercise {0} of {1}</value></data>
+  <data name="Practice.Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Practice.OneOpen" xml:space="preserve"><value>1 answer is missing. You can hand in anyway.</value></data>
+  <data name="Practice.SomeOpen" xml:space="preserve"><value>{0} answers are missing. You can hand in anyway.</value></data>
+  <data name="Practice.Submit" xml:space="preserve"><value>Hand in</value></data>
+  <data name="Points.Max" xml:space="preserve"><value>{0} points</value></data>
+  <data name="Points.Of" xml:space="preserve"><value>{0} / {1} points</value></data>
+  <data name="Exercise.Gap" xml:space="preserve"><value>Gap {0}</value></data>
+  <data name="Exercise.Answer" xml:space="preserve"><value>Answer</value></data>
+  <data name="Exercise.StartOver" xml:space="preserve"><value>Start over</value></data>
+  <data name="Exercise.SeveralCorrect" xml:space="preserve"><value>(several are correct)</value></data>
+  <data name="Answer.True" xml:space="preserve"><value>True</value></data>
+  <data name="Answer.False" xml:space="preserve"><value>False</value></data>
+  <data name="Result.Total" xml:space="preserve"><value>{0} of {1} points · mark {2}</value></data>
+  <data name="Result.CorrectWouldBe" xml:space="preserve"><value>Correct:</value></data>
+  <data name="Praise.Perfect" xml:space="preserve"><value>Perfect! Everything right!</value></data>
+  <data name="Praise.Great" xml:space="preserve"><value>Very good!</value></data>
+  <data name="Praise.Good" xml:space="preserve"><value>Well done!</value></data>
+  <data name="Praise.Half" xml:space="preserve"><value>More than half right. Keep going!</value></data>
+  <data name="Praise.KeepGoing" xml:space="preserve"><value>Practise again, you are getting better every time!</value></data>
+  <data name="NotFound.Title" xml:space="preserve"><value>Not found</value></data>
+  <data name="NotFound.Heading" xml:space="preserve"><value>Missed!</value></data>
+  <data name="NotFound.Text" xml:space="preserve"><value>This page does not exist.</value></data>
+  <data name="NotFound.Home" xml:space="preserve"><value>To the start page</value></data>
+  <data name="Privacy.Title" xml:space="preserve"><value>Privacy notice</value></data>
+  <data name="Privacy.Intro" xml:space="preserve"><value>Lernkicker is a private learning app for families. It runs on a server at the home of the person who runs Lernkicker and invited you. That person is responsible for the data.</value></data>
+  <data name="Privacy.StoredHeading" xml:space="preserve"><value>What is stored</value></data>
+  <data name="Privacy.StoredParents" xml:space="preserve"><value>Parents: name, email address (for logging in) and an encrypted password.</value></data>
+  <data name="Privacy.StoredChildren" xml:space="preserve"><value>Children: only a first name or nickname, the grade and an encrypted PIN. No date of birth, no photo.</value></data>
+  <data name="Privacy.StoredQuizzes" xml:space="preserve"><value>The uploaded practice tests, which test is assigned to which child, and the results.</value></data>
+  <data name="Privacy.StoredDevices" xml:space="preserve"><value>Which phones are connected to a child (label and time of last use).</value></data>
+  <data name="Privacy.WhoHeading" xml:space="preserve"><value>Who sees the data</value></data>
+  <data name="Privacy.Who" xml:space="preserve"><value>Only the parents of a family see that family's children, tests and results. Other families see none of it. The person who runs Lernkicker manages families but does not see other children's results.</value></data>
+  <data name="Privacy.SharingHeading" xml:space="preserve"><value>No sharing</value></data>
+  <data name="Privacy.Sharing" xml:space="preserve"><value>There are no ads, no analytics and no external fonts. Data is not passed on to anyone.</value></data>
+  <data name="Privacy.DeletingHeading" xml:space="preserve"><value>Deleting</value></data>
+  <data name="Privacy.Deleting" xml:space="preserve"><value>Parents can delete a child with all results at any time. To delete the whole family, contact the person who runs Lernkicker. Deleted data is gone at once; backups expire after their retention time.</value></data>
+  <data name="Parents.Title" xml:space="preserve"><value>Parents</value></data>
+  <data name="Parents.LoginHeading" xml:space="preserve"><value>Log in for parents</value></data>
+  <data name="Parents.InvitationOnly" xml:space="preserve"><value>No account yet? Lernkicker works by invitation only. Ask the person who runs Lernkicker.</value></data>
+  <data name="Parents.ManageQuizzes" xml:space="preserve"><value>Manage tests</value></data>
+  <data name="Parents.Children" xml:space="preserve"><value>Children</value></data>
+  <data name="Parents.NoChildren" xml:space="preserve"><value>Add a child first. Then connect the child's phone with a QR code.</value></data>
+  <data name="Parents.NoDevice" xml:space="preserve"><value>No phone connected yet</value></data>
+  <data name="Parents.OneDevice" xml:space="preserve"><value>1 phone connected</value></data>
+  <data name="Parents.Devices" xml:space="preserve"><value>{0} phones connected</value></data>
+  <data name="Parents.AddChild" xml:space="preserve"><value>Add a child</value></data>
+  <data name="Parents.AddChildHint" xml:space="preserve"><value>We only store the first name or nickname. Your child needs the PIN on their phone.</value></data>
+  <data name="Child.Title" xml:space="preserve"><value>Child</value></data>
+  <data name="Child.Name" xml:space="preserve"><value>First name or nickname</value></data>
+  <data name="Child.GradeLevel" xml:space="preserve"><value>Grade</value></data>
+  <data name="Child.Pin" xml:space="preserve"><value>PIN (4 digits)</value></data>
+  <data name="Child.ToPractice" xml:space="preserve"><value>To practise</value></data>
+  <data name="Child.NothingAssigned" xml:space="preserve"><value>Nothing chosen yet.</value></data>
+  <data name="Child.UploadFirst" xml:space="preserve"><value>Upload a test first.</value></data>
+  <data name="Child.Quiz" xml:space="preserve"><value>Test</value></data>
+  <data name="Child.DueOn" xml:space="preserve"><value>Test date (optional)</value></data>
+  <data name="Child.Assign" xml:space="preserve"><value>Give to practise</value></data>
+  <data name="Child.Results" xml:space="preserve"><value>Results</value></data>
+  <data name="Child.NoResults" xml:space="preserve"><value>No results yet.</value></data>
+  <data name="Child.When" xml:space="preserve"><value>When</value></data>
+  <data name="Child.Points" xml:space="preserve"><value>Points</value></data>
+  <data name="Child.Mark" xml:space="preserve"><value>Mark</value></data>
+  <data name="Child.TapForDetails" xml:space="preserve"><value>Tap a row for the details.</value></data>
+  <data name="Child.PairHint" xml:space="preserve"><value>Open Lernkicker on {0}'s phone and scan the QR code, or type in the code. It is valid for 10 minutes and only once.</value></data>
+  <data name="Child.ValidUntil" xml:space="preserve"><value>Valid until {0}.</value></data>
+  <data name="Child.NewQrCode" xml:space="preserve"><value>Show a new QR code</value></data>
+  <data name="Child.PairedDevices" xml:space="preserve"><value>Connected phones</value></data>
+  <data name="Child.Locked" xml:space="preserve"><value>locked</value></data>
+  <data name="Child.PairedOn" xml:space="preserve"><value>connected {0}</value></data>
+  <data name="Child.LastUsed" xml:space="preserve"><value>last used {0}</value></data>
+  <data name="Child.Unlock" xml:space="preserve"><value>Unlock</value></data>
+  <data name="Child.Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Child.NewPin" xml:space="preserve"><value>New PIN (4 digits)</value></data>
+  <data name="Child.ChangePin" xml:space="preserve"><value>Change PIN</value></data>
+  <data name="Child.PinChanged" xml:space="preserve"><value>The PIN has been changed.</value></data>
+  <data name="Child.Delete" xml:space="preserve"><value>Delete child</value></data>
+  <data name="Child.DeleteHint" xml:space="preserve"><value>Deletes {0} with all results and connected phones. This cannot be undone.</value></data>
+  <data name="Child.ReallyDelete" xml:space="preserve"><value>Yes, delete {0}</value></data>
+  <data name="Quizzes.Title" xml:space="preserve"><value>Tests</value></data>
+  <data name="Quizzes.Upload" xml:space="preserve"><value>Upload a test</value></data>
+  <data name="Quizzes.UploadHint" xml:space="preserve"><value>A file in the &lt;code&gt;quiz/v1&lt;/code&gt; format (JSON). If you upload a test with the same &lt;code&gt;id&lt;/code&gt; again, it becomes a new version; assignments move along.</value></data>
+  <data name="Quizzes.ChooseFile" xml:space="preserve"><value>Choose a file</value></data>
+  <data name="Quizzes.OrPaste" xml:space="preserve"><value>Or paste JSON</value></data>
+  <data name="Quizzes.UploadButton" xml:space="preserve"><value>Upload</value></data>
+  <data name="Quizzes.Saved" xml:space="preserve"><value>“{0}” saved (version {1}, {2} points).</value></data>
+  <data name="Quizzes.None" xml:space="preserve"><value>No tests yet. Upload the first one.</value></data>
+  <data name="Quizzes.Details" xml:space="preserve"><value>{0} · grade {1} · {2} points · version {3} · {4}</value></data>
+  <data name="Quizzes.ReallyDelete" xml:space="preserve"><value>Really delete</value></data>
+  <data name="Quizzes.ArchiveHint" xml:space="preserve"><value>If a child has already practised a test, it is archived: the results stay, the test disappears from the list.</value></data>
+  <data name="Invitation.Title" xml:space="preserve"><value>Invitation</value></data>
+  <data name="Invitation.Heading" xml:space="preserve"><value>Welcome to Lernkicker</value></data>
+  <data name="Invitation.Intro" xml:space="preserve"><value>You have been invited. Create your parent account here.</value></data>
+  <data name="Invitation.NoCode" xml:space="preserve"><value>This link contains no invitation code. Please open the complete link from the invitation.</value></data>
+  <data name="Invitation.YourName" xml:space="preserve"><value>Your name</value></data>
+  <data name="Invitation.Password" xml:space="preserve"><value>Password (at least 12 characters)</value></data>
+  <data name="Invitation.ConsentBefore" xml:space="preserve"><value>I have read the</value></data>
+  <data name="Invitation.ConsentLink" xml:space="preserve"><value>privacy notice</value></data>
+  <data name="Invitation.ConsentAfter" xml:space="preserve"><value>and agree.</value></data>
+  <data name="Invitation.Create" xml:space="preserve"><value>Create account</value></data>
+  <data name="Admin.Title" xml:space="preserve"><value>Administration</value></data>
+  <data name="Admin.Invite" xml:space="preserve"><value>Invite</value></data>
+  <data name="Admin.For" xml:space="preserve"><value>For</value></data>
+  <data name="Admin.NewFamily" xml:space="preserve"><value>a new family</value></data>
+  <data name="Admin.AnotherParent" xml:space="preserve"><value>{0} (another parent)</value></data>
+  <data name="Admin.FamilyName" xml:space="preserve"><value>Family name</value></data>
+  <data name="Admin.FamilyNamePlaceholder" xml:space="preserve"><value>e.g. The Millers</value></data>
+  <data name="Admin.CreateLink" xml:space="preserve"><value>Create invitation link</value></data>
+  <data name="Admin.SendLink" xml:space="preserve"><value>Send this link to the parents. It is valid until {0} and only once:</value></data>
+  <data name="Admin.Families" xml:space="preserve"><value>Families</value></data>
+  <data name="Admin.Family" xml:space="preserve"><value>Family</value></data>
+  <data name="Admin.Parents" xml:space="preserve"><value>Parents</value></data>
+  <data name="Admin.DeleteWithData" xml:space="preserve"><value>Delete with all data</value></data>
+  <data name="Admin.TailnetOnly" xml:space="preserve"><value>Administration only works inside your own tailnet, not through the public link.</value></data>
+  <data name="Subject.science" xml:space="preserve"><value>Science</value></data>
+  <data name="Subject.german" xml:space="preserve"><value>German</value></data>
+  <data name="Subject.math" xml:space="preserve"><value>Maths</value></data>
+  <data name="Subject.english" xml:space="preserve"><value>English</value></data>
+  <data name="Subject.religion" xml:space="preserve"><value>Religion</value></data>
+  <data name="Subject.ethics" xml:space="preserve"><value>Ethics</value></data>
+  <data name="Subject.music" xml:space="preserve"><value>Music</value></data>
+  <data name="Subject.art" xml:space="preserve"><value>Art</value></data>
+  <data name="Subject.sports" xml:space="preserve"><value>Sports</value></data>
+  <data name="Subject.crafts" xml:space="preserve"><value>Crafts</value></data>
+  <data name="Subject.other" xml:space="preserve"><value>Other</value></data>
+  <data name="Error.generic" xml:space="preserve"><value>Something went wrong. Please try again.</value></data>
+  <data name="Error.tooManyRequests" xml:space="preserve"><value>Too many attempts. Please wait a minute.</value></data>
+  <data name="Error.notFound" xml:space="preserve"><value>Not found.</value></data>
+  <data name="Error.family.notFound" xml:space="preserve"><value>This family does not exist.</value></data>
+  <data name="Error.family.isOwn" xml:space="preserve"><value>You cannot delete your own family.</value></data>
+  <data name="Error.invitation.invalid" xml:space="preserve"><value>This invitation is invalid, expired or already used.</value></data>
+  <data name="Error.invitation.consentRequired" xml:space="preserve"><value>Please agree to the privacy notice.</value></data>
+  <data name="Error.login.failed" xml:space="preserve"><value>Email or password is wrong.</value></data>
+  <data name="Error.login.lockedOut" xml:space="preserve"><value>Too many wrong attempts. The account is locked for a few minutes.</value></data>
+  <data name="Error.child.notFound" xml:space="preserve"><value>This child does not exist.</value></data>
+  <data name="Error.child.nameInvalid" xml:space="preserve"><value>Please enter a name with at most 50 characters.</value></data>
+  <data name="Error.child.gradeLevelInvalid" xml:space="preserve"><value>The grade must be between 1 and 13.</value></data>
+  <data name="Error.pin.invalid" xml:space="preserve"><value>The PIN must have exactly 4 digits.</value></data>
+  <data name="Error.pin.wrong" xml:space="preserve"><value>Wrong PIN. Try again.</value></data>
+  <data name="Error.device.notPaired" xml:space="preserve"><value>This phone is not connected.</value></data>
+  <data name="Error.device.locked" xml:space="preserve"><value>The PIN was wrong too often. Your parents can unlock this phone.</value></data>
+  <data name="Error.pairing.invalid" xml:space="preserve"><value>This code is invalid or expired. Ask for a new QR code.</value></data>
+  <data name="Error.quiz.notFound" xml:space="preserve"><value>This test does not exist.</value></data>
+  <data name="Error.quiz.invalid" xml:space="preserve"><value>The test has errors:</value></data>
+  <data name="Error.quiz.tooLarge" xml:space="preserve"><value>The file is larger than 256 KB.</value></data>
+  <data name="Error.language.invalid" xml:space="preserve"><value>This language is not supported.</value></data>
+  <data name="Error.account.DuplicateEmail" xml:space="preserve"><value>There is already an account with this email address.</value></data>
+  <data name="Error.account.InvalidEmail" xml:space="preserve"><value>This email address is invalid.</value></data>
+  <data name="Error.account.InvalidUserName" xml:space="preserve"><value>This email address is invalid.</value></data>
+  <data name="Error.account.PasswordTooShort" xml:space="preserve"><value>The password must have at least 12 characters.</value></data>
+  <data name="Error.account.DefaultError" xml:space="preserve"><value>The account could not be created.</value></data>
+  <data name="Issue.tooLarge" xml:space="preserve"><value>The file is larger than 256 KB.</value></data>
+  <data name="Issue.invalidJson" xml:space="preserve"><value>This is not valid JSON (line {line}): {message}</value></data>
+  <data name="Issue.schema" xml:space="preserve"><value>{message}</value></data>
+  <data name="Issue.duplicateId" xml:space="preserve"><value>The id “{id}” is used more than once.</value></data>
+  <data name="Issue.gapCount" xml:space="preserve"><value>The text has {inText} gaps (___), but gaps has {entries} entries.</value></data>
+  <data name="Issue.gapNotInWordBank" xml:space="preserve"><value>No answer of this gap is in the word bank.</value></data>
+  <data name="Issue.answerNotInOptions" xml:space="preserve"><value>“{answer}” is not one of the options.</value></data>
+  <data name="Issue.correctOutOfRange" xml:space="preserve"><value>correct points to an option that does not exist.</value></data>
+</root>

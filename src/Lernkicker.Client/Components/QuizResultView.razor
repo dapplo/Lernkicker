@@ -1,0 +1,65 @@
+@* The result of a handed-in quiz: score, stars and per exercise what was right and what the solution is. *@
+
+<section class="result" lang="@Language">
+    <div class="stars big" aria-label="@L["Stars.Label", StarCount]">@Display.Stars(StarCount)</div>
+    <p class="total" lang="@UiLanguage.Current">@L["Result.Total", Result.Points, Result.MaxPoints, Result.Mark]</p>
+    @if (ShowPraise)
+    {
+        <p class="praise" lang="@UiLanguage.Current">@Display.Praise(Result.Percent)</p>
+    }
+
+    @foreach (var exercise in Result.Exercises)
+    {
+        var full = exercise.Points == exercise.MaxPoints;
+        <article class="exercise-result @(full ? "full" : "")">
+            <h3>@exercise.Instruction <span class="points" lang="@UiLanguage.Current">@L["Points.Of", exercise.Points, exercise.MaxPoints]</span></h3>
+            <ul>
+                @foreach (var part in exercise.Parts)
+                {
+                    var solution = Solution(exercise, part);
+                    <li class="@(part.Correct ? "ok" : "wrong")">
+                        <span aria-hidden="true">@(part.Correct ? "✓" : "✗")</span>
+                        @if (part.Correct)
+                        {
+                            <span>@solution</span>
+                        }
+                        else
+                        {
+                            <span><span lang="@UiLanguage.Current">@L["Result.CorrectWouldBe"]</span> <b>@solution</b></span>
+                        }
+                        @if (!part.Correct && part.Explanation is { } explanation)
+                        {
+                            <small>@explanation</small>
+                        }
+                    </li>
+                }
+            </ul>
+            @if (exercise.Explanation is { } takeaway)
+            {
+                <p class="takeaway">💡 @takeaway</p>
+            }
+        </article>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public required QuizResultDto Result { get; set; }
+
+    /// <summary>Language of the quiz content (BCP 47).</summary>
+    [Parameter]
+    public string? Language { get; set; }
+
+    [Parameter]
+    public bool ShowPraise { get; set; } = true;
+
+    // Same thresholds as the server's stars (50 / 70 / 90 %)
+    private int StarCount => Result.Percent switch { >= 90 => 3, >= 70 => 2, >= 50 => 1, _ => 0 };
+
+    private string Solution(ExerciseResultDto exercise, PartResultDto part) => exercise.Type switch
+    {
+        "trueFalse" => part.ExpectedTruth == true ? L["Answer.True"] : L["Answer.False"],
+        "ordering" => $"{part.Index + 1}. {part.Solution}",
+        _ => part.Solution ?? "",
+    };
+}

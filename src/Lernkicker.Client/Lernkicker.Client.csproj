@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <!-- Driving adapter for people: the PWA for children and parents. Talks to the server only through Lernkicker.Contracts. -->
+
+  <PropertyGroup>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+    <!-- UI languages; the texts live in Resources/Strings.*.resx -->
+    <SatelliteResourceLanguages>de</SatelliteResourceLanguages>
+    <BlazorWebAssemblyLoadAllGlobalizationData>false</BlazorWebAssemblyLoadAllGlobalizationData>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.13" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.13" />
+    <PackageReference Include="QRCoder" Version="1.8.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lernkicker.Contracts\Lernkicker.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+</Project>

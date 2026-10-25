@@ -1,0 +1,135 @@
+@page "/parents"
+@inject Api Api
+
+<PageTitle>@L["Parents.Title"] · Lernkicker</PageTitle>
+
+@if (!_loaded)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else if (_me is null)
+{
+    <h1>@L["Parents.LoginHeading"]</h1>
+    <form class="form" @onsubmit="Login" @onsubmit:preventDefault>
+        <label>@L["Common.Email"] <input type="email" autocomplete="username" @bind="_email" required /></label>
+        <label>@L["Common.Password"] <input type="password" autocomplete="current-password" @bind="_password" required /></label>
+        <Messages Errors="@_errors" />
+        <button class="btn" type="submit" disabled="@_busy">@L["Common.Login"]</button>
+    </form>
+    <p class="hint">@L["Parents.InvitationOnly"]</p>
+}
+else
+{
+    <h1>@L["Home.Hello", _me.Name]</h1>
+    <p class="subtitle">@_me.Family</p>
+
+    <nav class="parents-nav">
+        <a class="btn" href="parents/quizzes">@L["Parents.ManageQuizzes"]</a>
+        @if (_me.IsAdmin)
+        {
+            <a class="btn quiet" href="admin">@L["Admin.Title"]</a>
+        }
+    </nav>
+
+    <h2>@L["Parents.Children"]</h2>
+    @if (_children.Count == 0)
+    {
+        <p>@L["Parents.NoChildren"]</p>
+    }
+    <ul class="cards">
+        @foreach (var child in _children)
+        {
+            <li>
+                <a class="card" href="parents/children/@child.Id">
+                    <span class="title">@child.Name</span>
+                    <span class="subject">@(child.GradeLevel is { } grade ? L["Common.Grade", grade] : "")</span>
+                    <span class="due">@(child.Devices switch { 0 => L["Parents.NoDevice"], 1 => L["Parents.OneDevice"], var n => L["Parents.Devices", n] })</span>
+                </a>
+            </li>
+        }
+    </ul>
+
+    <details class="box">
+        <summary>@L["Parents.AddChild"]</summary>
+        <form class="form" @onsubmit="AddChild" @onsubmit:preventDefault>
+            <label>@L["Child.Name"] <input @bind="_newName" maxlength="50" required /></label>
+            <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_newGrade" /></label>
+            <label>@L["Child.Pin"] <input inputmode="numeric" pattern="[0-9]{4}" maxlength="4" @bind="_newPin" required /></label>
+            <p class="hint">@L["Parents.AddChildHint"]</p>
+            <Messages Errors="@_childErrors" />
+            <button class="btn" type="submit" disabled="@_busy">@L["Common.Add"]</button>
+        </form>
+    </details>
+
+    <p><button class="btn quiet" @onclick="Logout">@L["Common.Logout"]</button> <a href="privacy">@L["Privacy.Title"]</a></p>
+}
+
+@code {
+    private bool _loaded;
+    private Me? _me;
+    private List<ChildOverview> _children = [];
+    private string _email = "", _password = "";
+    private string _newName = "", _newPin = "";
+    private int? _newGrade = 4;
+    private IReadOnlyList<string>? _errors, _childErrors;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+        _loaded = true;
+    }
+
+    private async Task Load()
+    {
+        _me = await Api.Me();
+        _children = _me is null ? [] : await Api.Children();
+    }
+
+    private async Task Login()
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            await Api.Login(_email, _password);
+            _password = "";
+            await Load();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task AddChild()
+    {
+        _busy = true;
+        _childErrors = null;
+        try
+        {
+            await Api.CreateChild(new NewChild(_newName, _newGrade, _newPin));
+            _newName = _newPin = "";
+            _children = await Api.Children();
+        }
+        catch (ApiException e)
+        {
+            _childErrors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task Logout()
+    {
+        await Api.Logout();
+        _me = null;
+        _children = [];
+    }
+}

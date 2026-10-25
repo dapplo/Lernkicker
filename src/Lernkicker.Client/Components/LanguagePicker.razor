@@ -1,0 +1,31 @@
+@* Switches the UI language on this device. A logged-in parent's choice is also saved on the server (for messages later). *@
+@inject UiLanguage Language
+@inject Api Api
+
+<nav class="languages" aria-label="@L["Language.Choose"]">
+    @foreach (var (language, name) in UiLanguage.Available)
+    {
+        <button type="button" class="@(language == UiLanguage.Current ? "on" : "")" lang="@language" aria-pressed="@(language == UiLanguage.Current)" @onclick="() => Switch(language)">@name</button>
+    }
+</nav>
+
+@code {
+    private async Task Switch(string code)
+    {
+        if (code == UiLanguage.Current)
+        {
+            return;
+        }
+
+        try
+        {
+            await Api.SetLanguage(code);
+        }
+        catch (ApiException)
+        {
+            // Not logged in as a parent: the choice only applies to this device
+        }
+
+        await Language.SwitchTo(code);
+    }
+}

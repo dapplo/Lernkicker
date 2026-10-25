@@ -1,0 +1,268 @@
+@page "/parents/children/{Id:guid}"
+@using QRCoder
+@inject Api Api
+@inject NavigationManager Navigation
+
+<PageTitle>@(_child?.Name ?? L["Child.Title"]) · Lernkicker</PageTitle>
+
+<p><a href="parents">← @L["Common.Back"]</a></p>
+
+@if (_child is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else
+{
+    <h1>@_child.Name</h1>
+    <Messages Errors="@_errors" />
+
+    <section class="box">
+        <h2>@L["Child.ToPractice"]</h2>
+        @if (_assignments.Count == 0)
+        {
+            <p>@L["Child.NothingAssigned"]</p>
+        }
+        <ul class="list">
+            @foreach (var a in _assignments)
+            {
+                <li class="@Display.SubjectClass(a.Subject)">
+                    <div>
+                        <b>@a.Title</b>
+                        <small>@Display.Subject(a.Subject)@(a.DueOn is { } due ? " · " + L["Home.TestOn", Display.Date(due)] : "")</small>
+                    </div>
+                    <button class="btn quiet" @onclick="() => Unassign(a.Id)">@L["Common.Remove"]</button>
+                </li>
+            }
+        </ul>
+        @if (_quizzes.Count == 0)
+        {
+            <p class="hint"><a href="parents/quizzes">@L["Child.UploadFirst"]</a></p>
+        }
+        else
+        {
+            <form class="form row" @onsubmit="Assign" @onsubmit:preventDefault>
+                <label>@L["Child.Quiz"]
+                    <select @bind="_newQuiz" required>
+                        <option value="">…</option>
+                        @foreach (var q in _quizzes)
+                        {
+                            <option value="@q.QuizId">@Display.Subject(q.Subject): @q.Title</option>
+                        }
+                    </select>
+                </label>
+                <label>@L["Child.DueOn"] <input type="date" @bind="_dueOn" /></label>
+                <button class="btn" type="submit" disabled="@string.IsNullOrEmpty(_newQuiz)">@L["Child.Assign"]</button>
+            </form>
+        }
+    </section>
+
+    <section class="box">
+        <h2>@L["Child.Results"]</h2>
+        @if (_attempts.Count == 0)
+        {
+            <p>@L["Child.NoResults"]</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead><tr><th>@L["Child.When"]</th><th>@L["Child.Quiz"]</th><th>@L["Child.Points"]</th><th>@L["Child.Mark"]</th></tr></thead>
+                <tbody>
+                    @foreach (var attempt in _attempts)
+                    {
+                        <tr class="@(attempt.Id == _openAttempt ? "active" : "")" @onclick="() => ShowAttempt(attempt.Id)">
+                            <td>@Display.Date(attempt.SubmittedAt)</td>
+                            <td>@attempt.Title</td>
+                            <td>@attempt.Points / @attempt.MaxPoints (@attempt.Percent %)</td>
+                            <td>@attempt.Mark</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="hint">@L["Child.TapForDetails"]</p>
+            @if (_details is not null)
+            {
+                <QuizResultView Result="@_details" ShowPraise="false" />
+            }
+        }
+    </section>
+
+    <section class="box">
+        <h2>@L["Pair.Title"]</h2>
+        <p>@L["Child.PairHint", _child.Name]</p>
+        @if (_pairing is { } pairing)
+        {
+            <div class="qr">@((MarkupString)_qrSvg!)</div>
+            <p class="code-big">@pairing.Code</p>
+            <p class="hint">@L["Child.ValidUntil", Display.Time(pairing.ExpiresAt)]</p>
+        }
+        <button class="btn" @onclick="Pair">@L["Child.NewQrCode"]</button>
+
+        @if (_devices.Count > 0)
+        {
+            <h3>@L["Child.PairedDevices"]</h3>
+            <ul class="list">
+                @foreach (var device in _devices)
+                {
+                    <li>
+                        <div>
+                            <b>@device.Label</b>
+                            @if (device.Locked)
+                            {
+                                <span class="locked-badge">@L["Child.Locked"]</span>
+                            }
+                            <small>@L["Child.PairedOn", Display.Date(device.PairedAt)]@(device.LastUsedAt is { } used ? " · " + L["Child.LastUsed", Display.Date(used)] : "")</small>
+                        </div>
+                        <span class="buttons">
+                            @if (device.Locked)
+                            {
+                                <button class="btn" @onclick="() => Unlock(device.Id)">@L["Child.Unlock"]</button>
+                            }
+                            <button class="btn quiet" @onclick="() => RemoveDevice(device.Id)">@L["Common.Remove"]</button>
+                        </span>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+
+    <details class="box">
+        <summary>@L["Child.Settings"]</summary>
+        <form class="form" @onsubmit="Save" @onsubmit:preventDefault>
+            <label>@L["Child.Name"] <input @bind="_name" maxlength="50" required /></label>
+            <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_gradeLevel" /></label>
+            <button class="btn" type="submit">@L["Common.Save"]</button>
+        </form>
+        <form class="form" @onsubmit="SavePin" @onsubmit:preventDefault>
+            <label>@L["Child.NewPin"] <input inputmode="numeric" pattern="[0-9]{4}" maxlength="4" @bind="_pin" required /></label>
+            <button class="btn" type="submit">@L["Child.ChangePin"]</button>
+        </form>
+        @if (_message is { } message)
+        {
+            <p class="ok" role="status">@message</p>
+        }
+        <h3>@L["Child.Delete"]</h3>
+        <p class="hint">@L["Child.DeleteHint", _child.Name]</p>
+        @if (_confirmDelete)
+        {
+            <button class="btn danger" @onclick="DeleteChild">@L["Child.ReallyDelete", _child.Name]</button>
+            <button class="btn quiet" @onclick="() => _confirmDelete = false">@L["Common.Cancel"]</button>
+        }
+        else
+        {
+            <button class="btn quiet" @onclick="() => _confirmDelete = true">@L["Common.DeleteEllipsis"]</button>
+        }
+    </details>
+}
+
+@code {
+    private ChildOverview? _child;
+    private List<AssignmentOverview> _assignments = [];
+    private List<QuizOverview> _quizzes = [];
+    private List<AttemptOverview> _attempts = [];
+    private List<DeviceOverview> _devices = [];
+    private QuizResultDto? _details;
+    private Guid? _openAttempt;
+    private PairingCodeResponse? _pairing;
+    private string? _qrSvg;
+    private string _newQuiz = "";
+    private DateOnly? _dueOn;
+    private string _name = "", _pin = "";
+    private int? _gradeLevel;
+    private string? _message;
+    private bool _confirmDelete;
+    private IReadOnlyList<string>? _errors;
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            _child = (await Api.Children()).SingleOrDefault(c => c.Id == Id);
+            if (_child is null)
+            {
+                Navigation.NavigateTo("parents");
+                return;
+            }
+
+            _name = _child.Name;
+            _gradeLevel = _child.GradeLevel;
+            _quizzes = await Api.Quizzes();
+            await Reload();
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("parents");
+        }
+    }
+
+    private async Task Reload()
+    {
+        _assignments = await Api.Assignments(Id);
+        _attempts = await Api.Attempts(Id);
+        _devices = await Api.Devices(Id);
+    }
+
+    private Task Assign() => Run(async () =>
+    {
+        await Api.Assign(Id, new NewAssignment(_newQuiz, _dueOn));
+        _newQuiz = "";
+        _dueOn = null;
+    });
+
+    private Task Unassign(Guid assignmentId) => Run(() => Api.Unassign(Id, assignmentId));
+
+    private async Task ShowAttempt(Guid attemptId)
+    {
+        _openAttempt = attemptId;
+        _details = await Api.Attempt(Id, attemptId);
+    }
+
+    private Task Pair() => Run(async () =>
+    {
+        _pairing = await Api.CreatePairingCode(Id);
+        using var generator = new QRCodeGenerator();
+        using var data = generator.CreateQrCode(_pairing.Link, QRCodeGenerator.ECCLevel.M);
+        _qrSvg = new SvgQRCode(data).GetGraphic(6);
+    });
+
+    private Task Unlock(Guid deviceId) => Run(() => Api.UnlockDevice(Id, deviceId));
+
+    private Task RemoveDevice(Guid deviceId) => Run(() => Api.RemoveDevice(Id, deviceId));
+
+    private Task Save() => Run(async () =>
+    {
+        await Api.UpdateChild(Id, new ChildDetails(_name, _gradeLevel));
+        _child = _child! with { Name = _name.Trim(), GradeLevel = _gradeLevel };
+        _message = L["Common.Saved"];
+    });
+
+    private Task SavePin() => Run(async () =>
+    {
+        await Api.ChangePin(Id, _pin);
+        _pin = "";
+        _message = L["Child.PinChanged"];
+    });
+
+    private async Task DeleteChild()
+    {
+        await Api.DeleteChild(Id);
+        Navigation.NavigateTo("parents");
+    }
+
+    private async Task Run(Func<Task> action)
+    {
+        _errors = null;
+        _message = null;
+        try
+        {
+            await action();
+            await Reload();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+}

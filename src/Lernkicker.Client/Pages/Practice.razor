@@ -1,0 +1,116 @@
+@page "/practice/{AssignmentId:guid}"
+@inject Api Api
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Practice.Title"] · Lernkicker</PageTitle>
+
+@if (_errors is not null)
+{
+    <Messages Errors="@_errors" />
+    <a class="btn" href="">@L["Common.Back"]</a>
+}
+else if (_sheet is null || _drafts is null)
+{
+    <p class="loading-text">@L["Practice.Loading"]</p>
+}
+else if (_result is not null)
+{
+    <h1 lang="@_sheet.Language">@_sheet.Title</h1>
+    <QuizResultView Result="@_result" Language="@_sheet.Language" />
+    <div class="buttons">
+        <button class="btn" @onclick="Again">@L["Practice.Again"]</button>
+        <a class="btn quiet" href="">@L["Practice.ToOverview"]</a>
+    </div>
+}
+else
+{
+    var draft = _drafts[_index];
+    var open = _drafts.Sum(d => d.Open);
+    <header class="practice-header">
+        <a href="" class="close" aria-label="@L["Practice.ToOverview"]">✕</a>
+        <span lang="@_sheet.Language">@_sheet.Title</span>
+    </header>
+    <progress class="progress" max="@_drafts.Count" value="@(_index + 1)"></progress>
+    <p class="counter">@L["Practice.Counter", _index + 1, _drafts.Count]</p>
+
+    <ExerciseView @key="draft" Draft="@draft" Language="@_sheet.Language" />
+
+    <div class="buttons">
+        @if (_index > 0)
+        {
+            <button class="btn quiet" @onclick="() => Go(-1)">@L["Common.Back"]</button>
+        }
+        @if (_index < _drafts.Count - 1)
+        {
+            <button class="btn" @onclick="() => Go(1)">@L["Practice.Next"]</button>
+        }
+        else
+        {
+            @if (open > 0)
+            {
+                <p class="hint">@(open == 1 ? L["Practice.OneOpen"] : L["Practice.SomeOpen", open])</p>
+            }
+            <button class="btn goal" disabled="@_busy" @onclick="Submit">@L["Practice.Submit"]</button>
+        }
+    </div>
+}
+
+@code {
+    private SheetDto? _sheet;
+    private List<AnswerDraft>? _drafts;
+    private QuizResultDto? _result;
+    private IReadOnlyList<string>? _errors;
+    private int _index;
+    private bool _busy;
+
+    [Parameter]
+    public Guid AssignmentId { get; set; }
+
+    protected override Task OnParametersSetAsync() => Load();
+
+    private async Task Load()
+    {
+        try
+        {
+            _sheet = await Api.Sheet(AssignmentId);
+            _drafts = _sheet.Exercises.Select(AnswerDraft.For).ToList();
+            _result = null;
+            _index = 0;
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("");
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+
+    private void Go(int direction) => _index = Math.Clamp(_index + direction, 0, _drafts!.Count - 1);
+
+    private async Task Submit()
+    {
+        _busy = true;
+        try
+        {
+            var answers = _drafts!.ToDictionary(d => d.Exercise.Id, d => d.ToAnswer());
+            _result = await Api.Submit(AssignmentId, answers);
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    // A fresh round reshuffles everything
+    private Task Again()
+    {
+        _sheet = null;
+        return Load();
+    }
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1f8f4e" />
+    <title>Lernkicker</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link href="manifest.webmanifest" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="loading">
+            <div class="ball" aria-hidden="true">⚽</div>
+            <p data-text="loading"></p>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        <span data-text="error"></span>
+        <a href="." class="reload" data-text="reload"></a>
+        <span class="dismiss">✕</span>
+    </div>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script src="js/start.js"></script>
+</body>
+
+</html>
