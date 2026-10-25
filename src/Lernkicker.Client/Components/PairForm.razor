@@ -1,0 +1,52 @@
+@* Pairs this phone with a child, using the code from the parent's QR code. *@
+@inject Api Api
+
+<form class="form" @onsubmit="Pair" @onsubmit:preventDefault>
+    <label>
+        @L["Pair.Code"]
+        <input class="code" value="@_code" @oninput="e => _code = e.Value?.ToString() ?? string.Empty"
+               autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="@L["Pair.CodePlaceholder"]" />
+    </label>
+    <Messages Errors="@_errors" />
+    <button class="btn" type="submit" disabled="@(_busy || _code.Trim().Length < 8)">@L["Pair.Connect"]</button>
+</form>
+
+@code {
+    private string _code = "";
+    private IReadOnlyList<string>? _errors;
+    private bool _busy;
+
+    [Parameter]
+    public string? Code { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback Paired { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Code) && _code != Code)
+        {
+            _code = Code;
+            await Pair();
+        }
+    }
+
+    private async Task Pair()
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            await Api.Pair(_code, L["Pair.DeviceLabel", Display.Date(DateOnly.FromDateTime(DateTime.Now))]);
+            await Paired.InvokeAsync();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

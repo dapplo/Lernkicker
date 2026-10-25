@@ -1,0 +1,105 @@
+@page "/"
+@inject Api Api
+
+<PageTitle>Lernkicker</PageTitle>
+
+@if (_device is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else if (!_device.Paired)
+{
+    <h1>@L["Home.Welcome"]</h1>
+    <p>@L["Home.NotPaired"]</p>
+    <PairForm Paired="Reload" />
+    <p class="parents-link"><a href="parents">@L["Home.IAmAParent"]</a></p>
+}
+else if (_device.Locked)
+{
+    <h1>@L["Home.Hello", _device.ChildName ?? ""]</h1>
+    <p class="error">@L["Home.Locked"]</p>
+    <button class="btn" @onclick="Reload">@L["Home.TryAgain"]</button>
+}
+else if (_assignments is null)
+{
+    <h1>@L["Home.Hello", _device.ChildName ?? ""]</h1>
+    <p>@L["Home.EnterPin"]</p>
+    <PinPad Entered="Login" Error="@_error" Disabled="@_busy" />
+}
+else
+{
+    <h1>@L["Home.Hello", _device.ChildName ?? ""]</h1>
+    @if (_assignments.Count == 0)
+    {
+        <div class="empty">
+            <div class="ball" aria-hidden="true">⚽</div>
+            <p>@L["Home.NothingToDo"]</p>
+        </div>
+    }
+    else
+    {
+        <p>@L["Home.WhatToPractice"]</p>
+        <ul class="cards">
+            @foreach (var assignment in _assignments)
+            {
+                <li>
+                    <a class="card @Display.SubjectClass(assignment.Subject)" href="practice/@assignment.AssignmentId">
+                        <span class="subject">@Display.Subject(assignment.Subject)</span>
+                        <span class="title">@assignment.Title</span>
+                        @if (assignment.DueOn is { } due)
+                        {
+                            <span class="due">@L["Home.TestOn", Display.Due(due)]</span>
+                        }
+                        <span class="stars" aria-label="@L["Stars.Label", assignment.Stars]">@Display.Stars(assignment.Stars)</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    <p class="tip">@L["Home.FocusTip"]</p>
+    <button class="btn quiet" @onclick="Logout">@L["Common.Logout"]</button>
+}
+
+@code {
+    private DeviceStatusResponse? _device;
+    private List<MyAssignment>? _assignments;
+    private string? _error;
+    private bool _busy;
+
+    protected override Task OnInitializedAsync() => Reload();
+
+    private async Task Reload()
+    {
+        _error = null;
+        _device = await Api.DeviceStatus();
+        _assignments = _device is { Paired: true, Locked: false } ? await Api.MyAssignments() : null;
+    }
+
+    private async Task Login(string pin)
+    {
+        _busy = true;
+        try
+        {
+            await Api.ChildLogin(pin);
+            await Reload();
+        }
+        catch (ApiException e)
+        {
+            _error = Display.Errors(e)[0];
+            if (e.Status == System.Net.HttpStatusCode.Locked)
+            {
+                _device = _device! with { Locked = true };
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task Logout()
+    {
+        await Api.ChildLogout();
+        await Reload();
+    }
+}

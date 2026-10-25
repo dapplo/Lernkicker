@@ -1,0 +1,44 @@
+# Lernkicker on a Synology (Container Manager → Project) or any Docker host.
+# The app has no published ports: the only way in is Tailscale. See docs/operations.md.
+name: lernkicker
+
+services:
+  tailscale:
+    image: tailscale/tailscale:stable
+    hostname: lernkicker
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY}
+      TS_EXTRA_ARGS: --advertise-tags=tag:lernkicker
+      TS_STATE_DIR: /var/lib/tailscale
+      # Userspace networking: no /dev/net/tun and no NET_ADMIN needed on the NAS
+      TS_USERSPACE: "true"
+      TS_SERVE_CONFIG: /config/serve.json
+    volumes:
+      - ./tailscale:/var/lib/tailscale
+      - ./serve.json:/config/serve.json:ro
+    restart: unless-stopped
+
+  lernkicker:
+    image: ghcr.io/dapplo/lernkicker:${LERNKICKER_TAG:-latest}
+    # Shares the network of the Tailscale container, so `tailscale serve` reaches it on 127.0.0.1:8080
+    network_mode: service:tailscale
+    depends_on:
+      - tailscale
+    environment:
+      # Only read on the first start, when the admin account is created; remove them afterwards
+      Admin__Email: ${ADMIN_EMAIL:-}
+      Admin__Password: ${ADMIN_PASSWORD:-}
+      Admin__Name: ${ADMIN_NAME:-Admin}
+      Admin__Family: ${ADMIN_FAMILY:-My family}
+      Admin__Language: ${ADMIN_LANGUAGE:-de}
+    volumes:
+      # Must belong to uid 1654 (the app user of the image)
+      - ./data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped

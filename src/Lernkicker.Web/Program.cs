@@ -134,6 +134,13 @@ app.MapChildren();
 app.MapDevice();
 app.Map("/api/{**rest}", ApiResults.NotFound);
 
+// The PWA (Lernkicker.Client). Fingerprinted files are cached forever; every other path is a page of the app.
+app.MapStaticAssets();
+app.MapFallbackToFile("index.html", new StaticFileOptions
+{
+    OnPrepareResponse = context => context.Context.Response.Headers.CacheControl = "no-cache",
+});
+
 await PersistenceSetup.InitializeAsync(app.Services, app.Configuration.GetSection("Admin").Get<AdminOptions>() ?? new(), app.Logger);
 await app.RunAsync();
 

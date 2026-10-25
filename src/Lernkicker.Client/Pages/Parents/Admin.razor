@@ -1,0 +1,119 @@
+@page "/admin"
+@inject Api Api
+
+<PageTitle>@L["Admin.Title"] · Lernkicker</PageTitle>
+
+<p><a href="parents">← @L["Common.Back"]</a></p>
+<h1>@L["Admin.Title"]</h1>
+<Messages Errors="@_errors" />
+
+@if (_families is null)
+{
+    @if (_errors is null)
+    {
+        <p class="loading-text">@L["Common.OneMoment"]</p>
+    }
+}
+else
+{
+    <section class="box">
+        <h2>@L["Admin.Invite"]</h2>
+        <form class="form" @onsubmit="Invite" @onsubmit:preventDefault>
+            <label>@L["Admin.For"]
+                <select @bind="_familyId">
+                    <option value="">@L["Admin.NewFamily"]</option>
+                    @foreach (var f in _families)
+                    {
+                        <option value="@f.Id">@L["Admin.AnotherParent", f.Name]</option>
+                    }
+                </select>
+            </label>
+            @if (string.IsNullOrEmpty(_familyId))
+            {
+                <label>@L["Admin.FamilyName"] <input @bind="_newFamily" maxlength="100" placeholder="@L["Admin.FamilyNamePlaceholder"]" /></label>
+            }
+            <button class="btn" type="submit">@L["Admin.CreateLink"]</button>
+        </form>
+        @if (_invitation is { } invitation)
+        {
+            <p>@L["Admin.SendLink", Display.Date(invitation.ExpiresAt)]</p>
+            <p><input class="link" readonly value="@invitation.Link" /></p>
+        }
+    </section>
+
+    <section class="box">
+        <h2>@L["Admin.Families"]</h2>
+        <table class="table">
+            <thead><tr><th>@L["Admin.Family"]</th><th>@L["Admin.Parents"]</th><th>@L["Parents.Children"]</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var f in _families)
+                {
+                    <tr>
+                        <td>@f.Name</td>
+                        <td>@f.Parents</td>
+                        <td>@f.Children</td>
+                        <td>
+                            @if (_deleting == f.Id)
+                            {
+                                <button class="btn danger" @onclick="() => Delete(f.Id)">@L["Admin.DeleteWithData"]</button>
+                            }
+                            else
+                            {
+                                <button class="btn quiet" @onclick="() => _deleting = f.Id">@L["Common.DeleteEllipsis"]</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p class="hint">@L["Admin.TailnetOnly"]</p>
+    </section>
+}
+
+@code {
+    private List<FamilyOverview>? _families;
+    private string _familyId = "", _newFamily = "";
+    private InvitationCreatedResponse? _invitation;
+    private Guid? _deleting;
+    private IReadOnlyList<string>? _errors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _families = await Api.Families();
+        }
+        catch (ApiException e)
+        {
+            _errors = e.Status == System.Net.HttpStatusCode.NotFound ? [L["Admin.TailnetOnly"]] : Display.Errors(e);
+        }
+    }
+
+    private async Task Invite()
+    {
+        _errors = null;
+        try
+        {
+            Guid? family = Guid.TryParse(_familyId, out var id) ? id : null;
+            _invitation = await Api.CreateInvitation(new NewInvitation(family, family is null ? _newFamily : null));
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+
+    private async Task Delete(Guid id)
+    {
+        _deleting = null;
+        try
+        {
+            await Api.DeleteFamily(id);
+            _families = await Api.Families();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+}

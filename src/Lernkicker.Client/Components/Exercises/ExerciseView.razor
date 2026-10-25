@@ -1,0 +1,166 @@
+@* Shows one exercise of a quiz and records the child's answers in the draft. Quiz texts keep the quiz's language. *@
+
+<section class="exercise" lang="@Language">
+    <h2>@Draft.Exercise.Instruction <span class="points" lang="@UiLanguage.Current">@L["Points.Max", Draft.Exercise.MaxPoints]</span></h2>
+    @if (Draft.Exercise.Hint is { } hint)
+    {
+        <p class="hint">@hint</p>
+    }
+
+    @switch (Draft.Exercise)
+    {
+        case ClozeSheetDto cloze:
+            <p class="cloze">
+                @for (var i = 0; i < cloze.Segments.Count; i++)
+                {
+                    var index = i;
+                    @cloze.Segments[index]
+                    @if (index < cloze.Segments.Count - 1)
+                    {
+                        @if (cloze.WordBank is { } words)
+                        {
+                            <select class="gap" aria-label="@L["Exercise.Gap", index + 1]" value="@Draft.Texts[index]" @onchange="e => Set(index, e)">
+                                <option value="">…</option>
+                                @foreach (var word in words)
+                                {
+                                    <option value="@word">@word</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <input class="gap" aria-label="@L["Exercise.Gap", index + 1]" autocomplete="off" autocapitalize="off" spellcheck="false"
+                                   value="@Draft.Texts[index]" @onchange="e => Set(index, e)" />
+                        }
+                    }
+                }
+            </p>
+            break;
+
+        case MatchingSheetDto matching:
+            <ul class="rows">
+                @foreach (var row in matching.Rows)
+                {
+                    var index = row.Index;
+                    <li>
+                        <span>@row.Text</span>
+                        <select aria-label="@L["Exercise.Answer"]" value="@Draft.Texts[index]" @onchange="e => Set(index, e)">
+                            <option value="">…</option>
+                            @foreach (var option in matching.Options)
+                            {
+                                <option value="@option">@option</option>
+                            }
+                        </select>
+                    </li>
+                }
+            </ul>
+            break;
+
+        case OrderingSheetDto ordering:
+            <ol class="steps">
+                @foreach (var step in ordering.Steps)
+                {
+                    var index = step.Index;
+                    var position = Draft.Order.IndexOf(index);
+                    <li>
+                        <button type="button" class="step @(position >= 0 ? "set" : "")" @onclick="() => Toggle(index)">
+                            <span class="badge">@(position >= 0 ? position + 1 : "")</span>
+                            @step.Text
+                        </button>
+                    </li>
+                }
+            </ol>
+            <button type="button" class="btn quiet" lang="@UiLanguage.Current" @onclick="Draft.Order.Clear">@L["Exercise.StartOver"]</button>
+            break;
+
+        case TrueFalseSheetDto trueFalse:
+            <ul class="statements">
+                @foreach (var statement in trueFalse.Statements)
+                {
+                    var index = statement.Index;
+                    <li>
+                        <span>@statement.Text</span>
+                        <span class="choice" lang="@UiLanguage.Current">
+                            <button type="button" class="@(Draft.Truths[index] == true ? "on" : "")" aria-pressed="@(Draft.Truths[index] == true)"
+                                    @onclick="() => Draft.Truths[index] = true">@L["Answer.True"]</button>
+                            <button type="button" class="@(Draft.Truths[index] == false ? "on" : "")" aria-pressed="@(Draft.Truths[index] == false)"
+                                    @onclick="() => Draft.Truths[index] = false">@L["Answer.False"]</button>
+                        </span>
+                    </li>
+                }
+            </ul>
+            break;
+
+        case FreeTextSheetDto freeText:
+            <ol class="fields">
+                @for (var i = 0; i < freeText.FieldLabels.Count; i++)
+                {
+                    var index = i;
+                    <li>
+                        <label>
+                            @if (freeText.FieldLabels[index] is { } label)
+                            {
+                                <span>@label</span>
+                            }
+                            <input autocomplete="off" autocapitalize="off" spellcheck="false" value="@Draft.Texts[index]" @onchange="e => Set(index, e)" />
+                        </label>
+                    </li>
+                }
+            </ol>
+            break;
+
+        case MultipleChoiceSheetDto choice:
+            @foreach (var question in choice.Questions)
+            {
+                var questionIndex = question.Index;
+                <fieldset class="question">
+                    <legend>@question.Text @if (question.MultipleAnswers) { <span lang="@UiLanguage.Current">@L["Exercise.SeveralCorrect"]</span> }</legend>
+                    @foreach (var option in question.Options)
+                    {
+                        var optionIndex = option.Index;
+                        var selected = Draft.Choices[questionIndex].Contains(optionIndex);
+                        <button type="button" class="option @(selected ? "on" : "")" aria-pressed="@selected" @onclick="() => Select(questionIndex, optionIndex, question.MultipleAnswers)">
+                            @option.Text
+                        </button>
+                    }
+                </fieldset>
+            }
+            break;
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public required AnswerDraft Draft { get; set; }
+
+    /// <summary>Language of the quiz content (BCP 47).</summary>
+    [Parameter]
+    public string? Language { get; set; }
+
+    private void Set(int index, ChangeEventArgs e) => Draft.Texts[index] = e.Value?.ToString();
+
+    private void Toggle(int index)
+    {
+        if (!Draft.Order.Remove(index))
+        {
+            Draft.Order.Add(index);
+        }
+    }
+
+    private void Select(int question, int option, bool multiple)
+    {
+        var choices = Draft.Choices[question];
+        if (multiple)
+        {
+            if (!choices.Remove(option))
+            {
+                choices.Add(option);
+            }
+        }
+        else
+        {
+            choices.Clear();
+            choices.Add(option);
+        }
+    }
+}

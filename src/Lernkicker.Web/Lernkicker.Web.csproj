@@ -8,12 +8,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lernkicker.Application\Lernkicker.Application.csproj" />
+    <ProjectReference Include="..\Lernkicker.Client\Lernkicker.Client.csproj" />
     <ProjectReference Include="..\Lernkicker.Contracts\Lernkicker.Contracts.csproj" />
     <ProjectReference Include="..\Lernkicker.Persistence\Lernkicker.Persistence.csproj" />
     <ProjectReference Include="..\Lernkicker.QuizFormat\Lernkicker.QuizFormat.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

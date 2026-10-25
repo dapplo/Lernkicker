@@ -1,0 +1,16 @@
+@page "/pair"
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Pair.Title"] · Lernkicker</PageTitle>
+
+<h1>@L["Pair.Title"]</h1>
+<p>@L["Pair.AlmostThere"]</p>
+<PairForm Code="@_code" Paired="@(() => Navigation.NavigateTo("", replace: true))" />
+
+@code {
+    private string? _code;
+
+    // The code travels in the fragment (#...), so it never shows up in server logs.
+    protected override void OnInitialized() =>
+        _code = new Uri(Navigation.Uri).Fragment.TrimStart('#') is { Length: > 0 } code ? Uri.UnescapeDataString(code) : null;
+}

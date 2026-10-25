@@ -1,0 +1,56 @@
+@page "/invitation"
+@inject Api Api
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Invitation.Title"] · Lernkicker</PageTitle>
+
+<h1>@L["Invitation.Heading"]</h1>
+<p>@L["Invitation.Intro"]</p>
+
+@if (string.IsNullOrEmpty(_code))
+{
+    <p class="error">@L["Invitation.NoCode"]</p>
+}
+else
+{
+    <form class="form" @onsubmit="Redeem" @onsubmit:preventDefault>
+        <label>@L["Invitation.YourName"] <input @bind="_name" autocomplete="name" maxlength="100" required /></label>
+        <label>@L["Common.Email"] <input type="email" @bind="_email" autocomplete="username" required /></label>
+        <label>@L["Invitation.Password"] <input type="password" @bind="_password" autocomplete="new-password" minlength="12" required /></label>
+        <label class="check">
+            <input type="checkbox" @bind="_consent" />
+            <span>@L["Invitation.ConsentBefore"] <a href="privacy" target="_blank">@L["Invitation.ConsentLink"]</a> @L["Invitation.ConsentAfter"]</span>
+        </label>
+        <Messages Errors="@_errors" />
+        <button class="btn" type="submit" disabled="@(_busy || !_consent)">@L["Invitation.Create"]</button>
+    </form>
+}
+
+@code {
+    private string? _code;
+    private string _name = "", _email = "", _password = "";
+    private bool _consent, _busy;
+    private IReadOnlyList<string>? _errors;
+
+    // The code travels in the fragment (#...), so it never shows up in server logs.
+    protected override void OnInitialized() => _code = new Uri(Navigation.Uri).Fragment.TrimStart('#');
+
+    private async Task Redeem()
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            await Api.RedeemInvitation(new RedeemInvitationRequest(_code!, _email, _password, _name, _consent, UiLanguage.Current));
+            Navigation.NavigateTo("parents", replace: true);
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}
