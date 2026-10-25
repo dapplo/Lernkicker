@@ -19,11 +19,15 @@ RUN dotnet restore src/Lernkicker.Web/Lernkicker.Web.csproj -a $TARGETARCH
 COPY schema/ schema/
 COPY src/ src/
 RUN dotnet publish src/Lernkicker.Web/Lernkicker.Web.csproj -a $TARGETARCH --no-restore -c Release -o /app
+# The final image has no shell; create the data folder here so it can be copied with the right owner
+RUN mkdir /data
 
 # Chiseled: no shell, no package manager, runs as the non-root user "app" (uid 1654)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled
 WORKDIR /app
 COPY --from=build /app ./
+# Owned by the app user, so a new named volume starts writable (a bind mount still needs chown 1654)
+COPY --from=build --chown=1654:1654 /data /data
 
 ENV ASPNETCORE_HTTP_PORTS=8080 \
     Lernkicker__DataPath=/data
