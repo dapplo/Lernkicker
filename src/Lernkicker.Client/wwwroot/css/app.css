@@ -312,6 +312,84 @@ input.gap { width: 9em; }
 .dates .when { color: var(--muted); font-size: 0.9rem; }
 .dates .what { font-weight: 700; }
 
+/* Learning material */
+.card .known { color: var(--green-dark); font-weight: 600; }
+.lesson-block { background: var(--paper); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; box-shadow: 0 1px 3px rgb(0 0 0 / 8%); border-left: 6px solid var(--line); }
+.lesson-block.known { border-left-color: var(--green); }
+.lesson-block p, .lesson-block li { line-height: 1.55; }
+.known-toggle {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    font: inherit;
+    font-weight: 600;
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+}
+.known-toggle.on { border: 2px solid var(--green); background: var(--green-light); color: var(--green-dark); }
+.facts { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.facts li { background: #fff8e1; border-radius: 10px; padding: 8px 12px; }
+.facts li::before { content: "★ "; color: var(--gold); }
+.lesson-end { margin: 24px 0; display: grid; gap: 10px; justify-items: start; }
+
+.modes { display: flex; gap: 6px; margin-bottom: 12px; }
+.modes button {
+    flex: 1;
+    padding: 10px 8px;
+    font: inherit;
+    font-weight: 600;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper);
+    color: var(--text);
+    cursor: pointer;
+}
+.modes button.on { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+.level { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; }
+.level span { grid-column: 1 / -1; order: -1; color: var(--muted); font-weight: 600; }
+.level .btn { padding: 8px 10px; }
+.poem { font-size: 1.15rem; line-height: 1.9; }
+.poem .stanza { margin: 0 0 1em; }
+.poem .line { display: block; }
+.poem .author { color: var(--muted); font-style: italic; font-size: 1rem; }
+.poem .revealed { color: var(--green-dark); font-weight: 600; }
+.poem .hidden-line { color: var(--line); letter-spacing: 0.3em; }
+.gap-word {
+    font: inherit;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    background: var(--green-light);
+    border: none;
+    border-radius: 6px;
+    padding: 0 3px;
+    cursor: pointer;
+}
+
+.flashcard {
+    display: grid;
+    place-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 150px;
+    padding: 20px;
+    font: inherit;
+    text-align: center;
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--background);
+    color: var(--text);
+    cursor: pointer;
+}
+.flashcard .side { font-size: 1.3rem; font-weight: 700; }
+.flashcard small { color: var(--muted); }
+.flashcard.flipped { border-color: var(--green); background: var(--green-light); }
+.flashcard.flipped .side { font-size: 1.1rem; font-weight: 600; }
+.cards-done { text-align: center; }
+
 .error { color: var(--red); background: var(--red-light); border-radius: 10px; padding: 8px 12px; }
 .error p, .error ul { margin: 0; }
 .ok { color: var(--green-dark); background: var(--green-light); border-radius: 10px; padding: 8px 12px; }

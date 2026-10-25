@@ -1,0 +1,130 @@
+@page "/learn/{AssignmentId:guid}"
+@inject Api Api
+@inject NavigationManager Navigation
+
+<PageTitle>@(_lesson?.Title ?? L["Learn.Title"]) · Lernkicker</PageTitle>
+
+@if (_errors is not null && _lesson is null)
+{
+    <Messages Errors="@_errors" />
+    <a class="btn" href="">@L["Common.Back"]</a>
+}
+else if (_lesson is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else
+{
+    <header class="practice-header">
+        <a href="" class="close" aria-label="@L["Practice.ToOverview"]">✕</a>
+        <span>@Display.Subject(_lesson.Subject)@(_lesson.DueOn is { } due ? " · " + L["Lessons.Until", Display.Due(due)] : "")</span>
+    </header>
+    <h1 lang="@_lesson.Language">@_lesson.Title</h1>
+    @if (_lesson.Description is { } description)
+    {
+        <p class="subtitle" lang="@_lesson.Language">@description</p>
+    }
+
+    @foreach (var block in _lesson.Blocks)
+    {
+        var known = _known.Contains(block.Id);
+        <section class="lesson-block @(known ? "known" : "")" @key="block.Id">
+            <h2 lang="@(block.Title is null ? null : _lesson.Language)">@(block.Title ?? L[$"Learn.Type.{block.Type}"])</h2>
+            <div lang="@_lesson.Language">
+                @switch (block.Type)
+                {
+                    case "text":
+                        <TextView Text="@(block.Text!)" />
+                        break;
+                    case "poem":
+                        <PoemView Block="@block" />
+                        break;
+                    case "flashcards":
+                        <FlashcardsView Cards="@(block.Cards!)" />
+                        break;
+                    case "facts":
+                        <ul class="facts">
+                            @foreach (var item in block.Items!)
+                            {
+                                <li>@item</li>
+                            }
+                        </ul>
+                        break;
+                }
+            </div>
+            <button class="known-toggle @(known ? "on" : "")" aria-pressed="@(known ? "true" : "false")" @onclick="() => Toggle(block.Id)">
+                @(known ? L["Learn.KnowIt"] : L["Learn.MarkKnown"])
+            </button>
+        </section>
+    }
+
+    <div class="lesson-end">
+        @if (_saved)
+        {
+            <p class="ok" role="status">@L["Learn.Saved", _known.Count, _lesson.Blocks.Count]</p>
+            <a class="btn" href="">@L["Practice.ToOverview"]</a>
+        }
+        else
+        {
+            <p class="hint">@L["Learn.FinishHint"]</p>
+            <button class="btn goal" disabled="@_busy" @onclick="Finish">@L["Learn.Finish"]</button>
+        }
+        <Messages Errors="@_errors" />
+    </div>
+}
+
+@code {
+    private LessonDto? _lesson;
+    private HashSet<string> _known = [];
+    private IReadOnlyList<string>? _errors;
+    private bool _busy, _saved;
+
+    [Parameter]
+    public Guid AssignmentId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            _lesson = await Api.Lesson(AssignmentId);
+            _known = [.. _lesson.KnownBlocks];
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("");
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+
+    private void Toggle(string blockId)
+    {
+        _saved = false;
+        if (!_known.Remove(blockId))
+        {
+            _known.Add(blockId);
+        }
+    }
+
+    private async Task Finish()
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            _lesson = await Api.Practised(AssignmentId, [.. _known]);
+            _known = [.. _lesson.KnownBlocks];
+            _saved = true;
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

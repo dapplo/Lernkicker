@@ -11,6 +11,7 @@ It runs as a Docker container on a Synology NAS and is reachable through Tailsca
 - [Operations](docs/operations.md): running it on a Synology with Tailscale (and Funnel)
 - [Security concept](docs/security.md): Funnel, login, family isolation, data protection, email
 - [Quiz format `quiz/v1`](docs/quiz-format.md): what a quiz looks like as JSON
+- [Lesson format `lesson/v1`](docs/lesson-format.md): learning material (poems, texts, flashcards, facts) as JSON
 - [`schema/`](schema/): JSON Schema for quizzes, [`quizzes/`](quizzes/): example quizzes
 - [`tools/validate_quizzes.py`](tools/validate_quizzes.py): validates quizzes locally and in CI
 
@@ -20,7 +21,7 @@ It runs as a Docker container on a Synology NAS and is reachable through Tailsca
 | --- | --- |
 | `src/Lernkicker.Domain` | Quizzes, exercise types, grading, families, children, devices, practice (no dependencies) |
 | `src/Lernkicker.Application` | Use cases, ports and error codes |
-| `src/Lernkicker.QuizFormat` | Adapter: `quiz/v1` JSON and schema validation |
+| `src/Lernkicker.QuizFormat` | Adapter: `quiz/v1` and `lesson/v1` JSON and schema validation |
 | `src/Lernkicker.Calendar` | Adapter: ICS import (only from public addresses) and feed with Ical.Net, local time with NodaTime |
 | `src/Lernkicker.Persistence` | Adapter: EF Core + SQLite, ASP.NET Core Identity, migrations |
 | `src/Lernkicker.Contracts` | DTOs of the HTTP API, shared by server and client |
@@ -68,12 +69,14 @@ Then open http://localhost:8080 and log in under **I am a parent / Ich bin ein E
 
 | Path | Who | What |
 | --- | --- | --- |
-| `/` | child | Pair the phone, PIN, list of quizzes with stars, dates of the next two weeks |
+| `/` | child | Pair the phone, PIN, list of quizzes with stars, learning material, dates of the next two weeks |
 | `/pair#<code>` | child | Opened from the QR code |
 | `/practice/<assignment>` | child | One exercise per screen, hand in, result with solutions |
+| `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, facts; mark parts as known |
 | `/parents` | parent | Login, children, add a child |
 | `/parents/quizzes` | parent | Upload (file or paste) and delete quizzes |
-| `/parents/children/<id>` | parent | Assign quizzes, dates, subscribed calendars, feed link, results, QR code for pairing, devices, settings |
+| `/parents/lessons` | parent | Upload (file or paste) and delete learning material |
+| `/parents/children/<id>` | parent | Assign quizzes and learning material (with progress), dates, subscribed calendars, feed link, results, QR code for pairing, devices, settings |
 | `/invitation#<code>` | new parent | Create an account from an invitation |
 | `/admin` | admin | Invite families, delete families (tailnet only) |
 | `/privacy` | everyone | Privacy notice |
@@ -87,11 +90,12 @@ All endpoints are under `/api`, take and return JSON, and answer errors with `{ 
 | `POST /api/account/login`, `POST /api/account/logout`, `GET /api/account/me`, `PUT /api/account/language`, `POST /api/account/invitation` | parents |
 | `POST /api/admin/invitations`, `GET /api/admin/families`, `DELETE /api/admin/families/{id}` | admin, tailnet only |
 | `GET /api/quizzes`, `POST /api/quizzes` (raw JSON body), `GET /api/quizzes/{quizId}`, `DELETE /api/quizzes/{quizId}` | parents |
+| `GET /api/lessons`, `POST /api/lessons` (raw JSON body), `GET /api/lessons/{lessonId}`, `DELETE /api/lessons/{lessonId}`, `GET/POST /api/children/{id}/lessons`, `DELETE …/lessons/{assignmentId}` | parents |
 | `GET/POST /api/children`, `PUT/DELETE /api/children/{id}`, `PUT …/pin`, `POST …/pairing`, `GET …/devices`, `DELETE …/devices/{deviceId}`, `POST …/devices/{deviceId}/unlock`, `GET/POST …/assignments`, `DELETE …/assignments/{assignmentId}`, `GET …/attempts`, `GET …/attempts/{attemptId}` | parents |
 | `GET/POST /api/children/{id}/calendar` (`?from=&to=`), `PUT/DELETE …/calendar/{eventId}`, `GET/POST …/subscriptions`, `POST …/subscriptions/{subscriptionId}/sync`, `DELETE …/subscriptions/{subscriptionId}`, `POST/DELETE …/feed` | parents |
 | `GET /calendar/{token}.ics` | calendar apps (secret link, no login) |
 | `POST /api/device/pair`, `GET /api/device/status`, `POST /api/device/login`, `POST /api/device/logout` | child's device |
-| `GET /api/device/calendar`, `GET /api/device/assignments`, `GET /api/device/assignments/{id}`, `POST /api/device/assignments/{id}/submit` | child |
+| `GET /api/device/calendar`, `GET /api/device/assignments`, `GET /api/device/assignments/{id}`, `POST /api/device/assignments/{id}/submit`, `GET /api/device/lessons`, `GET /api/device/lessons/{id}`, `POST /api/device/lessons/{id}/practice` | child |
 
 ## License and support
 

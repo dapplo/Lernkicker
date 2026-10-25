@@ -127,6 +127,12 @@ public static class TestData
     public static async Task<AssignmentOverview> AssignAsync(HttpClient parent, Guid childId, string quizId, DateOnly? dueOn = null) =>
         await LernkickerFactory.Json<AssignmentOverview>(await parent.PostAsJsonAsync($"/api/children/{childId}/assignments", new NewAssignment(quizId, dueOn)));
 
+    public static async Task<LessonOverview> UploadPoemAsync(HttpClient parent) =>
+        await LernkickerFactory.Json<LessonOverview>(await parent.PostAsync("/api/lessons", AsJson(Lernkicker.Tests.Examples.PoemJson())));
+
+    public static async Task<LessonAssignmentOverview> AssignLessonAsync(HttpClient parent, Guid childId, string lessonId, DateOnly? dueOn = null) =>
+        await LernkickerFactory.Json<LessonAssignmentOverview>(await parent.PostAsJsonAsync($"/api/children/{childId}/lessons", new NewLessonAssignment(lessonId, dueOn)));
+
     /// <summary>Pairs a new device for the child and logs in with the PIN.</summary>
     public static async Task<HttpClient> ChildPhoneAsync(LernkickerFactory factory, HttpClient parent, Guid childId, string pin = "1234")
     {

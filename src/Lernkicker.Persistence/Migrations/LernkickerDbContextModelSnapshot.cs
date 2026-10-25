@@ -292,6 +292,96 @@ namespace Lernkicker.Persistence.Migrations
                     b.ToTable("PairingCodes");
                 });
 
+            modelBuilder.Entity("Lernkicker.Domain.Lessons.LessonAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("AssignedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly?>("DueOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("KnownBlocks")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("LastPracticedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PracticeCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("StoredLessonId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StoredLessonId");
+
+                    b.HasIndex("ChildId", "StoredLessonId")
+                        .IsUnique();
+
+                    b.ToTable("LessonAssignments");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Lessons.StoredLesson", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("BlockCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GradeLevel")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LessonId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Topic")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UploadedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyId", "LessonId")
+                        .IsUnique();
+
+                    b.ToTable("Lessons");
+                });
+
             modelBuilder.Entity("Lernkicker.Domain.Library.StoredQuiz", b =>
                 {
                     b.Property<Guid>("Id")
@@ -698,6 +788,30 @@ namespace Lernkicker.Persistence.Migrations
                     b.HasOne("Lernkicker.Domain.Families.Child", null)
                         .WithMany()
                         .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Lessons.LessonAssignment", b =>
+                {
+                    b.HasOne("Lernkicker.Domain.Families.Child", null)
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lernkicker.Domain.Lessons.StoredLesson", null)
+                        .WithMany()
+                        .HasForeignKey("StoredLessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Lessons.StoredLesson", b =>
+                {
+                    b.HasOne("Lernkicker.Domain.Families.Family", null)
+                        .WithMany()
+                        .HasForeignKey("FamilyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

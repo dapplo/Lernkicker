@@ -1,0 +1,93 @@
+@inject Api Api
+
+@* The lessons a child has to learn, with progress, for parents *@
+<section class="box">
+    <h2>@L["Child.ToLearn"]</h2>
+    <Messages Errors="@_errors" />
+    @if (_assignments.Count == 0)
+    {
+        <p>@L["Child.NoLessons"]</p>
+    }
+    <ul class="list">
+        @foreach (var a in _assignments)
+        {
+            <li class="@Display.SubjectClass(a.Subject)">
+                <div>
+                    <b>@a.Title</b>
+                    <small>@Display.Subject(a.Subject)@(a.DueOn is { } due ? " · " + L["Lessons.Until", Display.Date(due)] : "")</small>
+                    <small>@Progress(a)</small>
+                </div>
+                <button class="btn quiet" @onclick="() => Unassign(a.Id)">@L["Common.Remove"]</button>
+            </li>
+        }
+    </ul>
+    @if (_lessons.Count == 0)
+    {
+        <p class="hint"><a href="parents/lessons">@L["Child.UploadLessonFirst"]</a></p>
+    }
+    else
+    {
+        <form class="form row" @onsubmit="Assign" @onsubmit:preventDefault>
+            <label>@L["Child.Lesson"]
+                <select @bind="_newLesson" required>
+                    <option value="">…</option>
+                    @foreach (var l in _lessons)
+                    {
+                        <option value="@l.LessonId">@Display.Subject(l.Subject): @l.Title</option>
+                    }
+                </select>
+            </label>
+            <label>@L["Child.LearnUntil"] <input type="date" @bind="_dueOn" /></label>
+            <button class="btn" type="submit" disabled="@string.IsNullOrEmpty(_newLesson)">@L["Child.AssignLesson"]</button>
+        </form>
+    }
+</section>
+
+@code {
+    private List<LessonAssignmentOverview> _assignments = [];
+    private List<LessonOverview> _lessons = [];
+    private string _newLesson = "";
+    private DateOnly? _dueOn;
+    private IReadOnlyList<string>? _errors;
+
+    [Parameter, EditorRequired]
+    public Guid ChildId { get; set; }
+
+    /// <summary>Called after a change, e.g. so the calendar shows the new due date.</summary>
+    [Parameter]
+    public EventCallback Changed { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _lessons = await Api.Lessons();
+        _assignments = await Api.LessonAssignments(ChildId);
+    }
+
+    private string Progress(LessonAssignmentOverview a) => a.LastPracticedAt is { } last
+        ? L["Child.LessonProgress", a.PracticeCount, Display.Date(last), a.KnownBlocks.Count, a.Blocks]
+        : L["Child.NotPractisedYet"];
+
+    private Task Assign() => Run(async () =>
+    {
+        await Api.AssignLesson(ChildId, new NewLessonAssignment(_newLesson, _dueOn));
+        _newLesson = "";
+        _dueOn = null;
+    });
+
+    private Task Unassign(Guid assignmentId) => Run(() => Api.UnassignLesson(ChildId, assignmentId));
+
+    private async Task Run(Func<Task> action)
+    {
+        _errors = null;
+        try
+        {
+            await action();
+            _assignments = await Api.LessonAssignments(ChildId);
+            await Changed.InvokeAsync();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+}

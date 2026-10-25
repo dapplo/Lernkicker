@@ -1,4 +1,5 @@
 using Lernkicker.Domain.Families;
+using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
 
 namespace Lernkicker.Application;
@@ -45,12 +46,26 @@ public sealed record AttemptSummary(
 public sealed record ChildAssignment(
     Guid AssignmentId, string Title, string Subject, string? Topic, int MaxPoints, DateOnly? DueOn, int Attempts, int? BestPercent, int Stars);
 
+public sealed record LessonSummary(string LessonId, string Title, string Subject, int GradeLevel, string? Topic, int Blocks, DateTimeOffset UploadedAt);
+
+/// <summary>A lesson given to a child, with the child's progress, for parents.</summary>
+public sealed record LessonAssignmentSummary(
+    Guid Id, string LessonId, string Title, string Subject, DateOnly? DueOn, DateTimeOffset AssignedAt,
+    int PracticeCount, DateTimeOffset? LastPracticedAt, IReadOnlyList<string> KnownBlocks, int Blocks);
+
+/// <summary>A lesson as the child sees it in the list.</summary>
+public sealed record ChildLesson(Guid AssignmentId, string Title, string Subject, string? Topic, DateOnly? DueOn, int KnownBlocks, int Blocks);
+
+/// <summary>A lesson to learn, with what the child already marked as known.</summary>
+public sealed record LessonToLearn(Guid AssignmentId, Lesson Lesson, DateOnly? DueOn, IReadOnlyList<string> KnownBlocks);
+
 /// <summary>Where a calendar entry comes from.</summary>
 public static class EntrySources
 {
     public const string Manual = "manual";
     public const string Imported = "imported";
     public const string Assignment = "assignment";
+    public const string Lesson = "lesson";
 }
 
 /// <summary>

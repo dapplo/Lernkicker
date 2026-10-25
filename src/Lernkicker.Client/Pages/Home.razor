@@ -29,14 +29,14 @@ else if (_assignments is null)
 else
 {
     <h1>@L["Home.Hello", _device.ChildName ?? ""]</h1>
-    @if (_assignments.Count == 0)
+    @if (_assignments.Count == 0 && _lessons is not { Count: > 0 })
     {
         <div class="empty">
             <div class="ball" aria-hidden="true">⚽</div>
             <p>@L["Home.NothingToDo"]</p>
         </div>
     }
-    else
+    else if (_assignments.Count > 0)
     {
         <p>@L["Home.WhatToPractice"]</p>
         <ul class="cards">
@@ -51,6 +51,26 @@ else
                             <span class="due">@L["Home.TestOn", Display.Due(due)]</span>
                         }
                         <span class="stars" aria-label="@L["Stars.Label", assignment.Stars]">@Display.Stars(assignment.Stars)</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    @if (_lessons is { Count: > 0 })
+    {
+        <h2>@L["Home.ToLearn"]</h2>
+        <ul class="cards">
+            @foreach (var lesson in _lessons)
+            {
+                <li>
+                    <a class="card lesson @Display.SubjectClass(lesson.Subject)" href="learn/@lesson.AssignmentId">
+                        <span class="subject">@Display.Subject(lesson.Subject)</span>
+                        <span class="title">@lesson.Title</span>
+                        @if (lesson.DueOn is { } due)
+                        {
+                            <span class="due">@L["Lessons.Until", Display.Due(due)]</span>
+                        }
+                        <span class="known">@L["Home.Known", lesson.KnownBlocks, lesson.Blocks]</span>
                     </a>
                 </li>
             }
@@ -92,6 +112,7 @@ else
 @code {
     private DeviceStatusResponse? _device;
     private List<MyAssignment>? _assignments;
+    private List<MyLesson>? _lessons;
     private List<CalendarEntryDto>? _dates;
     private string? _error;
     private bool _busy;
@@ -104,8 +125,9 @@ else
         _error = null;
         _device = await Api.DeviceStatus();
         _assignments = _device is { Paired: true, Locked: false } ? await Api.MyAssignments() : null;
-        // Tests to practise already have their card; the list shows the other dates
-        _dates = _assignments is null ? null : (await Api.MyCalendar())?.Where(d => d.Source != "assignment").ToList();
+        _lessons = _assignments is null ? null : await Api.MyLessons();
+        // Tests and lessons already have their card; the list shows the other dates
+        _dates = _assignments is null ? null : (await Api.MyCalendar())?.Where(d => d.Source is not ("assignment" or "lesson")).ToList();
     }
 
     private async Task Login(string pin)

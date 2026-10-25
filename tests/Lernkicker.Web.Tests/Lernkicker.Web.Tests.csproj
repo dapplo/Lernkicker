@@ -23,7 +23,9 @@
   <ItemGroup>
     <Compile Include="..\Shared\Examples.cs" Link="Examples.cs" />
     <None Include="..\..\quizzes\**\*.json" LinkBase="quizzes" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\lessons\**\*.json" LinkBase="lessons" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\schema\quiz-v1.schema.json" Link="quiz-v1.schema.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\schema\lesson-v1.schema.json" Link="lesson-v1.schema.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

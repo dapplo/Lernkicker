@@ -2,6 +2,7 @@ using Lernkicker.Application;
 using Lernkicker.Application.Ports;
 using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
+using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
 using Lernkicker.Domain.Practice;
 using Microsoft.EntityFrameworkCore;
@@ -185,4 +186,33 @@ internal sealed class UnitOfWork(LernkickerDbContext db) : IUnitOfWork
 
         public ValueTask DisposeAsync() => inner.DisposeAsync();
     }
+}
+
+internal sealed class LessonRepository(LernkickerDbContext db) : ILessonRepository
+{
+    public void Add(StoredLesson lesson) => db.Lessons.Add(lesson);
+
+    public void Remove(StoredLesson lesson) => db.Lessons.Remove(lesson);
+
+    public async Task<IReadOnlyList<StoredLesson>> ListAsync() => await db.Lessons.ToListAsync();
+
+    public Task<StoredLesson?> FindAsync(string lessonId) => db.Lessons.SingleOrDefaultAsync(l => l.LessonId == lessonId);
+
+    public Task<StoredLesson?> FindAsync(Guid storedLessonId) => db.Lessons.SingleOrDefaultAsync(l => l.Id == storedLessonId);
+
+    public void Add(LessonAssignment assignment) => db.LessonAssignments.Add(assignment);
+
+    public void Remove(LessonAssignment assignment) => db.LessonAssignments.Remove(assignment);
+
+    public Task<LessonAssignment?> FindAssignmentAsync(Guid childId, Guid assignmentId) =>
+        db.LessonAssignments.SingleOrDefaultAsync(a => a.ChildId == childId && a.Id == assignmentId);
+
+    public Task<LessonAssignment?> FindAssignmentForLessonAsync(Guid childId, Guid storedLessonId) =>
+        db.LessonAssignments.SingleOrDefaultAsync(a => a.ChildId == childId && a.StoredLessonId == storedLessonId);
+
+    public async Task<IReadOnlyList<LessonAssignment>> ListAssignmentsAsync(Guid childId) =>
+        await db.LessonAssignments.Where(a => a.ChildId == childId).ToListAsync();
+
+    public Task RemoveAssignmentsAsync(Guid storedLessonId) =>
+        db.LessonAssignments.Where(a => a.StoredLessonId == storedLessonId).ExecuteDeleteAsync();
 }

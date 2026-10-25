@@ -1,6 +1,7 @@
 using Lernkicker.Application;
 using Lernkicker.Contracts;
 using Lernkicker.Domain.Calendar;
+using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Quizzes;
 
 namespace Lernkicker.Web.Endpoints;
@@ -33,6 +34,30 @@ public static class Mapping
 
     public static SubscriptionOverview ToDto(this SubscriptionSummary s) =>
         new(s.Id, s.Label, s.Host, s.Kind, s.LastSyncedAt, s.LastError, s.EventCount);
+
+    public static LessonOverview ToDto(this LessonSummary l) =>
+        new(l.LessonId, l.Title, l.Subject, l.GradeLevel, l.Topic, l.Blocks, l.UploadedAt);
+
+    public static LessonAssignmentOverview ToDto(this LessonAssignmentSummary a) =>
+        new(a.Id, a.LessonId, a.Title, a.Subject, a.DueOn, a.AssignedAt, a.PracticeCount, a.LastPracticedAt, a.KnownBlocks, a.Blocks);
+
+    public static MyLesson ToDto(this ChildLesson l) => new(l.AssignmentId, l.Title, l.Subject, l.Topic, l.DueOn, l.KnownBlocks, l.Blocks);
+
+    public static LessonDto ToDto(this LessonToLearn l) =>
+        new(l.AssignmentId, l.Lesson.Title, l.Lesson.Subject, l.Lesson.Language, l.Lesson.Topic, l.Lesson.Description, l.DueOn,
+            l.KnownBlocks, l.Lesson.Blocks.Select(ToDto).ToList());
+
+    private static LessonBlockDto ToDto(LessonBlock b) => b switch
+    {
+        TextBlock t => new LessonBlockDto { Id = t.Id, Type = "text", Title = t.Title, Text = t.Text },
+        PoemBlock p => new LessonBlockDto { Id = p.Id, Type = "poem", Title = p.Title, Author = p.Author, Hint = p.Hint, Stanzas = p.Stanzas },
+        FlashcardsBlock f => new LessonBlockDto
+        {
+            Id = f.Id, Type = "flashcards", Title = f.Title, Cards = f.Cards.Select(c => new FlashcardDto(c.Front, c.Back)).ToList(),
+        },
+        FactsBlock f => new LessonBlockDto { Id = f.Id, Type = "facts", Title = f.Title, Items = f.Items },
+        _ => throw new NotSupportedException($"Unknown block type {b.GetType().Name}"),
+    };
 
     public static EventDetails ToDomain(this EventRequest r) => new(r.Kind, r.Title, r.Date, r.StartTime, r.EndTime, r.Location);
 

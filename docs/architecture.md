@@ -6,8 +6,8 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
           driving adapters                  core                    driven adapters
    ┌────────────────────────┐   ┌──────────────────────────┐   ┌──────────────────────────┐
    │ Lernkicker.Client      │   │ Lernkicker.Application   │   │ Lernkicker.QuizFormat    │
-   │ (Blazor PWA)           │   │ use cases, ports,        │──▶│ IQuizFormat: quiz/v1     │
-   │        │ HTTP + JSON   │   │ Result / error codes     │   │ JSON + JSON Schema       │
+   │ (Blazor PWA)           │   │ use cases, ports,        │──▶│ IQuizFormat, ILesson-    │
+   │        │ HTTP + JSON   │   │ Result / error codes     │   │ Format: JSON + Schema    │
    │        ▼               │   │            │             │   ├──────────────────────────┤
    │ Lernkicker.Web         │──▶│            ▼             │──▶│ Lernkicker.Persistence   │
    │ Minimal API, cookies,  │   │ Lernkicker.Domain        │   │ EF Core + SQLite,        │
@@ -25,9 +25,9 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 
 | Project | Role | May reference |
 | --- | --- | --- |
-| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed` | the BCL only |
+| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed` | the BCL only |
 | `Lernkicker.Application` | Use cases (`*UseCases`), ports (`Ports/Ports.cs`), `Result`/`AppError` and the stable `ErrorCodes` | Domain |
-| `Lernkicker.QuizFormat` | Driven adapter for `IQuizFormat`: reads and writes `quiz/v1` JSON, validates against the embedded schema | Application, Domain, JsonSchema.Net |
+| `Lernkicker.QuizFormat` | Driven adapter for `IQuizFormat` and `ILessonFormat`: reads `quiz/v1` and `lesson/v1` JSON, validates against the embedded schemas | Application, Domain, JsonSchema.Net |
 | `Lernkicker.Calendar` | Driven adapter for `ICalendarSource` (fetches ICS over HTTP, only from public addresses), `ICalendarWriter` (the ICS feed) and `ILocalClock` (today in the family's time zone) | Application, Domain, Ical.Net, NodaTime |
 | `Lernkicker.Persistence` | Driven adapter for the repositories, `IUnitOfWork`, `IParentAccounts`, `IPinHasher`: EF Core, SQLite, ASP.NET Core Identity, migrations | Application, Domain |
 | `Lernkicker.Contracts` | Request and response DTOs of the HTTP API | nothing |
@@ -49,6 +49,7 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 ## Adding things
 
 - **A new exercise type:** domain record + `QuizSheet` + `Grader` + schema + `docs/quiz-format.md` + `QuizJson.ExerciseTypes` + a sheet DTO in Contracts + a view in `ExerciseView.razor` + tests.
+- **A new lesson block type:** domain record + schema + `docs/lesson-format.md` + `LessonJson` + `Mapping` (block DTO) + a case in `Learn.razor` + a `Learn.Type.<type>` text + tests.
 - **A new error code:** a constant in `ErrorCodes` and an `Error.<code>` text in both resx files (`LocalizationTests` fails otherwise).
 - **A new UI language:** add `Strings.<lang>.resx`, the language to `UiLanguage.Available`, `Languages.Supported`, `SatelliteResourceLanguages` in the client csproj and `supported` plus the loading texts in `wwwroot/js/start.js`.
 - **A new adapter** (e.g. Telegram): define the port in Application, implement it in its own project, wire it in `Lernkicker.Web/Program.cs`.

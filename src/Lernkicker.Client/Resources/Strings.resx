@@ -263,4 +263,57 @@
   <data name="Error.calendar.tooLarge" xml:space="preserve"><value>The calendar is larger than 2 MB.</value></data>
   <data name="Error.calendar.notACalendar" xml:space="preserve"><value>There is no calendar (ICS) at this address. Maybe it is a web page?</value></data>
   <data name="Error.calendar.rangeInvalid" xml:space="preserve"><value>This period is too long.</value></data>
+  <data name="Parents.ManageLessons" xml:space="preserve"><value>Manage learning material</value></data>
+  <data name="Lessons.Title" xml:space="preserve"><value>Learning material</value></data>
+  <data name="Lessons.Intro" xml:space="preserve"><value>Material your child reads and learns on the phone: a poem to recite, words, key facts.</value></data>
+  <data name="Lessons.Upload" xml:space="preserve"><value>Upload learning material</value></data>
+  <data name="Lessons.UploadHint" xml:space="preserve"><value>A file in the &lt;code&gt;lesson/v1&lt;/code&gt; format (JSON) with text, a poem, flashcards or facts. If you upload a file with the same &lt;code&gt;id&lt;/code&gt; again, it replaces the old one; your child's progress stays.</value></data>
+  <data name="Lessons.Saved" xml:space="preserve"><value>“{0}” saved.</value></data>
+  <data name="Lessons.None" xml:space="preserve"><value>No learning material yet. Upload the first one.</value></data>
+  <data name="Lessons.Details" xml:space="preserve"><value>{0} · grade {1} · {2} parts · {3}</value></data>
+  <data name="Lessons.DeleteHint" xml:space="preserve"><value>Deleting also removes it from your children, together with their progress.</value></data>
+  <data name="Lessons.Until" xml:space="preserve"><value>Due {0}</value></data>
+  <data name="Error.lesson.notFound" xml:space="preserve"><value>This learning material does not exist.</value></data>
+  <data name="Error.lesson.invalid" xml:space="preserve"><value>The learning material has errors:</value></data>
+  <data name="Error.lesson.tooLarge" xml:space="preserve"><value>The file is larger than 256 KB.</value></data>
+  <data name="Calendar.Source.lesson" xml:space="preserve"><value>to learn</value></data>
+  <data name="Child.ToLearn" xml:space="preserve"><value>To learn</value></data>
+  <data name="Child.NoLessons" xml:space="preserve"><value>Nothing to learn yet.</value></data>
+  <data name="Child.UploadLessonFirst" xml:space="preserve"><value>Upload learning material first.</value></data>
+  <data name="Child.AssignLesson" xml:space="preserve"><value>Give to learn</value></data>
+  <data name="Child.Lesson" xml:space="preserve"><value>Learning material</value></data>
+  <data name="Child.LearnUntil" xml:space="preserve"><value>Due on (optional)</value></data>
+  <data name="Child.LessonProgress" xml:space="preserve"><value>Practised {0}×, last on {1} · knows {2} of {3} parts</value></data>
+  <data name="Child.NotPractisedYet" xml:space="preserve"><value>Not practised yet</value></data>
+  <data name="Home.ToLearn" xml:space="preserve"><value>To learn</value></data>
+  <data name="Home.Known" xml:space="preserve"><value>✓ {0} of {1}</value></data>
+  <data name="Learn.Title" xml:space="preserve"><value>Learn</value></data>
+  <data name="Learn.Type.text" xml:space="preserve"><value>Read</value></data>
+  <data name="Learn.Type.poem" xml:space="preserve"><value>Poem</value></data>
+  <data name="Learn.Type.flashcards" xml:space="preserve"><value>Flashcards</value></data>
+  <data name="Learn.Type.facts" xml:space="preserve"><value>Remember</value></data>
+  <data name="Learn.MarkKnown" xml:space="preserve"><value>I know this!</value></data>
+  <data name="Learn.KnowIt" xml:space="preserve"><value>✓ I know this</value></data>
+  <data name="Learn.FinishHint" xml:space="preserve"><value>Tap “I know this!” for every part you know. Your parents can see it.</value></data>
+  <data name="Learn.Finish" xml:space="preserve"><value>Done for today</value></data>
+  <data name="Learn.Saved" xml:space="preserve"><value>Well done! You know {0} of {1} parts.</value></data>
+  <data name="Learn.TapToFlip" xml:space="preserve"><value>Tap to turn over</value></data>
+  <data name="Learn.Answer" xml:space="preserve"><value>Answer</value></data>
+  <data name="Learn.KnewIt" xml:space="preserve"><value>I knew it</value></data>
+  <data name="Learn.Again" xml:space="preserve"><value>Again</value></data>
+  <data name="Learn.CardsLeft" xml:space="preserve"><value>{0} of {1} cards left</value></data>
+  <data name="Learn.AllCardsDone" xml:space="preserve"><value>You know all {0} cards!</value></data>
+  <data name="Learn.CardsAgain" xml:space="preserve"><value>Once more</value></data>
+  <data name="Learn.Poem.Read" xml:space="preserve"><value>Read</value></data>
+  <data name="Learn.Poem.Practise" xml:space="preserve"><value>Practise</value></data>
+  <data name="Learn.Poem.Recite" xml:space="preserve"><value>Recite</value></data>
+  <data name="Learn.Poem.MoreHelp" xml:space="preserve"><value>More help</value></data>
+  <data name="Learn.Poem.LessHelp" xml:space="preserve"><value>Fewer words</value></data>
+  <data name="Learn.Poem.Level" xml:space="preserve"><value>Level {0} of {1}</value></data>
+  <data name="Learn.Poem.PractiseHint" xml:space="preserve"><value>Say the poem out loud and fill the gaps in your head. Tap a gap to see the word.</value></data>
+  <data name="Learn.Poem.ReciteHint" xml:space="preserve"><value>Say the next line out loud, then tap to check.</value></data>
+  <data name="Learn.Poem.ShowWord" xml:space="preserve"><value>Show word</value></data>
+  <data name="Learn.Poem.NextLine" xml:space="preserve"><value>Show next line</value></data>
+  <data name="Learn.Poem.Done" xml:space="preserve"><value>You recited the whole poem!</value></data>
+  <data name="Learn.Poem.FromStart" xml:space="preserve"><value>From the start</value></data>
 </root>

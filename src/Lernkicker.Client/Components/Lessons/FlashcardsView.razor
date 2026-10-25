@@ -1,0 +1,52 @@
+@* Flip a card, then sort it: known cards are done, the others come again at the end *@
+@if (_queue.Count == 0)
+{
+    <div class="cards-done">
+        <p>🎉 @L["Learn.AllCardsDone", Cards.Count]</p>
+        <button class="btn quiet" @onclick="Restart">@L["Learn.CardsAgain"]</button>
+    </div>
+}
+else
+{
+    var card = Cards[_queue[0]];
+    <p class="counter">@L["Learn.CardsLeft", _queue.Count, Cards.Count]</p>
+    <button class="flashcard @(_flipped ? "flipped" : "")" @onclick="() => _flipped = !_flipped" aria-live="polite">
+        <span class="side">@(_flipped ? card.Back : card.Front)</span>
+        <small>@(_flipped ? L["Learn.Answer"] : L["Learn.TapToFlip"])</small>
+    </button>
+    @if (_flipped)
+    {
+        <div class="buttons">
+            <button class="btn" @onclick="() => Next(true)">@L["Learn.KnewIt"]</button>
+            <button class="btn quiet" @onclick="() => Next(false)">@L["Learn.Again"]</button>
+        </div>
+    }
+}
+
+@code {
+    private List<int> _queue = [];
+    private bool _flipped;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<FlashcardDto> Cards { get; set; } = [];
+
+    protected override void OnParametersSet() => Restart();
+
+    private void Restart()
+    {
+        _queue = Enumerable.Range(0, Cards.Count).OrderBy(_ => Random.Shared.Next()).ToList();
+        _flipped = false;
+    }
+
+    private void Next(bool knew)
+    {
+        var current = _queue[0];
+        _queue.RemoveAt(0);
+        if (!knew)
+        {
+            _queue.Add(current);
+        }
+
+        _flipped = false;
+    }
+}

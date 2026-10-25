@@ -52,6 +52,22 @@ public partial class LocalizationTests
     }
 
     [Fact]
+    public void Every_lesson_block_type_and_subject_has_a_name()
+    {
+        using var schema = JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "lesson-v1.schema.json")));
+        var types = schema.RootElement.GetProperty("$defs").GetProperty("block").GetProperty("properties").GetProperty("type").GetProperty("enum")
+            .EnumerateArray().Select(t => t.GetString()!);
+        var subjects = schema.RootElement.GetProperty("properties").GetProperty("subject").GetProperty("enum").EnumerateArray().Select(s => s.GetString()!);
+
+        Assert.DoesNotContain(types, t => !English.ContainsKey($"Learn.Type.{t}"));
+        Assert.DoesNotContain(subjects, s => !English.ContainsKey($"Subject.{s}"));
+    }
+
+    [Fact]
+    public void Every_calendar_source_has_a_name() =>
+        Assert.DoesNotContain(Constants(typeof(EntrySources)), s => s != EntrySources.Manual && !English.ContainsKey($"Calendar.Source.{s}"));
+
+    [Fact]
     public void Every_calendar_kind_has_a_name()
     {
         Assert.Equal(Lernkicker.Domain.Calendar.EventKinds.All, Client.Services.Display.Kinds);

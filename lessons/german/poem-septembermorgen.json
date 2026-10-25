@@ -1,0 +1,58 @@
+{
+  "$schema": "../../schema/lesson-v1.schema.json",
+  "format": "lesson/v1",
+  "id": "poem-septembermorgen",
+  "title": "Gedicht: Septembermorgen",
+  "subject": "german",
+  "gradeLevel": 4,
+  "language": "de",
+  "topic": "Gedichte",
+  "description": "Ein kurzes Herbstgedicht zum Auswendiglernen, dazu Tipps und die wichtigsten Begriffe rund ums Gedicht.",
+  "source": "Eduard Mörike (1827), gemeinfrei",
+  "blocks": [
+    {
+      "id": "tips",
+      "type": "text",
+      "title": "So lernst du ein Gedicht",
+      "text": "Lies das Gedicht zuerst **zweimal laut** vor. Überlege dir zu jeder Zeile ein Bild im Kopf.\n\n- Lerne immer nur **zwei Zeilen** auf einmal.\n- Sag sie auf, ohne hinzuschauen.\n- Nimm dann die nächsten zwei Zeilen dazu.\n\nAm nächsten Tag *wiederholst* du alles noch einmal. Über Nacht merkt sich dein Kopf das Gedicht besonders gut."
+    },
+    {
+      "id": "poem",
+      "type": "poem",
+      "title": "Septembermorgen",
+      "author": "Eduard Mörike",
+      "hint": "Achte beim Aufsagen auf Pausen am Ende jeder Zeile.",
+      "stanzas": [
+        [
+          "Im Nebel ruhet noch die Welt,",
+          "Noch träumen Wald und Wiesen:",
+          "Bald siehst du, wenn der Schleier fällt,",
+          "Den blauen Himmel unverstellt,",
+          "Herbstkräftig die gedämpfte Welt",
+          "In warmem Golde fließen."
+        ]
+      ]
+    },
+    {
+      "id": "terms",
+      "type": "flashcards",
+      "title": "Begriffe rund ums Gedicht",
+      "cards": [
+        { "front": "Vers", "back": "Eine Zeile in einem Gedicht" },
+        { "front": "Strophe", "back": "Mehrere Verse, die zusammengehören. Danach kommt eine Leerzeile." },
+        { "front": "Reim", "back": "Wörter, die am Ende gleich klingen, z. B. Welt – fällt" },
+        { "front": "Dichter", "back": "Jemand, der Gedichte schreibt" }
+      ]
+    },
+    {
+      "id": "facts",
+      "type": "facts",
+      "title": "Merke",
+      "items": [
+        "Eduard Mörike lebte von 1804 bis 1875.",
+        "Das Gedicht beschreibt einen Herbstmorgen: erst Nebel, dann Sonne.",
+        "Welt – fällt – unverstellt – Welt reimen sich, Wiesen – fließen auch."
+      ]
+    }
+  ]
+}

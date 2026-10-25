@@ -26,6 +26,9 @@ public static class ApiLimits
 {
     /// <summary>Largest quiz file the server accepts; the client checks it before uploading. Equals the domain's QuizLimits.MaxBytes.</summary>
     public const int QuizMaxBytes = 256 * 1024;
+
+    /// <summary>Largest lesson file the server accepts. Equals the domain's LessonLimits.MaxBytes.</summary>
+    public const int LessonMaxBytes = 256 * 1024;
 }
 
 // Account

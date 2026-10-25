@@ -3,7 +3,7 @@ using Lernkicker.QuizFormat;
 
 namespace Lernkicker.Tests;
 
-/// <summary>The example quizzes from /quizzes, copied next to the test assembly.</summary>
+/// <summary>The example quizzes from /quizzes and lessons from /lessons, copied next to the test assembly.</summary>
 internal static class Examples
 {
     public const string HsuFile = "hsu/grain-and-elections.json";
@@ -14,6 +14,16 @@ internal static class Examples
         Directory.EnumerateFiles(Path.Combine(AppContext.BaseDirectory, "quizzes"), "*.json", SearchOption.AllDirectories);
 
     public static string HsuJson() => File.ReadAllText(PathOf(HsuFile));
+
+    public const string PoemFile = "german/poem-septembermorgen.json";
+
+    /// <summary>The example lessons from /lessons.</summary>
+    public static string LessonPathOf(string relative) => Path.Combine(AppContext.BaseDirectory, "lessons", relative);
+
+    public static IEnumerable<string> AllLessonFiles() =>
+        Directory.EnumerateFiles(Path.Combine(AppContext.BaseDirectory, "lessons"), "*.json", SearchOption.AllDirectories);
+
+    public static string PoemJson() => File.ReadAllText(LessonPathOf(PoemFile));
 
     public static Quiz Hsu()
     {
