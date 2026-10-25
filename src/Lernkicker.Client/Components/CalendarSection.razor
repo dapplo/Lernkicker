@@ -1,0 +1,229 @@
+@inject Api Api
+
+@* A child's dates for parents: own entries, subscribed calendars and the feed for the parents' calendar app *@
+<section class="box calendar">
+    <h2>@L["Calendar.Title"]</h2>
+    <Messages Errors="@_errors" />
+
+    @if (_entries.Count == 0)
+    {
+        <p>@L["Calendar.Empty"]</p>
+    }
+    <ul class="list">
+        @foreach (var entry in _entries)
+        {
+            <li class="@(entry.Date < Today ? "past" : "")">
+                <div>
+                    <b><span aria-hidden="true">@Display.KindIcon(entry.Kind)</span> @entry.Title</b>
+                    <small>
+                        @Display.Date(entry.Date)@Suffix(Display.Times(entry.StartTime, entry.EndTime))@Suffix(entry.Location)
+                        · @Display.Kind(entry.Kind)@Suffix(entry.Source == "manual" ? null : L[$"Calendar.Source.{entry.Source}"].Value)
+                    </small>
+                </div>
+                @if (entry.EventId is { } eventId)
+                {
+                    <span class="buttons">
+                        <button class="btn quiet" @onclick="() => Edit(entry)">@L["Calendar.Edit"]</button>
+                        <button class="btn quiet" @onclick="() => Delete(eventId)">@L["Common.Delete"]</button>
+                    </span>
+                }
+            </li>
+        }
+    </ul>
+
+    <details open="@(_editing is not null)">
+        <summary>@L[_editing is null ? "Calendar.AddDate" : "Calendar.EditDate"]</summary>
+        <form class="form" @onsubmit="SaveEvent" @onsubmit:preventDefault>
+            <label>@L["Calendar.What"] <input @bind="_title" maxlength="200" required placeholder="@L["Calendar.WhatExample"]" /></label>
+            <label>@L["Calendar.Kind"]
+                <select @bind="_kind">
+                    @foreach (var kind in Display.Kinds)
+                    {
+                        <option value="@kind">@Display.KindIcon(kind) @Display.Kind(kind)</option>
+                    }
+                </select>
+            </label>
+            <div class="row">
+                <label>@L["Calendar.Date"] <input type="date" @bind="_date" required /></label>
+                <label>@L["Calendar.From"] <input type="time" @bind="_start" /></label>
+                <label>@L["Calendar.To"] <input type="time" @bind="_end" disabled="@(_start is null)" /></label>
+            </div>
+            <p class="hint">@L["Calendar.TimeHint"]</p>
+            <label>@L["Calendar.Where"] <input @bind="_location" maxlength="200" /></label>
+            <span class="buttons">
+                <button class="btn" type="submit">@L[_editing is null ? "Common.Add" : "Common.Save"]</button>
+                @if (_editing is not null)
+                {
+                    <button class="btn quiet" type="button" @onclick="ResetForm">@L["Common.Cancel"]</button>
+                }
+            </span>
+        </form>
+    </details>
+
+    <h3>@L["Calendar.Subscriptions"]</h3>
+    <p class="hint">@L["Calendar.SubscriptionsHint"]</p>
+    <ul class="list">
+        @foreach (var subscription in _subscriptions)
+        {
+            <li>
+                <div>
+                    <b><span aria-hidden="true">@Display.KindIcon(subscription.Kind)</span> @subscription.Label</b>
+                    <small>
+                        @subscription.Host · @L["Calendar.DateCount", subscription.EventCount]@(subscription.LastSyncedAt is { } synced ? " · " + L["Calendar.UpdatedAt", Display.Date(synced)] : "")
+                    </small>
+                    @if (subscription.LastError is { } error)
+                    {
+                        <small class="error">@ErrorText(error)</small>
+                    }
+                </div>
+                <span class="buttons">
+                    <button class="btn quiet" @onclick="() => Sync(subscription.Id)" disabled="@_busy">@L["Calendar.UpdateNow"]</button>
+                    <button class="btn quiet" @onclick="() => Unsubscribe(subscription.Id)">@L["Common.Remove"]</button>
+                </span>
+            </li>
+        }
+    </ul>
+    <details>
+        <summary>@L["Calendar.Subscribe"]</summary>
+        <form class="form" @onsubmit="Subscribe" @onsubmit:preventDefault>
+            <label>@L["Calendar.Label"] <input @bind="_label" maxlength="100" required placeholder="@L["Calendar.LabelExample"]" /></label>
+            <label>@L["Calendar.Url"] <input type="url" inputmode="url" @bind="_url" maxlength="2000" required placeholder="webcal://…" /></label>
+            <label>@L["Calendar.DatesAre"]
+                <select @bind="_subscriptionKind">
+                    @foreach (var kind in Display.Kinds)
+                    {
+                        <option value="@kind">@Display.KindIcon(kind) @Display.Kind(kind)</option>
+                    }
+                </select>
+            </label>
+            <button class="btn" type="submit" disabled="@_busy">@L["Calendar.SubscribeButton"]</button>
+        </form>
+    </details>
+
+    <h3>@L["Calendar.Feed"]</h3>
+    <p class="hint">@L["Calendar.FeedHint", ChildName]</p>
+    @if (_feedLink is { } link)
+    {
+        <input class="link" readonly value="@link" aria-label="@L["Calendar.Feed"]" onfocus="this.select()" />
+        <p class="hint">@L["Calendar.FeedOnce"]</p>
+    }
+    <span class="buttons">
+        <button class="btn" @onclick="CreateFeed">@L["Calendar.CreateFeed"]</button>
+        <button class="btn quiet" @onclick="RemoveFeed">@L["Calendar.RemoveFeed"]</button>
+    </span>
+    @if (_message is { } message)
+    {
+        <p class="ok" role="status">@message</p>
+    }
+</section>
+
+@code {
+    private List<CalendarEntryDto> _entries = [];
+    private List<SubscriptionOverview> _subscriptions = [];
+    private Guid? _editing;
+    private string _title = "", _kind = "test", _location = "";
+    private DateOnly? _date;
+    private TimeOnly? _start, _end;
+    private string _label = "", _url = "", _subscriptionKind = "football";
+    private string? _feedLink, _message;
+    private bool _busy;
+    private IReadOnlyList<string>? _errors;
+
+    [Parameter, EditorRequired]
+    public Guid ChildId { get; set; }
+
+    [Parameter, EditorRequired]
+    public string ChildName { get; set; } = "";
+
+    private static DateOnly Today => DateOnly.FromDateTime(DateTime.Now);
+
+    protected override Task OnParametersSetAsync() => Reload();
+
+    private async Task Reload()
+    {
+        _entries = await Api.Calendar(ChildId);
+        _subscriptions = await Api.Subscriptions(ChildId);
+    }
+
+    private static string Suffix(string? text) => string.IsNullOrEmpty(text) ? "" : " · " + text;
+
+    private string ErrorText(string code)
+    {
+        var text = L[$"Error.{code}"];
+        return text.ResourceNotFound ? L["Error.generic"] : text;
+    }
+
+    private void Edit(CalendarEntryDto entry)
+    {
+        _editing = entry.EventId;
+        (_title, _kind, _date, _start, _end, _location) = (entry.Title, entry.Kind, entry.Date, entry.StartTime, entry.EndTime, entry.Location ?? "");
+    }
+
+    private void ResetForm()
+    {
+        _editing = null;
+        (_title, _kind, _date, _start, _end, _location) = ("", "test", null, null, null, "");
+    }
+
+    private Task SaveEvent() => Run(async () =>
+    {
+        if (_date is not { } date)
+        {
+            return;
+        }
+
+        var request = new EventRequest(_kind, _title, date, _start, _start is null ? null : _end, string.IsNullOrWhiteSpace(_location) ? null : _location);
+        if (_editing is { } eventId)
+        {
+            await Api.UpdateEvent(ChildId, eventId, request);
+        }
+        else
+        {
+            await Api.AddEvent(ChildId, request);
+        }
+
+        ResetForm();
+    });
+
+    private Task Delete(Guid eventId) => Run(() => Api.DeleteEvent(ChildId, eventId));
+
+    private Task Subscribe() => Run(async () =>
+    {
+        var added = await Api.Subscribe(ChildId, new NewSubscription(_label, _url, _subscriptionKind));
+        (_label, _url) = ("", "");
+        _message = L["Calendar.Subscribed", added.EventCount];
+    });
+
+    private Task Sync(Guid subscriptionId) => Run(() => Api.SyncSubscription(ChildId, subscriptionId));
+
+    private Task Unsubscribe(Guid subscriptionId) => Run(() => Api.Unsubscribe(ChildId, subscriptionId));
+
+    private Task CreateFeed() => Run(async () => _feedLink = (await Api.CreateFeed(ChildId)).Link);
+
+    private Task RemoveFeed() => Run(async () =>
+    {
+        await Api.RemoveFeed(ChildId);
+        _feedLink = null;
+        _message = L["Calendar.FeedRemoved"];
+    });
+
+    private async Task Run(Func<Task> action)
+    {
+        _errors = null;
+        _message = null;
+        _busy = true;
+        try
+        {
+            await action();
+            await Reload();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

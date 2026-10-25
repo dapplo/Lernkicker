@@ -1,5 +1,6 @@
 using Lernkicker.Application;
 using Lernkicker.Application.Ports;
+using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
 using Lernkicker.Domain.Library;
 using Lernkicker.Domain.Practice;
@@ -131,6 +132,45 @@ internal sealed class PracticeRepository(LernkickerDbContext db) : IPracticeRepo
                select new AttemptSummary(a.Id, q.Id, q.QuizId, q.Title, q.Subject, a.Channel, a.SubmittedAt, a.Points, a.MaxPoints, a.Percent, a.Mark))
             .Take(max)
             .ToListAsync();
+}
+
+internal sealed class CalendarRepository(LernkickerDbContext db) : ICalendarRepository
+{
+    public void Add(CalendarEvent calendarEvent) => db.CalendarEvents.Add(calendarEvent);
+
+    public void Remove(CalendarEvent calendarEvent) => db.CalendarEvents.Remove(calendarEvent);
+
+    public Task<CalendarEvent?> FindEventAsync(Guid childId, Guid eventId) =>
+        db.CalendarEvents.SingleOrDefaultAsync(e => e.ChildId == childId && e.Id == eventId);
+
+    public async Task<IReadOnlyList<CalendarEvent>> ListEventsAsync(Guid childId, DateOnly from, DateOnly to) =>
+        await db.CalendarEvents.Where(e => e.ChildId == childId && e.Date >= from && e.Date <= to).ToListAsync();
+
+    public Task RemoveImportedAsync(Guid subscriptionId) =>
+        db.CalendarEvents.Where(e => e.SubscriptionId == subscriptionId).ExecuteDeleteAsync();
+
+    public void Add(CalendarSubscription subscription) => db.CalendarSubscriptions.Add(subscription);
+
+    public void Remove(CalendarSubscription subscription) => db.CalendarSubscriptions.Remove(subscription);
+
+    public Task<CalendarSubscription?> FindSubscriptionAsync(Guid childId, Guid subscriptionId) =>
+        db.CalendarSubscriptions.SingleOrDefaultAsync(s => s.ChildId == childId && s.Id == subscriptionId);
+
+    public Task<CalendarSubscription?> FindSubscriptionAsync(Guid subscriptionId) =>
+        db.CalendarSubscriptions.SingleOrDefaultAsync(s => s.Id == subscriptionId);
+
+    public async Task<IReadOnlyList<CalendarSubscription>> ListSubscriptionsAsync(Guid childId) =>
+        await db.CalendarSubscriptions.Where(s => s.ChildId == childId).ToListAsync();
+
+    public async Task<IReadOnlyList<SubscriptionRef>> ListAllSubscriptionsAnyFamilyAsync() =>
+        await db.CalendarSubscriptions.IgnoreQueryFilters().Select(s => new SubscriptionRef(s.Id, s.FamilyId)).ToListAsync();
+
+    public void Add(CalendarFeed feed) => db.CalendarFeeds.Add(feed);
+
+    public Task RemoveFeedsAsync(Guid childId) => db.CalendarFeeds.Where(f => f.ChildId == childId).ExecuteDeleteAsync();
+
+    public Task<CalendarFeed?> FindFeedAnyFamilyAsync(string tokenHash) =>
+        db.CalendarFeeds.IgnoreQueryFilters().SingleOrDefaultAsync(f => f.TokenHash == tokenHash);
 }
 
 internal sealed class UnitOfWork(LernkickerDbContext db) : IUnitOfWork

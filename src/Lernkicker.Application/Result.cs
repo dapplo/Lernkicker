@@ -52,6 +52,9 @@ public readonly struct Result<T>
         Error = error;
     }
 
+    /// <summary>For values of an interface type, which the implicit conversion cannot take.</summary>
+    public static Result<T> Ok(T value) => new(value, null);
+
     public static implicit operator Result<T>(T value) => new(value, null);
 
     public static implicit operator Result<T>(AppError error) => new(default, error);
@@ -79,6 +82,22 @@ public static class ErrorCodes
     public const string QuizInvalid = "quiz.invalid";
     public const string QuizTooLarge = "quiz.tooLarge";
     public const string LanguageInvalid = "language.invalid";
+
+    public const string EventKindInvalid = "calendar.kindInvalid";
+    public const string EventTitleInvalid = "calendar.titleInvalid";
+    public const string EventLocationInvalid = "calendar.locationInvalid";
+    public const string EventTimeInvalid = "calendar.timeInvalid";
+    public const string EventNotFound = "calendar.eventNotFound";
+    public const string EventReadOnly = "calendar.eventReadOnly";
+    public const string SubscriptionUrlInvalid = "calendar.urlInvalid";
+    public const string SubscriptionLabelInvalid = "calendar.labelInvalid";
+    public const string SubscriptionNotFound = "calendar.subscriptionNotFound";
+    public const string TooManySubscriptions = "calendar.tooManySubscriptions";
+    public const string CalendarUnreachable = "calendar.unreachable";
+    public const string CalendarAddressNotAllowed = "calendar.addressNotAllowed";
+    public const string CalendarTooLarge = "calendar.tooLarge";
+    public const string NotACalendar = "calendar.notACalendar";
+    public const string CalendarRangeInvalid = "calendar.rangeInvalid";
 
     /// <summary>Prefix for account errors from the identity adapter, e.g. "account.DuplicateEmail".</summary>
     public const string AccountPrefix = "account.";

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Lernkicker.Application.Ports;
+using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
 using Lernkicker.Domain.Library;
 using Lernkicker.Domain.Practice;
@@ -36,6 +37,9 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
     public DbSet<StoredQuiz> Quizzes => Set<StoredQuiz>();
     public DbSet<Assignment> Assignments => Set<Assignment>();
     public DbSet<Attempt> Attempts => Set<Attempt>();
+    public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
+    public DbSet<CalendarSubscription> CalendarSubscriptions => Set<CalendarSubscription>();
+    public DbSet<CalendarFeed> CalendarFeeds => Set<CalendarFeed>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -112,6 +116,36 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
             e.Property(x => x.Result).HasConversion(
                 v => JsonSerializer.Serialize(v, Json),
                 v => JsonSerializer.Deserialize<QuizResult>(v, Json)!);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        builder.Entity<CalendarEvent>(e =>
+        {
+            e.HasIndex(x => new { x.ChildId, x.Date });
+            e.HasIndex(x => x.SubscriptionId);
+            e.Property(x => x.Kind).HasMaxLength(20);
+            e.Property(x => x.Title).HasMaxLength(CalendarEvent.MaxTitleLength);
+            e.Property(x => x.Location).HasMaxLength(CalendarEvent.MaxLocationLength);
+            e.Property(x => x.ExternalId).HasMaxLength(500);
+            e.HasOne<Child>().WithMany().HasForeignKey(x => x.ChildId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<CalendarSubscription>().WithMany().HasForeignKey(x => x.SubscriptionId).OnDelete(DeleteBehavior.Cascade);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        builder.Entity<CalendarSubscription>(e =>
+        {
+            e.Property(x => x.Label).HasMaxLength(CalendarSubscription.MaxLabelLength);
+            e.Property(x => x.Url).HasMaxLength(CalendarSubscription.MaxUrlLength);
+            e.Property(x => x.Kind).HasMaxLength(20);
+            e.Property(x => x.LastError).HasMaxLength(50);
+            e.HasOne<Child>().WithMany().HasForeignKey(x => x.ChildId).OnDelete(DeleteBehavior.Cascade);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        builder.Entity<CalendarFeed>(e =>
+        {
+            e.HasIndex(x => x.TokenHash).IsUnique();
+            e.HasOne<Child>().WithMany().HasForeignKey(x => x.ChildId).OnDelete(DeleteBehavior.Cascade);
             e.HasQueryFilter(x => x.FamilyId == FamilyId);
         });
 

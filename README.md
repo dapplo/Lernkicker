@@ -21,6 +21,7 @@ It runs as a Docker container on a Synology NAS and is reachable through Tailsca
 | `src/Lernkicker.Domain` | Quizzes, exercise types, grading, families, children, devices, practice (no dependencies) |
 | `src/Lernkicker.Application` | Use cases, ports and error codes |
 | `src/Lernkicker.QuizFormat` | Adapter: `quiz/v1` JSON and schema validation |
+| `src/Lernkicker.Calendar` | Adapter: ICS import (only from public addresses) and feed with Ical.Net, local time with NodaTime |
 | `src/Lernkicker.Persistence` | Adapter: EF Core + SQLite, ASP.NET Core Identity, migrations |
 | `src/Lernkicker.Contracts` | DTOs of the HTTP API, shared by server and client |
 | `src/Lernkicker.Web` | Adapter: Minimal API, cookies, security headers; composition root; hosts the client |
@@ -45,6 +46,9 @@ Then open http://localhost:5208. On first start the server creates the database 
 | `Admin:Name`, `Admin:Family`, `Admin:Language` | `Admin`, `My family`, `de` | Display name, family name and language of the admin |
 | `Lernkicker:Limits:LoginsPerMinute` | `10` | Parent logins and invitations per IP and minute |
 | `Lernkicker:Limits:ChildLoginsPerMinute` | `20` | Pairing and PIN attempts per IP and minute |
+| `Lernkicker:Limits:CalendarRequestsPerMinute` | `30` | Calendar imports and ICS feed requests per IP and minute |
+| `Lernkicker:TimeZone` | `Europe/Berlin` | Time zone of all dates (IANA name) |
+| `Lernkicker:Calendar:SyncHours` | `6` | How often subscribed calendars are imported again; `0` turns it off |
 
 ## Trying the Docker image
 
@@ -62,12 +66,12 @@ Then open http://localhost:8080 and log in under **I am a parent / Ich bin ein E
 
 | Path | Who | What |
 | --- | --- | --- |
-| `/` | child | Pair the phone, PIN, list of quizzes with stars |
+| `/` | child | Pair the phone, PIN, list of quizzes with stars, dates of the next two weeks |
 | `/pair#<code>` | child | Opened from the QR code |
 | `/practice/<assignment>` | child | One exercise per screen, hand in, result with solutions |
 | `/parents` | parent | Login, children, add a child |
 | `/parents/quizzes` | parent | Upload (file or paste) and delete quizzes |
-| `/parents/children/<id>` | parent | Assign quizzes, results, QR code for pairing, devices, settings |
+| `/parents/children/<id>` | parent | Assign quizzes, dates, subscribed calendars, feed link, results, QR code for pairing, devices, settings |
 | `/invitation#<code>` | new parent | Create an account from an invitation |
 | `/admin` | admin | Invite families, delete families (tailnet only) |
 | `/privacy` | everyone | Privacy notice |
@@ -82,8 +86,10 @@ All endpoints are under `/api`, take and return JSON, and answer errors with `{ 
 | `POST /api/admin/invitations`, `GET /api/admin/families`, `DELETE /api/admin/families/{id}` | admin, tailnet only |
 | `GET /api/quizzes`, `POST /api/quizzes` (raw JSON body), `GET /api/quizzes/{quizId}`, `DELETE /api/quizzes/{quizId}` | parents |
 | `GET/POST /api/children`, `PUT/DELETE /api/children/{id}`, `PUT …/pin`, `POST …/pairing`, `GET …/devices`, `DELETE …/devices/{deviceId}`, `POST …/devices/{deviceId}/unlock`, `GET/POST …/assignments`, `DELETE …/assignments/{assignmentId}`, `GET …/attempts`, `GET …/attempts/{attemptId}` | parents |
+| `GET/POST /api/children/{id}/calendar` (`?from=&to=`), `PUT/DELETE …/calendar/{eventId}`, `GET/POST …/subscriptions`, `POST …/subscriptions/{subscriptionId}/sync`, `DELETE …/subscriptions/{subscriptionId}`, `POST/DELETE …/feed` | parents |
+| `GET /calendar/{token}.ics` | calendar apps (secret link, no login) |
 | `POST /api/device/pair`, `GET /api/device/status`, `POST /api/device/login`, `POST /api/device/logout` | child's device |
-| `GET /api/device/assignments`, `GET /api/device/assignments/{id}`, `POST /api/device/assignments/{id}/submit` | child |
+| `GET /api/device/calendar`, `GET /api/device/assignments`, `GET /api/device/assignments/{id}`, `POST /api/device/assignments/{id}/submit` | child |
 
 ## License and support
 

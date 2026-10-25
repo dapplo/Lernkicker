@@ -44,3 +44,27 @@ public sealed record AttemptSummary(
 /// <summary>An assignment as the child sees it, with progress.</summary>
 public sealed record ChildAssignment(
     Guid AssignmentId, string Title, string Subject, string? Topic, int MaxPoints, DateOnly? DueOn, int Attempts, int? BestPercent, int Stars);
+
+/// <summary>Where a calendar entry comes from.</summary>
+public static class EntrySources
+{
+    public const string Manual = "manual";
+    public const string Imported = "imported";
+    public const string Assignment = "assignment";
+}
+
+/// <summary>
+/// A date in a child's calendar: an event, or the due date of an assignment. <c>Uid</c> is stable across
+/// requests (for the ICS feed); <c>EventId</c> is set for events a parent may change.
+/// </summary>
+public sealed record CalendarEntry(
+    string Uid, string Kind, string Title, DateOnly Date, TimeOnly? StartTime, TimeOnly? EndTime, string? Location, string Source, Guid? EventId);
+
+/// <summary>A subscription as parents see it. Only the host of the URL is shown, as private calendar URLs contain secrets.</summary>
+public sealed record SubscriptionSummary(Guid Id, string Label, string Host, string Kind, DateTimeOffset? LastSyncedAt, string? LastError, int EventCount)
+{
+    public static SubscriptionSummary From(Domain.Calendar.CalendarSubscription s) =>
+        new(s.Id, s.Label, Uri.TryCreate(s.Url, UriKind.Absolute, out var uri) ? uri.Host : "", s.Kind, s.LastSyncedAt, s.LastError, s.EventCount);
+}
+
+public sealed record FeedCreated(string Token);

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lernkicker.Application\Lernkicker.Application.csproj" />
+    <ProjectReference Include="..\Lernkicker.Calendar\Lernkicker.Calendar.csproj" />
     <ProjectReference Include="..\Lernkicker.Client\Lernkicker.Client.csproj" />
     <ProjectReference Include="..\Lernkicker.Contracts\Lernkicker.Contracts.csproj" />
     <ProjectReference Include="..\Lernkicker.Persistence\Lernkicker.Persistence.csproj" />

@@ -59,6 +59,18 @@ public sealed class Api(HttpClient http)
     public Task<List<AttemptOverview>> Attempts(Guid id) => Get<List<AttemptOverview>>($"api/children/{id}/attempts");
     public Task<QuizResultDto> Attempt(Guid id, Guid attemptId) => Get<QuizResultDto>($"api/children/{id}/attempts/{attemptId}");
 
+    // Calendar (for parents)
+    public Task<List<CalendarEntryDto>> Calendar(Guid id) => Get<List<CalendarEntryDto>>($"api/children/{id}/calendar");
+    public Task<CalendarEntryDto> AddEvent(Guid id, EventRequest request) => Send<CalendarEntryDto>(HttpMethod.Post, $"api/children/{id}/calendar", request);
+    public Task<CalendarEntryDto> UpdateEvent(Guid id, Guid eventId, EventRequest request) => Send<CalendarEntryDto>(HttpMethod.Put, $"api/children/{id}/calendar/{eventId}", request);
+    public Task DeleteEvent(Guid id, Guid eventId) => Send(HttpMethod.Delete, $"api/children/{id}/calendar/{eventId}");
+    public Task<List<SubscriptionOverview>> Subscriptions(Guid id) => Get<List<SubscriptionOverview>>($"api/children/{id}/subscriptions");
+    public Task<SubscriptionOverview> Subscribe(Guid id, NewSubscription request) => Send<SubscriptionOverview>(HttpMethod.Post, $"api/children/{id}/subscriptions", request);
+    public Task<SubscriptionOverview> SyncSubscription(Guid id, Guid subscriptionId) => Send<SubscriptionOverview>(HttpMethod.Post, $"api/children/{id}/subscriptions/{subscriptionId}/sync");
+    public Task Unsubscribe(Guid id, Guid subscriptionId) => Send(HttpMethod.Delete, $"api/children/{id}/subscriptions/{subscriptionId}");
+    public Task<FeedResponse> CreateFeed(Guid id) => Send<FeedResponse>(HttpMethod.Post, $"api/children/{id}/feed");
+    public Task RemoveFeed(Guid id) => Send(HttpMethod.Delete, $"api/children/{id}/feed");
+
     // Child's device
     public Task<DeviceStatusResponse> DeviceStatus() => Get<DeviceStatusResponse>("api/device/status");
     public Task<DeviceStatusResponse> Pair(string code, string? label) => Send<DeviceStatusResponse>(HttpMethod.Post, "api/device/pair", new PairDevice(code, label));
@@ -70,6 +82,13 @@ public sealed class Api(HttpClient http)
     {
         var response = await http.GetAsync("api/device/assignments");
         return response.StatusCode == HttpStatusCode.Unauthorized ? null : await Read<List<MyAssignment>>(response);
+    }
+
+    /// <summary>The child's next dates, or null when the child is not logged in.</summary>
+    public async Task<List<CalendarEntryDto>?> MyCalendar()
+    {
+        var response = await http.GetAsync("api/device/calendar");
+        return response.StatusCode == HttpStatusCode.Unauthorized ? null : await Read<List<CalendarEntryDto>>(response);
     }
 
     public Task<SheetDto> Sheet(Guid assignmentId) => Get<SheetDto>($"api/device/assignments/{assignmentId}");

@@ -17,6 +17,130 @@ namespace Lernkicker.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
 
+            modelBuilder.Entity("Lernkicker.Domain.Calendar.CalendarEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeOnly?>("EndTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalId")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeOnly?>("StartTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("SubscriptionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubscriptionId");
+
+                    b.HasIndex("ChildId", "Date");
+
+                    b.ToTable("CalendarEvents");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Calendar.CalendarFeed", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.ToTable("CalendarFeeds");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Calendar.CalendarSubscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("LastSyncedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildId");
+
+                    b.ToTable("CalendarSubscriptions");
+                });
+
             modelBuilder.Entity("Lernkicker.Domain.Families.Child", b =>
                 {
                     b.Property<Guid>("Id")
@@ -509,6 +633,38 @@ namespace Lernkicker.Persistence.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Calendar.CalendarEvent", b =>
+                {
+                    b.HasOne("Lernkicker.Domain.Families.Child", null)
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lernkicker.Domain.Calendar.CalendarSubscription", null)
+                        .WithMany()
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Calendar.CalendarFeed", b =>
+                {
+                    b.HasOne("Lernkicker.Domain.Families.Child", null)
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Calendar.CalendarSubscription", b =>
+                {
+                    b.HasOne("Lernkicker.Domain.Families.Child", null)
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Lernkicker.Domain.Families.Child", b =>

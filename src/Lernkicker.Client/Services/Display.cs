@@ -11,6 +11,9 @@ public sealed class Display(IStringLocalizer<Strings> l)
 {
     public static readonly IReadOnlyList<string> Subjects = ["science", "german", "math", "english", "religion", "ethics", "music", "art", "sports", "crafts", "other"];
 
+    /// <summary>The kinds of calendar dates (EventKinds on the server).</summary>
+    public static readonly IReadOnlyList<string> Kinds = ["test", "football", "other"];
+
     public string Date(DateOnly date) => date.ToString(l["Format.Date"], CultureInfo.CurrentCulture);
 
     public string Date(DateTimeOffset time) => time.ToLocalTime().ToString(l["Format.DateTime"], CultureInfo.CurrentCulture);
@@ -30,6 +33,23 @@ public sealed class Display(IStringLocalizer<Strings> l)
             _ => Date(date),
         };
     }
+
+    /// <summary>"10:00–11:30", "10:00" or empty for a whole day.</summary>
+    public static string Times(TimeOnly? start, TimeOnly? end) => (start, end) switch
+    {
+        ({ } s, { } e) => $"{s.ToString("t", CultureInfo.CurrentCulture)}–{e.ToString("t", CultureInfo.CurrentCulture)}",
+        ({ } s, null) => s.ToString("t", CultureInfo.CurrentCulture),
+        _ => "",
+    };
+
+    public string Kind(string kind) => Text($"Calendar.Kind.{kind}", kind);
+
+    public static string KindIcon(string kind) => kind switch
+    {
+        "test" => "📝",
+        "football" => "⚽",
+        _ => "📅",
+    };
 
     public static string Stars(int count) => new string('★', count) + new string('☆', 3 - count);
 

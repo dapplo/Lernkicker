@@ -290,6 +290,26 @@ input.gap { width: 9em; }
 .code { font: 700 1.4rem ui-monospace, monospace; letter-spacing: 0.15em; text-transform: uppercase; width: 100%; }
 .link { width: 100%; }
 
+/* Calendar */
+.calendar details { margin: 12px 0; }
+.calendar details > summary { cursor: pointer; font-weight: 600; color: var(--green-dark); }
+.calendar .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.calendar .list li.past { opacity: 0.6; }
+.calendar .list small.error { padding: 2px 8px; }
+.dates { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; }
+.dates li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    column-gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--paper);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
+.dates .icon { grid-row: span 2; font-size: 1.5rem; align-self: center; }
+.dates .when { color: var(--muted); font-size: 0.9rem; }
+.dates .what { font-weight: 700; }
+
 .error { color: var(--red); background: var(--red-light); border-radius: 10px; padding: 8px 12px; }
 .error p, .error ul { margin: 0; }
 .ok { color: var(--green-dark); background: var(--green-light); border-radius: 10px; padding: 8px 12px; }

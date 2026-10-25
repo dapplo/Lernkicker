@@ -17,7 +17,7 @@ Items marked *(planned)* are not built yet.
 | Measure | Implementation |
 | --- | --- |
 | Only the app is public | Funnel forwards only port 443 to the app container. DSM, SSH and other NAS services stay invisible. |
-| Isolate the container | Its own Tailscale node with `tag:lernkicker`; the tailnet policy gives this tag **no** access to other devices. The app container publishes no ports and shares the Tailscale container's network, so it is not reachable from the LAN. Docker does not block *outgoing* connections to the home network; the app makes none (later only Telegram and calendar import on the internet), and a router or NAS firewall rule can block it completely. |
+| Isolate the container | Its own Tailscale node with `tag:lernkicker`; the tailnet policy gives this tag **no** access to other devices. The app container publishes no ports and shares the Tailscale container's network, so it is not reachable from the LAN. Docker does not block *outgoing* connections to the home network; the app only makes them to the internet (calendar import; later Telegram) and refuses private addresses itself (section 6). A router or NAS firewall rule can block the home network completely. |
 | Harden the container | Runs as a non-root user (chiseled .NET image, uid 1654), read-only file system (`read_only: true`), the only writable folder is `/data` (plus a `/tmp` tmpfs), `cap_drop: [ALL]`, `no-new-privileges`. |
 | TLS | Tailscale terminates TLS in its own container. The app sends HSTS. |
 | Real client IP | For rate limits the app reads `X-Forwarded-For` only from the local Tailscale proxy (ASP.NET Core trusts loopback by default). |
@@ -66,14 +66,27 @@ Technology: ASP.NET Core Identity. The device token is 256 random bits and store
 - The bot token is a Docker secret, never in the repository or image.
 - Long polling: Telegram never needs to reach the app.
 
-## 6. Calendar feeds *(planned)*
+## 6. Calendar
 
-- Each child has a secret ICS address with a 256-bit random token. Calendar apps fetch it without a login, so it can be regenerated at any time, which invalidates the old one.
-- The feed only contains title, date and place, no surname and no results.
+**Feed for the parents' calendar app**
+
+- Each child has at most one secret ICS address with a 256-bit random token; only its SHA-256 hash is stored, so the link is shown once. Calendar apps fetch it without a login. A new link replaces the old one, and the parent can turn it off.
+- The feed only contains the child's first name (in the calendar name), titles, dates, times and places: no results, no PINs, no other children.
+- It is rate limited per IP (`Lernkicker:Limits:CalendarRequestsPerMinute`) and an unknown token is a plain 404.
+
+**Importing subscribed calendars (SSRF)**
+
+A parent can paste any URL, and the server fetches it. That must not become a way into the home network or the tailnet:
+
+- Only `http`, `https` and `webcal` (read as `https`) URLs, no user name or password in the URL, at most 2000 characters.
+- Every connection, including each of at most 3 redirects, resolves the host and refuses loopback, private (10/8, 172.16/12, 192.168/16), carrier-grade NAT and Tailscale (100.64/10, fd7a:115c:a1e0::/48 via fc00::/7), link-local and cloud metadata (169.254/16, fe80::/10), multicast, reserved and NAT64 addresses, also as IPv4-mapped IPv6. The check runs in the socket connect callback, on the address actually used, so DNS rebinding does not get around it. No proxy is used.
+- At most 2 MB, 15 seconds, and the answer must be an ICS calendar; at most 1000 imported dates, 5 subscriptions per child, and the import endpoints are rate limited.
+- Parents only see the host of a subscription and an error code, never the response body.
+- Imported text is shown as text, never as HTML, and clipped to the field lengths. Imported dates are read-only.
 
 ## 7. Rate limits and monitoring
 
-- ASP.NET Core rate limiter per IP for parent logins and invitations (`Lernkicker:Limits:LoginsPerMinute`) and for pairing and PIN login on the child's device (`Lernkicker:Limits:ChildLoginsPerMinute`). Limits for uploads and ICS feeds *(planned)*.
+- ASP.NET Core rate limiter per IP for parent logins and invitations (`Lernkicker:Limits:LoginsPerMinute`) and for pairing and PIN login on the child's device (`Lernkicker:Limits:ChildLoginsPerMinute`). Calendar imports and the ICS feed: `Lernkicker:Limits:CalendarRequestsPerMinute`. Limits for uploads *(planned)*.
 - Failed logins and lockouts are logged, without passwords, PINs or children's answers.
 - Alerts to the admin via Telegram on suspicious patterns *(planned)*, e.g. more than 20 failures in 10 minutes or a device lock.
 
