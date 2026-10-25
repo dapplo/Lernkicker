@@ -89,6 +89,21 @@ Other families need to reach the app: either share the node with them in Tailsca
 
 Read the [security concept](security.md) first. To make the app public, set `AllowFunnel` in `serve.json` to `true` and restart the project. Turning it back to `false` (and restarting) makes the app private again at once. The admin API stays tailnet-only either way.
 
+## 6. Telegram (optional)
+
+The bot sends parents their children's results after each quiz and, at 18:00, the dates of the next day (tests, due dates, football). It uses long polling, so Telegram never needs to reach the NAS.
+
+1. In Telegram, talk to [@BotFather](https://t.me/BotFather): `/newbot`, pick a name and a username (e.g. `LernkickerKromBot`). It answers with the token.
+2. Still in BotFather: `/setjoingroups` → your bot → **Disable**, so nobody can add it to a group. The bot only answers private chats anyway.
+3. As admin, open `/admin` → **Telegram-Bot**, paste the token and save. The app checks it with Telegram, stores it encrypted (with the same keys as the cookies, in `data/keys`) and starts the bot at once. The token is never shown again.
+4. Each parent opens **Eltern → Telegram → Mit Telegram verbinden** and presses *Start* in the bot. The link works once and for 10 minutes. `/next` shows the next 7 days, `/stop` disconnects.
+
+"Token ersetzen" switches to another bot, "Bot stoppen" turns Telegram off; both take effect without a restart. If the token leaks, `/revoke` in BotFather makes it useless; paste the new one.
+
+To change the hour of the reminder, set `Lernkicker__Telegram__ReminderHour` (0–23, default 18).
+
+**Token as a file instead:** if you prefer to keep the token out of the database, mount a file readable by uid 1654 (e.g. `./secrets:/run/secrets:ro`) and set `Lernkicker__Telegram__BotTokenFile: /run/secrets/telegram-bot-token`. A token from the configuration wins; the admin page then only shows the bot's status.
+
 ## Updates
 
 Container Manager → Project → `lernkicker` → Action → Build (pulls `latest`), or pin `LERNKICKER_TAG` to a version and change it. The database is migrated on start.

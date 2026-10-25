@@ -14,6 +14,7 @@ public class ArchitectureTests
     private static readonly Assembly QuizFormat = typeof(QuizFormat.QuizJson).Assembly;
     private static readonly Assembly Persistence = typeof(Persistence.LernkickerDbContext).Assembly;
     private static readonly Assembly Calendar = typeof(Calendar.IcsCalendarSource).Assembly;
+    private static readonly Assembly Telegram = typeof(Lernkicker.Telegram.MessageTexts).Assembly;
 
     [Fact]
     public void Domain_depends_only_on_the_bcl() =>
@@ -38,6 +39,10 @@ public class ArchitectureTests
     [Fact]
     public void Calendar_adapter_knows_only_the_core_and_its_calendar_libraries() =>
         Assert.Equal(["Ical.Net", "Lernkicker.Application", "Lernkicker.Domain", "NodaTime"], NonBcl(Calendar));
+
+    [Fact]
+    public void Telegram_adapter_knows_only_the_core_and_the_bot_library() =>
+        Assert.Empty(NonBcl(Telegram).Except(["Lernkicker.Application", "Lernkicker.Domain", "Telegram.Bot"]));
 
     [Fact]
     public void Shared_kinds_match_the_application()

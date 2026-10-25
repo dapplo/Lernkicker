@@ -13,6 +13,7 @@
     <ProjectReference Include="..\Lernkicker.Contracts\Lernkicker.Contracts.csproj" />
     <ProjectReference Include="..\Lernkicker.Persistence\Lernkicker.Persistence.csproj" />
     <ProjectReference Include="..\Lernkicker.QuizFormat\Lernkicker.QuizFormat.csproj" />
+    <ProjectReference Include="..\Lernkicker.Telegram\Lernkicker.Telegram.csproj" />
   </ItemGroup>
 
   <ItemGroup>

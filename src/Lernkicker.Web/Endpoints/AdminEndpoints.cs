@@ -21,6 +21,16 @@ public static class AdminEndpoints
         admin.MapGet("/families", async (AdminUseCases admins) =>
             Results.Json((await admins.ListFamiliesAsync()).Select(f => f.ToDto()), ApiJson.Options));
 
+        // The Telegram bot token, when it is not configured as a file. Write-only: it is never sent back.
+        admin.MapGet("/telegram", async (TelegramBotUseCases bot) =>
+            Results.Json((await bot.SettingsAsync()).ToDto(), ApiJson.Options));
+
+        admin.MapPut("/telegram", async (SetBotToken request, TelegramBotUseCases bot, CancellationToken cancellationToken) =>
+            (await bot.SetTokenAsync(request.Token, cancellationToken)).ToHttp());
+
+        admin.MapDelete("/telegram", async (TelegramBotUseCases bot) =>
+            (await bot.RemoveTokenAsync()).ToHttp());
+
         admin.MapDelete("/families/{id:guid}", async (Guid id, ClaimsPrincipal user, AdminUseCases admins) =>
             (await admins.DeleteFamilyAsync(user.RequiredFamily(), id)).ToHttp());
     }

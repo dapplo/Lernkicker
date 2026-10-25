@@ -1,10 +1,12 @@
-using Lernkicker.Application;
 using Lernkicker.Application.Ports;
+using Lernkicker.Application;
 using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
 using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
+using Lernkicker.Domain.Messaging;
 using Lernkicker.Domain.Practice;
+using Lernkicker.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lernkicker.Persistence;
@@ -228,4 +230,42 @@ internal sealed class LessonRepository(LernkickerDbContext db) : ILessonReposito
 
     public Task<StoredLesson?> FindSharedAnyFamilyAsync(Guid storedLessonId) =>
         db.Lessons.IgnoreQueryFilters().SingleOrDefaultAsync(l => l.Id == storedLessonId && l.SharedAt != null);
+}
+
+internal sealed class TelegramRepository(LernkickerDbContext db) : ITelegramRepository
+{
+    public void Add(TelegramLink link) => db.TelegramLinks.Add(link);
+
+    public void Remove(TelegramLink link) => db.TelegramLinks.Remove(link);
+
+    public Task<TelegramLink?> FindByParentAsync(Guid parentId) => db.TelegramLinks.SingleOrDefaultAsync(l => l.ParentId == parentId);
+
+    public async Task<IReadOnlyList<TelegramLink>> ListAsync() => await db.TelegramLinks.ToListAsync();
+
+    public void Add(TelegramLinkCode code) => db.TelegramLinkCodes.Add(code);
+
+    public void Remove(TelegramLinkCode code) => db.TelegramLinkCodes.Remove(code);
+
+    public Task RemoveCodesAsync(Guid parentId) => db.TelegramLinkCodes.Where(c => c.ParentId == parentId).ExecuteDeleteAsync();
+
+    public Task RemoveByChatAnyFamilyAsync(long chatId) =>
+        db.TelegramLinks.IgnoreQueryFilters().Where(l => l.ChatId == chatId).ExecuteDeleteAsync();
+
+    public Task<TelegramLinkCode?> FindCodeAnyFamilyAsync(string codeHash) =>
+        db.TelegramLinkCodes.IgnoreQueryFilters().SingleOrDefaultAsync(c => c.CodeHash == codeHash);
+
+    public Task<TelegramLink?> FindByChatAnyFamilyAsync(long chatId) =>
+        db.TelegramLinks.IgnoreQueryFilters().SingleOrDefaultAsync(l => l.ChatId == chatId);
+
+    public async Task<IReadOnlyList<Guid>> FamiliesWithLinksAnyFamilyAsync() =>
+        await db.TelegramLinks.IgnoreQueryFilters().Select(l => l.FamilyId).Distinct().ToListAsync();
+}
+
+internal sealed class ServerSecrets(LernkickerDbContext db) : IServerSecrets
+{
+    public Task<ServerSecret?> FindAsync(string name) => db.ServerSecrets.FirstOrDefaultAsync(s => s.Name == name);
+
+    public void Add(ServerSecret secret) => db.ServerSecrets.Add(secret);
+
+    public void Remove(ServerSecret secret) => db.ServerSecrets.Remove(secret);
 }

@@ -5,7 +5,8 @@ using Lernkicker.Domain.Quizzes;
 namespace Lernkicker.Application.UseCases;
 
 /// <summary>A logged-in child practising: assigned quizzes, the sheet without solutions, handing in answers.</summary>
-public sealed class PracticeUseCases(IPracticeRepository practice, IQuizLibrary library, IQuizFormat format, IUnitOfWork unitOfWork, TimeProvider time)
+public sealed class PracticeUseCases(
+    IPracticeRepository practice, IQuizLibrary library, IQuizFormat format, IChildRepository children, TelegramUseCases telegram, IUnitOfWork unitOfWork, TimeProvider time)
 {
     public async Task<IReadOnlyList<ChildAssignment>> AssignmentsAsync(Guid childId)
     {
@@ -41,6 +42,12 @@ public sealed class PracticeUseCases(IPracticeRepository practice, IQuizLibrary 
         var result = Grader.Grade(found.Quiz, answers);
         practice.Add(new Attempt(found.Assignment.FamilyId, childId, found.Assignment.StoredQuizId, channel, time.GetUtcNow(), answers, result));
         await unitOfWork.SaveChangesAsync();
+
+        if (await children.FindAsync(childId) is { } child)
+        {
+            await telegram.ResultAsync(child.Name, found.Quiz.Title, result);
+        }
+
         return result;
     }
 

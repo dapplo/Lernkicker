@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Driven adapter for Telegram: the bot (long polling, no open port) and the messages it sends, in German and English -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lernkicker.Application\Lernkicker.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Telegram.Bot" Version="22.10.3.3" />
+  </ItemGroup>
+
+</Project>

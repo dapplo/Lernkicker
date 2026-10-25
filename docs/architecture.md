@@ -14,9 +14,12 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
    │ composition root       │   │ quizzes, grading,        │   │ Identity, repositories   │
    └────────────────────────┘   │ families, practice,      │   ├──────────────────────────┤
                                 │ calendar                 │──▶│ Lernkicker.Calendar      │
-                                └──────────────────────────┘   │ Ical.Net, NodaTime: ICS  │
-                                                               │ import/feed, local clock │
-                                                               └──────────────────────────┘
+   ┌────────────────────────┐   └──────────────────────────┘   │ Ical.Net, NodaTime: ICS  │
+   │ Lernkicker.Telegram    │                ▲                  │ import/feed, local clock │
+   │ bot: commands in,      │────────────────┘                  └──────────────────────────┘
+   │ messages out (IMes-    │
+   │ senger), reminders     │
+   └────────────────────────┘
         Lernkicker.Contracts
         (DTOs shared by Web and Client)
 ```
@@ -25,13 +28,14 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 
 | Project | Role | May reference |
 | --- | --- | --- |
-| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed` | the BCL only |
+| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed`, `TelegramLink`, `TelegramLinkCode`, `ServerSecret` | the BCL only |
 | `Lernkicker.Application` | Use cases (`*UseCases`), ports (`Ports/Ports.cs`), `Result`/`AppError` and the stable `ErrorCodes` | Domain |
 | `Lernkicker.QuizFormat` | Driven adapter for `IQuizFormat` and `ILessonFormat`: reads `quiz/v1` and `lesson/v1` JSON, validates against the embedded schemas | Application, Domain, JsonSchema.Net |
 | `Lernkicker.Calendar` | Driven adapter for `ICalendarSource` (fetches ICS over HTTP, only from public addresses), `ICalendarWriter` (the ICS feed) and `ILocalClock` (today in the family's time zone) | Application, Domain, Ical.Net, NodaTime |
+| `Lernkicker.Telegram` | Adapter for Telegram: drives `TelegramUseCases` with the commands parents send (long polling), implements `IMessenger` (a queue that sends results and reminders; restarts the bot when the admin changes the token) and the daily reminder; the bot's texts in `Resources/Messages*.resx` | Application, Domain, Telegram.Bot |
 | `Lernkicker.Persistence` | Driven adapter for the repositories, `IUnitOfWork`, `IParentAccounts`, `IPinHasher`: EF Core, SQLite, ASP.NET Core Identity, migrations | Application, Domain |
 | `Lernkicker.Contracts` | Request and response DTOs of the HTTP API | nothing |
-| `Lernkicker.Web` | Driving adapter (Minimal API endpoints, cookies, rate limits, security headers) and composition root; hosts the client | everything above |
+| `Lernkicker.Web` | Driving adapter (Minimal API endpoints, cookies, rate limits, security headers, `ISecretProtector` with Data Protection) and composition root; hosts the client | everything above |
 | `Lernkicker.Client` | Driving adapter for people: the Blazor WebAssembly PWA, localized UI | Contracts |
 
 `ArchitectureTests` in `tests/Lernkicker.Web.Tests` check these references, so a wrong dependency fails the build in CI.
@@ -40,7 +44,7 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 
 - Dependencies point inwards. The domain has no package references; the application layer only knows the domain.
 - A use case returns `Result`/`Result<T>`. Failures are an `AppError` with a kind (invalid, not found, unauthorized, locked, too large) and a stable code such as `pin.wrong`. The web adapter maps the kind to an HTTP status and sends `{ "code": "...", "issues": [...] }`.
-- **The server never sends user-facing text.** The client translates codes (`Error.<code>`, `Issue.<code>`) in `Resources/Strings*.resx`. Quiz validation issues carry named arguments (`{inText}`, `{answer}`, …) that the translation fills in. Only the schema validator's detail message (`{message}`) is English.
+- **The server never sends user-facing text** to the client. The client translates codes (`Error.<code>`, `Issue.<code>`) in `Resources/Strings*.resx`. Quiz validation issues carry named arguments (`{inText}`, `{answer}`, …) that the translation fills in. Only the schema validator's detail message (`{message}`) is English. The exception is the Telegram adapter, which has no client: use cases hand it a `Notification` record, and it picks the text in the parent's Telegram language (German by default).
 - Family isolation is enforced twice: the `IFamilyScope` port feeds a global EF Core query filter, and the use cases check that ids belong to the caller's family. `FamilyIsolationTests` check that one family can neither read nor change another family's data through the API.
 - Children never receive solutions before handing in: `QuizSheet` is built from the domain quiz without answers, and grading happens on the server.
 - Background work without a login (the calendar sync, the ICS feed) enters a family explicitly with `IFamilyScope.Enter`, so the query filter still applies; it refuses to switch away from a logged-in family.
@@ -52,4 +56,5 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 - **A new lesson block type:** domain record + schema + `docs/lesson-format.md` + `LessonJson` + `Mapping` (block DTO) + a case in `Learn.razor` + a `Learn.Type.<type>` text + tests.
 - **A new error code:** a constant in `ErrorCodes` and an `Error.<code>` text in both resx files (`LocalizationTests` fails otherwise).
 - **A new UI language:** add `Strings.<lang>.resx`, the language to `UiLanguage.Available`, `Languages.Supported`, `SatelliteResourceLanguages` in the client csproj and `supported` plus the loading texts in `wwwroot/js/start.js`.
-- **A new adapter** (e.g. Telegram): define the port in Application, implement it in its own project, wire it in `Lernkicker.Web/Program.cs`.
+- **A new bot message:** a `Notification` record in Application, a case in `MessageTexts.Format` and the text in both `Messages*.resx` (`TelegramTextsTests`).
+- **A new adapter:** define the port in Application, implement it in its own project, wire it in `Lernkicker.Web/Program.cs`.

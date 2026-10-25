@@ -20,6 +20,11 @@ public sealed class Api(HttpClient http)
     public Task RedeemInvitation(RedeemInvitationRequest request) => Send(HttpMethod.Post, "api/account/invitation", request);
     public Task SetLanguage(string language) => Send(HttpMethod.Put, "api/account/language", new SetLanguage(language));
 
+    // Telegram for the logged-in parent
+    public Task<TelegramStatusDto> TelegramStatus() => Get<TelegramStatusDto>("api/account/telegram");
+    public Task<TelegramLinkDto> CreateTelegramLink() => Send<TelegramLinkDto>(HttpMethod.Post, "api/account/telegram/link");
+    public Task UnlinkTelegram() => Send(HttpMethod.Delete, "api/account/telegram");
+
     /// <summary>The logged-in parent, or null.</summary>
     public async Task<Me?> Me()
     {
@@ -31,6 +36,9 @@ public sealed class Api(HttpClient http)
     public Task<InvitationCreatedResponse> CreateInvitation(NewInvitation request) => Send<InvitationCreatedResponse>(HttpMethod.Post, "api/admin/invitations", request);
     public Task<List<FamilyOverview>> Families() => Get<List<FamilyOverview>>("api/admin/families");
     public Task DeleteFamily(Guid id) => Send(HttpMethod.Delete, $"api/admin/families/{id}");
+    public Task<TelegramBotDto> TelegramBot() => Get<TelegramBotDto>("api/admin/telegram");
+    public Task SetBotToken(string token) => Send(HttpMethod.Put, "api/admin/telegram", new SetBotToken(token));
+    public Task RemoveBotToken() => Send(HttpMethod.Delete, "api/admin/telegram");
 
     // Quizzes
     public Task<List<QuizOverview>> Quizzes() => Get<List<QuizOverview>>("api/quizzes");

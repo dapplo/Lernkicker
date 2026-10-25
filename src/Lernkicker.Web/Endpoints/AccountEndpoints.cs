@@ -39,6 +39,19 @@ public static class AccountEndpoints
             (await accounts.SetLanguageAsync(user.ParentId(), request.Language)).ToHttp())
             .RequireAuthorization(Policies.Parent);
 
+        // Telegram for this parent: status, a one-time link to the bot, unlink
+        account.MapGet("/telegram", async (ClaimsPrincipal user, TelegramUseCases telegram) =>
+            Results.Json((await telegram.StatusAsync(user.ParentId())).ToDto(), ApiJson.Options))
+            .RequireAuthorization(Policies.Parent);
+
+        account.MapPost("/telegram/link", async (ClaimsPrincipal user, TelegramUseCases telegram) =>
+            (await telegram.CreateLinkAsync(user.RequiredFamily(), user.ParentId())).ToHttp(l => l.ToDto()))
+            .RequireAuthorization(Policies.Parent);
+
+        account.MapDelete("/telegram", async (ClaimsPrincipal user, TelegramUseCases telegram) =>
+            (await telegram.UnlinkAsync(user.ParentId())).ToHttp())
+            .RequireAuthorization(Policies.Parent);
+
         account.MapPost("/invitation", async (RedeemInvitationRequest request, AccountUseCases accounts, UserManager<ParentUser> users, SignInManager<ParentUser> signIn) =>
         {
             var redeemed = await accounts.RedeemInvitationAsync(new RedeemInvitation(

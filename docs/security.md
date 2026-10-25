@@ -17,7 +17,7 @@ Items marked *(planned)* are not built yet.
 | Measure | Implementation |
 | --- | --- |
 | Only the app is public | Funnel forwards only port 443 to the app container. DSM, SSH and other NAS services stay invisible. |
-| Isolate the container | Its own Tailscale node with `tag:lernkicker`; the tailnet policy gives this tag **no** access to other devices. The app container publishes no ports and shares the Tailscale container's network, so it is not reachable from the LAN. Docker does not block *outgoing* connections to the home network; the app only makes them to the internet (calendar import; later Telegram) and refuses private addresses itself (section 6). A router or NAS firewall rule can block the home network completely. |
+| Isolate the container | Its own Tailscale node with `tag:lernkicker`; the tailnet policy gives this tag **no** access to other devices. The app container publishes no ports and shares the Tailscale container's network, so it is not reachable from the LAN. Docker does not block *outgoing* connections to the home network; the app only makes them to the internet (calendar import, Telegram) and refuses private addresses itself (section 6). A router or NAS firewall rule can block the home network completely. |
 | Harden the container | Runs as a non-root user (chiseled .NET image, uid 1654), read-only file system (`read_only: true`), the only writable folder is `/data` (plus a `/tmp` tmpfs), `cap_drop: [ALL]`, `no-new-privileges`. |
 | TLS | Tailscale terminates TLS in its own container. The app sends HSTS. |
 | Real client IP | For rate limits the app reads `X-Forwarded-For` only from the local Tailscale proxy (ASP.NET Core trusts loopback by default). |
@@ -57,14 +57,16 @@ Technology: ASP.NET Core Identity. The device token is 256 random bits and store
 - Images (later, as ZIP) *(planned)*: size limit, PNG/JPEG/WebP only, re-encoded and stored without metadata.
 - API tokens for uploads (e.g. for Claude or scripts) *(planned)*: per parent, only "upload quizzes", stored as a hash, revocable.
 
-## 5. Telegram *(planned)*
+## 5. Telegram
 
-- The bot only answers linked chat ids; everything else is ignored and not stored.
-- Link codes are single use, valid 10 minutes and only created from the logged-in parent view.
-- A child can only be linked when a parent has turned on "Telegram allowed"; turning it off unlinks at once.
+- The bot only reads private chats. A chat that is not linked only gets an answer to `/start`; nothing about it is stored. Linked chats get the commands `/next` and `/stop`.
+- Link codes are random (like the pairing codes), single use, valid 10 minutes, stored only as a hash and only created from the logged-in parent view. Creating a new one removes the old ones. Linking moves a chat that was linked before, so one chat belongs to one parent.
+- Messages contain only what the parent sees on the parents' page anyway: child names, quiz titles, points, marks and dates. They are sent as plain text, never Markdown or HTML, so names and titles cannot inject formatting or links. Telegram stores these messages on its servers (privacy notice).
+- `/stop` in the chat or "Trennen" on the parents' page removes the link at once; deleting a parent or family removes it too.
 - In BotFather: disable joining groups (`/setjoingroups` → Disable).
-- The bot token is a Docker secret, never in the repository or image.
-- Long polling: Telegram never needs to reach the app.
+- The bot token is set by the admin on the admin page (tailnet only), checked with Telegram and stored encrypted with ASP.NET Core Data Protection (the keys in `data/keys`, like the cookies). It is write-only: the API never returns it. Whoever has the `data` folder can decrypt it, so backups of it must be encrypted (Hyper Backup with encryption, docs/operations.md). Alternatively it comes from a file (`Lernkicker:Telegram:BotTokenFile`, a Docker secret), which then wins. Never in the repository, the image or `.env`. Without a token Telegram is off.
+- Long polling: Telegram never needs to reach the app, and no port is opened. Outgoing connections only go to `api.telegram.org`.
+- Children on Telegram *(planned)*: only when a parent has turned on "Telegram allowed"; turning it off unlinks at once.
 
 ## 6. Calendar
 

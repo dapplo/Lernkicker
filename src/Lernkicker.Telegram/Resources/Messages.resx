@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Welcome" xml:space="preserve"><value>This is the Lernkicker bot. To connect it, open Lernkicker, go to the parents' area and tap “Connect Telegram”.</value></data>
+  <data name="LinkInvalid" xml:space="preserve"><value>This link is invalid or has expired. Create a new one in Lernkicker under “Connect Telegram”.</value></data>
+  <data name="Linked" xml:space="preserve"><value>Hello {0}! Lernkicker is now connected. You will get results and reminders here.
+
+/next shows the next dates, /stop disconnects.</value></data>
+  <data name="Unlinked" xml:space="preserve"><value>Disconnected. You will no longer get messages from Lernkicker. You can connect again in Lernkicker at any time.</value></data>
+  <data name="Help" xml:space="preserve"><value>Lernkicker sends you your children's results and, in the evening, a reminder of the next day's dates.
+
+/next – the next 7 days
+/stop – disconnect</value></data>
+  <data name="Result" xml:space="preserve"><value>📝 {0} practised “{1}”: {2} of {3} points ({4} %), mark {5}.</value></data>
+  <data name="Dates.Tomorrow" xml:space="preserve"><value>Tomorrow:</value></data>
+  <data name="Dates.NextDays" xml:space="preserve"><value>The next 7 days:</value></data>
+  <data name="Dates.None" xml:space="preserve"><value>No dates in the next 7 days.</value></data>
+  <data name="Dates.Child" xml:space="preserve"><value>{0}:</value></data>
+  <data name="Format.Day" xml:space="preserve"><value>ddd, MMM d</value></data>
+  <data name="Command.Next" xml:space="preserve"><value>The next 7 days</value></data>
+  <data name="Command.Stop" xml:space="preserve"><value>Disconnect Lernkicker</value></data>
+  <data name="Command.Help" xml:space="preserve"><value>What the bot does</value></data>
+</root>

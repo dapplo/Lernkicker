@@ -443,6 +443,65 @@ namespace Lernkicker.Persistence.Migrations
                     b.ToTable("Quizzes");
                 });
 
+            modelBuilder.Entity("Lernkicker.Domain.Messaging.TelegramLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("LinkedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId")
+                        .IsUnique();
+
+                    b.HasIndex("ParentId")
+                        .IsUnique();
+
+                    b.ToTable("TelegramLinks");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Messaging.TelegramLinkCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ExpiresAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodeHash")
+                        .IsUnique();
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("TelegramLinkCodes");
+                });
+
             modelBuilder.Entity("Lernkicker.Domain.Practice.Assignment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -523,6 +582,24 @@ namespace Lernkicker.Persistence.Migrations
                     b.HasIndex("ChildId", "SubmittedAt");
 
                     b.ToTable("Attempts");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Settings.ServerSecret", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProtectedValue")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("ServerSecrets");
                 });
 
             modelBuilder.Entity("Lernkicker.Persistence.ParentUser", b =>
@@ -827,6 +904,24 @@ namespace Lernkicker.Persistence.Migrations
                     b.HasOne("Lernkicker.Domain.Families.Family", null)
                         .WithMany()
                         .HasForeignKey("FamilyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Messaging.TelegramLink", b =>
+                {
+                    b.HasOne("Lernkicker.Persistence.ParentUser", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Messaging.TelegramLinkCode", b =>
+                {
+                    b.HasOne("Lernkicker.Persistence.ParentUser", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

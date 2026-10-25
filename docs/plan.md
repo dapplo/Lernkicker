@@ -41,7 +41,7 @@ The code follows a hexagonal architecture, see [architecture](architecture.md).
 ## Phases
 
 1. **Core:** quiz format v1, upload, assign, delete, child PWA, results, German and English UI, Docker image with Tailscale.
-2. **Calendar and Telegram:** dates, ICS import and feed *(done)*; bot for parents and children, Web Push.
+2. **Calendar and Telegram:** dates, ICS import and feed *(done)*; bot for parents: linking, results, evening reminder, `/next` *(done)*; bot for children, Web Push.
 3. **More families:** class groups, export and deletion, turn on Funnel.
 
 ## Open questions
