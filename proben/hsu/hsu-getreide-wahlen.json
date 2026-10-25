@@ -1,0 +1,127 @@
+{
+  "$schema": "../../schema/probe-v1.schema.json",
+  "format": "probe/v1",
+  "id": "hsu-getreide-wahlen",
+  "titel": "Vom Korn zum Brot & Wahlen",
+  "fach": "HSU",
+  "klasse": 4,
+  "thema": "Getreide, Brot und demokratische Wahlen",
+  "dauerMinuten": 30,
+  "mischen": true,
+  "aufgaben": [
+    {
+      "id": "fachbegriffe",
+      "typ": "luecke",
+      "anweisung": "Setze die Fachbegriffe ein.",
+      "punkte": 8,
+      "wortspeicher": ["Ähre", "Rispe", "Halm", "Knoten", "Spelze", "Ährchen", "Gräser", "Wurzeln"],
+      "text": "Bei Weizen, Roggen und Gerste sitzen die Körner in einer ___. Beim Hafer heißt der Fruchtstand ___. Ähre und Rispe sitzen oben auf dem ___. Die harten Verdickungen am Halm heißen ___. Sie geben dem Halm Stabilität. Jedes Korn wird von einer ___ geschützt. Mehrere Körner bündeln sich in einem ___. Alle Getreidearten gehören zur Familie der ___. Wasser und Nährstoffe bekommt die Pflanze über die ___.",
+      "luecken": [
+        { "antworten": ["Ähre"] },
+        { "antworten": ["Rispe"] },
+        { "antworten": ["Halm"] },
+        { "antworten": ["Knoten"] },
+        { "antworten": ["Spelze"] },
+        { "antworten": ["Ährchen"] },
+        { "antworten": ["Gräser"] },
+        { "antworten": ["Wurzeln"] }
+      ]
+    },
+    {
+      "id": "getreidearten",
+      "typ": "zuordnen",
+      "anweisung": "Welches Getreide ist das?",
+      "punkte": 4,
+      "optionen": ["Weizen", "Roggen", "Gerste", "Hafer"],
+      "zeilen": [
+        { "text": "Mein Fruchtstand ist eine Rispe. Aus mir macht man Haferflocken.", "antwort": "Hafer" },
+        { "text": "Ich habe sehr lange Grannen. Aus mir braut man Bier.", "antwort": "Gerste" },
+        { "text": "Aus mir backt man dunkles Brot (Schwarzbrot).", "antwort": "Roggen" },
+        { "text": "Aus mir backt man helle Brötchen und Kuchen.", "antwort": "Weizen" }
+      ]
+    },
+    {
+      "id": "korn-zum-brot",
+      "typ": "reihenfolge",
+      "anweisung": "Vom Korn zum Brot: Bringe in die richtige Reihenfolge.",
+      "hinweis": "Tippe die Schritte der Reihe nach an. Der erste Schritt bekommt die 1.",
+      "punkte": 4,
+      "schritte": [
+        "Säen",
+        "Ernten mit dem Mähdrescher",
+        "Körner reinigen",
+        "Im Walzenstuhl zerkleinern",
+        "Im Plansichter sieben",
+        "Teig mit Mehl, Wasser und Hefe kneten",
+        "Backen"
+      ]
+    },
+    {
+      "id": "muehle-und-baeckerei",
+      "typ": "richtigFalsch",
+      "anweisung": "Richtig oder falsch? Kreuze an.",
+      "punkte": 6,
+      "aussagen": [
+        { "text": "Der Mähdrescher mäht das Getreide nur, die Körner trennt der Bauer später mit der Hand.", "richtig": false, "erklaerung": "Der Mähdrescher mäht und drischt: Er trennt die Körner gleich vom Stroh." },
+        { "text": "Der Mähdrescher trennt die Körner vom Stroh.", "richtig": true },
+        { "text": "Im Walzenstuhl wird das Korn zwischen Walzen zerkleinert.", "richtig": true },
+        { "text": "Im Plansichter wird das Mehl gebacken.", "richtig": false, "erklaerung": "Im Plansichter wird gesiebt, gebacken wird im Ofen." },
+        { "text": "Die Hefe lässt den Teig aufgehen. Dadurch wird das Brot luftig.", "richtig": true },
+        { "text": "Getreide wird im Frühling geerntet.", "richtig": false, "erklaerung": "Getreide wird im Sommer geerntet." }
+      ]
+    },
+    {
+      "id": "mehlsorten",
+      "typ": "zuordnen",
+      "anweisung": "Weißmehl oder Vollkornmehl?",
+      "punkte": 4,
+      "optionen": ["Weißmehl", "Vollkornmehl"],
+      "zeilen": [
+        { "text": "Das ganze Korn mit Schale und Keimling wird gemahlen.", "antwort": "Vollkornmehl" },
+        { "text": "Nur der helle Mehlkörper wird gemahlen.", "antwort": "Weißmehl" },
+        { "text": "Es hat viele Ballaststoffe und Vitamine und hält lange satt.", "antwort": "Vollkornmehl" },
+        { "text": "Daraus backt man helle Semmeln.", "antwort": "Weißmehl" }
+      ]
+    },
+    {
+      "id": "wahlgrundsaetze",
+      "typ": "freitext",
+      "anweisung": "Schreibe die 5 Grundsätze bei einer demokratischen Wahl auf.",
+      "punkte": 5,
+      "reihenfolgeEgal": true,
+      "erklaerung": "Merksatz: Alle Und Freie Gleiche Geheimnisse (allgemein, unmittelbar, frei, gleich, geheim).",
+      "felder": [
+        { "antworten": ["allgemein", "allgemeine", "allgemeiner"] },
+        { "antworten": ["unmittelbar", "unmittelbare", "unmittelbarer"] },
+        { "antworten": ["frei", "freie", "freier"] },
+        { "antworten": ["gleich", "gleiche", "gleicher"] },
+        { "antworten": ["geheim", "geheime", "geheimer"] }
+      ]
+    },
+    {
+      "id": "grundsatz-zuordnen",
+      "typ": "zuordnen",
+      "anweisung": "Welcher Wahlgrundsatz passt?",
+      "punkte": 5,
+      "optionen": ["allgemein", "unmittelbar", "frei", "gleich", "geheim"],
+      "zeilen": [
+        { "text": "In der Wahlkabine sieht niemand, wen ich wähle.", "antwort": "geheim" },
+        { "text": "Jede Stimme zählt gleich viel.", "antwort": "gleich" },
+        { "text": "Alle Bürgerinnen und Bürger ab 18 Jahren dürfen wählen.", "antwort": "allgemein" },
+        { "text": "Niemand darf mich zwingen, eine bestimmte Partei zu wählen.", "antwort": "frei" },
+        { "text": "Ich wähle die Person direkt, niemand wählt für mich.", "antwort": "unmittelbar" }
+      ]
+    },
+    {
+      "id": "demokratie",
+      "typ": "auswahl",
+      "anweisung": "Kreuze die richtige Antwort an.",
+      "punkte": 3,
+      "fragen": [
+        { "frage": "In einer Demokratie …", "optionen": ["bestimmen alle Menschen mit.", "entscheidet nur der König.", "darf nur der Bürgermeister bestimmen."], "richtig": 0 },
+        { "frage": "Bei der Bundestagswahl darf man wählen ab …", "optionen": ["10 Jahren.", "18 Jahren.", "30 Jahren."], "richtig": 1 },
+        { "frage": "Damit die Wahl geheim ist, geht man …", "optionen": ["in die Wahlkabine.", "auf den Marktplatz.", "zum Nachbarn."], "richtig": 0 }
+      ]
+    }
+  ]
+}
