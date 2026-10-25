@@ -269,3 +269,10 @@ internal sealed class ServerSecrets(LernkickerDbContext db) : IServerSecrets
 
     public void Remove(ServerSecret secret) => db.ServerSecrets.Remove(secret);
 }
+
+internal sealed class ServerSettings(LernkickerDbContext db) : IServerSettings
+{
+    public Task<ServerSetting?> FindAsync(string name) => db.ServerSettings.FirstOrDefaultAsync(s => s.Name == name);
+
+    public void Add(ServerSetting setting) => db.ServerSettings.Add(setting);
+}

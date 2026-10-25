@@ -1,5 +1,6 @@
 @page "/"
 @inject Api Api
+@inject NavigationManager Navigation
 
 <PageTitle>Lernkicker</PageTitle>
 
@@ -124,6 +125,13 @@ else
     {
         _error = null;
         _device = await Api.DeviceStatus();
+        if (!_device.Paired && await Api.SetupNeeded())
+        {
+            // A fresh server: the first visitor creates the admin
+            Navigation.NavigateTo("setup", replace: true);
+            return;
+        }
+
         _assignments = _device is { Paired: true, Locked: false } ? await Api.MyAssignments() : null;
         _lessons = _assignments is null ? null : await Api.MyLessons();
         // Tests and lessons already have their card; the list shows the other dates

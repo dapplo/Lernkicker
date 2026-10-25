@@ -92,6 +92,10 @@ public static class ErrorCodes
     public const string TelegramUnreachable = "telegram.unreachable";
     public const string TelegramTokenFromFile = "telegram.tokenFromFile";
     public const string LanguageInvalid = "language.invalid";
+    public const string SetupDone = "setup.done";
+    public const string BackupInvalid = "backup.invalid";
+    public const string SetupNameInvalid = "setup.nameInvalid";
+    public const string SetupFamilyInvalid = "setup.familyInvalid";
 
     public const string EventKindInvalid = "calendar.kindInvalid";
     public const string EventTitleInvalid = "calendar.titleInvalid";

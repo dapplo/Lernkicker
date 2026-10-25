@@ -48,6 +48,7 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
     public DbSet<TelegramLink> TelegramLinks => Set<TelegramLink>();
     public DbSet<TelegramLinkCode> TelegramLinkCodes => Set<TelegramLinkCode>();
     public DbSet<ServerSecret> ServerSecrets => Set<ServerSecret>();
+    public DbSet<ServerSetting> ServerSettings => Set<ServerSetting>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -202,6 +203,13 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
         {
             e.HasKey(x => x.Name);
             e.Property(x => x.Name).HasMaxLength(64);
+        });
+
+        builder.Entity<ServerSetting>(e =>
+        {
+            e.HasKey(x => x.Name);
+            e.Property(x => x.Name).HasMaxLength(64);
+            e.Property(x => x.Value).HasMaxLength(2048);
         });
 
         // SQLite cannot order or compare DateTimeOffset; store as UTC ticks.

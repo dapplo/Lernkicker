@@ -38,11 +38,23 @@ builder.Services.AddSingleton<ICalendarWriter>(_ => new IcsCalendarWriter(timeZo
 builder.Services.AddSingleton<ILocalClock>(sp => new ZonedClock(sp.GetRequiredService<TimeProvider>(), timeZone));
 builder.Services.AddHostedService<CalendarSync>();
 builder.Services.AddTelegram(builder.Configuration);
-builder.Services.AddPersistence(builder.Configuration.GetConnectionString("Lernkicker") ?? $"Data Source={Path.Combine(dataPath, "lernkicker.db")}");
+var connectionString = builder.Configuration.GetConnectionString("Lernkicker") ?? $"Data Source={Path.Combine(dataPath, "lernkicker.db")}";
+builder.Services.AddPersistence(connectionString);
+
+// A restore uploaded on the setup page replaces the data now, before anything opens the database
+var backup = new DataBackup(dataPath, Path.GetFullPath(new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder(connectionString).DataSource));
+if (backup.ApplyStaged(DateTimeOffset.UtcNow))
+{
+    Console.WriteLine("Lernkicker: restored the data from the uploaded backup.");
+}
+
+builder.Services.AddSingleton(backup);
+builder.Services.AddSingleton<IAppRestart, AppRestart>();
 
 // Use cases
 builder.Services.AddScoped<AdminUseCases>();
 builder.Services.AddScoped<AccountUseCases>();
+builder.Services.AddScoped<SetupUseCases>();
 builder.Services.AddScoped<QuizLibraryUseCases>();
 builder.Services.AddScoped<ChildrenUseCases>();
 builder.Services.AddScoped<ChildDeviceUseCases>();
@@ -149,26 +161,29 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
     trustedProxies.ForEach(o.KnownIPNetworks.Add);
 });
 
-// The address people use (e.g. https://lernkicker.example.ts.net). Links in QR codes, invitations and the
-// calendar feed are built from it; without it from the request, which needs the proxy's X-Forwarded-Proto.
+// The address people use; see PublicAddress
 var publicUrl = builder.Configuration["Lernkicker:PublicUrl"] is { Length: > 0 } configuredUrl
     ? Uri.TryCreate(configuredUrl, UriKind.Absolute, out var parsedUrl) && parsedUrl.Scheme is "https" or "http"
         ? parsedUrl
         : throw new InvalidOperationException($"Lernkicker:PublicUrl is not an http(s) URL: {configuredUrl}")
     : null;
 
+builder.Services.AddSingleton(new PublicAddress(publicUrl));
+
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-if (publicUrl is not null)
+var publicAddress = app.Services.GetRequiredService<PublicAddress>();
+app.Use((context, next) =>
 {
-    app.Use((context, next) =>
+    if (publicAddress.Current is { } url)
     {
-        context.Request.Scheme = publicUrl.Scheme;
-        context.Request.Host = new HostString(publicUrl.Authority);
-        return next(context);
-    });
-}
+        context.Request.Scheme = url.Scheme;
+        context.Request.Host = new HostString(url.Authority);
+    }
+
+    return next(context);
+});
 
 app.UseSecurityHeaders();
 if (!app.Environment.IsDevelopment())
@@ -181,6 +196,7 @@ app.UseAuthorization();
 app.UseRateLimiter();
 
 app.MapGet("/api/status", () => Results.Ok(new { status = "ok" }));
+app.MapSetup();
 app.MapAccount();
 app.MapAdmin();
 app.MapQuizzes();
@@ -199,6 +215,11 @@ app.MapFallbackToFile("index.html", new StaticFileOptions
 });
 
 await PersistenceSetup.InitializeAsync(app.Services, app.Configuration.GetSection("Admin").Get<AdminOptions>() ?? new(), app.Logger);
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    publicAddress.UseStored(await scope.ServiceProvider.GetRequiredService<SetupUseCases>().StoredPublicUrlAsync());
+}
+
 await app.RunAsync();
 
 static void ApiCookie(CookieAuthenticationOptions o)

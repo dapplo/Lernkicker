@@ -16,20 +16,15 @@ services:
       tsdproxy.container_port: "8080"
       # "true" makes it reachable from the internet via Tailscale Funnel; read docs/security.md first
       tsdproxy.funnel: "false"
+    # No admin settings needed: the first visit from the tailnet opens the setup page (docs/operations.md)
     environment:
-      # The address of the node, for links in QR codes, invitations and the calendar feed
-      Lernkicker__PublicUrl: ${PUBLIC_URL}
+      # The address for links in QR codes, invitations and the feed is taken from the browser during the
+      # first-run setup; set Lernkicker__PublicUrl only to override it
       # TSDProxy connects from a Docker network; trust its X-Forwarded-For so rate limits see the real client
       Lernkicker__TrustedProxies: ${TRUSTED_PROXIES:-172.16.0.0/12}
-      # Only read on the first start, when the admin account is created; remove them afterwards
-      Admin__Email: ${ADMIN_EMAIL:-}
-      Admin__Password: ${ADMIN_PASSWORD:-}
-      Admin__Name: ${ADMIN_NAME:-Admin}
-      Admin__Family: ${ADMIN_FAMILY:-My family}
-      Admin__Language: ${ADMIN_LANGUAGE:-de}
     volumes:
-      # Must belong to uid 1654 (the app user of the image)
-      - ./data:/data
+      # A named volume: Docker creates it, already writable for the app. Back it up from the admin page.
+      - lernkicker-data:/data
     read_only: true
     tmpfs:
       - /tmp
@@ -38,3 +33,6 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+
+volumes:
+  lernkicker-data:

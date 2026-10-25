@@ -1,5 +1,6 @@
 @page "/parents"
 @inject Api Api
+@inject NavigationManager Navigation
 
 <PageTitle>@L["Parents.Title"] · Lernkicker</PageTitle>
 
@@ -87,6 +88,12 @@ else
     private async Task Load()
     {
         _me = await Api.Me();
+        if (_me is null && await Api.SetupNeeded())
+        {
+            Navigation.NavigateTo("setup", replace: true);
+            return;
+        }
+
         _children = _me is null ? [] : await Api.Children();
     }
 

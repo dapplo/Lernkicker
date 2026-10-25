@@ -31,6 +31,13 @@ public static class AdminEndpoints
         admin.MapDelete("/telegram", async (TelegramBotUseCases bot) =>
             (await bot.RemoveTokenAsync()).ToHttp());
 
+        // Everything as one zip, for backups when the data lives in a Docker volume
+        admin.MapGet("/backup", (DataBackup backup, TimeProvider time) =>
+        {
+            var now = time.GetUtcNow();
+            return Results.Stream(stream => backup.WriteAsync(stream, now, CancellationToken.None), "application/zip", $"lernkicker-backup-{now:yyyy-MM-dd}.zip");
+        });
+
         admin.MapDelete("/families/{id:guid}", async (Guid id, ClaimsPrincipal user, AdminUseCases admins) =>
             (await admins.DeleteFamilyAsync(user.RequiredFamily(), id)).ToHttp());
     }

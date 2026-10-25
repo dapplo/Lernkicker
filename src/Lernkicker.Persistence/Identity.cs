@@ -41,6 +41,18 @@ internal sealed class ParentAccounts(UserManager<ParentUser> users) : IParentAcc
             : new ParentAccount(user.Id, user.Email!, user.DisplayName, user.FamilyId, user.Language, await users.IsInRoleAsync(user, Roles.Admin));
     }
 
+    public async Task<bool> AdminExistsAsync() => (await users.GetUsersInRoleAsync(Roles.Admin)).Count > 0;
+
+    public async Task MakeAdminAsync(Guid id)
+    {
+        var user = await users.FindByIdAsync(id.ToString()) ?? throw new InvalidOperationException($"No parent {id}");
+        var result = await users.AddToRoleAsync(user, Roles.Admin);
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException("Making the admin failed: " + string.Join(" ", result.Errors.Select(e => e.Code)));
+        }
+    }
+
     public async Task SetLanguageAsync(Guid id, string language)
     {
         var user = await users.FindByIdAsync(id.ToString());

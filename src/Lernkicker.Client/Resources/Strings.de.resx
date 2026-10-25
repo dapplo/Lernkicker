@@ -371,6 +371,28 @@
   <data name="Error.telegram.tokenRejected" xml:space="preserve"><value>Telegram kennt diesen Token nicht. Kopier ihn noch einmal aus @BotFather.</value></data>
   <data name="Error.telegram.unreachable" xml:space="preserve"><value>Der Server erreicht Telegram nicht, darum ließ sich der Token nicht prüfen. Bitte versuch es später noch einmal.</value></data>
   <data name="Error.telegram.tokenFromFile" xml:space="preserve"><value>Der Token ist in der Konfiguration des Servers gesetzt und lässt sich nur dort ändern.</value></data>
+  <data name="Setup.Title" xml:space="preserve"><value>Einrichtung</value></data>
+  <data name="Setup.Heading" xml:space="preserve"><value>Willkommen bei Lernkicker</value></data>
+  <data name="Setup.Intro" xml:space="preserve"><value>Dieser Lernkicker ist neu. Leg dein Konto an: Du wirst die Verwaltung und kannst danach andere Familien einladen.</value></data>
+  <data name="Setup.Family" xml:space="preserve"><value>Name deiner Familie</value></data>
+  <data name="Setup.Address" xml:space="preserve"><value>Links in QR-Codes und Einladungen verwenden {0}.</value></data>
+  <data name="Setup.NotHttps" xml:space="preserve"><value>Das ist keine https-Adresse. Öffne Lernkicker lieber über seine Tailscale-Adresse (https://….ts.net), sonst klappt die Anmeldung nicht.</value></data>
+  <data name="Setup.Create" xml:space="preserve"><value>Konto anlegen</value></data>
+  <data name="Setup.Done" xml:space="preserve"><value>Lernkicker ist schon eingerichtet.</value></data>
+  <data name="Setup.ToParents" xml:space="preserve"><value>Zur Anmeldung</value></data>
+  <data name="Setup.TailnetOnly" xml:space="preserve"><value>Die Einrichtung geht nur von einem Gerät in deinem Tailnet, nicht über Funnel.</value></data>
+  <data name="Setup.Restore" xml:space="preserve"><value>Lernkicker umziehen? Mit einer Sicherung starten</value></data>
+  <data name="Setup.RestoreHint" xml:space="preserve"><value>Wähl eine Sicherung von der Verwaltungsseite deines alten Lernkickers. Alles kommt zurück: Familien, Kinder, Proben, Ergebnisse und Anmeldungen. Der Server startet dabei einmal neu.</value></data>
+  <data name="Setup.ChooseBackup" xml:space="preserve"><value>Sicherung auswählen</value></data>
+  <data name="Setup.Restoring" xml:space="preserve"><value>Wird wiederhergestellt und neu gestartet, einen Moment…</value></data>
+  <data name="Admin.Backup.Title" xml:space="preserve"><value>Sicherung</value></data>
+  <data name="Admin.Backup.Intro" xml:space="preserve"><value>Alles in einer Datei: alle Familien, Kinder, Proben, Ergebnisse, Anmeldungen und der Telegram-Bot.</value></data>
+  <data name="Admin.Backup.Download" xml:space="preserve"><value>Sicherung herunterladen</value></data>
+  <data name="Admin.Backup.Hint" xml:space="preserve"><value>Bewahr sie sicher auf: Wer die Datei hat, kann alle Daten lesen. Zum Wiederherstellen startest du einen neuen, leeren Lernkicker und wählst die Datei auf seiner Einrichtungsseite.</value></data>
+  <data name="Error.backup.invalid" xml:space="preserve"><value>Das ist keine Lernkicker-Sicherung, oder sie ist größer als 200 MB.</value></data>
+  <data name="Error.setup.done" xml:space="preserve"><value>Lernkicker ist schon eingerichtet. Melde dich stattdessen an.</value></data>
+  <data name="Error.setup.nameInvalid" xml:space="preserve"><value>Bitte gib deinen Namen ein (bis 100 Zeichen).</value></data>
+  <data name="Error.setup.familyInvalid" xml:space="preserve"><value>Bitte gib einen Familiennamen ein (bis 100 Zeichen).</value></data>
   <data name="Error.telegram.unavailable" xml:space="preserve"><value>Der Bot erreicht Telegram gerade nicht. Bitte versuch es in ein paar Minuten noch einmal.</value></data>
   <data name="Error.telegram.disabled" xml:space="preserve"><value>Telegram ist auf diesem Lernkicker nicht eingerichtet.</value></data>
 </root>

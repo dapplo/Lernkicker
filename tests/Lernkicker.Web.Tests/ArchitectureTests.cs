@@ -56,6 +56,7 @@ public class ArchitectureTests
     {
         Assert.Equal(Lernkicker.Domain.Quizzes.QuizLimits.MaxBytes, Lernkicker.Contracts.ApiLimits.QuizMaxBytes);
         Assert.Equal(Lernkicker.Domain.Lessons.LessonLimits.MaxBytes, Lernkicker.Contracts.ApiLimits.LessonMaxBytes);
+        Assert.Equal(DataBackup.MaxBytes, Lernkicker.Contracts.ApiLimits.BackupMaxBytes);
     }
 
     // Everything that is not part of .NET itself

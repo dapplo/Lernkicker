@@ -69,6 +69,13 @@ else
         <p class="hint">@L["Admin.TailnetOnly"]</p>
     </section>
 
+    <section class="box">
+        <h2>@L["Admin.Backup.Title"]</h2>
+        <p>@L["Admin.Backup.Intro"]</p>
+        <p><a class="btn" href="api/admin/backup" download>@L["Admin.Backup.Download"]</a></p>
+        <p class="hint">@L["Admin.Backup.Hint"]</p>
+    </section>
+
     @if (_bot is { } bot)
     {
         <section class="box">

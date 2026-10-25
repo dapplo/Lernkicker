@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using Lernkicker.Application;
 using Lernkicker.Application.Ports;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,9 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
 
     public int LimitPerMinute { get; init; } = 10_000;
 
+    /// <summary>False: a fresh server without Admin:* settings, set up through /api/setup.</summary>
+    public bool SeedAdmin { get; init; } = true;
+
     /// <summary>Lernkicker:PublicUrl, if set.</summary>
     public string? PublicUrl { get; init; }
 
@@ -31,7 +35,18 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
     /// <summary>What the subscribed calendars "on the internet" return.</summary>
     public FakeCalendarSource Calendars { get; } = new();
 
+    private readonly string? _givenDataPath;
     private readonly string _dataPath = Path.Combine(Path.GetTempPath(), "lernkicker-tests", Guid.NewGuid().ToString("N"));
+
+    /// <summary>A data folder the test owns (and deletes), e.g. to start a second server on the same data.</summary>
+    public string DataPath
+    {
+        get => _dataPath;
+        init => _dataPath = _givenDataPath = value;
+    }
+
+    /// <summary>Counts restarts the app asked for (after a restore) instead of stopping the test server.</summary>
+    public FakeRestart Restarts { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -39,10 +54,14 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
         // Static web assets (the client app) are only wired up automatically in Development
         builder.UseStaticWebAssets();
         builder.UseSetting("Lernkicker:DataPath", _dataPath);
-        builder.UseSetting("Admin:Email", AdminEmail);
-        builder.UseSetting("Admin:Password", AdminPassword);
-        builder.UseSetting("Admin:Name", "Robin");
-        builder.UseSetting("Admin:Family", "Family Admin");
+        if (SeedAdmin)
+        {
+            builder.UseSetting("Admin:Email", AdminEmail);
+            builder.UseSetting("Admin:Password", AdminPassword);
+            builder.UseSetting("Admin:Name", "Robin");
+            builder.UseSetting("Admin:Family", "Family Admin");
+        }
+
         builder.UseSetting("Lernkicker:Limits:LoginsPerMinute", LimitPerMinute.ToString());
         builder.UseSetting("Lernkicker:Limits:ChildLoginsPerMinute", LimitPerMinute.ToString());
         builder.UseSetting("Lernkicker:Limits:CalendarRequestsPerMinute", LimitPerMinute.ToString());
@@ -55,6 +74,7 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
         {
             services.AddSingleton<ICalendarSource>(Calendars);
             services.AddSingleton<IMessenger>(Messenger);
+            services.AddSingleton<IAppRestart>(Restarts);
         });
     }
 
@@ -87,7 +107,10 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
         base.Dispose(disposing);
         try
         {
-            Directory.Delete(_dataPath, recursive: true);
+            if (_givenDataPath is null)
+            {
+                Directory.Delete(_dataPath, recursive: true);
+            }
         }
         catch (IOException)
         {
@@ -206,4 +229,11 @@ public sealed class FakeMessenger : IMessenger
 
     public IEnumerable<T> SentTo<T>(long chatId) where T : Notification =>
         Sent.Where(m => m.ChatId == chatId).Select(m => m.Notification).OfType<T>();
+}
+
+public sealed class FakeRestart : IAppRestart
+{
+    public int Count { get; private set; }
+
+    public void AfterResponse(HttpResponse response) => Count++;
 }
