@@ -41,6 +41,9 @@ public sealed class Api(HttpClient http)
         return await Read<QuizOverview>(await http.PostAsync("api/quizzes", content));
     }
 
+    public Task<QuizOverview> ShareQuiz(string quizId, bool shared) => Send<QuizOverview>(HttpMethod.Put, $"api/quizzes/{Uri.EscapeDataString(quizId)}/shared", new ShareRequest(shared));
+    public Task<SheetDto> QuizPreview(string quizId) => Get<SheetDto>($"api/quizzes/{Uri.EscapeDataString(quizId)}/preview");
+
     public Task<QuizDeletedResponse> DeleteQuiz(string quizId) => Send<QuizDeletedResponse>(HttpMethod.Delete, $"api/quizzes/{Uri.EscapeDataString(quizId)}");
 
     // Lessons
@@ -51,6 +54,16 @@ public sealed class Api(HttpClient http)
         using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         return await Read<LessonOverview>(await http.PostAsync("api/lessons", content));
     }
+
+    public Task<LessonOverview> ShareLesson(string lessonId, bool shared) => Send<LessonOverview>(HttpMethod.Put, $"api/lessons/{Uri.EscapeDataString(lessonId)}/shared", new ShareRequest(shared));
+    public Task<LessonDto> LessonPreview(string lessonId) => Get<LessonDto>($"api/lessons/{Uri.EscapeDataString(lessonId)}/preview");
+
+    // Shared library (what other families shared)
+    public Task<List<SharedOverview>> Library() => Get<List<SharedOverview>>("api/library");
+    public Task<SheetDto> SharedQuiz(Guid id) => Get<SheetDto>($"api/library/quizzes/{id}");
+    public Task<LessonDto> SharedLesson(Guid id) => Get<LessonDto>($"api/library/lessons/{id}");
+    public Task<QuizOverview> CopyQuiz(Guid id) => Send<QuizOverview>(HttpMethod.Post, $"api/library/quizzes/{id}/copy");
+    public Task<LessonOverview> CopyLesson(Guid id) => Send<LessonOverview>(HttpMethod.Post, $"api/library/lessons/{id}/copy");
 
     public Task DeleteLesson(string lessonId) => Send(HttpMethod.Delete, $"api/lessons/{Uri.EscapeDataString(lessonId)}");
 

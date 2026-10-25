@@ -46,7 +46,7 @@ Technology: ASP.NET Core Identity. The device token is 256 random bits and store
 - Ids exposed to the outside are random GUIDs, never sequential numbers.
 - Integration tests (`FamilyIsolationTests`) check that family A cannot read or change family B's data. New endpoints need such a test.
 - The admin manages families but sees no results of other families' children.
-- Shared quizzes (class group) *(planned)* are copied into the other family. Results are never shared.
+- **Shared library:** a parent can share a quiz or lesson with all families on the same server. This is the one place where data crosses families, and only the file crosses: other parents see the title, subject, grade, size and sharing date, can preview it as a child would see it, and can copy it into their own library. They never see who shared it, the sharing family's children, assignments or results. The repository methods that cross families (`ListSharedAnyFamilyAsync`, `FindSharedAnyFamilyAsync`) only return shared, current items. A copy belongs to the copying family; stopping to share hides the original but leaves copies. `SharedLibraryTests` cover this.
 
 ## 4. Input and uploads
 

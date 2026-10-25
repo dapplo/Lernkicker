@@ -13,7 +13,7 @@ public static class Mapping
 
     public static Me ToDto(this ParentProfile p) => new(p.Name, p.Email, p.FamilyName, p.IsAdmin, p.Language);
 
-    public static QuizOverview ToDto(this QuizSummary q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt);
+    public static QuizOverview ToDto(this QuizSummary q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt, q.Shared);
 
     public static ChildOverview ToDto(this ChildSummary c) => new(c.Id, c.Name, c.GradeLevel, c.HasPin, c.Devices);
 
@@ -36,10 +36,16 @@ public static class Mapping
         new(s.Id, s.Label, s.Host, s.Kind, s.LastSyncedAt, s.LastError, s.EventCount);
 
     public static LessonOverview ToDto(this LessonSummary l) =>
-        new(l.LessonId, l.Title, l.Subject, l.GradeLevel, l.Topic, l.Blocks, l.UploadedAt);
+        new(l.LessonId, l.Title, l.Subject, l.GradeLevel, l.Topic, l.Blocks, l.UploadedAt, l.Shared);
 
     public static LessonAssignmentOverview ToDto(this LessonAssignmentSummary a) =>
         new(a.Id, a.LessonId, a.Title, a.Subject, a.DueOn, a.AssignedAt, a.PracticeCount, a.LastPracticedAt, a.KnownBlocks, a.Blocks);
+
+    public static SharedOverview ToDto(this SharedSummary s) =>
+        new(s.Id, s.Kind, s.ItemId, s.Title, s.Subject, s.GradeLevel, s.Topic, s.Size, s.SharedAt, s.InMyLibrary);
+
+    /// <summary>A lesson outside an assignment, for the parents' preview.</summary>
+    public static LessonDto ToPreviewDto(this Lesson lesson) => new LessonToLearn(Guid.Empty, lesson, null, []).ToDto();
 
     public static MyLesson ToDto(this ChildLesson l) => new(l.AssignmentId, l.Title, l.Subject, l.Topic, l.DueOn, l.KnownBlocks, l.Blocks);
 

@@ -43,6 +43,10 @@ else
                 <div>
                     <b>@quiz.Title</b>
                     <small>@L["Quizzes.Details", Display.Subject(quiz.Subject), quiz.GradeLevel, quiz.MaxPoints, quiz.Version, Display.Date(quiz.UploadedAt)]</small>
+                    @if (quiz.Shared)
+                    {
+                        <small class="shared-badge">@L["Share.Badge"]</small>
+                    }
                 </div>
                 @if (_deleting == quiz.QuizId)
                 {
@@ -53,12 +57,17 @@ else
                 }
                 else
                 {
-                    <button class="btn quiet" @onclick="() => _deleting = quiz.QuizId">@L["Common.Delete"]</button>
+                    <span class="buttons">
+                        <a class="btn quiet" href="parents/preview/quiz/@Uri.EscapeDataString(quiz.QuizId)">@L["Preview.Button"]</a>
+                        <button class="btn quiet" @onclick="() => Share(quiz.QuizId, !quiz.Shared)">@L[quiz.Shared ? "Share.Stop" : "Share.Start"]</button>
+                        <button class="btn quiet" @onclick="() => _deleting = quiz.QuizId">@L["Common.Delete"]</button>
+                    </span>
                 }
             </li>
         }
     </ul>
     <p class="hint">@L["Quizzes.ArchiveHint"]</p>
+    <p class="hint">@L["Share.Hint"]</p>
 }
 
 @code {
@@ -113,6 +122,20 @@ else
         finally
         {
             _busy = false;
+        }
+    }
+
+    private async Task Share(string quizId, bool shared)
+    {
+        _errors = null;
+        try
+        {
+            await Api.ShareQuiz(quizId, shared);
+            _quizzes = await Api.Quizzes();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
         }
     }
 

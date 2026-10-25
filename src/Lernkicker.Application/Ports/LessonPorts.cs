@@ -33,4 +33,10 @@ public interface ILessonRepository
     Task<LessonAssignment?> FindAssignmentForLessonAsync(Guid childId, Guid storedLessonId);
     Task<IReadOnlyList<LessonAssignment>> ListAssignmentsAsync(Guid childId);
     Task RemoveAssignmentsAsync(Guid storedLessonId);
+
+    /// <summary>The shared lessons of all families.</summary>
+    Task<IReadOnlyList<StoredLesson>> ListSharedAnyFamilyAsync();
+
+    /// <summary>A lesson of any family, only when it is shared.</summary>
+    Task<StoredLesson?> FindSharedAnyFamilyAsync(Guid storedLessonId);
 }

@@ -47,6 +47,7 @@ builder.Services.AddScoped<ChildDeviceUseCases>();
 builder.Services.AddScoped<PracticeUseCases>();
 builder.Services.AddScoped<CalendarUseCases>();
 builder.Services.AddScoped<LessonUseCases>();
+builder.Services.AddScoped<SharedLibraryUseCases>();
 
 // Keys for cookies survive restarts and image updates
 builder.Services.AddDataProtection()
@@ -182,6 +183,7 @@ app.MapChildren();
 app.MapDevice();
 app.MapCalendar();
 app.MapLessons();
+app.MapLibrary();
 app.Map("/api/{**rest}", ApiResults.NotFound);
 
 // The PWA (Lernkicker.Client). Fingerprinted files are cached forever; every other path is a page of the app.

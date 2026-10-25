@@ -51,7 +51,8 @@ public sealed record FamilyOverview(Guid Id, string Name, int Parents, int Child
 
 // Quizzes
 
-public sealed record QuizOverview(string QuizId, int Version, string Title, string Subject, int GradeLevel, string? Topic, int MaxPoints, DateTimeOffset UploadedAt);
+/// <summary><c>Shared</c>: all families on this server can see, preview and copy it.</summary>
+public sealed record QuizOverview(string QuizId, int Version, string Title, string Subject, int GradeLevel, string? Topic, int MaxPoints, DateTimeOffset UploadedAt, bool Shared);
 
 public sealed record QuizDeletedResponse(bool Archived);
 

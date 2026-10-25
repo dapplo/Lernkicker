@@ -40,6 +40,13 @@ public class ArchitectureTests
         Assert.Equal(["Ical.Net", "Lernkicker.Application", "Lernkicker.Domain", "NodaTime"], NonBcl(Calendar));
 
     [Fact]
+    public void Shared_kinds_match_the_application()
+    {
+        Assert.Equal(Lernkicker.Application.SharedKinds.Quiz, Lernkicker.Contracts.SharedKinds.Quiz);
+        Assert.Equal(Lernkicker.Application.SharedKinds.Lesson, Lernkicker.Contracts.SharedKinds.Lesson);
+    }
+
+    [Fact]
     public void Client_upload_limits_match_the_domain()
     {
         Assert.Equal(Lernkicker.Domain.Quizzes.QuizLimits.MaxBytes, Lernkicker.Contracts.ApiLimits.QuizMaxBytes);

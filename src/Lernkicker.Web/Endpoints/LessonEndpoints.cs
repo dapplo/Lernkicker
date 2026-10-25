@@ -38,6 +38,12 @@ public static class LessonEndpoints
             return source.IsSuccess ? Results.Text(source.Value, "application/json") : ApiResults.Error(source.Error!);
         });
 
+        lessons.MapGet("/{lessonId}/preview", async (string lessonId, LessonUseCases uc) =>
+            (await uc.PreviewAsync(lessonId)).ToHttp(l => l.ToPreviewDto()));
+
+        lessons.MapPut("/{lessonId}/shared", async (string lessonId, ShareRequest request, LessonUseCases uc) =>
+            (await uc.SetSharedAsync(lessonId, request.Shared)).ToHttp(l => l.ToDto()));
+
         lessons.MapDelete("/{lessonId}", async (string lessonId, LessonUseCases uc) =>
             (await uc.DeleteAsync(lessonId)).ToHttp());
 

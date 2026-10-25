@@ -93,6 +93,13 @@ internal sealed class QuizLibrary(LernkickerDbContext db) : IQuizLibrary
 
     public async Task<IReadOnlyList<StoredQuiz>> VersionsAsync(string quizId) =>
         await db.Quizzes.Where(q => q.QuizId == quizId).ToListAsync();
+
+    // Only the current version carries the sharing (older versions are archived)
+    public async Task<IReadOnlyList<StoredQuiz>> ListSharedAnyFamilyAsync() =>
+        await db.Quizzes.IgnoreQueryFilters().Where(q => q.SharedAt != null && !q.Archived).ToListAsync();
+
+    public Task<StoredQuiz?> FindSharedAnyFamilyAsync(Guid storedQuizId) =>
+        db.Quizzes.IgnoreQueryFilters().SingleOrDefaultAsync(q => q.Id == storedQuizId && q.SharedAt != null && !q.Archived);
 }
 
 internal sealed class PracticeRepository(LernkickerDbContext db) : IPracticeRepository
@@ -215,4 +222,10 @@ internal sealed class LessonRepository(LernkickerDbContext db) : ILessonReposito
 
     public Task RemoveAssignmentsAsync(Guid storedLessonId) =>
         db.LessonAssignments.Where(a => a.StoredLessonId == storedLessonId).ExecuteDeleteAsync();
+
+    public async Task<IReadOnlyList<StoredLesson>> ListSharedAnyFamilyAsync() =>
+        await db.Lessons.IgnoreQueryFilters().Where(l => l.SharedAt != null).ToListAsync();
+
+    public Task<StoredLesson?> FindSharedAnyFamilyAsync(Guid storedLessonId) =>
+        db.Lessons.IgnoreQueryFilters().SingleOrDefaultAsync(l => l.Id == storedLessonId && l.SharedAt != null);
 }

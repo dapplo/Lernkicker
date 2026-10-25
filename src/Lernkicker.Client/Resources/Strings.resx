@@ -316,4 +316,32 @@
   <data name="Learn.Poem.NextLine" xml:space="preserve"><value>Show next line</value></data>
   <data name="Learn.Poem.Done" xml:space="preserve"><value>You recited the whole poem!</value></data>
   <data name="Learn.Poem.FromStart" xml:space="preserve"><value>From the start</value></data>
+  <data name="Parents.Library" xml:space="preserve"><value>Shared library</value></data>
+  <data name="Library.Title" xml:space="preserve"><value>Shared library</value></data>
+  <data name="Library.Intro" xml:space="preserve"><value>Tests and learning material other families on this Lernkicker have shared. Look at them first, then copy them into your own collection. The copy is yours: later changes by the other family do not affect it.</value></data>
+  <data name="Library.Empty" xml:space="preserve"><value>Nothing shared yet. When you share a test or learning material, other families find it here.</value></data>
+  <data name="Library.Kind" xml:space="preserve"><value>Type</value></data>
+  <data name="Library.All" xml:space="preserve"><value>All</value></data>
+  <data name="Library.Quizzes" xml:space="preserve"><value>Tests</value></data>
+  <data name="Library.Lessons" xml:space="preserve"><value>Learning material</value></data>
+  <data name="Library.Subject" xml:space="preserve"><value>Subject</value></data>
+  <data name="Library.Grade" xml:space="preserve"><value>Grade</value></data>
+  <data name="Library.QuizDetails" xml:space="preserve"><value>Test · {0} · grade {1} · {2} points · shared {3}</value></data>
+  <data name="Library.LessonDetails" xml:space="preserve"><value>Learning material · {0} · grade {1} · {2} parts · shared {3}</value></data>
+  <data name="Library.InMyLibrary" xml:space="preserve"><value>You already have one with the same id; copying replaces it with this one.</value></data>
+  <data name="Library.Copy" xml:space="preserve"><value>Copy to my collection</value></data>
+  <data name="Library.Update" xml:space="preserve"><value>Replace mine</value></data>
+  <data name="Library.CopiedShort" xml:space="preserve"><value>✓ In your collection</value></data>
+  <data name="Library.Copied" xml:space="preserve"><value>“{0}” is now in your collection.</value></data>
+  <data name="Library.ToMine" xml:space="preserve"><value>Go there</value></data>
+  <data name="Preview.Title" xml:space="preserve"><value>Preview</value></data>
+  <data name="Preview.Button" xml:space="preserve"><value>Preview</value></data>
+  <data name="Preview.QuizHint" xml:space="preserve"><value>Preview: this is how the test looks on the child's phone. You can try the exercises; nothing is handed in.</value></data>
+  <data name="Preview.LessonHint" xml:space="preserve"><value>Preview: this is how the learning material looks on the child's phone.</value></data>
+  <data name="Preview.QuizDetails" xml:space="preserve"><value>{0} · grade {1} · {2} exercises · {3} points</value></data>
+  <data name="Share.Start" xml:space="preserve"><value>Share</value></data>
+  <data name="Share.Stop" xml:space="preserve"><value>Stop sharing</value></data>
+  <data name="Share.Badge" xml:space="preserve"><value>Shared with all families</value></data>
+  <data name="Share.Hint" xml:space="preserve"><value>Shared items are visible to all families on this Lernkicker. They can preview and copy them; they do not see your name, your children or any results. Copies already made stay when you stop sharing.</value></data>
+  <data name="Error.shared.notFound" xml:space="preserve"><value>This is no longer shared.</value></data>
 </root>

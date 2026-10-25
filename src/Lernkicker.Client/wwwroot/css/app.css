@@ -278,6 +278,12 @@ input.gap { width: 9em; }
 }
 .list li > div { display: grid; min-width: 0; }
 .list small { color: var(--muted); }
+.shared-badge { color: var(--green-dark) !important; font-weight: 600; }
+.shared-badge::before { content: "🌍 "; }
+.preview-banner { background: #fff8e1; border-radius: var(--radius); padding: 12px 16px; margin: 8px 0 16px; display: grid; gap: 8px; justify-items: start; }
+.preview-banner p { margin: 0; }
+.preview-exercise { margin-bottom: 16px; }
+.filters { margin-bottom: 16px; }
 .locked-badge { background: var(--red-light); color: var(--red); border-radius: 6px; padding: 0 6px; font-size: 0.85rem; margin-left: 6px; }
 
 .table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
