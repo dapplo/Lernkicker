@@ -44,6 +44,10 @@ else
                 <div>
                     <b>@lesson.Title</b>
                     <small>@L["Lessons.Details", Display.Subject(lesson.Subject), lesson.GradeLevel, lesson.Blocks, Display.Date(lesson.UploadedAt)]</small>
+                    @if (lesson.Shared)
+                    {
+                        <small class="shared-badge">@L["Share.Badge"]</small>
+                    }
                 </div>
                 @if (_deleting == lesson.LessonId)
                 {
@@ -54,12 +58,17 @@ else
                 }
                 else
                 {
-                    <button class="btn quiet" @onclick="() => _deleting = lesson.LessonId">@L["Common.Delete"]</button>
+                    <span class="buttons">
+                        <a class="btn quiet" href="parents/preview/lesson/@Uri.EscapeDataString(lesson.LessonId)">@L["Preview.Button"]</a>
+                        <button class="btn quiet" @onclick="() => Share(lesson.LessonId, !lesson.Shared)">@L[lesson.Shared ? "Share.Stop" : "Share.Start"]</button>
+                        <button class="btn quiet" @onclick="() => _deleting = lesson.LessonId">@L["Common.Delete"]</button>
+                    </span>
                 }
             </li>
         }
     </ul>
     <p class="hint">@L["Lessons.DeleteHint"]</p>
+    <p class="hint">@L["Share.Hint"]</p>
 }
 
 @code {
@@ -114,6 +123,20 @@ else
         finally
         {
             _busy = false;
+        }
+    }
+
+    private async Task Share(string lessonId, bool shared)
+    {
+        _errors = null;
+        try
+        {
+            await Api.ShareLesson(lessonId, shared);
+            _lessons = await Api.Lessons();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
         }
     }
 

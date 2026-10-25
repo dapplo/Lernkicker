@@ -43,3 +43,24 @@ public class LessonTests
         Assert.Equal("blocks/1/id", issue.Path);
     }
 }
+
+public class SharingTests
+{
+    private static readonly DateTimeOffset Now = new(2026, 10, 25, 16, 0, 0, TimeSpan.Zero);
+
+    [Fact]
+    public void Sharing_again_keeps_the_first_date_and_unsharing_clears_it()
+    {
+        var lesson = new StoredLesson(Guid.NewGuid(), new Lesson
+        {
+            Id = "x-lesson", Title = "X", Subject = "german", GradeLevel = 4, Blocks = [new FactsBlock { Id = "a", Items = ["1"] }],
+        }, "{}", Now);
+
+        lesson.Share(Now);
+        lesson.Share(Now.AddDays(1));
+        Assert.Equal(Now, lesson.SharedAt);
+
+        lesson.Unshare();
+        Assert.False(lesson.IsShared);
+    }
+}

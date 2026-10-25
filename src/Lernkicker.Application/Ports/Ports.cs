@@ -125,6 +125,12 @@ public interface IQuizLibrary
     Task<StoredQuiz?> FindAsync(Guid storedQuizId);
 
     Task<IReadOnlyList<StoredQuiz>> VersionsAsync(string quizId);
+
+    /// <summary>The current, shared quizzes of all families (the shared library is the one place that crosses families).</summary>
+    Task<IReadOnlyList<StoredQuiz>> ListSharedAnyFamilyAsync();
+
+    /// <summary>A current quiz of any family, only when it is shared.</summary>
+    Task<StoredQuiz?> FindSharedAnyFamilyAsync(Guid storedQuizId);
 }
 
 public interface IPracticeRepository

@@ -5,7 +5,7 @@ using Lernkicker.Domain.Quizzes;
 
 namespace Lernkicker.Application.UseCases;
 
-/// <summary>A family's library of quizzes: upload (new version per id), list, read, delete.</summary>
+/// <summary>A family's library of quizzes: upload (new version per id), list, read, preview, share, delete.</summary>
 public sealed class QuizLibraryUseCases(IQuizLibrary library, IPracticeRepository practice, IQuizFormat format, IUnitOfWork unitOfWork, TimeProvider time)
 {
     public async Task<IReadOnlyList<QuizSummary>> ListAsync() =>
@@ -43,6 +43,11 @@ public sealed class QuizLibraryUseCases(IQuizLibrary library, IPracticeRepositor
             }
         }
 
+        if (previous.Where(q => !q.Archived).MaxBy(q => q.Version) is { } current)
+        {
+            stored.KeepSharingOf(current);
+        }
+
         foreach (var old in previous)
         {
             old.Archive();
@@ -55,6 +60,32 @@ public sealed class QuizLibraryUseCases(IQuizLibrary library, IPracticeRepositor
     /// <summary>The current version's file, exactly as uploaded.</summary>
     public async Task<Result<string>> SourceAsync(string quizId) =>
         await library.FindCurrentAsync(quizId) is { } quiz ? quiz.Source : AppError.NotFound(ErrorCodes.QuizNotFound);
+
+    /// <summary>The current version as a child sees it, so parents know what they assign or share.</summary>
+    public async Task<Result<QuizSheet>> PreviewAsync(string quizId, Random random) =>
+        await library.FindCurrentAsync(quizId) is { } quiz ? QuizSheet.For(format.Read(quiz.Source), random) : AppError.NotFound(ErrorCodes.QuizNotFound);
+
+    /// <summary>Shares the quiz with all families on this server, or makes it private again (copies stay).</summary>
+    public async Task<Result<QuizSummary>> SetSharedAsync(string quizId, bool shared)
+    {
+        var quiz = await library.FindCurrentAsync(quizId);
+        if (quiz is null)
+        {
+            return AppError.NotFound(ErrorCodes.QuizNotFound);
+        }
+
+        if (shared)
+        {
+            quiz.Share(time.GetUtcNow());
+        }
+        else
+        {
+            quiz.Unshare();
+        }
+
+        await unitOfWork.SaveChangesAsync();
+        return QuizSummary.From(quiz);
+    }
 
     /// <summary>Removes the quiz and its assignments. With results it is archived instead, so the history stays.</summary>
     public async Task<Result<QuizDeleted>> DeleteAsync(string quizId)

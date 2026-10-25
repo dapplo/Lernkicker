@@ -84,6 +84,7 @@ public static class ErrorCodes
     public const string LessonNotFound = "lesson.notFound";
     public const string LessonInvalid = "lesson.invalid";
     public const string LessonTooLarge = "lesson.tooLarge";
+    public const string SharedNotFound = "shared.notFound";
     public const string LanguageInvalid = "language.invalid";
 
     public const string EventKindInvalid = "calendar.kindInvalid";

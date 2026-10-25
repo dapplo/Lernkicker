@@ -27,6 +27,11 @@ public sealed class StoredQuiz : IFamilyOwned
     /// <summary>Archived versions keep their results but are no longer listed or assignable.</summary>
     public bool Archived { get; private set; }
 
+    /// <summary>When the family shared the quiz with all families on this server; null when it is private.</summary>
+    public DateTimeOffset? SharedAt { get; private set; }
+
+    public bool IsShared => SharedAt is not null;
+
     // For the persistence adapter
     private StoredQuiz(Guid familyId, string quizId, int version, string title, string subject, int gradeLevel, string? topic, int maxPoints, string source, DateTimeOffset uploadedAt)
     {
@@ -46,4 +51,12 @@ public sealed class StoredQuiz : IFamilyOwned
         new(familyId, quiz.Id, version, quiz.Title, quiz.Subject, quiz.GradeLevel, quiz.Topic, quiz.MaxPoints, source, uploadedAt);
 
     public void Archive() => Archived = true;
+
+    /// <summary>Other families can see, preview and copy the quiz; a new version stays shared.</summary>
+    public void Share(DateTimeOffset at) => SharedAt ??= at;
+
+    public void Unshare() => SharedAt = null;
+
+    /// <summary>A new version keeps the sharing of the version it replaces.</summary>
+    public void KeepSharingOf(StoredQuiz previous) => SharedAt = previous.SharedAt;
 }

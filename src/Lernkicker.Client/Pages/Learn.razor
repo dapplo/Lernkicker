@@ -25,38 +25,7 @@ else
         <p class="subtitle" lang="@_lesson.Language">@description</p>
     }
 
-    @foreach (var block in _lesson.Blocks)
-    {
-        var known = _known.Contains(block.Id);
-        <section class="lesson-block @(known ? "known" : "")" @key="block.Id">
-            <h2 lang="@(block.Title is null ? null : _lesson.Language)">@(block.Title ?? L[$"Learn.Type.{block.Type}"])</h2>
-            <div lang="@_lesson.Language">
-                @switch (block.Type)
-                {
-                    case "text":
-                        <TextView Text="@(block.Text!)" />
-                        break;
-                    case "poem":
-                        <PoemView Block="@block" />
-                        break;
-                    case "flashcards":
-                        <FlashcardsView Cards="@(block.Cards!)" />
-                        break;
-                    case "facts":
-                        <ul class="facts">
-                            @foreach (var item in block.Items!)
-                            {
-                                <li>@item</li>
-                            }
-                        </ul>
-                        break;
-                }
-            </div>
-            <button class="known-toggle @(known ? "on" : "")" aria-pressed="@(known ? "true" : "false")" @onclick="() => Toggle(block.Id)">
-                @(known ? L["Learn.KnowIt"] : L["Learn.MarkKnown"])
-            </button>
-        </section>
-    }
+    <LessonBlocks Lesson="@_lesson" Known="@_known" Toggle="Toggle" />
 
     <div class="lesson-end">
         @if (_saved)

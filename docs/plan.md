@@ -16,7 +16,7 @@ Children practise tests on their phone; parents pick the tests and see results a
 
 ## Building blocks
 
-- **Quizzes:** JSON in the [`quiz/v1`](quiz-format.md) format. Upload (file, paste, later an API token), assign to children (optionally with a test date), delete (archived when there are results). Later: share with a class group; results stay private.
+- **Quizzes:** JSON in the [`quiz/v1`](quiz-format.md) format. Upload (file, paste, later an API token), assign to children (optionally with a test date), delete (archived when there are results), preview as the child sees it. Quizzes and lessons can be shared with all families on the server; others preview them in the shared library and copy them into their own (results stay private).
 - **Learning material:** JSON in the [`lesson/v1`](lesson-format.md) format: texts, poems to learn by heart (read, practise with words hidden, recite line by line), flashcards, key facts. Parents give it to a child with an optional due date and see how often it was practised and which parts the child knows.
 - **Child app:** PWA with an icon on the home screen, short rounds, stars; wrong answers come back.
 - **Languages:** the UI is German and English (German by default); quiz content is in the quiz's own `language`. The server only sends codes, the client translates them. More UI languages are a new `Strings.<lang>.resx`.

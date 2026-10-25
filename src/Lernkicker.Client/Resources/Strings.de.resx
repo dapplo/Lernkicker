@@ -316,4 +316,32 @@
   <data name="Learn.Poem.NextLine" xml:space="preserve"><value>Nächste Zeile zeigen</value></data>
   <data name="Learn.Poem.Done" xml:space="preserve"><value>Du hast das ganze Gedicht aufgesagt!</value></data>
   <data name="Learn.Poem.FromStart" xml:space="preserve"><value>Von vorne</value></data>
+  <data name="Parents.Library" xml:space="preserve"><value>Gemeinsame Sammlung</value></data>
+  <data name="Library.Title" xml:space="preserve"><value>Gemeinsame Sammlung</value></data>
+  <data name="Library.Intro" xml:space="preserve"><value>Proben und Lernstoff, die andere Familien auf diesem Lernkicker geteilt haben. Schau sie dir zuerst an und übernimm sie dann in deine eigene Sammlung. Die Kopie gehört dir: Spätere Änderungen der anderen Familie ändern sie nicht.</value></data>
+  <data name="Library.Empty" xml:space="preserve"><value>Noch nichts geteilt. Wenn du eine Probe oder Lernstoff teilst, finden andere Familien sie hier.</value></data>
+  <data name="Library.Kind" xml:space="preserve"><value>Art</value></data>
+  <data name="Library.All" xml:space="preserve"><value>Alle</value></data>
+  <data name="Library.Quizzes" xml:space="preserve"><value>Proben</value></data>
+  <data name="Library.Lessons" xml:space="preserve"><value>Lernstoff</value></data>
+  <data name="Library.Subject" xml:space="preserve"><value>Fach</value></data>
+  <data name="Library.Grade" xml:space="preserve"><value>Klasse</value></data>
+  <data name="Library.QuizDetails" xml:space="preserve"><value>Probe · {0} · Klasse {1} · {2} Punkte · geteilt am {3}</value></data>
+  <data name="Library.LessonDetails" xml:space="preserve"><value>Lernstoff · {0} · Klasse {1} · {2} Teile · geteilt am {3}</value></data>
+  <data name="Library.InMyLibrary" xml:space="preserve"><value>Du hast schon einen mit derselben id; Übernehmen ersetzt ihn durch diesen.</value></data>
+  <data name="Library.Copy" xml:space="preserve"><value>In meine Sammlung übernehmen</value></data>
+  <data name="Library.Update" xml:space="preserve"><value>Meinen ersetzen</value></data>
+  <data name="Library.CopiedShort" xml:space="preserve"><value>✓ In deiner Sammlung</value></data>
+  <data name="Library.Copied" xml:space="preserve"><value>„{0}“ ist jetzt in deiner Sammlung.</value></data>
+  <data name="Library.ToMine" xml:space="preserve"><value>Dorthin</value></data>
+  <data name="Preview.Title" xml:space="preserve"><value>Vorschau</value></data>
+  <data name="Preview.Button" xml:space="preserve"><value>Vorschau</value></data>
+  <data name="Preview.QuizHint" xml:space="preserve"><value>Vorschau: So sieht die Probe am Handy des Kindes aus. Du kannst die Aufgaben ausprobieren; nichts wird abgegeben.</value></data>
+  <data name="Preview.LessonHint" xml:space="preserve"><value>Vorschau: So sieht der Lernstoff am Handy des Kindes aus.</value></data>
+  <data name="Preview.QuizDetails" xml:space="preserve"><value>{0} · Klasse {1} · {2} Aufgaben · {3} Punkte</value></data>
+  <data name="Share.Start" xml:space="preserve"><value>Teilen</value></data>
+  <data name="Share.Stop" xml:space="preserve"><value>Nicht mehr teilen</value></data>
+  <data name="Share.Badge" xml:space="preserve"><value>Mit allen Familien geteilt</value></data>
+  <data name="Share.Hint" xml:space="preserve"><value>Geteiltes sehen alle Familien auf diesem Lernkicker. Sie können es ansehen und kopieren; deinen Namen, deine Kinder und Ergebnisse sehen sie nicht. Schon gemachte Kopien bleiben, wenn du nicht mehr teilst.</value></data>
+  <data name="Error.shared.notFound" xml:space="preserve"><value>Das ist nicht mehr geteilt.</value></data>
 </root>

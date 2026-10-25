@@ -1,0 +1,126 @@
+@page "/parents/library"
+@inject Api Api
+@inject NavigationManager Navigation
+
+<PageTitle>@L["Library.Title"] · Lernkicker</PageTitle>
+
+<p><a href="parents">← @L["Common.Back"]</a></p>
+<h1>@L["Library.Title"]</h1>
+<p class="subtitle">@L["Library.Intro"]</p>
+
+@if (_items is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else if (_items.Count == 0)
+{
+    <p>@L["Library.Empty"]</p>
+}
+else
+{
+    <div class="form row filters">
+        <label>@L["Library.Kind"]
+            <select @bind="_kind">
+                <option value="">@L["Library.All"]</option>
+                <option value="@SharedKinds.Quiz">@L["Library.Quizzes"]</option>
+                <option value="@SharedKinds.Lesson">@L["Library.Lessons"]</option>
+            </select>
+        </label>
+        <label>@L["Library.Subject"]
+            <select @bind="_subject">
+                <option value="">@L["Library.All"]</option>
+                @foreach (var subject in _items.Select(i => i.Subject).Distinct().Order())
+                {
+                    <option value="@subject">@Display.Subject(subject)</option>
+                }
+            </select>
+        </label>
+        <label>@L["Library.Grade"]
+            <select @bind="_grade">
+                <option value="0">@L["Library.All"]</option>
+                @foreach (var grade in _items.Select(i => i.GradeLevel).Distinct().Order())
+                {
+                    <option value="@grade">@L["Common.Grade", grade]</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    <Messages Errors="@_errors" />
+    <ul class="list">
+        @foreach (var item in Filtered)
+        {
+            <li class="@Display.SubjectClass(item.Subject)">
+                <div>
+                    <b>@item.Title</b>
+                    <small>@Details(item)</small>
+                    @if (_copied.Contains(item.Id))
+                    {
+                        <small class="ok">@L["Library.CopiedShort"]</small>
+                    }
+                    else if (item.InMyLibrary)
+                    {
+                        <small>@L["Library.InMyLibrary"]</small>
+                    }
+                </div>
+                <span class="buttons">
+                    <a class="btn quiet" href="parents/library/@item.Kind/@item.Id">@L["Preview.Button"]</a>
+                    @if (!_copied.Contains(item.Id))
+                    {
+                        <button class="btn" @onclick="() => Copy(item)">@L[item.InMyLibrary ? "Library.Update" : "Library.Copy"]</button>
+                    }
+                </span>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<SharedOverview>? _items;
+    private readonly HashSet<Guid> _copied = [];
+    private string _kind = "", _subject = "";
+    private int _grade;
+    private IReadOnlyList<string>? _errors;
+
+    private IEnumerable<SharedOverview> Filtered => _items!
+        .Where(i => _kind == "" || i.Kind == _kind)
+        .Where(i => _subject == "" || i.Subject == _subject)
+        .Where(i => _grade == 0 || i.GradeLevel == _grade);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _items = await Api.Library();
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("parents");
+        }
+    }
+
+    private string Details(SharedOverview item) => L[item.Kind == SharedKinds.Quiz ? "Library.QuizDetails" : "Library.LessonDetails",
+        Display.Subject(item.Subject), item.GradeLevel, item.Size, Display.Date(item.SharedAt)];
+
+    private async Task Copy(SharedOverview item)
+    {
+        _errors = null;
+        try
+        {
+            if (item.Kind == SharedKinds.Quiz)
+            {
+                await Api.CopyQuiz(item.Id);
+            }
+            else
+            {
+                await Api.CopyLesson(item.Id);
+            }
+
+            _copied.Add(item.Id);
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+}

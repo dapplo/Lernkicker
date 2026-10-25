@@ -28,9 +28,9 @@ public sealed record DeviceStatus(bool Paired, string? ChildName, bool Locked);
 /// <summary>Who is logged in on a child's device after a correct PIN.</summary>
 public sealed record ChildSession(Guid FamilyId, Guid ChildId, Guid DeviceId, string ChildName);
 
-public sealed record QuizSummary(string QuizId, int Version, string Title, string Subject, int GradeLevel, string? Topic, int MaxPoints, DateTimeOffset UploadedAt)
+public sealed record QuizSummary(string QuizId, int Version, string Title, string Subject, int GradeLevel, string? Topic, int MaxPoints, DateTimeOffset UploadedAt, bool Shared)
 {
-    public static QuizSummary From(StoredQuiz q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt);
+    public static QuizSummary From(StoredQuiz q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt, q.IsShared);
 }
 
 /// <summary><c>Archived</c>: the quiz had results and was archived instead of removed.</summary>
@@ -46,7 +46,20 @@ public sealed record AttemptSummary(
 public sealed record ChildAssignment(
     Guid AssignmentId, string Title, string Subject, string? Topic, int MaxPoints, DateOnly? DueOn, int Attempts, int? BestPercent, int Stars);
 
-public sealed record LessonSummary(string LessonId, string Title, string Subject, int GradeLevel, string? Topic, int Blocks, DateTimeOffset UploadedAt);
+public sealed record LessonSummary(string LessonId, string Title, string Subject, int GradeLevel, string? Topic, int Blocks, DateTimeOffset UploadedAt, bool Shared);
+
+public static class SharedKinds
+{
+    public const string Quiz = "quiz";
+    public const string Lesson = "lesson";
+}
+
+/// <summary>
+/// A quiz or lesson another family shared. <c>Size</c> is the points of a quiz or the parts of a lesson;
+/// <c>InMyLibrary</c> says the own library already has one with the same id (copying it replaces that one).
+/// </summary>
+public sealed record SharedSummary(
+    Guid Id, string Kind, string ItemId, string Title, string Subject, int GradeLevel, string? Topic, int Size, DateTimeOffset SharedAt, bool InMyLibrary);
 
 /// <summary>A lesson given to a child, with the child's progress, for parents.</summary>
 public sealed record LessonAssignmentSummary(

@@ -88,6 +88,11 @@ public sealed class StoredLesson : IFamilyOwned
     public string Source { get; private set; }
     public DateTimeOffset UploadedAt { get; private set; }
 
+    /// <summary>When the family shared the lesson with all families on this server; null when it is private.</summary>
+    public DateTimeOffset? SharedAt { get; private set; }
+
+    public bool IsShared => SharedAt is not null;
+
     public StoredLesson(Guid familyId, Lesson lesson, string source, DateTimeOffset uploadedAt)
     {
         FamilyId = familyId;
@@ -113,6 +118,11 @@ public sealed class StoredLesson : IFamilyOwned
         Source = source;
         UploadedAt = uploadedAt;
     }
+
+    /// <summary>Other families can see, preview and copy the lesson; a replaced lesson stays shared.</summary>
+    public void Share(DateTimeOffset at) => SharedAt ??= at;
+
+    public void Unshare() => SharedAt = null;
 }
 
 /// <summary>

@@ -50,6 +50,32 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
     public async Task<Result<string>> SourceAsync(string lessonId) =>
         await lessons.FindAsync(lessonId) is { } lesson ? lesson.Source : AppError.NotFound(ErrorCodes.LessonNotFound);
 
+    /// <summary>The lesson as a child sees it.</summary>
+    public async Task<Result<Lesson>> PreviewAsync(string lessonId) =>
+        await lessons.FindAsync(lessonId) is { } lesson ? format.Read(lesson.Source) : AppError.NotFound(ErrorCodes.LessonNotFound);
+
+    /// <summary>Shares the lesson with all families on this server, or makes it private again (copies stay).</summary>
+    public async Task<Result<LessonSummary>> SetSharedAsync(string lessonId, bool shared)
+    {
+        var lesson = await lessons.FindAsync(lessonId);
+        if (lesson is null)
+        {
+            return AppError.NotFound(ErrorCodes.LessonNotFound);
+        }
+
+        if (shared)
+        {
+            lesson.Share(time.GetUtcNow());
+        }
+        else
+        {
+            lesson.Unshare();
+        }
+
+        await unitOfWork.SaveChangesAsync();
+        return Summary(lesson);
+    }
+
     /// <summary>Removes the lesson together with its assignments and the children's progress.</summary>
     public async Task<Result> DeleteAsync(string lessonId)
     {
@@ -173,7 +199,7 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
     }
 
     private static LessonSummary Summary(StoredLesson lesson) =>
-        new(lesson.LessonId, lesson.Title, lesson.Subject, lesson.GradeLevel, lesson.Topic, lesson.BlockCount, lesson.UploadedAt);
+        new(lesson.LessonId, lesson.Title, lesson.Subject, lesson.GradeLevel, lesson.Topic, lesson.BlockCount, lesson.UploadedAt, lesson.IsShared);
 
     private static LessonAssignmentSummary Summary(LessonAssignment assignment, StoredLesson lesson) =>
         new(assignment.Id, lesson.LessonId, lesson.Title, lesson.Subject, assignment.DueOn, assignment.AssignedAt,

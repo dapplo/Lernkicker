@@ -1,0 +1,146 @@
+@page "/parents/preview/{Kind}/{ItemId}"
+@page "/parents/library/{Kind}/{SharedId:guid}"
+@inject Api Api
+@inject NavigationManager Navigation
+
+@* What a quiz or lesson looks like for the child: the family's own (to check before assigning or sharing) or one another family shared (to decide whether to copy it) *@
+
+<PageTitle>@L["Preview.Title"] · Lernkicker</PageTitle>
+
+<p><a href="@BackLink">← @L["Common.Back"]</a></p>
+
+@if (_errors is not null && _sheet is null && _lesson is null)
+{
+    <Messages Errors="@_errors" />
+}
+else if (_sheet is null && _lesson is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else
+{
+    <div class="preview-banner">
+        <p>@L[Kind == SharedKinds.Quiz ? "Preview.QuizHint" : "Preview.LessonHint"]</p>
+        @if (SharedId is not null)
+        {
+            @CopyButton
+        }
+    </div>
+
+    @if (_sheet is { } sheet)
+    {
+        <h1 lang="@sheet.Language">@sheet.Title</h1>
+        <p class="subtitle">@L["Preview.QuizDetails", Display.Subject(sheet.Subject), sheet.GradeLevel, sheet.Exercises.Count, sheet.MaxPoints]</p>
+        @foreach (var draft in _drafts!)
+        {
+            <div class="preview-exercise">
+                <ExerciseView @key="draft" Draft="@draft" Language="@sheet.Language" />
+            </div>
+        }
+    }
+    else if (_lesson is { } lesson)
+    {
+        <h1 lang="@lesson.Language">@lesson.Title</h1>
+        <p class="subtitle">@Display.Subject(lesson.Subject)</p>
+        @if (lesson.Description is { } description)
+        {
+            <p lang="@lesson.Language">@description</p>
+        }
+        <LessonBlocks Lesson="@lesson" />
+    }
+
+    @if (SharedId is not null)
+    {
+        <div class="buttons">@CopyButton</div>
+    }
+}
+
+@code {
+    private SheetDto? _sheet;
+    private List<AnswerDraft>? _drafts;
+    private LessonDto? _lesson;
+    private IReadOnlyList<string>? _errors;
+    private string? _copied;
+    private bool _busy;
+
+    /// <summary>"quiz" or "lesson".</summary>
+    [Parameter]
+    public string Kind { get; set; } = "";
+
+    /// <summary>The id from the family's own file.</summary>
+    [Parameter]
+    public string? ItemId { get; set; }
+
+    /// <summary>A shared quiz or lesson of another family.</summary>
+    [Parameter]
+    public Guid? SharedId { get; set; }
+
+    private string BackLink => SharedId is not null ? "parents/library" : Kind == SharedKinds.Quiz ? "parents/quizzes" : "parents/lessons";
+
+    private RenderFragment CopyButton => __builder =>
+    {
+        if (_copied is { } title)
+        {
+            <p class="ok" role="status">@L["Library.Copied", title] <a href="@(Kind == SharedKinds.Quiz ? "parents/quizzes" : "parents/lessons")">@L["Library.ToMine"]</a></p>
+        }
+        else
+        {
+            <button class="btn" disabled="@_busy" @onclick="Copy">@L["Library.Copy"]</button>
+        }
+        <Messages Errors="@(_sheet is null && _lesson is null ? null : _errors)" />
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _errors = null;
+        try
+        {
+            switch (Kind, SharedId)
+            {
+                case (SharedKinds.Quiz, { } id):
+                    _sheet = await Api.SharedQuiz(id);
+                    break;
+                case (SharedKinds.Quiz, null):
+                    _sheet = await Api.QuizPreview(ItemId!);
+                    break;
+                case (SharedKinds.Lesson, { } id):
+                    _lesson = await Api.SharedLesson(id);
+                    break;
+                case (SharedKinds.Lesson, null):
+                    _lesson = await Api.LessonPreview(ItemId!);
+                    break;
+                default:
+                    Navigation.NavigateTo("parents");
+                    return;
+            }
+
+            _drafts = _sheet?.Exercises.Select(AnswerDraft.For).ToList();
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("parents");
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+
+    private async Task Copy()
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            _copied = Kind == SharedKinds.Quiz ? (await Api.CopyQuiz(SharedId!.Value)).Title : (await Api.CopyLesson(SharedId!.Value)).Title;
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

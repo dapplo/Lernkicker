@@ -1,0 +1,47 @@
+@* The parts of a lesson. With Toggle, each part has a "Kann ich!" button; without (the parents' preview) not. *@
+@foreach (var block in Lesson.Blocks)
+{
+    var known = Known?.Contains(block.Id) == true;
+    <section class="lesson-block @(known ? "known" : "")" @key="block.Id">
+        <h2 lang="@(block.Title is null ? null : Lesson.Language)">@(block.Title ?? L[$"Learn.Type.{block.Type}"])</h2>
+        <div lang="@Lesson.Language">
+            @switch (block.Type)
+            {
+                case "text":
+                    <TextView Text="@(block.Text!)" />
+                    break;
+                case "poem":
+                    <PoemView Block="@block" />
+                    break;
+                case "flashcards":
+                    <FlashcardsView Cards="@(block.Cards!)" />
+                    break;
+                case "facts":
+                    <ul class="facts">
+                        @foreach (var item in block.Items!)
+                        {
+                            <li>@item</li>
+                        }
+                    </ul>
+                    break;
+            }
+        </div>
+        @if (Toggle.HasDelegate)
+        {
+            <button class="known-toggle @(known ? "on" : "")" aria-pressed="@(known ? "true" : "false")" @onclick="() => Toggle.InvokeAsync(block.Id)">
+                @(known ? L["Learn.KnowIt"] : L["Learn.MarkKnown"])
+            </button>
+        }
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public LessonDto Lesson { get; set; } = null!;
+
+    [Parameter]
+    public IReadOnlySet<string>? Known { get; set; }
+
+    [Parameter]
+    public EventCallback<string> Toggle { get; set; }
+}

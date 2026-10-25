@@ -38,6 +38,12 @@ public static class QuizEndpoints
             return source.IsSuccess ? Results.Text(source.Value, "application/json") : ApiResults.Error(source.Error!);
         });
 
+        quizzes.MapGet("/{quizId}/preview", async (string quizId, QuizLibraryUseCases library) =>
+            (await library.PreviewAsync(quizId, Random.Shared)).ToHttp(s => s.ToDto()));
+
+        quizzes.MapPut("/{quizId}/shared", async (string quizId, ShareRequest request, QuizLibraryUseCases library) =>
+            (await library.SetSharedAsync(quizId, request.Shared)).ToHttp(q => q.ToDto()));
+
         quizzes.MapDelete("/{quizId}", async (string quizId, QuizLibraryUseCases library) =>
             (await library.DeleteAsync(quizId)).ToHttp(d => new QuizDeletedResponse(d.Archived)));
     }
