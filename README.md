@@ -7,6 +7,7 @@ Läuft als Docker-Container auf einer Synology NAS, erreichbar über Tailscale.
 ## Inhalt
 
 - [Plan](docs/plan.md): Rollen, Bausteine, Technik, Phasen
+- [Sicherheitskonzept](docs/sicherheit.md): Funnel, Anmeldung, Trennung der Familien, Datenschutz, E-Mail
 - [Probe-Format `probe/v1`](docs/probe-format.md): wie eine Übungsprobe als JSON aussieht
 - [`schema/`](schema/): JSON Schema zum Prüfen von Proben
 - [`proben/`](proben/): Beispielproben

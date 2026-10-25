@@ -20,7 +20,7 @@ Kinder üben Übungsproben auf dem Handy, Eltern wählen die Proben aus und sehe
 - **Kinder-App:** PWA, ein Symbol auf dem Startbildschirm, kurze Runden, Sterne, falsche Fragen kommen wieder.
 - **Telegram:** ein Bot, nur für verknüpfte Konten (Einmal-Code per `t.me/<bot>?start=…`). Eltern: Ergebnisse, Erinnerungen, `/senden`. Kind: nur wenn freigeschaltet, Fragen mit Antwortknöpfen. Long Polling, kein offener Port.
 - **Kalender:** Termine je Kind (Proben, Fußball, Sonstiges), Import von Team-Kalendern (ICS, z. B. fussball.de), geheimer ICS-Feed je Kind.
-- **Zugang:** Tailscale (MagicDNS + HTTPS-Zertifikat). Andere Familien über Tailscale Sharing oder Funnel (offen).
+- **Zugang:** Tailscale (MagicDNS + HTTPS-Zertifikat), öffentlich über Tailscale Funnel. Details im [Sicherheitskonzept](sicherheit.md).
 
 ## Technik
 
@@ -38,10 +38,10 @@ Kinder üben Übungsproben auf dem Handy, Eltern wählen die Proben aus und sehe
 
 1. **Kern:** Probe-Format v1 (dieser Stand), Upload, Zuweisen, Löschen, Kinder-PWA, Ergebnisse, Docker-Image mit Tailscale.
 2. **Telegram und Kalender:** Bot für Eltern und Kinder, Termine, ICS, Fußball-Import, Web Push.
-3. **Weitere Familien:** Einladungen, Klassengruppen, Datenschutz-Seite, Export und Löschen, Funnel oder Sharing.
+3. **Weitere Familien:** Einladungen, Klassengruppen, Datenschutz-Seite, Export und Löschen, Funnel einschalten.
 
 ## Offen
 
 - Tailscale-Einrichtung auf der Synology: Sidecar mit `--advertise-tags` oder Label-basierter Proxy (z. B. TSDProxy)?
-- Andere Familien über Funnel oder Tailscale Sharing?
 - Lizenz des Repos.
+- E-Mail-Versand (SMTP) später: vorhandenes Postfach oder Versanddienst, siehe Sicherheitskonzept.
