@@ -46,5 +46,4 @@ The code follows a hexagonal architecture, see [architecture](architecture.md).
 ## Open questions
 
 - Tailscale on the Synology: sidecar with `--advertise-tags` (current plan) or a label-based proxy such as TSDProxy?
-- License of the repository.
 - Sending email (SMTP) later: an existing mailbox or a delivery service, see the security concept.

@@ -50,6 +50,18 @@ Then open http://localhost:5208. On first start the server creates the database 
 | `Lernkicker:TimeZone` | `Europe/Berlin` | Time zone of all dates (IANA name) |
 | `Lernkicker:Calendar:SyncHours` | `6` | How often subscribed calendars are imported again; `0` turns it off |
 
+## Trying the Docker image
+
+The image `ghcr.io/dapplo/lernkicker` (amd64 and arm64) is built by GitHub Actions on every push to `main` (`latest`, `sha-…`) and for `v*` tags. To try it on your own computer:
+
+```bash
+docker run --rm -p 8080:8080 -v lernkicker-data:/data \
+  -e Admin__Email=you@example.org -e Admin__Password='at-least-12-chars' \
+  ghcr.io/dapplo/lernkicker:latest
+```
+
+Then open http://localhost:8080 and log in under **I am a parent / Ich bin ein Elternteil**. Login cookies are HTTPS-only, and browsers only make an exception for `localhost`: on another machine (e.g. `http://<nas-ip>:8080`) the login does not stick. For the NAS, use the Tailscale setup in [Operations](docs/operations.md), which serves HTTPS.
+
 ## Pages
 
 | Path | Who | What |
@@ -78,3 +90,9 @@ All endpoints are under `/api`, take and return JSON, and answer errors with `{ 
 | `GET /calendar/{token}.ics` | calendar apps (secret link, no login) |
 | `POST /api/device/pair`, `GET /api/device/status`, `POST /api/device/login`, `POST /api/device/logout` | child's device |
 | `GET /api/device/calendar`, `GET /api/device/assignments`, `GET /api/device/assignments/{id}`, `POST /api/device/assignments/{id}/submit` | child |
+
+## License and support
+
+Lernkicker is released under the [MIT License](LICENSE).
+
+If it helps your family, you can support the development via [GitHub Sponsors](https://github.com/sponsors/lakritzator) or [Ko-fi](https://ko-fi.com/lakritzator).
