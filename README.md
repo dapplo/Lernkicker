@@ -1,14 +1,15 @@
 # Lernkicker
 
-Lernkicker ist eine kleine, selbst gehostete Lern-App für Grundschulkinder: Eltern laden Übungsproben hoch und weisen sie ihren Kindern zu, die Kinder üben auf dem Handy (PWA oder Telegram), und die Eltern sehen die Ergebnisse und Termine (Proben, Fußballspiele).
+Lernkicker is a small self-hosted learning app for primary school children. Parents upload practice tests ("quizzes") and assign them to their children, the children practise on their phone, and the parents see the results.
 
-Läuft als Docker-Container auf einer Synology NAS, erreichbar über Tailscale.
+## Contents
 
-## Inhalt
-
-- [Plan](docs/plan.md): Rollen, Bausteine, Technik, Phasen
-- [Sicherheitskonzept](docs/sicherheit.md): Funnel, Anmeldung, Trennung der Familien, Datenschutz, E-Mail
-- [Probe-Format `probe/v1`](docs/probe-format.md): wie eine Übungsprobe als JSON aussieht
-- [`schema/`](schema/): JSON Schema zum Prüfen von Proben
-- [`proben/`](proben/): Beispielproben
-- [`tools/validate_proben.py`](tools/validate_proben.py): prüft Proben lokal und in der CI
+- [Plan](docs/plan.md)
+- [Architecture](docs/architecture.md)
+- [Security concept](docs/security.md)
+- [Quiz format `quiz/v1`](docs/quiz-format.md): what a quiz looks like as JSON
+- [`schema/`](schema/): JSON Schema for quizzes, [`quizzes/`](quizzes/): example quizzes
+- [`tools/validate_quizzes.py`](tools/validate_quizzes.py): validates quizzes locally and in CI
+- `src/Lernkicker.Domain`: quizzes, grading, families, practice (no dependencies)
+- `src/Lernkicker.Application`: use cases, ports and error codes
+- `src/Lernkicker.QuizFormat`: adapter for the `quiz/v1` JSON format

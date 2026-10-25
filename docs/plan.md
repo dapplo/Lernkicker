@@ -1,47 +1,50 @@
 # Lernkicker – Plan
 
-Stand: 25.10.2026. Ausführliche Fassung mit Diagrammen: Claude-Doc „Lern-App: Umsetzungsplan“.
+As of 2026-10-25. A longer version with diagrams is the Claude doc "Lern-App: Umsetzungsplan".
 
-## Ziel
+## Goal
 
-Kinder üben Übungsproben auf dem Handy, Eltern wählen die Proben aus und sehen Ergebnisse und Termine. Mehrere Familien (z. B. Klassenkameraden) nutzen dieselbe Installation, jede Familie sieht nur ihre eigenen Daten.
+Children practise tests on their phone; parents pick the tests and see results and dates. Several families (e.g. classmates) share one installation, and each family only sees its own data.
 
-## Rollen
+## Roles
 
-| Rolle | Anmeldung | Darf |
+| Role | Login | May |
 | --- | --- | --- |
-| Admin | E-Mail + Passwort, 2FA | Familien einladen und löschen, Betrieb; sieht keine Ergebnisse fremder Kinder |
-| Elternteil | Einladungslink, dann E-Mail + Passwort | Kinder anlegen, Proben hochladen, löschen und zuweisen, Ergebnisse sehen, Termine pflegen, Telegram freischalten |
-| Kind | QR-Code vom Elternteil, danach 4-stellige PIN | Zugewiesene Proben üben, Sterne und Termine sehen |
+| Admin | Email + password (2FA planned) | Invite and delete families, run the server; sees no results of other families' children |
+| Parent | Invitation link, then email + password | Add children, upload, delete and assign quizzes, see results, manage dates, enable Telegram |
+| Child | QR code from a parent, then a 4-digit PIN | Practise assigned quizzes, see stars and dates |
 
-## Bausteine
+## Building blocks
 
-- **Proben:** JSON im Format [`probe/v1`](probe-format.md). Hochladen (Datei, Einfügen, API mit Token), Zuweisen an Kinder (optional mit Termin), Löschen (mit Ergebnissen: archivieren). Optional für eine Klassengruppe freigeben; Ergebnisse bleiben privat.
-- **Kinder-App:** PWA, ein Symbol auf dem Startbildschirm, kurze Runden, Sterne, falsche Fragen kommen wieder.
-- **Telegram:** ein Bot, nur für verknüpfte Konten (Einmal-Code per `t.me/<bot>?start=…`). Eltern: Ergebnisse, Erinnerungen, `/senden`. Kind: nur wenn freigeschaltet, Fragen mit Antwortknöpfen. Long Polling, kein offener Port.
-- **Kalender:** Termine je Kind (Proben, Fußball, Sonstiges), Import von Team-Kalendern (ICS, z. B. fussball.de), geheimer ICS-Feed je Kind.
-- **Zugang:** Tailscale (MagicDNS + HTTPS-Zertifikat), öffentlich über Tailscale Funnel. Details im [Sicherheitskonzept](sicherheit.md).
+- **Quizzes:** JSON in the [`quiz/v1`](quiz-format.md) format. Upload (file, paste, later an API token), assign to children (optionally with a test date), delete (archived when there are results). Later: share with a class group; results stay private.
+- **Child app:** PWA with an icon on the home screen, short rounds, stars; wrong answers come back.
+- **Languages:** the UI is German and English (German by default); quiz content is in the quiz's own `language`. The server only sends codes, the client translates them. More UI languages are a new `Strings.<lang>.resx`.
+- **Telegram:** one bot, only for linked accounts (one-time code via `t.me/<bot>?start=…`). Parents: results, reminders, `/send`. Children: only when enabled, questions with answer buttons. Long polling, no open port.
+- **Calendar:** dates per child (tests, football, other), import of team calendars (ICS, e.g. fussball.de), a secret ICS feed per child.
+- **Access:** Tailscale (MagicDNS + HTTPS certificate), public via Tailscale Funnel. Details in the [security concept](security.md).
 
-## Technik
+## Technology
 
-| Teil | Technik |
+| Part | Technology |
 | --- | --- |
 | Backend + API | ASP.NET Core (.NET 10), Minimal APIs, ASP.NET Core Identity |
-| Datenbank | EF Core mit SQLite, globaler Filter je Familie |
-| Oberfläche | Blazor WebAssembly mit PWA-Vorlage |
-| Telegram | Telegram.Bot als BackgroundService |
-| Kalender | Ical.Net |
+| Database | EF Core with SQLite, a global filter per family |
+| UI | Blazor WebAssembly PWA, `IStringLocalizer` with resx files |
+| Telegram | Telegram.Bot as a BackgroundService |
+| Calendar | Ical.Net |
 | Push | Web Push (VAPID) |
-| Betrieb | ein Docker-Image (ghcr.io) + Tailscale-Sidecar auf der Synology, Backup von `data/` |
+| Operations | one Docker image (ghcr.io) + a Tailscale sidecar on the Synology, backup of `data/` |
 
-## Phasen
+The code follows a hexagonal architecture, see [architecture](architecture.md).
 
-1. **Kern:** Probe-Format v1 (dieser Stand), Upload, Zuweisen, Löschen, Kinder-PWA, Ergebnisse, Docker-Image mit Tailscale.
-2. **Telegram und Kalender:** Bot für Eltern und Kinder, Termine, ICS, Fußball-Import, Web Push.
-3. **Weitere Familien:** Einladungen, Klassengruppen, Datenschutz-Seite, Export und Löschen, Funnel einschalten.
+## Phases
 
-## Offen
+1. **Core:** quiz format v1, upload, assign, delete, child PWA, results, German and English UI, Docker image with Tailscale.
+2. **Telegram and calendar:** bot for parents and children, dates, ICS, football import, Web Push.
+3. **More families:** class groups, export and deletion, turn on Funnel.
 
-- Tailscale-Einrichtung auf der Synology: Sidecar mit `--advertise-tags` oder Label-basierter Proxy (z. B. TSDProxy)?
-- Lizenz des Repos.
-- E-Mail-Versand (SMTP) später: vorhandenes Postfach oder Versanddienst, siehe Sicherheitskonzept.
+## Open questions
+
+- Tailscale on the Synology: sidecar with `--advertise-tags` (current plan) or a label-based proxy such as TSDProxy?
+- License of the repository.
+- Sending email (SMTP) later: an existing mailbox or a delivery service, see the security concept.

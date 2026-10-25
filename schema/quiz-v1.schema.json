@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dapplo/lernkicker/schema/quiz-v1.schema.json",
+  "title": "Lernkicker practice quiz (quiz/v1)",
+  "description": "A practice quiz for Lernkicker. See docs/quiz-format.md.",
+  "type": "object",
+  "required": ["format", "id", "title", "subject", "gradeLevel", "exercises"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": "quiz/v1" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 64,
+      "description": "Unique within a family. Uploading the same id again creates a new version."
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "subject": {
+      "enum": ["science", "german", "math", "english", "religion", "ethics", "music", "art", "sports", "crafts", "other"],
+      "description": "School subject. 'science' is the Bavarian HSU (Heimat- und Sachunterricht)."
+    },
+    "gradeLevel": { "type": "integer", "minimum": 1, "maximum": 13, "description": "School year (Jahrgangsstufe)." },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$",
+      "default": "de",
+      "description": "Language of the quiz content as a BCP 47 tag, e.g. 'de' or 'en'."
+    },
+    "topic": { "type": "string", "maxLength": 120 },
+    "description": { "type": "string", "maxLength": 500 },
+    "durationMinutes": { "type": "integer", "minimum": 1, "maximum": 180 },
+    "source": { "type": "string", "maxLength": 200, "description": "Where the material comes from, e.g. a notebook entry or worksheet." },
+    "shuffle": { "type": "boolean", "default": true, "description": "Shuffle options, rows and statements for every round." },
+    "exercises": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": { "$ref": "#/$defs/exercise" }
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "answerList": {
+      "description": "Every spelling that counts as correct. Case and surrounding whitespace are ignored.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1, "maxLength": 100 }
+    },
+    "base": {
+      "type": "object",
+      "required": ["id", "type", "instruction"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 32 },
+        "type": { "type": "string" },
+        "instruction": { "$ref": "#/$defs/text" },
+        "hint": { "$ref": "#/$defs/text" },
+        "points": { "type": "integer", "minimum": 1, "maximum": 50, "description": "Maximum points. Without it, every gap, row or question gives 1 point." },
+        "explanation": { "$ref": "#/$defs/text", "description": "Shown after grading." },
+        "solutionText": { "$ref": "#/$defs/text", "description": "Optional text for 'show solutions'. Without it, the app builds one." }
+      }
+    },
+    "exercise": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["cloze", "matching", "ordering", "trueFalse", "freeText", "multipleChoice"] }
+      },
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        { "if": { "properties": { "type": { "const": "cloze" } } }, "then": { "$ref": "#/$defs/cloze" } },
+        { "if": { "properties": { "type": { "const": "matching" } } }, "then": { "$ref": "#/$defs/matching" } },
+        { "if": { "properties": { "type": { "const": "ordering" } } }, "then": { "$ref": "#/$defs/ordering" } },
+        { "if": { "properties": { "type": { "const": "trueFalse" } } }, "then": { "$ref": "#/$defs/trueFalse" } },
+        { "if": { "properties": { "type": { "const": "freeText" } } }, "then": { "$ref": "#/$defs/freeText" } },
+        { "if": { "properties": { "type": { "const": "multipleChoice" } } }, "then": { "$ref": "#/$defs/multipleChoice" } }
+      ]
+    },
+    "cloze": {
+      "description": "Gap text. Every ___ in text is a gap; gaps[i] belongs to the i-th gap.",
+      "required": ["text", "gaps"],
+      "properties": {
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "text": { "type": "string", "minLength": 1, "maxLength": 2000, "pattern": "___" },
+        "wordBank": {
+          "description": "If present, gaps are shown as drop-downs with these words. Otherwise as text inputs.",
+          "type": "array", "minItems": 2, "items": { "type": "string", "minLength": 1, "maxLength": 60 }
+        },
+        "gaps": {
+          "type": "array", "minItems": 1,
+          "items": { "type": "object", "required": ["answers"], "additionalProperties": false, "properties": { "answers": { "$ref": "#/$defs/answerList" } } }
+        }
+      },
+      "additionalProperties": false
+    },
+    "matching": {
+      "description": "Every row gets one of the options via a drop-down. An option may fit several rows.",
+      "required": ["options", "rows"],
+      "properties": {
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "options": { "type": "array", "minItems": 2, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+        "rows": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "required": ["text", "answer"], "additionalProperties": false,
+            "properties": { "text": { "$ref": "#/$defs/text" }, "answer": { "type": "string" }, "explanation": { "$ref": "#/$defs/text" } }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ordering": {
+      "description": "Steps in the CORRECT order; the app shuffles them.",
+      "required": ["steps"],
+      "properties": {
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "steps": { "type": "array", "minItems": 2, "maxItems": 12, "items": { "type": "string", "minLength": 1, "maxLength": 120 } }
+      },
+      "additionalProperties": false
+    },
+    "trueFalse": {
+      "required": ["statements"],
+      "properties": {
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "statements": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "required": ["text", "isTrue"], "additionalProperties": false,
+            "properties": { "text": { "$ref": "#/$defs/text" }, "isTrue": { "type": "boolean" }, "explanation": { "$ref": "#/$defs/text" } }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "freeText": {
+      "description": "Text inputs. With anyOrder, every correct answer may be in any field, but each counts only once.",
+      "required": ["fields"],
+      "properties": {
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "anyOrder": { "type": "boolean", "default": false },
+        "fields": {
+          "type": "array", "minItems": 1, "maxItems": 20,
+          "items": {
+            "type": "object", "required": ["answers"], "additionalProperties": false,
+            "properties": { "label": { "type": "string", "maxLength": 120 }, "answers": { "$ref": "#/$defs/answerList" } }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "multipleChoice": {
+      "description": "correct is the index (from 0) of the correct option, or a list of indices when several are correct.",
+      "required": ["questions"],
+      "properties": {
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "questions": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "required": ["text", "options", "correct"], "additionalProperties": false,
+            "properties": {
+              "text": { "$ref": "#/$defs/text" },
+              "options": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "string", "minLength": 1, "maxLength": 200 } },
+              "correct": {
+                "oneOf": [
+                  { "type": "integer", "minimum": 0 },
+                  { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } }
+                ]
+              },
+              "explanation": { "$ref": "#/$defs/text" }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

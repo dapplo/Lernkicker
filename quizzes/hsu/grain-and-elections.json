@@ -1,0 +1,144 @@
+{
+  "$schema": "../../schema/quiz-v1.schema.json",
+  "format": "quiz/v1",
+  "id": "hsu-grain-and-elections",
+  "title": "Vom Korn zum Brot & Wahlen",
+  "subject": "science",
+  "gradeLevel": 4,
+  "language": "de",
+  "topic": "Getreide, Brot und demokratische Wahlen",
+  "durationMinutes": 30,
+  "shuffle": true,
+  "exercises": [
+    {
+      "id": "fachbegriffe",
+      "type": "cloze",
+      "instruction": "Setze die Fachbegriffe ein.",
+      "points": 8,
+      "wordBank": ["Ähre", "Rispe", "Halm", "Knoten", "Spelze", "Ährchen", "Gräser", "Wurzeln"],
+      "text": "Bei Weizen, Roggen und Gerste sitzen die Körner in einer ___. Beim Hafer heißt der Fruchtstand ___. Ähre und Rispe sitzen oben auf dem ___. Die harten Verdickungen am Halm heißen ___. Sie geben dem Halm Stabilität. Jedes Korn wird von einer ___ geschützt. Mehrere Körner bündeln sich in einem ___. Alle Getreidearten gehören zur Familie der ___. Wasser und Nährstoffe bekommt die Pflanze über die ___.",
+      "gaps": [
+        { "answers": ["Ähre"] },
+        { "answers": ["Rispe"] },
+        { "answers": ["Halm"] },
+        { "answers": ["Knoten"] },
+        { "answers": ["Spelze"] },
+        { "answers": ["Ährchen"] },
+        { "answers": ["Gräser"] },
+        { "answers": ["Wurzeln"] }
+      ]
+    },
+    {
+      "id": "getreidearten",
+      "type": "matching",
+      "instruction": "Welches Getreide ist das?",
+      "points": 4,
+      "options": ["Weizen", "Roggen", "Gerste", "Hafer"],
+      "rows": [
+        { "text": "Mein Fruchtstand ist eine Rispe. Aus mir macht man Haferflocken.", "answer": "Hafer" },
+        { "text": "Ich habe sehr lange Grannen. Aus mir braut man Bier.", "answer": "Gerste" },
+        { "text": "Aus mir backt man dunkles Brot (Schwarzbrot).", "answer": "Roggen" },
+        { "text": "Aus mir backt man helle Brötchen und Kuchen.", "answer": "Weizen" }
+      ]
+    },
+    {
+      "id": "korn-zum-brot",
+      "type": "ordering",
+      "instruction": "Vom Korn zum Brot: Bringe in die richtige Reihenfolge.",
+      "hint": "Tippe die Schritte der Reihe nach an. Der erste Schritt bekommt die 1.",
+      "points": 4,
+      "steps": [
+        "Säen",
+        "Ernten mit dem Mähdrescher",
+        "Körner reinigen",
+        "Im Walzenstuhl zerkleinern",
+        "Im Plansichter sieben",
+        "Teig mit Mehl, Wasser und Hefe kneten",
+        "Backen"
+      ]
+    },
+    {
+      "id": "muehle-und-baeckerei",
+      "type": "trueFalse",
+      "instruction": "Richtig oder falsch? Kreuze an.",
+      "points": 6,
+      "statements": [
+        {
+          "text": "Der Mähdrescher mäht das Getreide nur, die Körner trennt der Bauer später mit der Hand.",
+          "isTrue": false,
+          "explanation": "Der Mähdrescher mäht und drischt: Er trennt die Körner gleich vom Stroh."
+        },
+        { "text": "Der Mähdrescher trennt die Körner vom Stroh.", "isTrue": true },
+        { "text": "Im Walzenstuhl wird das Korn zwischen Walzen zerkleinert.", "isTrue": true },
+        {
+          "text": "Im Plansichter wird das Mehl gebacken.",
+          "isTrue": false,
+          "explanation": "Im Plansichter wird gesiebt, gebacken wird im Ofen."
+        },
+        { "text": "Die Hefe lässt den Teig aufgehen. Dadurch wird das Brot luftig.", "isTrue": true },
+        { "text": "Getreide wird im Frühling geerntet.", "isTrue": false, "explanation": "Getreide wird im Sommer geerntet." }
+      ]
+    },
+    {
+      "id": "mehlsorten",
+      "type": "matching",
+      "instruction": "Weißmehl oder Vollkornmehl?",
+      "points": 4,
+      "options": ["Weißmehl", "Vollkornmehl"],
+      "rows": [
+        { "text": "Das ganze Korn mit Schale und Keimling wird gemahlen.", "answer": "Vollkornmehl" },
+        { "text": "Nur der helle Mehlkörper wird gemahlen.", "answer": "Weißmehl" },
+        { "text": "Es hat viele Ballaststoffe und Vitamine und hält lange satt.", "answer": "Vollkornmehl" },
+        { "text": "Daraus backt man helle Semmeln.", "answer": "Weißmehl" }
+      ]
+    },
+    {
+      "id": "wahlgrundsaetze",
+      "type": "freeText",
+      "instruction": "Schreibe die 5 Grundsätze bei einer demokratischen Wahl auf.",
+      "points": 5,
+      "explanation": "Merksatz: Alle Und Freie Gleiche Geheimnisse (allgemein, unmittelbar, frei, gleich, geheim).",
+      "anyOrder": true,
+      "fields": [
+        { "answers": ["allgemein", "allgemeine", "allgemeiner"] },
+        { "answers": ["unmittelbar", "unmittelbare", "unmittelbarer"] },
+        { "answers": ["frei", "freie", "freier"] },
+        { "answers": ["gleich", "gleiche", "gleicher"] },
+        { "answers": ["geheim", "geheime", "geheimer"] }
+      ]
+    },
+    {
+      "id": "grundsatz-zuordnen",
+      "type": "matching",
+      "instruction": "Welcher Wahlgrundsatz passt?",
+      "points": 5,
+      "options": ["allgemein", "unmittelbar", "frei", "gleich", "geheim"],
+      "rows": [
+        { "text": "In der Wahlkabine sieht niemand, wen ich wähle.", "answer": "geheim" },
+        { "text": "Jede Stimme zählt gleich viel.", "answer": "gleich" },
+        { "text": "Alle Bürgerinnen und Bürger ab 18 Jahren dürfen wählen.", "answer": "allgemein" },
+        { "text": "Niemand darf mich zwingen, eine bestimmte Partei zu wählen.", "answer": "frei" },
+        { "text": "Ich wähle die Person direkt, niemand wählt für mich.", "answer": "unmittelbar" }
+      ]
+    },
+    {
+      "id": "demokratie",
+      "type": "multipleChoice",
+      "instruction": "Kreuze die richtige Antwort an.",
+      "points": 3,
+      "questions": [
+        {
+          "text": "In einer Demokratie …",
+          "options": ["bestimmen alle Menschen mit.", "entscheidet nur der König.", "darf nur der Bürgermeister bestimmen."],
+          "correct": 0
+        },
+        { "text": "Bei der Bundestagswahl darf man wählen ab …", "options": ["10 Jahren.", "18 Jahren.", "30 Jahren."], "correct": 1 },
+        {
+          "text": "Damit die Wahl geheim ist, geht man …",
+          "options": ["in die Wahlkabine.", "auf den Marktplatz.", "zum Nachbarn."],
+          "correct": 0
+        }
+      ]
+    }
+  ]
+}

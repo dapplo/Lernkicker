@@ -1,14 +1,14 @@
-name: Proben prüfen
+name: Validate quizzes
 
 on:
   push:
     branches: [main]
   pull_request:
     paths:
-      - "proben/**"
+      - "quizzes/**"
       - "schema/**"
-      - "tools/validate_proben.py"
-      - ".github/workflows/proben.yml"
+      - "tools/validate_quizzes.py"
+      - ".github/workflows/quizzes.yml"
 
 jobs:
   validate:
@@ -19,4 +19,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install jsonschema==4.23.0
-      - run: python3 tools/validate_proben.py
+      - run: python3 tools/validate_quizzes.py
