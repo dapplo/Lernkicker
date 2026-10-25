@@ -1,0 +1,41 @@
+@* A lesson text with its little formatting (see MiniMarkdown); everything is rendered as text, never as HTML *@
+@foreach (var part in MiniMarkdown.Parse(Text))
+{
+    if (part.IsList)
+    {
+        <ul>
+            @foreach (var line in part.Lines)
+            {
+                <li>@Line(line)</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>@Line(part.Lines[0])</p>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = "";
+
+    private static RenderFragment Line(IReadOnlyList<MiniMarkdown.Span> spans) => __builder =>
+    {
+        foreach (var span in spans)
+        {
+            if (span.Bold)
+            {
+                <strong>@span.Text</strong>
+            }
+            else if (span.Italic)
+            {
+                <em>@span.Text</em>
+            }
+            else
+            {
+                @span.Text
+            }
+        }
+    };
+}

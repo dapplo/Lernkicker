@@ -13,6 +13,7 @@
   <ItemGroup>
     <!-- Single source of truth for the format: the schema in /schema -->
     <EmbeddedResource Include="..\..\schema\quiz-v1.schema.json" LogicalName="quiz-v1.schema.json" />
+    <EmbeddedResource Include="..\..\schema\lesson-v1.schema.json" LogicalName="lesson-v1.schema.json" />
   </ItemGroup>
 
 </Project>

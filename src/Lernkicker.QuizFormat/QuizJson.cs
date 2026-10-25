@@ -16,7 +16,7 @@ public sealed class QuizJson : IQuizFormat
 {
     public static JsonSerializerOptions Options { get; } = CreateOptions();
 
-    private static readonly Lazy<JsonSchema> Schema = new(LoadSchema);
+    private static readonly Lazy<JsonSchema> Schema = new(() => SchemaIssues.Load("quiz-v1.schema.json"));
 
     public QuizParseResult Parse(string json)
     {
@@ -32,7 +32,7 @@ public sealed class QuizJson : IQuizFormat
 
         using (document)
         {
-            var schemaIssues = SchemaIssues(document.RootElement);
+            var schemaIssues = SchemaIssues.Of(Schema.Value, document.RootElement);
             if (schemaIssues.Count > 0)
             {
                 return new QuizParseResult(null, schemaIssues);
@@ -49,53 +49,6 @@ public sealed class QuizJson : IQuizFormat
         JsonSerializer.Deserialize<Quiz>(storedSource, Options) ?? throw new InvalidOperationException("Stored quiz is empty.");
 
     private static QuizParseResult Invalid(QuizIssue issue) => new(null, [issue]);
-
-    private static List<QuizIssue> SchemaIssues(JsonElement root)
-    {
-        var results = Schema.Value.Evaluate(root, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
-        var issues = new List<QuizIssue>();
-        Collect(results, issues);
-        return issues.DistinctBy(i => (i.Path, i.Args?["message"])).ToList();
-    }
-
-    // Keywords whose error only summarises failures that are reported further down the tree.
-    private static readonly HashSet<string> SummaryKeywords =
-        ["properties", "additionalProperties", "items", "prefixItems", "allOf", "anyOf", "oneOf", "if", "then", "else", "$ref"];
-
-    // Walks only failing nodes, so failed "if" conditions and the passing branch of oneOf stay out of the report.
-    private static void Collect(EvaluationResults node, List<QuizIssue> issues)
-    {
-        if (node.IsValid)
-        {
-            return;
-        }
-
-        foreach (var (keyword, message) in node.Errors ?? [])
-        {
-            if (!SummaryKeywords.Contains(keyword))
-            {
-                issues.Add(QuizIssue.Of(QuizIssueCodes.Schema, node.InstanceLocation.ToString().TrimStart('/'), ("keyword", keyword), ("message", Clarify(message))));
-            }
-        }
-
-        foreach (var child in node.Details ?? [])
-        {
-            Collect(child, issues);
-        }
-    }
-
-    private static string Clarify(string message) =>
-        message.StartsWith("All values fail against the false schema", StringComparison.Ordinal)
-            ? "This property is not allowed here"
-            : message;
-
-    private static JsonSchema LoadSchema()
-    {
-        using var stream = typeof(QuizJson).Assembly.GetManifestResourceStream("quiz-v1.schema.json")
-            ?? throw new InvalidOperationException("Embedded schema quiz-v1.schema.json is missing.");
-        using var reader = new StreamReader(stream);
-        return JsonSchema.FromText(reader.ReadToEnd());
-    }
 
     private static JsonSerializerOptions CreateOptions()
     {

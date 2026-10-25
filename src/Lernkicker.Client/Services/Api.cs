@@ -43,6 +43,17 @@ public sealed class Api(HttpClient http)
 
     public Task<QuizDeletedResponse> DeleteQuiz(string quizId) => Send<QuizDeletedResponse>(HttpMethod.Delete, $"api/quizzes/{Uri.EscapeDataString(quizId)}");
 
+    // Lessons
+    public Task<List<LessonOverview>> Lessons() => Get<List<LessonOverview>>("api/lessons");
+
+    public async Task<LessonOverview> UploadLesson(string json)
+    {
+        using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        return await Read<LessonOverview>(await http.PostAsync("api/lessons", content));
+    }
+
+    public Task DeleteLesson(string lessonId) => Send(HttpMethod.Delete, $"api/lessons/{Uri.EscapeDataString(lessonId)}");
+
     // Children (for parents)
     public Task<List<ChildOverview>> Children() => Get<List<ChildOverview>>("api/children");
     public Task<ChildOverview> CreateChild(NewChild request) => Send<ChildOverview>(HttpMethod.Post, "api/children", request);
@@ -56,6 +67,9 @@ public sealed class Api(HttpClient http)
     public Task<List<AssignmentOverview>> Assignments(Guid id) => Get<List<AssignmentOverview>>($"api/children/{id}/assignments");
     public Task<AssignmentOverview> Assign(Guid id, NewAssignment request) => Send<AssignmentOverview>(HttpMethod.Post, $"api/children/{id}/assignments", request);
     public Task Unassign(Guid id, Guid assignmentId) => Send(HttpMethod.Delete, $"api/children/{id}/assignments/{assignmentId}");
+    public Task<List<LessonAssignmentOverview>> LessonAssignments(Guid id) => Get<List<LessonAssignmentOverview>>($"api/children/{id}/lessons");
+    public Task<LessonAssignmentOverview> AssignLesson(Guid id, NewLessonAssignment request) => Send<LessonAssignmentOverview>(HttpMethod.Post, $"api/children/{id}/lessons", request);
+    public Task UnassignLesson(Guid id, Guid assignmentId) => Send(HttpMethod.Delete, $"api/children/{id}/lessons/{assignmentId}");
     public Task<List<AttemptOverview>> Attempts(Guid id) => Get<List<AttemptOverview>>($"api/children/{id}/attempts");
     public Task<QuizResultDto> Attempt(Guid id, Guid attemptId) => Get<QuizResultDto>($"api/children/{id}/attempts/{attemptId}");
 
@@ -90,6 +104,18 @@ public sealed class Api(HttpClient http)
         var response = await http.GetAsync("api/device/calendar");
         return response.StatusCode == HttpStatusCode.Unauthorized ? null : await Read<List<CalendarEntryDto>>(response);
     }
+
+    /// <summary>The child's lessons, or null when the child is not logged in.</summary>
+    public async Task<List<MyLesson>?> MyLessons()
+    {
+        var response = await http.GetAsync("api/device/lessons");
+        return response.StatusCode == HttpStatusCode.Unauthorized ? null : await Read<List<MyLesson>>(response);
+    }
+
+    public Task<LessonDto> Lesson(Guid assignmentId) => Get<LessonDto>($"api/device/lessons/{assignmentId}");
+
+    public Task<LessonDto> Practised(Guid assignmentId, IReadOnlyList<string> knownBlocks) =>
+        Send<LessonDto>(HttpMethod.Post, $"api/device/lessons/{assignmentId}/practice", new LessonPractice(knownBlocks));
 
     public Task<SheetDto> Sheet(Guid assignmentId) => Get<SheetDto>($"api/device/assignments/{assignmentId}");
 

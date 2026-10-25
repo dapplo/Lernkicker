@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Checks practice quizzes against schema/quiz-v1.schema.json and the content rules.
+"""Checks quizzes (quiz/v1) and learning material (lesson/v1) against their schemas and content rules.
 
 Usage: python3 tools/validate_quizzes.py [FILE ...]
-Without arguments all quizzes/**/*.json are checked. Exit code 1 on errors.
+Without arguments all quizzes/**/*.json and lessons/**/*.json are checked. The "format" field picks the
+schema. Exit code 1 on errors.
 """
 import json
 import sys
@@ -11,8 +12,10 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parent.parent
-SCHEMA = json.loads((ROOT / "schema" / "quiz-v1.schema.json").read_text(encoding="utf-8"))
-VALIDATOR = Draft202012Validator(SCHEMA)
+VALIDATORS = {
+    name: Draft202012Validator(json.loads((ROOT / "schema" / f"{name.replace('/', '-')}.schema.json").read_text(encoding="utf-8")))
+    for name in ("quiz/v1", "lesson/v1")
+}
 GAP = "___"
 
 
@@ -47,21 +50,36 @@ def content_errors(quiz):
     return errors
 
 
+def lesson_errors(lesson):
+    """Rules JSON Schema cannot express (same as LessonRules in Lernkicker.Domain)."""
+    errors = []
+    seen = set()
+    for i, b in enumerate(lesson.get("blocks", [])):
+        if b.get("id") in seen:
+            errors.append(f"blocks/{i}/id: duplicate id '{b.get('id')}'")
+        seen.add(b.get("id"))
+    return errors
+
+
 def check(path):
     try:
-        quiz = json.loads(path.read_text(encoding="utf-8"))
+        document = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
         return [f"invalid JSON: {e}"]
+    kind = document.get("format") if isinstance(document, dict) else None
+    validator = VALIDATORS.get(kind)
+    if validator is None:
+        return [f"format: must be one of {', '.join(VALIDATORS)}, not {kind!r}"]
     errors = [
         f"{'/'.join(map(str, e.absolute_path)) or '(root)'}: {e.message}"
-        for e in sorted(VALIDATOR.iter_errors(quiz), key=lambda e: list(map(str, e.absolute_path)))
+        for e in sorted(validator.iter_errors(document), key=lambda e: list(map(str, e.absolute_path)))
     ]
     # Content rules only make sense once the structure is valid
-    return errors or content_errors(quiz)
+    return errors or (content_errors(document) if kind == "quiz/v1" else lesson_errors(document))
 
 
 def main(args):
-    files = [Path(a) for a in args] or sorted((ROOT / "quizzes").rglob("*.json"))
+    files = [Path(a) for a in args] or sorted([*(ROOT / "quizzes").rglob("*.json"), *(ROOT / "lessons").rglob("*.json")])
     failed = 0
     for f in files:
         errors = check(f)
@@ -72,7 +90,7 @@ def main(args):
                 print(f"  - {e}")
         else:
             print(f"ok    {f}")
-    print(f"{len(files)} quiz(zes) checked, {failed} with errors.")
+    print(f"{len(files)} file(s) checked, {failed} with errors.")
     return 1 if failed else 0
 
 

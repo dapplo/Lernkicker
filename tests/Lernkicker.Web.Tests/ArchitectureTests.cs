@@ -40,8 +40,11 @@ public class ArchitectureTests
         Assert.Equal(["Ical.Net", "Lernkicker.Application", "Lernkicker.Domain", "NodaTime"], NonBcl(Calendar));
 
     [Fact]
-    public void Client_upload_limit_matches_the_domain() =>
+    public void Client_upload_limits_match_the_domain()
+    {
         Assert.Equal(Lernkicker.Domain.Quizzes.QuizLimits.MaxBytes, Lernkicker.Contracts.ApiLimits.QuizMaxBytes);
+        Assert.Equal(Lernkicker.Domain.Lessons.LessonLimits.MaxBytes, Lernkicker.Contracts.ApiLimits.LessonMaxBytes);
+    }
 
     // Everything that is not part of .NET itself
     private static List<string> NonBcl(Assembly assembly) =>

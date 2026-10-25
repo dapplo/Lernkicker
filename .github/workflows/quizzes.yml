@@ -1,4 +1,4 @@
-name: Validate quizzes
+name: Validate quizzes and lessons
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - "quizzes/**"
+      - "lessons/**"
       - "schema/**"
       - "tools/validate_quizzes.py"
       - ".github/workflows/quizzes.yml"

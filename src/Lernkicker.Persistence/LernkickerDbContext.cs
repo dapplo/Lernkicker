@@ -2,6 +2,7 @@ using System.Text.Json;
 using Lernkicker.Application.Ports;
 using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
+using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
 using Lernkicker.Domain.Practice;
 using Lernkicker.Domain.Quizzes;
@@ -40,6 +41,8 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
     public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
     public DbSet<CalendarSubscription> CalendarSubscriptions => Set<CalendarSubscription>();
     public DbSet<CalendarFeed> CalendarFeeds => Set<CalendarFeed>();
+    public DbSet<StoredLesson> Lessons => Set<StoredLesson>();
+    public DbSet<LessonAssignment> LessonAssignments => Set<LessonAssignment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -146,6 +149,30 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
         {
             e.HasIndex(x => x.TokenHash).IsUnique();
             e.HasOne<Child>().WithMany().HasForeignKey(x => x.ChildId).OnDelete(DeleteBehavior.Cascade);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        builder.Entity<StoredLesson>(e =>
+        {
+            e.HasIndex(x => new { x.FamilyId, x.LessonId }).IsUnique();
+            e.Property(x => x.LessonId).HasMaxLength(64);
+            e.Property(x => x.Title).HasMaxLength(120);
+            e.Property(x => x.Subject).HasMaxLength(20);
+            e.Property(x => x.Topic).HasMaxLength(120);
+            e.HasOne<Family>().WithMany().HasForeignKey(x => x.FamilyId).OnDelete(DeleteBehavior.Cascade);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        builder.Entity<LessonAssignment>(e =>
+        {
+            e.HasIndex(x => new { x.ChildId, x.StoredLessonId }).IsUnique();
+            e.HasOne<Child>().WithMany().HasForeignKey(x => x.ChildId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<StoredLesson>().WithMany().HasForeignKey(x => x.StoredLessonId).OnDelete(DeleteBehavior.Cascade);
+            // A short list of block ids, stored as JSON
+            e.Property(x => x.KnownBlocks).HasConversion(
+                v => JsonSerializer.Serialize(v, Json),
+                v => JsonSerializer.Deserialize<List<string>>(v, Json)!,
+                new ValueComparer<IReadOnlyList<string>>((a, b) => a!.SequenceEqual(b!), v => v.Aggregate(0, (h, s) => HashCode.Combine(h, s)), v => v.ToList()));
             e.HasQueryFilter(x => x.FamilyId == FamilyId);
         });
 

@@ -56,7 +56,10 @@ else
         }
     </section>
 
-    <CalendarSection ChildId="@Id" ChildName="@_child.Name" />
+    <LessonsSection ChildId="@Id" Changed="() => _calendarVersion++" />
+
+    @* A new key loads the calendar again, so new due dates show up *@
+    <CalendarSection @key="_calendarVersion" ChildId="@Id" ChildName="@_child.Name" />
 
     <section class="box">
         <h2>@L["Child.Results"]</h2>
@@ -172,6 +175,7 @@ else
     private int? _gradeLevel;
     private string? _message;
     private bool _confirmDelete;
+    private int _calendarVersion;
     private IReadOnlyList<string>? _errors;
 
     [Parameter]
@@ -211,9 +215,14 @@ else
         await Api.Assign(Id, new NewAssignment(_newQuiz, _dueOn));
         _newQuiz = "";
         _dueOn = null;
+        _calendarVersion++;
     });
 
-    private Task Unassign(Guid assignmentId) => Run(() => Api.Unassign(Id, assignmentId));
+    private Task Unassign(Guid assignmentId) => Run(async () =>
+    {
+        await Api.Unassign(Id, assignmentId);
+        _calendarVersion++;
+    });
 
     private async Task ShowAttempt(Guid attemptId)
     {

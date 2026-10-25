@@ -81,7 +81,7 @@ public sealed class Display(IStringLocalizer<Strings> l)
 
         if (error.Issues is { Count: > 0 } issues)
         {
-            return [l["Error.quiz.invalid"], .. issues.Select(Issue)];
+            return [Text($"Error.{error.Code}", l["Error.quiz.invalid"]), .. issues.Select(Issue)];
         }
 
         return [Text($"Error.{error.Code}", l["Error.generic"])];

@@ -23,6 +23,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IFamilyScope, HttpFamilyScope>();
 builder.Services.AddSingleton<IQuizFormat, QuizJson>();
+builder.Services.AddSingleton<ILessonFormat, LessonJson>();
 
 // Calendars: dates and times are in the family's time zone (one per installation)
 var timeZone = builder.Configuration["Lernkicker:TimeZone"] ?? "Europe/Berlin";
@@ -45,6 +46,7 @@ builder.Services.AddScoped<ChildrenUseCases>();
 builder.Services.AddScoped<ChildDeviceUseCases>();
 builder.Services.AddScoped<PracticeUseCases>();
 builder.Services.AddScoped<CalendarUseCases>();
+builder.Services.AddScoped<LessonUseCases>();
 
 // Keys for cookies survive restarts and image updates
 builder.Services.AddDataProtection()
@@ -179,6 +181,7 @@ app.MapQuizzes();
 app.MapChildren();
 app.MapDevice();
 app.MapCalendar();
+app.MapLessons();
 app.Map("/api/{**rest}", ApiResults.NotFound);
 
 // The PWA (Lernkicker.Client). Fingerprinted files are cached forever; every other path is a page of the app.

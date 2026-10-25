@@ -1,0 +1,119 @@
+@* A poem to learn by heart: read it, practise with fewer and fewer words, then recite it line by line *@
+<div class="modes" role="tablist">
+    @foreach (var mode in Modes)
+    {
+        <button role="tab" class="@(_mode == mode ? "on" : "")" aria-selected="@(_mode == mode ? "true" : "false")" @onclick="() => Switch(mode)">
+            @L[$"Learn.Poem.{mode}"]
+        </button>
+    }
+</div>
+
+@if (Block.Hint is { } hint)
+{
+    <p class="takeaway">💡 @hint</p>
+}
+
+@if (_mode == "Practise")
+{
+    <div class="level">
+        <button class="btn quiet" disabled="@(_level == 0)" @onclick="() => SetLevel(_level - 1)">@L["Learn.Poem.MoreHelp"]</button>
+        <span>@L["Learn.Poem.Level", _level, PoemHelp.Levels - 1]</span>
+        <button class="btn" disabled="@(_level == PoemHelp.Levels - 1)" @onclick="() => SetLevel(_level + 1)">@L["Learn.Poem.LessHelp"]</button>
+    </div>
+    <p class="hint">@L["Learn.Poem.PractiseHint"]</p>
+}
+else if (_mode == "Recite")
+{
+    <p class="hint">@L["Learn.Poem.ReciteHint"]</p>
+}
+
+<div class="poem">
+    @{ var lineNo = 0; }
+    @for (var s = 0; s < Block.Stanzas!.Count; s++)
+    {
+        <p class="stanza">
+            @for (var l = 0; l < Block.Stanzas[s].Count; l++)
+            {
+                var line = Block.Stanzas[s][l];
+                var index = lineNo++;
+                <span class="line">
+                    @if (_mode == "Read")
+                    {
+                        @line
+                    }
+                    else if (_mode == "Practise")
+                    {
+                        @foreach (var (word, w) in PoemHelp.Words(line, _level, index).Select((word, w) => (word, w)))
+                        {
+                            var key = (index, w);
+                            @word.Leading
+                            @if (word.Hidden && !_revealed.Contains(key))
+                            {
+                                <button class="gap-word" aria-label="@L["Learn.Poem.ShowWord"]" @onclick="() => _revealed.Add(key)">@PoemHelp.Gap(word.Text)</button>
+                            }
+                            else
+                            {
+                                <span class="@(word.Hidden ? "revealed" : "")">@word.Text</span>
+                            }
+                            @word.Trailing
+                            @(" ")
+                        }
+                    }
+                    else if (index < _shown)
+                    {
+                        @line
+                    }
+                    else
+                    {
+                        <span class="hidden-line" aria-hidden="true">· · ·</span>
+                    }
+                </span>
+            }
+        </p>
+    }
+    @if (Block.Author is { } author)
+    {
+        <p class="author">– @author</p>
+    }
+</div>
+
+@if (_mode == "Recite")
+{
+    <div class="buttons">
+        @if (_shown < LineCount)
+        {
+            <button class="btn" @onclick="() => _shown++">@L["Learn.Poem.NextLine"]</button>
+        }
+        else
+        {
+            <p class="ok">🎉 @L["Learn.Poem.Done"]</p>
+        }
+        <button class="btn quiet" disabled="@(_shown == 0)" @onclick="() => _shown = 0">@L["Learn.Poem.FromStart"]</button>
+    </div>
+}
+
+@code {
+    private static readonly string[] Modes = ["Read", "Practise", "Recite"];
+
+    private string _mode = "Read";
+    private int _level = 1, _shown;
+    private readonly HashSet<(int Line, int Word)> _revealed = [];
+
+    [Parameter, EditorRequired]
+    public LessonBlockDto Block { get; set; } = null!;
+
+    private int LineCount => Block.Stanzas!.Sum(s => s.Count);
+
+    private void Switch(string mode)
+    {
+        _mode = mode;
+        _shown = 0;
+        _revealed.Clear();
+    }
+
+    private void SetLevel(int level)
+    {
+        _level = level;
+        _revealed.Clear();
+    }
+}

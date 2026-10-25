@@ -23,6 +23,7 @@
   <ItemGroup>
     <Compile Include="..\Shared\Examples.cs" Link="Examples.cs" />
     <None Include="..\..\quizzes\**\*.json" LinkBase="quizzes" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\lessons\**\*.json" LinkBase="lessons" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Text;
 using Lernkicker.Application;
 using Lernkicker.Application.UseCases;
 using Lernkicker.Contracts;
@@ -21,7 +20,7 @@ public static class QuizEndpoints
         // The body is the raw quiz/v1 JSON, exactly as in a file.
         quizzes.MapPost("/", async (HttpRequest request, ClaimsPrincipal user, QuizLibraryUseCases library) =>
         {
-            var json = await ReadBodyAsync(request);
+            var json = await RequestBody.ReadAsync(request, QuizLimits.MaxBytes);
             if (json is null)
             {
                 return ApiResults.Error(StatusCodes.Status413PayloadTooLarge, ErrorCodes.QuizTooLarge);
@@ -41,29 +40,5 @@ public static class QuizEndpoints
 
         quizzes.MapDelete("/{quizId}", async (string quizId, QuizLibraryUseCases library) =>
             (await library.DeleteAsync(quizId)).ToHttp(d => new QuizDeletedResponse(d.Archived)));
-    }
-
-    /// <summary>Reads the body as UTF-8, or null when it exceeds the size limit.</summary>
-    private static async Task<string?> ReadBodyAsync(HttpRequest request)
-    {
-        if (request.ContentLength > QuizLimits.MaxBytes)
-        {
-            return null;
-        }
-
-        using var buffer = new MemoryStream();
-        var block = new byte[16 * 1024];
-        int read;
-        while ((read = await request.Body.ReadAsync(block)) > 0)
-        {
-            if (buffer.Length + read > QuizLimits.MaxBytes)
-            {
-                return null;
-            }
-
-            buffer.Write(block, 0, read);
-        }
-
-        return Encoding.UTF8.GetString(buffer.ToArray());
     }
 }

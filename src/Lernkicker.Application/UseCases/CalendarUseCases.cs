@@ -11,6 +11,7 @@ public sealed class CalendarUseCases(
     ICalendarRepository calendar,
     IChildRepository children,
     IPracticeRepository practice,
+    ILessonRepository lessons,
     ICalendarSource source,
     ICalendarWriter writer,
     IFamilyScope familyScope,
@@ -288,14 +289,31 @@ public sealed class CalendarUseCases(
         var dueDates = (await practice.ListAssignmentSummariesAsync(childId))
             .Where(a => a.DueOn is { } due && due >= from && due <= to)
             .Select(a => new CalendarEntry($"assignment-{a.Id}", EventKinds.Test, a.Title, a.DueOn!.Value, null, null, null, EntrySources.Assignment, null));
+        var lessonDates = await LessonDatesAsync(childId, from, to);
 
         return events
             .Select(Entry)
             .Concat(dueDates)
+            .Concat(lessonDates)
             .OrderBy(e => e.Date)
             .ThenBy(e => e.StartTime ?? TimeOnly.MinValue)
             .ThenBy(e => e.Title, StringComparer.CurrentCulture)
             .ToList();
+    }
+
+    // E.g. the day a poem is recited
+    private async Task<IEnumerable<CalendarEntry>> LessonDatesAsync(Guid childId, DateOnly from, DateOnly to)
+    {
+        var due = (await lessons.ListAssignmentsAsync(childId)).Where(a => a.DueOn is { } d && d >= from && d <= to).ToList();
+        if (due.Count == 0)
+        {
+            return [];
+        }
+
+        var titles = (await lessons.ListAsync()).ToDictionary(l => l.Id, l => l.Title);
+        return due
+            .Where(a => titles.ContainsKey(a.StoredLessonId))
+            .Select(a => new CalendarEntry($"lesson-{a.Id}", EventKinds.Test, titles[a.StoredLessonId], a.DueOn!.Value, null, null, null, EntrySources.Lesson, null));
     }
 
     private static CalendarEntry Entry(CalendarEvent e) =>
