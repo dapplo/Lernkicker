@@ -22,7 +22,7 @@ Items marked *(planned)* are not built yet.
 | TLS | Tailscale terminates TLS in its own container. The app sends HSTS. |
 | Real client IP | For rate limits the app reads `X-Forwarded-For` only from the local Tailscale proxy (ASP.NET Core trusts loopback by default). |
 | Kill switch | `tailscale funnel off` in the sidecar (or removing `AllowFunnel` from the serve config) makes the app private again at once; it stays reachable inside the tailnet. |
-| Updates | Dependabot or Renovate for NuGet packages and base images *(planned)*; pull the new image in Container Manager. |
+| Updates | Dependabot (`.github/dependabot.yml`) proposes NuGet, base image and Actions updates weekly; pull the new image in Container Manager. |
 | Backup | Hyper Backup encrypts the `data/` folder (SQLite database, data protection keys). |
 
 ## 2. Login
