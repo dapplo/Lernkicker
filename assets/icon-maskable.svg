@@ -1,0 +1,38 @@
+<!-- Lernkicker app icon. The PNGs in src/Lernkicker.Client/wwwroot are rendered from assets/icon*.svg. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2aa862"/><stop offset="1" stop-color="#166b3a"/></linearGradient>
+    <clipPath id="ball"><circle cx="256" cy="206" r="128"/></clipPath>
+  </defs>
+  <rect width="512" height="512" fill="url(#g)"/>
+  <g transform="translate(256 256) scale(0.82) translate(-256 -256)">
+  <path d="M256 424 C 210 396 148 390 92 402 L 92 344 C 148 332 210 338 256 366 Z" fill="#ffffff"/>
+  <path d="M256 424 C 302 396 364 390 420 402 L 420 344 C 364 332 302 338 256 366 Z" fill="#e3f3e8"/>
+  <ellipse cx="256" cy="350" rx="86" ry="9" fill="#0f4d2a" opacity="0.3"/>
+  <circle cx="256" cy="206" r="128" fill="#ffffff"/>
+  <g clip-path="url(#ball)">
+    <polygon points="256.0,163.8 296.2,192.9 280.8,240.2 231.2,240.2 215.8,192.9" fill="#1d2b22" stroke="#1d2b22" stroke-width="6" stroke-linejoin="round"/>
+    <polygon points="306.4,136.6 292.5,93.7 329.0,67.2 365.5,93.7 351.6,136.6" fill="#1d2b22" stroke="#1d2b22" stroke-width="6" stroke-linejoin="round"/>
+    <polygon points="337.6,232.5 374.1,206.0 410.6,232.5 396.7,275.4 351.5,275.4" fill="#1d2b22" stroke="#1d2b22" stroke-width="6" stroke-linejoin="round"/>
+    <polygon points="256.0,291.8 292.5,318.3 278.6,361.2 233.4,361.2 219.5,318.3" fill="#1d2b22" stroke="#1d2b22" stroke-width="6" stroke-linejoin="round"/>
+    <polygon points="174.4,232.5 160.5,275.4 115.3,275.4 101.4,232.5 137.9,206.0" fill="#1d2b22" stroke="#1d2b22" stroke-width="6" stroke-linejoin="round"/>
+    <polygon points="205.6,136.6 160.4,136.6 146.5,93.7 183.0,67.2 219.5,93.7" fill="#1d2b22" stroke="#1d2b22" stroke-width="6" stroke-linejoin="round"/>
+    <line x1="256.0" y1="163.8" x2="256.0" y2="126.6" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="256.0" y1="126.6" x2="292.5" y2="93.7" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="256.0" y1="126.6" x2="219.5" y2="93.7" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="296.2" y1="192.9" x2="331.5" y2="181.5" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="331.5" y1="181.5" x2="374.1" y2="206.0" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="331.5" y1="181.5" x2="351.6" y2="136.6" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="280.8" y1="240.2" x2="302.6" y2="270.2" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="302.6" y1="270.2" x2="292.5" y2="318.3" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="302.6" y1="270.2" x2="351.5" y2="275.4" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="231.2" y1="240.2" x2="209.4" y2="270.2" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="209.4" y1="270.2" x2="160.5" y2="275.4" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="209.4" y1="270.2" x2="219.5" y2="318.3" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="215.8" y1="192.9" x2="180.5" y2="181.5" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="180.5" y1="181.5" x2="160.4" y2="136.6" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+    <line x1="180.5" y1="181.5" x2="137.9" y2="206.0" stroke="#1d2b22" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <circle cx="256" cy="206" r="128" fill="none" stroke="#1d2b22" stroke-width="10"/>
+</g>
+</svg>
