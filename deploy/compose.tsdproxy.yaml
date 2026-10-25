@@ -10,9 +10,12 @@ services:
       - "${LERNKICKER_PORT:-8080}:8080"
     labels:
       tsdproxy.enable: "true"
+      # Results in https://lernkicker.<tailnet>.ts.net
       tsdproxy.name: lernkicker
-      # HTTPS on the tailnet to HTTP in the container; add ", tailscale_funnel" for public access (docs/security.md)
-      tsdproxy.port.1: "443/https:8080/http"
+      # The app's HTTP port inside the container; TSDProxy serves it as HTTPS on the tailnet
+      tsdproxy.container_port: "8080"
+      # "true" makes it reachable from the internet via Tailscale Funnel; read docs/security.md first
+      tsdproxy.funnel: "false"
     environment:
       # The address of the node, for links in QR codes, invitations and the calendar feed
       Lernkicker__PublicUrl: ${PUBLIC_URL}

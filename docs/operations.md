@@ -77,7 +77,7 @@ Differences to the sidecar:
 - The node gets TSDProxy's tags or none: `tsdproxy.tags` only works when TSDProxy logs in with OAuth. Give the node the restricted tag from step 1 that way, or check in the Tailscale console that it cannot reach your other devices.
 - The app publishes a port on the NAS, so it is reachable over plain HTTP in the LAN. Logging in only works over HTTPS, so this gives nobody access, but a NAS firewall rule (Control Panel → Security → Firewall) can limit the port to Docker's networks (`172.16.0.0/12`).
 - `Lernkicker__TrustedProxies` (default `172.16.0.0/12`) lets the app see the real client address behind TSDProxy, for the rate limits. If TSDProxy runs in `network_mode: host`, the requests come from the NAS's own address; set it to that address.
-- Funnel: append `, tailscale_funnel` to the `tsdproxy.port.1` label (read the [security concept](security.md) first). The admin pages stay tailnet-only only if TSDProxy passes Tailscale's `Tailscale-Funnel-Request` header; otherwise keep Funnel off.
+- Funnel: set the label `tsdproxy.funnel` to `"true"` (read the [security concept](security.md) first). The admin pages stay tailnet-only only if TSDProxy passes Tailscale's `Tailscale-Funnel-Request` header; otherwise keep Funnel off.
 
 ## 4. Invite families
 
