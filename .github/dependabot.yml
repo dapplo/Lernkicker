@@ -1,0 +1,23 @@
+# Weekly updates for NuGet packages, the .NET base images and the GitHub Actions used in CI.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      # Packages released together with .NET (EF Core, ASP.NET Core, extensions) move as one PR
+      dotnet:
+        patterns: ["Microsoft.*", "System.*"]
+      tests:
+        patterns: ["xunit*", "coverlet*", "Microsoft.NET.Test.Sdk"]
+
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
