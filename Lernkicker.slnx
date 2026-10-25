@@ -3,9 +3,13 @@
     <Project Path="src/Lernkicker.Domain/Lernkicker.Domain.csproj" />
     <Project Path="src/Lernkicker.Application/Lernkicker.Application.csproj" />
     <Project Path="src/Lernkicker.QuizFormat/Lernkicker.QuizFormat.csproj" />
+    <Project Path="src/Lernkicker.Persistence/Lernkicker.Persistence.csproj" />
+    <Project Path="src/Lernkicker.Contracts/Lernkicker.Contracts.csproj" />
+    <Project Path="src/Lernkicker.Web/Lernkicker.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Lernkicker.Domain.Tests/Lernkicker.Domain.Tests.csproj" />
     <Project Path="tests/Lernkicker.QuizFormat.Tests/Lernkicker.QuizFormat.Tests.csproj" />
+    <Project Path="tests/Lernkicker.Web.Tests/Lernkicker.Web.Tests.csproj" />
   </Folder>
 </Solution>

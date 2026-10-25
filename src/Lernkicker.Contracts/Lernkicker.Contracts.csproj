@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The HTTP API's request and response bodies, shared by the web adapter and the client. No domain types. -->
+
+</Project>

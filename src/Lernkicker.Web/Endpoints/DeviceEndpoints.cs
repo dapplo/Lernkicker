@@ -1,0 +1,82 @@
+using System.Security.Claims;
+using Lernkicker.Application.UseCases;
+using Lernkicker.Contracts;
+using Lernkicker.Domain.Practice;
+using Lernkicker.Web.Security;
+using Microsoft.AspNetCore.Authentication;
+
+namespace Lernkicker.Web.Endpoints;
+
+/// <summary>Everything the child's phone talks to: pairing, PIN login, assigned quizzes, handing in answers.</summary>
+public static class DeviceEndpoints
+{
+    public const string Path = "/api/device";
+
+    public static void MapDevice(this IEndpointRouteBuilder app)
+    {
+        var device = app.MapGroup(Path);
+
+        device.MapPost("/pair", async (PairDevice request, ChildDeviceUseCases uc, HttpContext http) =>
+        {
+            var paired = await uc.PairAsync(request.Code, request.Label);
+            if (!paired.IsSuccess)
+            {
+                return ApiResults.Error(paired.Error!);
+            }
+
+            http.Response.Cookies.Append(Cookies.Device, paired.Value.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Path = Path,
+                MaxAge = TimeSpan.FromDays(400),
+                IsEssential = true,
+            });
+            return Results.Json(new DeviceStatusResponse(true, paired.Value.ChildName, false), ApiJson.Options);
+        }).RequireRateLimiting(RateLimits.Child);
+
+        device.MapGet("/status", async (ChildDeviceUseCases uc, HttpContext http) =>
+            Results.Json((await uc.StatusAsync(DeviceToken(http))).ToDto(), ApiJson.Options));
+
+        device.MapPost("/login", async (PinLogin request, ChildDeviceUseCases uc, HttpContext http) =>
+        {
+            var session = await uc.LoginAsync(DeviceToken(http), request.Pin);
+            if (!session.IsSuccess)
+            {
+                return ApiResults.Error(session.Error!);
+            }
+
+            var s = session.Value;
+            var identity = new ClaimsIdentity(
+                [
+                    new Claim(Claims.FamilyId, s.FamilyId.ToString()),
+                    new Claim(Claims.ChildId, s.ChildId.ToString()),
+                    new Claim(Claims.DeviceId, s.DeviceId.ToString()),
+                    new Claim(ClaimTypes.GivenName, s.ChildName),
+                ],
+                Schemes.Child);
+            await http.SignInAsync(Schemes.Child, new ClaimsPrincipal(identity), new AuthenticationProperties { IsPersistent = true });
+            return Results.NoContent();
+        }).RequireRateLimiting(RateLimits.Child);
+
+        device.MapPost("/logout", async (HttpContext http) =>
+        {
+            await http.SignOutAsync(Schemes.Child);
+            return Results.NoContent();
+        });
+
+        var child = device.MapGroup("/").RequireAuthorization(Policies.Child);
+
+        child.MapGet("/assignments", async (ClaimsPrincipal user, PracticeUseCases uc) =>
+            Results.Json((await uc.AssignmentsAsync(user.ChildIdOf())).Select(a => a.ToDto()), ApiJson.Options));
+
+        child.MapGet("/assignments/{assignmentId:guid}", async (Guid assignmentId, ClaimsPrincipal user, PracticeUseCases uc) =>
+            (await uc.SheetAsync(user.ChildIdOf(), assignmentId, Random.Shared)).ToHttp(s => s.ToDto()));
+
+        child.MapPost("/assignments/{assignmentId:guid}/submit", async (Guid assignmentId, Submission submission, ClaimsPrincipal user, PracticeUseCases uc) =>
+            (await uc.SubmitAsync(user.ChildIdOf(), assignmentId, submission.Answers.ToDomain(), Channels.Pwa)).ToHttp(r => r.ToDto()));
+    }
+
+    private static string? DeviceToken(HttpContext http) => http.Request.Cookies[Cookies.Device];
+}
