@@ -4,8 +4,8 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="Welcome" xml:space="preserve"><value>This is the Lernkicker bot. To connect it, open Lernkicker, go to the parents' area and tap “Connect Telegram”.</value></data>
-  <data name="LinkInvalid" xml:space="preserve"><value>This link is invalid or has expired. Create a new one in Lernkicker under “Connect Telegram”.</value></data>
+  <data name="Welcome" xml:space="preserve"><value>This is the Lernkicker bot. To connect it, open Lernkicker, go to the parents' area, tap “Connect Telegram” and send me the code shown there.</value></data>
+  <data name="LinkInvalid" xml:space="preserve"><value>This link or code is invalid or has expired. Create a new one in Lernkicker under “Connect Telegram”.</value></data>
   <data name="Linked" xml:space="preserve"><value>Hello {0}! Lernkicker is now connected. You will get results and reminders here.
 
 /next shows the next dates, /stop disconnects.</value></data>

@@ -91,7 +91,7 @@ The bot sends parents their children's results after each quiz and, at 18:00, th
 1. In Telegram, talk to [@BotFather](https://t.me/BotFather): `/newbot`, pick a name and a username (e.g. `LernkickerKromBot`). It answers with the token.
 2. Still in BotFather: `/setjoingroups` → your bot → **Disable**, so nobody can add it to a group. The bot only answers private chats anyway.
 3. As admin, open `/admin` → **Telegram-Bot**, paste the token and save. The app checks it with Telegram, stores it encrypted (with the same keys as the cookies, in `data/keys`) and starts the bot at once. The token is never shown again.
-4. Each parent opens **Eltern → Telegram → Mit Telegram verbinden** and presses *Start* in the bot. The link works once and for 10 minutes. `/next` shows the next 7 days, `/stop` disconnects.
+4. Each parent opens **Eltern → Telegram → Mit Telegram verbinden** and presses *Start* in the bot. If the chat with the bot already exists, Telegram shows no Start button; then send the code shown below the button to the bot as a message. The link works once and for 10 minutes. `/next` shows the next 7 days, `/stop` disconnects.
 
 "Token ersetzen" switches to another bot, "Bot stoppen" turns Telegram off; both take effect without a restart. If the token leaks, `/revoke` in BotFather makes it useless; paste the new one.
 

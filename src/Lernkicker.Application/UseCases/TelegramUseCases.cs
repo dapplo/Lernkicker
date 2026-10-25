@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Lernkicker.Application.Ports;
 using Lernkicker.Domain.Messaging;
 using Lernkicker.Domain.Quizzes;
@@ -6,9 +7,9 @@ namespace Lernkicker.Application.UseCases;
 
 /// <summary>
 /// Telegram for parents: link a chat with a one-time code, answer the bot's commands, and send results and
-/// the evening reminder. The bot only talks to linked chats; an unknown chat only gets an answer to /start.
+/// the evening reminder. The bot only talks to linked chats; an unknown chat can send a link code and otherwise gets a hint how to connect.
 /// </summary>
-public sealed class TelegramUseCases(
+public sealed partial class TelegramUseCases(
     ITelegramRepository telegram,
     IMessenger messenger,
     IParentAccounts parents,
@@ -44,7 +45,7 @@ public sealed class TelegramUseCases(
         await telegram.RemoveCodesAsync(parentId);
         telegram.Add(new TelegramLinkCode(familyId, parentId, Secrets.Hash(code), expiresAt));
         await unitOfWork.SaveChangesAsync();
-        return new TelegramLinkCreated($"https://t.me/{bot}?start={code}", expiresAt);
+        return new TelegramLinkCreated($"https://t.me/{bot}?start={code}", code, expiresAt);
     }
 
     public async Task<Result> UnlinkAsync(Guid parentId)
@@ -73,7 +74,10 @@ public sealed class TelegramUseCases(
         var link = await telegram.FindByChatAnyFamilyAsync(chatId);
         if (link is null)
         {
-            return command == "/start" ? new BotReply(language, new WelcomeNotification()) : null;
+            // In a chat that already exists Telegram shows no Start button, so the code (or the whole link) can be sent as a message
+            return LinkCode(text) is { } code
+                ? await LinkAsync(chatId, code, language)
+                : new BotReply(language, new WelcomeNotification());
         }
 
         familyScope.Enter(link.FamilyId);
@@ -175,6 +179,16 @@ public sealed class TelegramUseCases(
 
         return dates;
     }
+
+    /// <summary>The code of a link, sent on its own or as the whole link; null for any other text.</summary>
+    private static string? LinkCode(string text)
+    {
+        var match = LinkCodePattern().Match(text.Trim());
+        return match.Success ? match.Groups["code"].Value : null;
+    }
+
+    [GeneratedRegex(@"^(?:https://t\.me/\w+\?start=)?(?<code>[A-Za-z0-9_-]{43})$")]
+    private static partial Regex LinkCodePattern();
 
     /// <summary>"/start abc" → ("/start", "abc"); "/next@LernkickerBot" → ("/next", "").</summary>
     private static (string Command, string Argument) Command(string text)
