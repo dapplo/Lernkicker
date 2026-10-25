@@ -27,6 +27,7 @@ public static class PersistenceSetup
         services.AddScoped<IChildRepository, ChildRepository>();
         services.AddScoped<IQuizLibrary, QuizLibrary>();
         services.AddScoped<IPracticeRepository, PracticeRepository>();
+        services.AddScoped<ICalendarRepository, CalendarRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IParentAccounts, ParentAccounts>();
         services.AddSingleton<IPinHasher, PinHasher>();

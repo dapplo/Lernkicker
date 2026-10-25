@@ -1,9 +1,11 @@
 using System.Threading.RateLimiting;
 using Lernkicker.Application.Ports;
 using Lernkicker.Application.UseCases;
+using Lernkicker.Calendar;
 using Lernkicker.Contracts;
 using Lernkicker.Persistence;
 using Lernkicker.QuizFormat;
+using Lernkicker.Web;
 using Lernkicker.Web.Endpoints;
 using Lernkicker.Web.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -21,6 +23,18 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IFamilyScope, HttpFamilyScope>();
 builder.Services.AddSingleton<IQuizFormat, QuizJson>();
+
+// Calendars: dates and times are in the family's time zone (one per installation)
+var timeZone = builder.Configuration["Lernkicker:TimeZone"] ?? "Europe/Berlin";
+if (!ZonedClock.IsKnown(timeZone))
+{
+    throw new InvalidOperationException($"Unknown time zone in Lernkicker:TimeZone: {timeZone}");
+}
+
+builder.Services.AddSingleton<ICalendarSource>(_ => new IcsCalendarSource(timeZone));
+builder.Services.AddSingleton<ICalendarWriter>(_ => new IcsCalendarWriter(timeZone));
+builder.Services.AddSingleton<ILocalClock>(sp => new ZonedClock(sp.GetRequiredService<TimeProvider>(), timeZone));
+builder.Services.AddHostedService<CalendarSync>();
 builder.Services.AddPersistence(builder.Configuration.GetConnectionString("Lernkicker") ?? $"Data Source={Path.Combine(dataPath, "lernkicker.db")}");
 
 // Use cases
@@ -30,6 +44,7 @@ builder.Services.AddScoped<QuizLibraryUseCases>();
 builder.Services.AddScoped<ChildrenUseCases>();
 builder.Services.AddScoped<ChildDeviceUseCases>();
 builder.Services.AddScoped<PracticeUseCases>();
+builder.Services.AddScoped<CalendarUseCases>();
 
 // Keys for cookies survive restarts and image updates
 builder.Services.AddDataProtection()
@@ -93,6 +108,7 @@ builder.Services.AddAuthorizationBuilder()
 
 var loginsPerMinute = builder.Configuration.GetValue("Lernkicker:Limits:LoginsPerMinute", 10);
 var childRequestsPerMinute = builder.Configuration.GetValue("Lernkicker:Limits:ChildLoginsPerMinute", 20);
+var calendarRequestsPerMinute = builder.Configuration.GetValue("Lernkicker:Limits:CalendarRequestsPerMinute", 30);
 builder.Services.AddRateLimiter(o =>
 {
     o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -102,6 +118,9 @@ builder.Services.AddRateLimiter(o =>
     o.AddPolicy(RateLimits.Child, http => RateLimitPartition.GetFixedWindowLimiter(
         http.Connection.RemoteIpAddress?.ToString() ?? "?",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = childRequestsPerMinute, Window = TimeSpan.FromMinutes(1) }));
+    o.AddPolicy(RateLimits.Calendar, http => RateLimitPartition.GetFixedWindowLimiter(
+        http.Connection.RemoteIpAddress?.ToString() ?? "?",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = calendarRequestsPerMinute, Window = TimeSpan.FromMinutes(1) }));
 });
 
 builder.Services.ConfigureHttpJsonOptions(o =>
@@ -132,6 +151,7 @@ app.MapAdmin();
 app.MapQuizzes();
 app.MapChildren();
 app.MapDevice();
+app.MapCalendar();
 app.Map("/api/{**rest}", ApiResults.NotFound);
 
 // The PWA (Lernkicker.Client). Fingerprinted files are cached forever; every other path is a page of the app.

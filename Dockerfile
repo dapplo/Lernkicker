@@ -10,6 +10,7 @@ COPY global.json Directory.Build.props ./
 COPY src/Lernkicker.Domain/Lernkicker.Domain.csproj src/Lernkicker.Domain/
 COPY src/Lernkicker.Application/Lernkicker.Application.csproj src/Lernkicker.Application/
 COPY src/Lernkicker.QuizFormat/Lernkicker.QuizFormat.csproj src/Lernkicker.QuizFormat/
+COPY src/Lernkicker.Calendar/Lernkicker.Calendar.csproj src/Lernkicker.Calendar/
 COPY src/Lernkicker.Persistence/Lernkicker.Persistence.csproj src/Lernkicker.Persistence/
 COPY src/Lernkicker.Contracts/Lernkicker.Contracts.csproj src/Lernkicker.Contracts/
 COPY src/Lernkicker.Client/Lernkicker.Client.csproj src/Lernkicker.Client/

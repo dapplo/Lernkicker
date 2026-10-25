@@ -20,7 +20,7 @@ Children practise tests on their phone; parents pick the tests and see results a
 - **Child app:** PWA with an icon on the home screen, short rounds, stars; wrong answers come back.
 - **Languages:** the UI is German and English (German by default); quiz content is in the quiz's own `language`. The server only sends codes, the client translates them. More UI languages are a new `Strings.<lang>.resx`.
 - **Telegram:** one bot, only for linked accounts (one-time code via `t.me/<bot>?start=…`). Parents: results, reminders, `/send`. Children: only when enabled, questions with answer buttons. Long polling, no open port.
-- **Calendar:** dates per child (tests, football, other), import of team calendars (ICS, e.g. fussball.de), a secret ICS feed per child.
+- **Calendar:** dates per child (tests, football, other), the due dates of assignments, subscribed ICS calendars (football team, school) that are imported again every few hours, a secret ICS feed per child for the parents' calendar app, and the next two weeks on the child's start page. fussball.de has no ICS export, so the football dates come from the club's or coach's calendar (or are entered by hand).
 - **Access:** Tailscale (MagicDNS + HTTPS certificate), public via Tailscale Funnel. Details in the [security concept](security.md).
 
 ## Technology
@@ -40,7 +40,7 @@ The code follows a hexagonal architecture, see [architecture](architecture.md).
 ## Phases
 
 1. **Core:** quiz format v1, upload, assign, delete, child PWA, results, German and English UI, Docker image with Tailscale.
-2. **Telegram and calendar:** bot for parents and children, dates, ICS, football import, Web Push.
+2. **Calendar and Telegram:** dates, ICS import and feed *(done)*; bot for parents and children, Web Push.
 3. **More families:** class groups, export and deletion, turn on Funnel.
 
 ## Open questions

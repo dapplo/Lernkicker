@@ -2,8 +2,13 @@ using System.Net;
 using System.Net.Http.Json;
 using Lernkicker.Contracts;
 using Lernkicker.Domain.Quizzes;
+using System.Collections.Concurrent;
+using Lernkicker.Application;
+using Lernkicker.Application.Ports;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lernkicker.Web.Tests;
 
@@ -14,6 +19,9 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
     public const string AdminPassword = "admin-password-123";
 
     public int LimitPerMinute { get; init; } = 10_000;
+
+    /// <summary>What the subscribed calendars "on the internet" return.</summary>
+    public FakeCalendarSource Calendars { get; } = new();
 
     private readonly string _dataPath = Path.Combine(Path.GetTempPath(), "lernkicker-tests", Guid.NewGuid().ToString("N"));
 
@@ -29,6 +37,9 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
         builder.UseSetting("Admin:Family", "Family Admin");
         builder.UseSetting("Lernkicker:Limits:LoginsPerMinute", LimitPerMinute.ToString());
         builder.UseSetting("Lernkicker:Limits:ChildLoginsPerMinute", LimitPerMinute.ToString());
+        builder.UseSetting("Lernkicker:Limits:CalendarRequestsPerMinute", LimitPerMinute.ToString());
+        builder.UseSetting("Lernkicker:Calendar:SyncHours", "0");
+        builder.ConfigureTestServices(services => services.AddSingleton<ICalendarSource>(Calendars));
     }
 
     /// <summary>A browser-like client with its own cookies.</summary>
@@ -79,6 +90,19 @@ public sealed class LernkickerFactory : WebApplicationFactory<Program>
         Assert.Equal(expected, response.StatusCode);
         return (await response.Content.ReadFromJsonAsync<ApiError>(ApiJson.Options))!;
     }
+}
+
+/// <summary>Answers calendar fetches from a table instead of the internet; unknown URLs are unreachable.</summary>
+public sealed class FakeCalendarSource : ICalendarSource
+{
+    private readonly ConcurrentDictionary<string, Result<IReadOnlyList<ImportedEvent>>> _answers = new();
+
+    public void Set(string url, params ImportedEvent[] events) => _answers[url] = Result<IReadOnlyList<ImportedEvent>>.Ok(events);
+
+    public void Fail(string url, string errorCode) => _answers[url] = AppError.Invalid(errorCode);
+
+    public Task<Result<IReadOnlyList<ImportedEvent>>> FetchAsync(Uri url, DateOnly from, DateOnly to, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_answers.TryGetValue(url.ToString(), out var answer) ? answer : AppError.Invalid(ErrorCodes.CalendarUnreachable));
 }
 
 public static class TestData

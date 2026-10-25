@@ -51,6 +51,13 @@ public partial class LocalizationTests
         Assert.DoesNotContain(subjects, s => !English.ContainsKey($"Subject.{s}"));
     }
 
+    [Fact]
+    public void Every_calendar_kind_has_a_name()
+    {
+        Assert.Equal(Lernkicker.Domain.Calendar.EventKinds.All, Client.Services.Display.Kinds);
+        Assert.DoesNotContain(Lernkicker.Domain.Calendar.EventKinds.All, k => !English.ContainsKey($"Calendar.Kind.{k}"));
+    }
+
     private static Dictionary<string, string> Texts(CultureInfo culture) =>
         Strings.GetResourceSet(culture, createIfNotExists: true, tryParents: false)!
             .Cast<DictionaryEntry>()
