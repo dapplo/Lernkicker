@@ -129,12 +129,39 @@ builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.DefaultIgnoreCondition = ApiJson.Options.DefaultIgnoreCondition;
 });
 
-// Tailscale serve/funnel proxies from localhost and passes the client address on
-builder.Services.Configure<ForwardedHeadersOptions>(o => o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+// Tailscale serve/funnel proxies from localhost and passes the client address on. A proxy in another
+// container (e.g. TSDProxy) has to be trusted explicitly: Lernkicker:TrustedProxies = "172.16.0.0/12"
+var trustedProxies = (builder.Configuration["Lernkicker:TrustedProxies"] ?? "")
+    .Split([',', ';', ' '], StringSplitOptions.RemoveEmptyEntries)
+    .Select(System.Net.IPNetwork.Parse)
+    .ToList();
+builder.Services.Configure<ForwardedHeadersOptions>(o =>
+{
+    o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    trustedProxies.ForEach(o.KnownIPNetworks.Add);
+});
+
+// The address people use (e.g. https://lernkicker.example.ts.net). Links in QR codes, invitations and the
+// calendar feed are built from it; without it from the request, which needs the proxy's X-Forwarded-Proto.
+var publicUrl = builder.Configuration["Lernkicker:PublicUrl"] is { Length: > 0 } configuredUrl
+    ? Uri.TryCreate(configuredUrl, UriKind.Absolute, out var parsedUrl) && parsedUrl.Scheme is "https" or "http"
+        ? parsedUrl
+        : throw new InvalidOperationException($"Lernkicker:PublicUrl is not an http(s) URL: {configuredUrl}")
+    : null;
 
 var app = builder.Build();
 
 app.UseForwardedHeaders();
+if (publicUrl is not null)
+{
+    app.Use((context, next) =>
+    {
+        context.Request.Scheme = publicUrl.Scheme;
+        context.Request.Host = new HostString(publicUrl.Authority);
+        return next(context);
+    });
+}
+
 app.UseSecurityHeaders();
 if (!app.Environment.IsDevelopment())
 {

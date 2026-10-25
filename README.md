@@ -47,6 +47,8 @@ Then open http://localhost:5208. On first start the server creates the database 
 | `Lernkicker:Limits:LoginsPerMinute` | `10` | Parent logins and invitations per IP and minute |
 | `Lernkicker:Limits:ChildLoginsPerMinute` | `20` | Pairing and PIN attempts per IP and minute |
 | `Lernkicker:Limits:CalendarRequestsPerMinute` | `30` | Calendar imports and ICS feed requests per IP and minute |
+| `Lernkicker:PublicUrl` | – | The address people use, e.g. `https://lernkicker.<tailnet>.ts.net`, for links in QR codes, invitations and the feed. Needed behind a proxy that does not send `X-Forwarded-Proto` |
+| `Lernkicker:TrustedProxies` | – | Networks of reverse proxies (CIDR, comma-separated) whose `X-Forwarded-For` is trusted; loopback is always trusted |
 | `Lernkicker:TimeZone` | `Europe/Berlin` | Time zone of all dates (IANA name) |
 | `Lernkicker:Calendar:SyncHours` | `6` | How often subscribed calendars are imported again; `0` turns it off |
 

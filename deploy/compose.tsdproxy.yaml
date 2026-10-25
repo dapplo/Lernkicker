@@ -1,0 +1,37 @@
+# Lernkicker behind an existing TSDProxy (https://almeidapaulopt.github.io/tsdproxy/) instead of the
+# Tailscale sidecar in compose.yaml. TSDProxy creates the Tailscale node "lernkicker" from the labels below
+# and terminates HTTPS; the app itself only speaks HTTP. See docs/operations.md, "Option B".
+services:
+  lernkicker:
+    image: ghcr.io/dapplo/lernkicker:${LERNKICKER_TAG:-latest}
+    # TSDProxy reaches published ports through the Docker host. Plain HTTP on the LAN cannot be used to log
+    # in (the cookies are HTTPS-only); bind to 127.0.0.1 instead if your TSDProxy setup allows it.
+    ports:
+      - "${LERNKICKER_PORT:-8080}:8080"
+    labels:
+      tsdproxy.enable: "true"
+      tsdproxy.name: lernkicker
+      # HTTPS on the tailnet to HTTP in the container; add ", tailscale_funnel" for public access (docs/security.md)
+      tsdproxy.port.1: "443/https:8080/http"
+    environment:
+      # The address of the node, for links in QR codes, invitations and the calendar feed
+      Lernkicker__PublicUrl: ${PUBLIC_URL}
+      # TSDProxy connects from a Docker network; trust its X-Forwarded-For so rate limits see the real client
+      Lernkicker__TrustedProxies: ${TRUSTED_PROXIES:-172.16.0.0/12}
+      # Only read on the first start, when the admin account is created; remove them afterwards
+      Admin__Email: ${ADMIN_EMAIL:-}
+      Admin__Password: ${ADMIN_PASSWORD:-}
+      Admin__Name: ${ADMIN_NAME:-Admin}
+      Admin__Family: ${ADMIN_FAMILY:-My family}
+      Admin__Language: ${ADMIN_LANGUAGE:-de}
+    volumes:
+      # Must belong to uid 1654 (the app user of the image)
+      - ./data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped

@@ -1,6 +1,6 @@
 # Quiz format `quiz/v1`
 
-A practice quiz is **one JSON file** (UTF-8). Parents upload it in the parents' area, as a file or by pasting, or send it through the API. On upload, Lernkicker checks the file against the schema [`schema/quiz-v1.schema.json`](../schema/quiz-v1.schema.json) and the content rules below. A complete example is [`quizzes/hsu/grain-and-elections.json`](../quizzes/hsu/grain-and-elections.json).
+A practice quiz is **one JSON file** (UTF-8). Parents upload it in the parents' area, as a file or by pasting, or send it through the API. On upload, Lernkicker checks the file against the schema [`schema/quiz-v1.schema.json`](../schema/quiz-v1.schema.json) and the content rules below. A real test is [`quizzes/hsu/grain-and-elections.json`](../quizzes/hsu/grain-and-elections.json); [`quizzes/other/showcase-all-exercise-types.json`](../quizzes/other/showcase-all-exercise-types.json) uses every exercise type and every optional field once, to try them out or copy from.
 
 The format's keys are English. The **content** (titles, questions, answers) is in whatever language the child learns in, usually German; declare it with `language`.
 

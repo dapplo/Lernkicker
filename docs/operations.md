@@ -7,6 +7,14 @@ Lernkicker runs as two containers from [`deploy/compose.yaml`](../deploy/compose
 
 The app container runs as uid 1654 with a read-only file system; it only writes to `/data` (SQLite database and cookie keys).
 
+## What you need
+
+- A Synology with **DSM 7.2 or newer** and the **Container Manager** package (Package Center). The image exists for x86-64 (Intel/AMD, e.g. DS920+, DS923+) and arm64 models; 32-bit ARM models (j series, older value series) cannot run it.
+- About 200 MB of disk space and 150 MB of RAM.
+- A **Tailscale** account (the free plan is enough). The NAS itself does not need the Tailscale package: the sidecar container brings its own.
+- Nothing else: no open ports on the router, no own domain, no certificate. Tailscale provides `https://lernkicker.<tailnet>.ts.net` with a valid certificate.
+- Everyone who uses the app (you, Calvin's phone) needs the Tailscale app and access to the node, unless you turn on Funnel later (step 5).
+
 ## 1. Tailnet policy (once)
 
 In the [Tailscale admin console](https://login.tailscale.com/admin/acls) → Access controls, make sure that:
@@ -55,6 +63,21 @@ Container Manager → Project → Create: name `lernkicker`, path `/volume1/dock
 After a minute the node `lernkicker` shows up in the Tailscale console. Open `https://lernkicker.<tailnet>.ts.net` on a device in your tailnet, go to **I am a parent / Ich bin ein Elternteil**, and log in with the admin email and password from `.env`.
 
 Then remove `ADMIN_PASSWORD` (and `TS_AUTHKEY`) from `.env`: the account and the Tailscale node state are stored, and the values are not needed any more.
+
+## Option B: an existing TSDProxy
+
+If the NAS already runs [TSDProxy](https://almeidapaulopt.github.io/tsdproxy/), use [`deploy/compose.tsdproxy.yaml`](../deploy/compose.tsdproxy.yaml) instead of `compose.yaml` (no `serve.json`, no `tailscale` folder, no `TS_AUTHKEY`):
+
+1. Copy it as `compose.yaml` into the project folder, next to `.env` and the `data` folder (step 2, including the `chown`).
+2. In `.env`, set `PUBLIC_URL=https://lernkicker.<tailnet>.ts.net` (the node TSDProxy will create) and, if 8080 is taken on the NAS, another `LERNKICKER_PORT`.
+3. Start the project. TSDProxy sees the `tsdproxy.*` labels and creates the node `lernkicker`; it shows up in its dashboard and in the Tailscale console.
+
+Differences to the sidecar:
+
+- The node gets TSDProxy's tags or none: `tsdproxy.tags` only works when TSDProxy logs in with OAuth. Give the node the restricted tag from step 1 that way, or check in the Tailscale console that it cannot reach your other devices.
+- The app publishes a port on the NAS, so it is reachable over plain HTTP in the LAN. Logging in only works over HTTPS, so this gives nobody access, but a NAS firewall rule (Control Panel → Security → Firewall) can limit the port to Docker's networks (`172.16.0.0/12`).
+- `Lernkicker__TrustedProxies` (default `172.16.0.0/12`) lets the app see the real client address behind TSDProxy, for the rate limits. If TSDProxy runs in `network_mode: host`, the requests come from the NAS's own address; set it to that address.
+- Funnel: append `, tailscale_funnel` to the `tsdproxy.port.1` label (read the [security concept](security.md) first). The admin pages stay tailnet-only only if TSDProxy passes Tailscale's `Tailscale-Funnel-Request` header; otherwise keep Funnel off.
 
 ## 4. Invite families
 

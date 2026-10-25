@@ -134,6 +134,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .empty { text-align: center; padding: 32px 0; color: var(--muted); }
 .tip, .hint, .subtitle { color: var(--muted); font-size: 0.95rem; }
 .parents-link { margin-top: 32px; }
+.grown-ups { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+.grown-ups > summary { cursor: pointer; width: max-content; }
 
 /* PIN pad */
 .pin-pad { max-width: 320px; margin: 16px auto; text-align: center; }
