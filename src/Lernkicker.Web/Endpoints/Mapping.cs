@@ -1,0 +1,61 @@
+using Lernkicker.Application;
+using Lernkicker.Contracts;
+using Lernkicker.Domain.Quizzes;
+
+namespace Lernkicker.Web.Endpoints;
+
+/// <summary>Maps between the application's models and the HTTP contracts.</summary>
+public static class Mapping
+{
+    public static FamilyOverview ToDto(this FamilySummary f) => new(f.Id, f.Name, f.Parents, f.Children, f.CreatedAt);
+
+    public static Me ToDto(this ParentProfile p) => new(p.Name, p.Email, p.FamilyName, p.IsAdmin, p.Language);
+
+    public static QuizOverview ToDto(this QuizSummary q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt);
+
+    public static ChildOverview ToDto(this ChildSummary c) => new(c.Id, c.Name, c.GradeLevel, c.HasPin, c.Devices);
+
+    public static DeviceOverview ToDto(this DeviceSummary d) => new(d.Id, d.Label, d.PairedAt, d.LastUsedAt, d.Locked);
+
+    public static AssignmentOverview ToDto(this AssignmentSummary a) => new(a.Id, a.QuizId, a.Version, a.Title, a.Subject, a.DueOn, a.AssignedAt);
+
+    public static AttemptOverview ToDto(this AttemptSummary a) =>
+        new(a.Id, a.QuizId, a.Title, a.Subject, a.Channel, a.SubmittedAt, a.Points, a.MaxPoints, a.Percent, a.Mark);
+
+    public static MyAssignment ToDto(this ChildAssignment a) =>
+        new(a.AssignmentId, a.Title, a.Subject, a.Topic, a.MaxPoints, a.DueOn, a.Attempts, a.BestPercent, a.Stars);
+
+    public static DeviceStatusResponse ToDto(this DeviceStatus s) => new(s.Paired, s.ChildName, s.Locked);
+
+    public static SheetDto ToDto(this QuizSheet s) =>
+        new(s.Id, s.Title, s.Subject, s.GradeLevel, s.Language, s.Topic, s.DurationMinutes, s.MaxPoints, s.Exercises.Select(ToDto).ToList());
+
+    private static ExerciseSheetDto ToDto(ExerciseSheet e) => e switch
+    {
+        ClozeSheet c => new ClozeSheetDto(c.Id, c.Instruction, c.Hint, c.MaxPoints, c.Segments, c.WordBank),
+        MatchingSheet m => new MatchingSheetDto(m.Id, m.Instruction, m.Hint, m.MaxPoints, m.Options, Items(m.Rows)),
+        OrderingSheet o => new OrderingSheetDto(o.Id, o.Instruction, o.Hint, o.MaxPoints, Items(o.Steps)),
+        TrueFalseSheet t => new TrueFalseSheetDto(t.Id, t.Instruction, t.Hint, t.MaxPoints, Items(t.Statements)),
+        FreeTextSheet f => new FreeTextSheetDto(f.Id, f.Instruction, f.Hint, f.MaxPoints, f.FieldLabels),
+        MultipleChoiceSheet mc => new MultipleChoiceSheetDto(mc.Id, mc.Instruction, mc.Hint, mc.MaxPoints,
+            mc.Questions.Select(q => new QuestionSheetDto(q.Index, q.Text, Items(q.Options), q.MultipleAnswers)).ToList()),
+        _ => throw new NotSupportedException($"Unknown sheet type {e.GetType().Name}"),
+    };
+
+    private static List<SheetItemDto> Items(IEnumerable<SheetItem> items) => items.Select(i => new SheetItemDto(i.Index, i.Text)).ToList();
+
+    public static QuizResultDto ToDto(this QuizResult r) =>
+        new(r.Points, r.MaxPoints, r.Percent, r.Mark, r.Exercises.Select(e => new ExerciseResultDto(
+            e.Id, e.Type, e.Instruction, e.Points, e.MaxPoints,
+            e.Parts.Select(p => new PartResultDto(p.Index, p.Correct, p.Solution, p.Explanation, p.ExpectedTruth)).ToList(),
+            e.Explanation, e.SolutionText)).ToList());
+
+    public static Dictionary<string, ExerciseAnswer> ToDomain(this Dictionary<string, AnswerDto>? answers) =>
+        (answers ?? []).ToDictionary(a => a.Key, a => new ExerciseAnswer
+        {
+            Texts = a.Value.Texts,
+            Truths = a.Value.Truths,
+            Order = a.Value.Order,
+            Choices = a.Value.Choices,
+        });
+}

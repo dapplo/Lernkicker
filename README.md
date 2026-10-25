@@ -13,3 +13,8 @@ Lernkicker is a small self-hosted learning app for primary school children. Pare
 - `src/Lernkicker.Domain`: quizzes, grading, families, practice (no dependencies)
 - `src/Lernkicker.Application`: use cases, ports and error codes
 - `src/Lernkicker.QuizFormat`: adapter for the `quiz/v1` JSON format
+- `src/Lernkicker.Persistence`: adapter for EF Core + SQLite and ASP.NET Core Identity
+- `src/Lernkicker.Contracts`: DTOs of the HTTP API
+- `src/Lernkicker.Web`: the HTTP API (Minimal API, cookies, security headers) and composition root
+
+Run the tests with `dotnet test`, the server with `Admin__Email=you@example.org Admin__Password='at-least-12-chars' dotnet run --project src/Lernkicker.Web`.
