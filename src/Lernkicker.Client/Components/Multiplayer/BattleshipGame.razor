@@ -23,8 +23,9 @@
             for (var x = 0; x < View.Size; x++)
             {
                 var (cx, cy) = (x, y);
-                var ship = _placed.Any(s => Covers(s, cx, cy));
-                <button type="button" class="cell @(ship ? "ship" : "")" aria-label="@(ship ? $"{Coordinate(cx, cy)}, {L["Battleship.Ship"]}" : Coordinate(cx, cy))"
+                var placed = _placed.FirstOrDefault(s => Covers(s, cx, cy));
+                var ship = placed is not null;
+                <button type="button" class="cell @Hull(placed, cx, cy)" aria-label="@(ship ? $"{Coordinate(cx, cy)}, {L["Battleship.Ship"]}" : Coordinate(cx, cy))"
                         disabled="@Busy" @onclick="() => Place(cx, cy)"></button>
             }
         }
@@ -65,11 +66,12 @@ else
                         {
                             var (cx, cy) = (x, y);
                             var shot = View.MyShots.FirstOrDefault(s => s.X == cx && s.Y == cy);
-                            var sunk = View.SunkShips.Any(s => Covers(s, cx, cy));
-                            var css = sunk ? (shot is null ? "ship revealed" : "ship sunk") : shot is null ? "" : shot.Hit ? "hit" : "miss";
+                            var sunkShip = View.SunkShips.FirstOrDefault(s => Covers(s, cx, cy));
+                            var sunk = sunkShip is not null;
+                            var css = sunk ? $"{Hull(sunkShip, cx, cy)} {(shot is null ? "revealed" : "sunk")}" : shot is null ? "" : shot.Hit ? "hit" : "miss";
                             var last = View.MyShots.Count > 0 && View.MyShots[^1] == shot;
                             <button type="button" class="cell @css @(last ? "last" : "")" aria-label="@CellLabel(cx, cy, shot, sunk)"
-                                    disabled="@(Busy || !MyTurn || shot is not null)" @onclick="() => Shoot(cx, cy)">@Mark(shot)</button>
+                                    disabled="@(Busy || !MyTurn || shot is not null)" @onclick="() => Shoot(cx, cy)"><span class="mark">@Mark(shot)</span></button>
                         }
                     }
                 </div>
@@ -87,9 +89,9 @@ else
                         var shot = View.TheirShots.FirstOrDefault(s => s.X == cx && s.Y == cy);
                         var ship = View.MyShips?.FirstOrDefault(s => Covers(s, cx, cy));
                         var sunk = ship is not null && Sunk(ship, View.TheirShots);
-                        var css = ship is null ? (shot is null ? "" : "miss") : sunk ? "ship sunk" : shot is null ? "ship" : "ship hit";
+                        var css = ship is null ? (shot is null ? "" : "miss") : $"{Hull(ship, cx, cy)}{(sunk ? " sunk" : shot is null ? "" : " hit")}";
                         var last = View.TheirShots.Count > 0 && View.TheirShots[^1] == shot;
-                        <span class="cell @css @(last ? "last" : "")" role="gridcell" aria-label="@CellLabel(cx, cy, shot, sunk)">@Mark(shot)</span>
+                        <span class="cell @css @(last ? "last" : "")" role="gridcell" aria-label="@CellLabel(cx, cy, shot, sunk)"><span class="mark">@Mark(shot)</span></span>
                     }
                 }
             </div>
@@ -133,6 +135,22 @@ else
 
             return left.Count > 0 ? left[0] : null;
         }
+    }
+
+    /// <summary>
+    /// The CSS classes that draw a ship's hull across its cells: the stern (first cell), the middle with its deck
+    /// house and the pointed bow (last cell), lying across (h) or down (v).
+    /// </summary>
+    private static string Hull(ShipDto? ship, int x, int y)
+    {
+        if (ship is null)
+        {
+            return "";
+        }
+
+        var i = ship.Horizontal ? x - ship.X : y - ship.Y;
+        var part = i == 0 ? "stern" : i == ship.Length - 1 ? "bow" : "deck";
+        return $"ship {(ship.Horizontal ? "h" : "v")} {part}";
     }
 
     private static bool Covers(ShipDto ship, int x, int y) =>

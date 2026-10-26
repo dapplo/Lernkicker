@@ -912,14 +912,44 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 }
 .sea button.cell:not(:disabled) { cursor: pointer; }
 .sea button.cell:not(:disabled):hover { background: #d4ecfc; }
-.sea .cell.ship { background: #5f6b76; color: #fff; }
 .sea .cell.hit { background: #f08c00; color: #fff; }
-.sea .cell.ship.hit { background: #e8590c; }
-.sea .cell.sunk { background: #9b2c2c; color: #fff; }
-.sea .cell.revealed { background: #8c99a6; }
 .sea .cell.miss { color: #2f6fa3; }
 .sea .cell.last { outline: 3px solid var(--gold); outline-offset: -3px; }
-.sea.placing .cell.ship { background: #495057; }
+.sea .cell .mark { position: relative; z-index: 2; }
+
+/* Ships are drawn over the water of their cells: one hull across the cells (it reaches over the gaps), a rounded
+   stern on the first cell, a pointed bow on the last and a deck house on the cells between. */
+.sea .cell.ship { position: relative; background: #a9d6f5; color: #fff; }
+.sea .cell.ship::before { content: ""; position: absolute; z-index: 0; background: var(--hull, #5f6b76); }
+.sea .cell.ship.h::before { top: 20%; bottom: 20%; left: -1px; right: -1px; }
+.sea .cell.ship.v::before { left: 20%; right: 20%; top: -1px; bottom: -1px; }
+.sea .cell.ship.h.stern::before { left: 8%; border-radius: 45% 0 0 45%; }
+.sea .cell.ship.v.stern::before { top: 8%; border-radius: 45% 45% 0 0; }
+.sea .cell.ship.h.bow::before { right: 2%; clip-path: polygon(0 0, 45% 0, 100% 50%, 45% 100%, 0 100%); }
+.sea .cell.ship.v.bow::before { bottom: 2%; clip-path: polygon(0 0, 100% 0, 100% 45%, 50% 100%, 0 45%); }
+.sea .cell.ship.deck::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: 36%;
+    border-radius: 3px;
+    background: var(--deck, #c3ccd4);
+}
+.sea .cell.ship.stern::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    width: 22%;
+    height: 22%;
+    top: 39%;
+    left: 39%;
+    border-radius: 50%;
+    background: var(--deck, #c3ccd4);
+}
+.sea.placing .cell.ship { --hull: #495057; }
+.sea .cell.ship.hit { background: #a9d6f5; --hull: #e8590c; --deck: #ffc078; }
+.sea .cell.ship.sunk { --hull: #9b2c2c; --deck: #e8a0a0; }
+.sea .cell.ship.revealed { --hull: #8c99a6; --deck: #d5dbe0; }
 .fleet-left { margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; color: var(--muted); font-size: 0.95rem; }
 .fleet-ship { letter-spacing: -2px; color: var(--text); }
 .fleet-ship.gone { color: var(--muted); text-decoration: line-through; opacity: 0.5; }
