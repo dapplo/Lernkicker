@@ -13,5 +13,6 @@ builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.H
 builder.Services.AddScoped<Api>();
 builder.Services.AddScoped<Display>();
 builder.Services.AddScoped<UiLanguage>();
+builder.Services.AddScoped<UploadFiles>();
 
 await builder.Build().RunAsync();

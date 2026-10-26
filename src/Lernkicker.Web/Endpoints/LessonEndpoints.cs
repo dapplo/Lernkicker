@@ -4,6 +4,7 @@ using Lernkicker.Application.UseCases;
 using Lernkicker.Contracts;
 using Lernkicker.Domain.Lessons;
 using Lernkicker.Web.Security;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Lernkicker.Web.Endpoints;
 
@@ -17,20 +18,20 @@ public static class LessonEndpoints
         lessons.MapGet("/", async (LessonUseCases uc) =>
             Results.Json((await uc.ListAsync()).Select(l => l.ToDto()), ApiJson.Options));
 
-        // The body is the raw lesson/v1 JSON, exactly as in a file.
+        // The raw lesson/v1 JSON as the body, or with its pictures: a zip, or a form with the JSON file and the pictures.
         lessons.MapPost("/", async (HttpRequest request, ClaimsPrincipal user, LessonUseCases uc) =>
         {
-            var json = await RequestBody.ReadAsync(request, LessonLimits.MaxBytes);
-            if (json is null)
+            var (upload, status, code) = await Uploads.ReadAsync(request, LessonLimits.MaxBytes, ErrorCodes.LessonTooLarge);
+            if (upload is null)
             {
-                return ApiResults.Error(StatusCodes.Status413PayloadTooLarge, ErrorCodes.LessonTooLarge);
+                return ApiResults.Error(status, code!);
             }
 
-            var uploaded = await uc.UploadAsync(user.RequiredFamily(), json);
+            var uploaded = await uc.UploadAsync(user.RequiredFamily(), upload.Json, upload.Files);
             return uploaded.IsSuccess
                 ? Results.Json(uploaded.Value.ToDto(), ApiJson.Options, statusCode: StatusCodes.Status201Created)
                 : ApiResults.Error(uploaded.Error!);
-        });
+        }).WithMetadata(new RequestSizeLimitAttribute(ApiLimits.UploadMaxBytes));
 
         lessons.MapGet("/{lessonId}", async (string lessonId, LessonUseCases uc) =>
         {
@@ -38,8 +39,15 @@ public static class LessonEndpoints
             return source.IsSuccess ? Results.Text(source.Value, "application/json") : ApiResults.Error(source.Error!);
         });
 
+        // The file with its pictures as a zip, ready to change and upload again
+        lessons.MapGet("/{lessonId}/zip", async (string lessonId, LessonUseCases uc) =>
+        {
+            var package = await uc.PackageAsync(lessonId);
+            return package.IsSuccess ? Uploads.Zip(package.Value) : ApiResults.Error(package.Error!);
+        });
+
         lessons.MapGet("/{lessonId}/preview", async (string lessonId, LessonUseCases uc) =>
-            (await uc.PreviewAsync(lessonId)).ToHttp(l => l.ToPreviewDto()));
+            (await uc.PreviewAsync(lessonId)).ToHttp(l => l.ToDto()));
 
         lessons.MapPut("/{lessonId}/shared", async (string lessonId, ShareRequest request, LessonUseCases uc) =>
             (await uc.SetSharedAsync(lessonId, request.Shared)).ToHttp(l => l.ToDto()));

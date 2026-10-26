@@ -8,7 +8,8 @@ namespace Lernkicker.Application.UseCases;
 /// Learning material: parents upload lessons (lesson/v1) and give them to a child; the child reads and practises
 /// them and marks the blocks they know, which parents see as progress.
 /// </summary>
-public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository children, ILessonFormat format, IUnitOfWork unitOfWork, TimeProvider time)
+public sealed class LessonUseCases(
+    ILessonRepository lessons, IChildRepository children, ILessonFormat format, ImageUseCases images, IUnitOfWork unitOfWork, TimeProvider time)
 {
     public async Task<IReadOnlyList<LessonSummary>> ListAsync() =>
         (await lessons.ListAsync())
@@ -16,8 +17,11 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
             .Select(Summary)
             .ToList();
 
-    /// <summary>Adds a lesson, or replaces the one with the same id (assignments and progress stay).</summary>
-    public async Task<Result<LessonSummary>> UploadAsync(Guid familyId, string json)
+    /// <summary>
+    /// Adds a lesson, or replaces the one with the same id (assignments and progress stay); <paramref name="files"/>
+    /// are the pictures uploaded with it.
+    /// </summary>
+    public async Task<Result<LessonSummary>> UploadAsync(Guid familyId, string json, IReadOnlyList<UploadedFile>? files = null)
     {
         if (Encoding.UTF8.GetByteCount(json) > LessonLimits.MaxBytes)
         {
@@ -31,6 +35,12 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
         }
 
         var lesson = parsed.Lesson!;
+        var (attached, imageIssues) = images.Attach(lesson.Images(), files ?? []);
+        if (imageIssues.Count > 0)
+        {
+            return AppError.Invalid(ErrorCodes.LessonInvalid, imageIssues);
+        }
+
         var stored = await lessons.FindAsync(lesson.Id);
         if (stored is null)
         {
@@ -42,7 +52,9 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
             stored.Replace(lesson, json, time.GetUtcNow());
         }
 
+        await images.AttachToLessonAsync(familyId, stored.Id, attached);
         await unitOfWork.SaveChangesAsync();
+        await images.RemoveUnusedAsync();
         return Summary(stored);
     }
 
@@ -50,9 +62,17 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
     public async Task<Result<string>> SourceAsync(string lessonId) =>
         await lessons.FindAsync(lessonId) is { } lesson ? lesson.Source : AppError.NotFound(ErrorCodes.LessonNotFound);
 
+    /// <summary>The file with its pictures, to download it as a zip.</summary>
+    public async Task<Result<DocumentPackage>> PackageAsync(string lessonId) =>
+        await lessons.FindAsync(lessonId) is { } lesson
+            ? new DocumentPackage(lesson.LessonId, lesson.Source, await images.LessonFilesAsync(lesson.Id))
+            : AppError.NotFound(ErrorCodes.LessonNotFound);
+
     /// <summary>The lesson as a child sees it.</summary>
-    public async Task<Result<Lesson>> PreviewAsync(string lessonId) =>
-        await lessons.FindAsync(lessonId) is { } lesson ? format.Read(lesson.Source) : AppError.NotFound(ErrorCodes.LessonNotFound);
+    public async Task<Result<LessonToLearn>> PreviewAsync(string lessonId) =>
+        await lessons.FindAsync(lessonId) is { } lesson
+            ? LessonToLearn.Preview(format.Read(lesson.Source), await images.ForLessonAsync(lesson.Id))
+            : AppError.NotFound(ErrorCodes.LessonNotFound);
 
     /// <summary>Shares the lesson with all families on this server, or makes it private again (copies stay).</summary>
     public async Task<Result<LessonSummary>> SetSharedAsync(string lessonId, bool shared)
@@ -90,6 +110,7 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
         lessons.Remove(lesson);
         await unitOfWork.SaveChangesAsync();
         await transaction.CommitAsync();
+        await images.RemoveUnusedAsync();
         return Result.Ok();
     }
 
@@ -165,7 +186,7 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
             return AppError.NotFound(ErrorCodes.LessonNotFound);
         }
 
-        return new LessonToLearn(assignment.Id, format.Read(stored.Source), assignment.DueOn, assignment.KnownBlocks);
+        return new LessonToLearn(assignment.Id, format.Read(stored.Source), assignment.DueOn, assignment.KnownBlocks, await images.ForLessonAsync(stored.Id));
     }
 
     /// <summary>The child finished a practice session and says which blocks they know.</summary>
@@ -180,7 +201,7 @@ public sealed class LessonUseCases(ILessonRepository lessons, IChildRepository c
         var lesson = format.Read(stored.Source);
         assignment.Practised(knownBlocks, lesson.Blocks.Select(b => b.Id).ToHashSet(), time.GetUtcNow());
         await unitOfWork.SaveChangesAsync();
-        return new LessonToLearn(assignment.Id, lesson, assignment.DueOn, assignment.KnownBlocks);
+        return new LessonToLearn(assignment.Id, lesson, assignment.DueOn, assignment.KnownBlocks, await images.ForLessonAsync(stored.Id));
     }
 
     private async Task<IReadOnlyList<(LessonAssignment Assignment, StoredLesson Lesson)>> WithLessonsAsync(Guid childId)

@@ -4,7 +4,7 @@ using Lernkicker.Domain.Families;
 namespace Lernkicker.Application.UseCases;
 
 /// <summary>Administration of the installation. Never shows children's results.</summary>
-public sealed class AdminUseCases(IFamilyRepository families, IUnitOfWork unitOfWork, TimeProvider time)
+public sealed class AdminUseCases(IFamilyRepository families, ImageUseCases images, IUnitOfWork unitOfWork, TimeProvider time)
 {
     /// <summary>Invites a parent into an existing family, or into a new family when <paramref name="familyId"/> is null.</summary>
     public async Task<Result<InvitationCreated>> CreateInvitationAsync(Guid? familyId, string? newFamilyName)
@@ -30,6 +30,12 @@ public sealed class AdminUseCases(IFamilyRepository families, IUnitOfWork unitOf
             return AppError.Invalid(ErrorCodes.FamilyIsOwn);
         }
 
-        return await families.DeleteAsync(familyId) ? Result.Ok() : AppError.NotFound(ErrorCodes.FamilyNotFound);
+        if (!await families.DeleteAsync(familyId))
+        {
+            return AppError.NotFound(ErrorCodes.FamilyNotFound);
+        }
+
+        await images.RemoveUnusedAsync();
+        return Result.Ok();
     }
 }

@@ -56,6 +56,7 @@ python3 tools/validate_quizzes.py my-quiz.json
 | `points` | no | maximum points of the exercise (see grading) |
 | `explanation` | no | shown after grading, e.g. a mnemonic |
 | `solutionText` | no | text for "show solutions"; without it the app builds one |
+| `image` | no | a picture the whole exercise refers to, e.g. a map or a diagram (see [Pictures](#pictures)) |
 
 ## Exercise types
 
@@ -93,6 +94,8 @@ Every row gets one of the `options` via a drop-down. An option may fit several r
 }
 ```
 
+Each row may have an `image`, e.g. a plant to name.
+
 ### `ordering`: put steps in order
 
 List the `steps` in the **correct** order (2–12). The app shuffles them, and the child taps them in order. A step counts as correct when it is in its position.
@@ -110,6 +113,8 @@ List the `steps` in the **correct** order (2–12). The app shuffles them, and t
     { "text": "Getreide wird im Frühling geerntet.", "isTrue": false, "explanation": "Geerntet wird im Sommer." }
   ] }
 ```
+
+Each statement may have an `image`.
 
 ### `freeText`: type the answers
 
@@ -134,6 +139,48 @@ Each field may have a `label`, e.g. `"Hauptstadt von Bayern:"`.
   ] }
 ```
 
+Each question may have an `image`. An option is either a text or a **picture answer**: an object with an `image` and an optional `text` under it. Text and picture options can be mixed; the solution names a picture option by its `text`, or else by its `alt`.
+
+```json
+{ "text": "Welche Form ist ein Dreieck?",
+  "options": [
+    { "image": { "src": "shapes/circle.svg", "alt": "Ein Kreis" } },
+    { "image": { "src": "shapes/triangle.svg", "alt": "Ein Dreieck" }, "text": "Dreieck" }
+  ],
+  "correct": 1 }
+```
+
+## Pictures
+
+[`quizzes/other/showcase-pictures.json`](../quizzes/other/showcase-pictures.json) uses a picture in every place the format allows: on an exercise, on a `matching` row, on a `trueFalse` statement, on a `multipleChoice` question and as picture answers. Its pictures are in the folder next to it.
+
+Pictures are files uploaded **together with the JSON**: the JSON names each one in an `image` object, and the parent uploads the JSON with its pictures, either as a `.zip` or by picking all files at once. Without pictures, a file stays exactly as before.
+
+```json
+"image": { "src": "plants/rose.jpg", "alt": "Eine rote Rose", "caption": "Die Rose", "credit": "Wikimedia Commons, CC0" }
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `src` | yes | Path of the picture relative to the JSON file, e.g. `plants/rose.jpg`. No URLs, no leading `/`, no `..`; letters, digits, umlauts, `-`, `_`, `.`, spaces and `/` |
+| `alt` | yes | What the picture shows, in the content language (at most 200 characters). Screen readers read it, and the app shows it when the picture is missing |
+| `caption` | no | Text under the picture |
+| `credit` | no | Source and licence, shown small under the picture. Fill it in for pictures from the internet (e.g. Wikimedia Commons) |
+
+How the upload finds the files:
+
+- **Zip:** exactly one `.json` file; `src` is relative to its folder. Folders such as `__MACOSX` are ignored; paths with `..` are refused.
+- **Several files picked at once:** the browser sends file names without folders, so `plants/rose.jpg` also matches a file named `rose.jpg` (as long as only one file has that name).
+- **API:** `POST` the raw JSON as before, a zip with `Content-Type: application/zip`, or a `multipart/form-data` form with the files.
+
+Rules:
+
+- Formats: PNG, JPEG, GIF, WebP and SVG, recognised by the file's content, not its name. An SVG is cleaned on upload: only drawing elements stay, and scripts, event handlers, embedded HTML and links to anything outside the file are removed.
+- At most 2 MB per picture and 20 MB for all pictures of one file together; at most 100 files per upload. The parents' page shrinks large photos (longest side 1600 px) before uploading, which also removes their metadata such as the GPS position.
+- A picture used several times is uploaded and stored once.
+- Issues: `missingImage` (no file for a `src`), `imageType` (not one of the formats), `imageTooLarge`, `imagesTooLarge`.
+- Downloading a file with pictures (`GET …/{id}/zip`) gives a zip in the same layout, ready to change and upload again.
+
 ## Grading
 
 - Every gap, row, step, statement, field and question is a **part**. Without `points`, every correct part gives 1 point.
@@ -154,4 +201,4 @@ Each field may have a `label`, e.g. `"Hauptstadt von Bayern:"`.
 - Write the content in the child's language and at their level (for Calvin: German, 4th grade).
 - Create the exercises in the order and with the points of the real test, so the practice feels like the test.
 - Give wrong answers an `explanation` where possible; it shows right after grading.
-- Images are not part of v1; they come in a later version as a ZIP upload.
+- Use pictures where the real test has them (maps, diagrams, photos of plants), and always write an `alt` that names what matters for the task.

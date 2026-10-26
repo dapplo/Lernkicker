@@ -1,6 +1,7 @@
 @page "/parents/lessons"
 @inject Api Api
 @inject NavigationManager Navigation
+@inject UploadFiles Files
 
 <PageTitle>@L["Lessons.Title"] · Lernkicker</PageTitle>
 
@@ -11,10 +12,15 @@
 <section class="box">
     <h2>@L["Lessons.Upload"]</h2>
     <p class="hint">@((MarkupString)L["Lessons.UploadHint"].Value)</p>
+    <p class="hint">@L["Upload.PicturesHint"]</p>
     <label class="file">
-        @L["Quizzes.ChooseFile"]
-        <InputFile accept=".json,application/json" OnChange="FileChosen" />
+        @L["Upload.ChooseFiles"]
+        <InputFile multiple accept=".json,application/json,.zip,application/zip,image/*" OnChange="FilesChosen" disabled="@_busy" />
     </label>
+    @if (_shrinking)
+    {
+        <p class="loading-text" role="status">@L["Upload.Shrinking"]</p>
+    }
     <details>
         <summary>@L["Quizzes.OrPaste"]</summary>
         <textarea rows="8" @bind="_json" @bind:event="oninput" spellcheck="false" placeholder='{ "format": "lesson/v1", … }'></textarea>
@@ -78,6 +84,10 @@ else
     private IReadOnlyList<string>? _errors;
     private string? _deleting;
     private bool _busy;
+    private bool _shrinking;
+
+    // The server takes at most 100 files per upload, the JSON included
+    private const int MaxFiles = 100;
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,28 +101,47 @@ else
         }
     }
 
-    private async Task FileChosen(InputFileChangeEventArgs e)
+    private async Task FilesChosen(InputFileChangeEventArgs e)
     {
         _errors = null;
+        if (e.FileCount > MaxFiles)
+        {
+            _errors = [L["Error.upload.tooManyFiles"]];
+            return;
+        }
+
+        MultipartFormDataContent form;
+        _shrinking = true;
         try
         {
-            using var reader = new StreamReader(e.File.OpenReadStream(ApiLimits.LessonMaxBytes));
-            await Upload(await reader.ReadToEndAsync());
+            form = await Files.PrepareAsync(e.GetMultipleFiles(MaxFiles));
         }
-        catch (IOException)
+        catch (FileTooLargeException tooLarge)
         {
-            _errors = [L["Error.lesson.tooLarge"]];
+            _errors = [L["Upload.FileTooLarge", tooLarge.FileName]];
+            return;
+        }
+        finally
+        {
+            _shrinking = false;
+        }
+
+        using (form)
+        {
+            await Upload(() => Api.UploadLesson(form));
         }
     }
 
-    private async Task Upload(string json)
+    private Task Upload(string json) => Upload(() => Api.UploadLesson(json));
+
+    private async Task Upload(Func<Task<LessonOverview>> send)
     {
         _busy = true;
         _uploaded = null;
         _errors = null;
         try
         {
-            _uploaded = await Api.UploadLesson(json);
+            _uploaded = await send();
             _json = "";
             _lessons = await Api.Lessons();
         }

@@ -30,6 +30,9 @@ public static class ApiLimits
     /// <summary>Largest lesson file the server accepts. Equals the domain's LessonLimits.MaxBytes.</summary>
     public const int LessonMaxBytes = 256 * 1024;
 
+    /// <summary>A quiz or lesson upload with its pictures (a zip or several files); the pictures are checked one by one.</summary>
+    public const int UploadMaxBytes = 25 * 1024 * 1024;
+
     /// <summary>A backup zip uploaded on the setup page.</summary>
     public const long BackupMaxBytes = 200 * 1024 * 1024;
 }

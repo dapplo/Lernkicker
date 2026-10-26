@@ -443,6 +443,70 @@ namespace Lernkicker.Persistence.Migrations
                     b.ToTable("Quizzes");
                 });
 
+            modelBuilder.Entity("Lernkicker.Domain.Media.DocumentImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Hash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("StoredLessonId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("StoredQuizId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyId");
+
+                    b.HasIndex("Hash");
+
+                    b.HasIndex("StoredLessonId");
+
+                    b.HasIndex("StoredQuizId");
+
+                    b.ToTable("DocumentImages");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Media.StoredImage", b =>
+                {
+                    b.Property<string>("Hash")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Bytes")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Hash");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("Lernkicker.Domain.Messaging.TelegramLink", b =>
                 {
                     b.Property<Guid>("Id")
@@ -925,6 +989,25 @@ namespace Lernkicker.Persistence.Migrations
                         .HasForeignKey("FamilyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Media.DocumentImage", b =>
+                {
+                    b.HasOne("Lernkicker.Domain.Families.Family", null)
+                        .WithMany()
+                        .HasForeignKey("FamilyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lernkicker.Domain.Lessons.StoredLesson", null)
+                        .WithMany()
+                        .HasForeignKey("StoredLessonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Lernkicker.Domain.Library.StoredQuiz", null)
+                        .WithMany()
+                        .HasForeignKey("StoredQuizId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Lernkicker.Domain.Messaging.TelegramLink", b =>

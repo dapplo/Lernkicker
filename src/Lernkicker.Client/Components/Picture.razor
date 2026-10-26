@@ -1,0 +1,52 @@
+@* A picture of a quiz or lesson with its caption. Tapping it shows it full screen, unless it sits inside a button
+   (a picture answer, a flashcard): then Zoom is off. A missing picture shows its description instead. *@
+@if (Image is { } image)
+{
+    <figure class="picture @Class">
+        @if (image.Url is not { } url)
+        {
+            <div class="picture-missing" role="img" aria-label="@image.Alt">@image.Alt</div>
+        }
+        else if (Zoom)
+        {
+            <button type="button" class="picture-zoom" @onclick="() => _zoomed = true">
+                <img src="@url" alt="@image.Alt" loading="lazy" />
+            </button>
+        }
+        else
+        {
+            <img src="@url" alt="@image.Alt" loading="lazy" />
+        }
+        @if (image.Caption is not null || image.Credit is not null)
+        {
+            <figcaption>
+                @image.Caption
+                @if (image.Credit is { } credit)
+                {
+                    <small>@credit</small>
+                }
+            </figcaption>
+        }
+    </figure>
+    @if (_zoomed && image.Url is { } large)
+    {
+        <div class="picture-overlay" role="dialog" aria-modal="true" aria-label="@image.Alt" @onclick="() => _zoomed = false">
+            <img src="@large" alt="@image.Alt" />
+            <button type="button" class="btn" lang="@UiLanguage.Current">@L["Picture.Close"]</button>
+        </div>
+    }
+}
+
+@code {
+    private bool _zoomed;
+
+    [Parameter]
+    public ImageDto? Image { get; set; }
+
+    [Parameter]
+    public bool Zoom { get; set; } = true;
+
+    /// <summary>Extra CSS class, e.g. "large" for a lesson's picture block.</summary>
+    [Parameter]
+    public string? Class { get; set; }
+}

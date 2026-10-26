@@ -69,8 +69,15 @@ public sealed record LessonAssignmentSummary(
 /// <summary>A lesson as the child sees it in the list.</summary>
 public sealed record ChildLesson(Guid AssignmentId, string Title, string Subject, string? Topic, DateOnly? DueOn, int KnownBlocks, int Blocks);
 
-/// <summary>A lesson to learn, with what the child already marked as known.</summary>
-public sealed record LessonToLearn(Guid AssignmentId, Lesson Lesson, DateOnly? DueOn, IReadOnlyList<string> KnownBlocks);
+/// <summary>
+/// A lesson to learn, with what the child already marked as known. <c>Images</c> maps each picture <c>src</c> to
+/// the hash of the stored picture.
+/// </summary>
+public sealed record LessonToLearn(Guid AssignmentId, Lesson Lesson, DateOnly? DueOn, IReadOnlyList<string> KnownBlocks, IReadOnlyDictionary<string, string> Images)
+{
+    /// <summary>A lesson outside an assignment, for the parents' preview.</summary>
+    public static LessonToLearn Preview(Lesson lesson, IReadOnlyDictionary<string, string> images) => new(Guid.Empty, lesson, null, [], images);
+}
 
 /// <summary>Where a calendar entry comes from.</summary>
 public static class EntrySources

@@ -3,10 +3,11 @@
 
 Usage: python3 tools/validate_quizzes.py [FILE ...]
 Without arguments all quizzes/**/*.json and lessons/**/*.json are checked. The "format" field picks the
-schema. Exit code 1 on errors.
+schema. Pictures named in "src" must exist next to the JSON file (same rules as the upload). Exit code 1 on errors.
 """
 import json
 import sys
+import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -17,6 +18,9 @@ VALIDATORS = {
     for name in ("quiz/v1", "lesson/v1")
 }
 GAP = "___"
+IMAGE_KEYS = ("image", "frontImage", "backImage")
+MAX_IMAGE_BYTES = 2 * 1024 * 1024
+MAX_TOTAL_IMAGE_BYTES = 20 * 1024 * 1024
 
 
 def content_errors(quiz):
@@ -61,6 +65,53 @@ def lesson_errors(lesson):
     return errors
 
 
+def images(node, where=""):
+    """Every picture object with its JSON path (same as Quiz.Images and Lesson.Images)."""
+    if isinstance(node, dict):
+        for key, value in node.items():
+            at = f"{where}/{key}" if where else key
+            if key in IMAGE_KEYS and isinstance(value, dict):
+                yield at, value
+            else:
+                yield from images(value, at)
+    elif isinstance(node, list):
+        for i, value in enumerate(node):
+            yield from images(value, f"{where}/{i}")
+
+
+def is_svg(data):
+    """An SVG document (the upload removes scripts and outside links from it, see SvgSanitizer)."""
+    try:
+        return ElementTree.fromstring(data).tag == "{http://www.w3.org/2000/svg}svg"
+    except ElementTree.ParseError:
+        return False
+
+
+def is_picture(head):
+    """PNG, JPEG, GIF or WebP by the first bytes (same as ImageFormats.Detect)."""
+    return (head.startswith(b"\x89PNG\r\n\x1a\n") or head.startswith(b"\xff\xd8\xff")
+            or head[:6] in (b"GIF87a", b"GIF89a") or (head[:4] == b"RIFF" and head[8:12] == b"WEBP"))
+
+
+def image_errors(document, folder):
+    errors = []
+    total = 0
+    for where, image in images(document):
+        file = folder / image["src"]
+        if not file.is_file():
+            errors.append(f"{where}/src: file '{image['src']}' not found next to the JSON file")
+            continue
+        data = file.read_bytes()
+        total += len(data)
+        if not is_picture(data[:12]) and not is_svg(data):
+            errors.append(f"{where}/src: '{image['src']}' is not a PNG, JPEG, GIF, WebP or SVG picture")
+        if len(data) > MAX_IMAGE_BYTES:
+            errors.append(f"{where}/src: '{image['src']}' is larger than 2 MB")
+    if total > MAX_TOTAL_IMAGE_BYTES:
+        errors.append("pictures together are larger than 20 MB")
+    return errors
+
+
 def check(path):
     try:
         document = json.loads(path.read_text(encoding="utf-8"))
@@ -75,7 +126,10 @@ def check(path):
         for e in sorted(validator.iter_errors(document), key=lambda e: list(map(str, e.absolute_path)))
     ]
     # Content rules only make sense once the structure is valid
-    return errors or (content_errors(document) if kind == "quiz/v1" else lesson_errors(document))
+    if errors:
+        return errors
+    rules = content_errors(document) if kind == "quiz/v1" else lesson_errors(document)
+    return rules + image_errors(document, path.parent)
 
 
 def main(args):

@@ -4,6 +4,7 @@ using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
 using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
+using Lernkicker.Domain.Media;
 using Lernkicker.Domain.Messaging;
 using Lernkicker.Domain.Practice;
 using Lernkicker.Domain.Settings;
@@ -230,6 +231,47 @@ internal sealed class LessonRepository(LernkickerDbContext db) : ILessonReposito
 
     public Task<StoredLesson?> FindSharedAnyFamilyAsync(Guid storedLessonId) =>
         db.Lessons.IgnoreQueryFilters().SingleOrDefaultAsync(l => l.Id == storedLessonId && l.SharedAt != null);
+}
+
+internal sealed class ImageStore(LernkickerDbContext db) : IImageStore
+{
+    public Task<bool> ExistsAsync(string hash) => db.Images.AnyAsync(i => i.Hash == hash);
+
+    public void Add(StoredImage image) => db.Images.Add(image);
+
+    public Task<StoredImage?> FindAsync(string hash) => db.Images.SingleOrDefaultAsync(i => i.Hash == hash);
+
+    public void Add(DocumentImage image) => db.DocumentImages.Add(image);
+
+    public void Remove(DocumentImage image) => db.DocumentImages.Remove(image);
+
+    public async Task<IReadOnlyList<DocumentImage>> ForQuizAsync(Guid storedQuizId) =>
+        await db.DocumentImages.Where(i => i.StoredQuizId == storedQuizId).ToListAsync();
+
+    public async Task<IReadOnlyList<DocumentImage>> ForLessonAsync(Guid storedLessonId) =>
+        await db.DocumentImages.Where(i => i.StoredLessonId == storedLessonId).ToListAsync();
+
+    public async Task<IReadOnlyList<DocumentImage>> ForQuizAnyFamilyAsync(Guid storedQuizId) =>
+        await db.DocumentImages.IgnoreQueryFilters().Where(i => i.StoredQuizId == storedQuizId).ToListAsync();
+
+    public async Task<IReadOnlyList<DocumentImage>> ForLessonAnyFamilyAsync(Guid storedLessonId) =>
+        await db.DocumentImages.IgnoreQueryFilters().Where(i => i.StoredLessonId == storedLessonId).ToListAsync();
+
+    public async Task<bool> IsVisibleAsync(string hash)
+    {
+        if (await db.DocumentImages.AnyAsync(i => i.Hash == hash))
+        {
+            return true;
+        }
+
+        var sharedQuizzes = db.Quizzes.IgnoreQueryFilters().Where(q => q.SharedAt != null && !q.Archived).Select(q => (Guid?)q.Id);
+        var sharedLessons = db.Lessons.IgnoreQueryFilters().Where(l => l.SharedAt != null).Select(l => (Guid?)l.Id);
+        return await db.DocumentImages.IgnoreQueryFilters().AnyAsync(i =>
+            i.Hash == hash && (sharedQuizzes.Contains(i.StoredQuizId) || sharedLessons.Contains(i.StoredLessonId)));
+    }
+
+    public Task RemoveUnusedAsync() =>
+        db.Images.Where(i => !db.DocumentImages.IgnoreQueryFilters().Any(d => d.Hash == i.Hash)).ExecuteDeleteAsync();
 }
 
 internal sealed class TelegramRepository(LernkickerDbContext db) : ITelegramRepository

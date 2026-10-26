@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Json.Schema;
 using Lernkicker.Application.Ports;
+using Lernkicker.Domain.Media;
 using Lernkicker.Domain.Quizzes;
 
 namespace Lernkicker.QuizFormat;
@@ -60,6 +61,7 @@ public sealed class QuizJson : IQuizFormat
             AllowOutOfOrderMetadataProperties = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             TypeInfoResolver = resolver,
+            Converters = { new ChoiceOptionConverter() },
         };
     }
 
@@ -120,4 +122,33 @@ public sealed class IndexListConverter : JsonConverter<IReadOnlyList<int>>
             JsonSerializer.Serialize(writer, value, options);
         }
     }
+}
+
+/// <summary>Reads a multiple-choice option as a plain text or as an object with a picture (and optionally a text).</summary>
+public sealed class ChoiceOptionConverter : JsonConverter<ChoiceOption>
+{
+    public override ChoiceOption Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            return new ChoiceOption(reader.GetString());
+        }
+
+        var option = JsonSerializer.Deserialize<PictureOption>(ref reader, options) ?? throw new JsonException("Empty option.");
+        return new ChoiceOption(option.Text, option.Image);
+    }
+
+    public override void Write(Utf8JsonWriter writer, ChoiceOption value, JsonSerializerOptions options)
+    {
+        if (value.Image is null)
+        {
+            writer.WriteStringValue(value.Text);
+        }
+        else
+        {
+            JsonSerializer.Serialize(writer, new PictureOption(value.Text, value.Image), options);
+        }
+    }
+
+    private sealed record PictureOption(string? Text, ImageRef? Image);
 }

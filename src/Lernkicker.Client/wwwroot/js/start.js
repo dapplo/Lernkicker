@@ -33,6 +33,25 @@
             }
             location.reload();
         },
+
+        // Scales a photo down to maxSide pixels and re-encodes it as JPEG (which drops EXIF data such as GPS).
+        // Transparent parts become white. Returns the original bytes when the picture is small enough already.
+        async shrinkImage(bytes, type, maxSide) {
+            const bitmap = await createImageBitmap(new Blob([bytes], { type }));
+            const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(bitmap.width * scale);
+            canvas.height = Math.round(bitmap.height * scale);
+            const context = canvas.getContext('2d');
+            context.fillStyle = '#fff';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+            bitmap.close();
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+            const shrunk = new Uint8Array(await blob.arrayBuffer());
+            return shrunk.length < bytes.length ? shrunk : bytes;
+        },
+
         scrollIntoView(element) {
             element?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         },

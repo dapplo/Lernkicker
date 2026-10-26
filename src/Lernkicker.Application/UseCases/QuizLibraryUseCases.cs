@@ -6,7 +6,8 @@ using Lernkicker.Domain.Quizzes;
 namespace Lernkicker.Application.UseCases;
 
 /// <summary>A family's library of quizzes: upload (new version per id), list, read, preview, share, delete.</summary>
-public sealed class QuizLibraryUseCases(IQuizLibrary library, IPracticeRepository practice, IQuizFormat format, IUnitOfWork unitOfWork, TimeProvider time)
+public sealed class QuizLibraryUseCases(
+    IQuizLibrary library, IPracticeRepository practice, IQuizFormat format, ImageUseCases images, IUnitOfWork unitOfWork, TimeProvider time)
 {
     public async Task<IReadOnlyList<QuizSummary>> ListAsync() =>
         (await library.ListCurrentAsync())
@@ -14,7 +15,8 @@ public sealed class QuizLibraryUseCases(IQuizLibrary library, IPracticeRepositor
             .Select(QuizSummary.From)
             .ToList();
 
-    public async Task<Result<QuizSummary>> UploadAsync(Guid familyId, string json)
+    /// <summary>Adds a quiz version; <paramref name="files"/> are the pictures uploaded with it.</summary>
+    public async Task<Result<QuizSummary>> UploadAsync(Guid familyId, string json, IReadOnlyList<UploadedFile>? files = null)
     {
         if (Encoding.UTF8.GetByteCount(json) > QuizLimits.MaxBytes)
         {
@@ -28,9 +30,16 @@ public sealed class QuizLibraryUseCases(IQuizLibrary library, IPracticeRepositor
         }
 
         var quiz = parsed.Quiz!;
+        var (attached, imageIssues) = images.Attach(quiz.Images(), files ?? []);
+        if (imageIssues.Count > 0)
+        {
+            return AppError.Invalid(ErrorCodes.QuizInvalid, imageIssues);
+        }
+
         var previous = await library.VersionsAsync(quiz.Id);
         var stored = StoredQuiz.Create(familyId, quiz, json, previous.Count == 0 ? 1 : previous.Max(q => q.Version) + 1, time.GetUtcNow());
         library.Add(stored);
+        await images.AttachToQuizAsync(familyId, stored.Id, attached);
 
         // Open assignments move to the new version; results stay with the version they were made on.
         var assignments = await practice.AssignmentsForQuizzesAsync(previous.Select(q => q.Id).ToList());
@@ -61,9 +70,17 @@ public sealed class QuizLibraryUseCases(IQuizLibrary library, IPracticeRepositor
     public async Task<Result<string>> SourceAsync(string quizId) =>
         await library.FindCurrentAsync(quizId) is { } quiz ? quiz.Source : AppError.NotFound(ErrorCodes.QuizNotFound);
 
+    /// <summary>The current version's file with its pictures, to download it as a zip.</summary>
+    public async Task<Result<DocumentPackage>> PackageAsync(string quizId) =>
+        await library.FindCurrentAsync(quizId) is { } quiz
+            ? new DocumentPackage(quiz.QuizId, quiz.Source, await images.QuizFilesAsync(quiz.Id))
+            : AppError.NotFound(ErrorCodes.QuizNotFound);
+
     /// <summary>The current version as a child sees it, so parents know what they assign or share.</summary>
     public async Task<Result<QuizSheet>> PreviewAsync(string quizId, Random random) =>
-        await library.FindCurrentAsync(quizId) is { } quiz ? QuizSheet.For(format.Read(quiz.Source), random) : AppError.NotFound(ErrorCodes.QuizNotFound);
+        await library.FindCurrentAsync(quizId) is { } quiz
+            ? QuizSheet.For(format.Read(quiz.Source), random) with { Images = await images.ForQuizAsync(quiz.Id) }
+            : AppError.NotFound(ErrorCodes.QuizNotFound);
 
     /// <summary>Shares the quiz with all families on this server, or makes it private again (copies stay).</summary>
     public async Task<Result<QuizSummary>> SetSharedAsync(string quizId, bool shared)
@@ -116,6 +133,7 @@ public sealed class QuizLibraryUseCases(IQuizLibrary library, IPracticeRepositor
         }
 
         await unitOfWork.SaveChangesAsync();
+        await images.RemoveUnusedAsync();
         return new QuizDeleted(hasResults);
     }
 }

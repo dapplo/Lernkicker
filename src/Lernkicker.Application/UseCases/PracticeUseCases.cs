@@ -6,7 +6,7 @@ namespace Lernkicker.Application.UseCases;
 
 /// <summary>A logged-in child practising: assigned quizzes, the sheet without solutions, handing in answers.</summary>
 public sealed class PracticeUseCases(
-    IPracticeRepository practice, IQuizLibrary library, IQuizFormat format, IChildRepository children, TelegramUseCases telegram, IUnitOfWork unitOfWork, TimeProvider time)
+    IPracticeRepository practice, IQuizLibrary library, IQuizFormat format, ImageUseCases images, IChildRepository children, TelegramUseCases telegram, IUnitOfWork unitOfWork, TimeProvider time)
 {
     public async Task<IReadOnlyList<ChildAssignment>> AssignmentsAsync(Guid childId)
     {
@@ -28,7 +28,9 @@ public sealed class PracticeUseCases(
     public async Task<Result<QuizSheet>> SheetAsync(Guid childId, Guid assignmentId, Random random)
     {
         var quiz = await QuizAsync(childId, assignmentId);
-        return quiz is null ? AppError.NotFound() : QuizSheet.For(quiz.Value.Quiz, random);
+        return quiz is { } found
+            ? QuizSheet.For(found.Quiz, random) with { Images = await images.ForQuizAsync(found.Assignment.StoredQuizId) }
+            : AppError.NotFound();
     }
 
     public async Task<Result<QuizResult>> SubmitAsync(Guid childId, Guid assignmentId, IReadOnlyDictionary<string, ExerciseAnswer> answers, string channel)

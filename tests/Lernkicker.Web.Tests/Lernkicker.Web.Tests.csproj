@@ -24,6 +24,9 @@
     <Compile Include="..\Shared\Examples.cs" Link="Examples.cs" />
     <None Include="..\..\quizzes\**\*.json" LinkBase="quizzes" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\lessons\**\*.json" LinkBase="lessons" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The pictures of the examples with pictures -->
+    <None Include="..\..\quizzes\**\*.svg;..\..\quizzes\**\*.png" LinkBase="quizzes" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\lessons\**\*.svg;..\..\lessons\**\*.png" LinkBase="lessons" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\schema\quiz-v1.schema.json" Link="quiz-v1.schema.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\schema\lesson-v1.schema.json" Link="lesson-v1.schema.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

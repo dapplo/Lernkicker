@@ -74,6 +74,9 @@ public sealed class Api(HttpClient http)
         return await Read<QuizOverview>(await http.PostAsync("api/quizzes", content));
     }
 
+    /// <summary>A quiz with its pictures, or a zip (see <see cref="UploadFiles"/>).</summary>
+    public async Task<QuizOverview> UploadQuiz(HttpContent files) => await Read<QuizOverview>(await http.PostAsync("api/quizzes", files));
+
     public Task<QuizOverview> ShareQuiz(string quizId, bool shared) => Send<QuizOverview>(HttpMethod.Put, $"api/quizzes/{Uri.EscapeDataString(quizId)}/shared", new ShareRequest(shared));
     public Task<SheetDto> QuizPreview(string quizId) => Get<SheetDto>($"api/quizzes/{Uri.EscapeDataString(quizId)}/preview");
 
@@ -87,6 +90,9 @@ public sealed class Api(HttpClient http)
         using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         return await Read<LessonOverview>(await http.PostAsync("api/lessons", content));
     }
+
+    /// <summary>A lesson with its pictures, or a zip (see <see cref="UploadFiles"/>).</summary>
+    public async Task<LessonOverview> UploadLesson(HttpContent files) => await Read<LessonOverview>(await http.PostAsync("api/lessons", files));
 
     public Task<LessonOverview> ShareLesson(string lessonId, bool shared) => Send<LessonOverview>(HttpMethod.Put, $"api/lessons/{Uri.EscapeDataString(lessonId)}/shared", new ShareRequest(shared));
     public Task<LessonDto> LessonPreview(string lessonId) => Get<LessonDto>($"api/lessons/{Uri.EscapeDataString(lessonId)}/preview");

@@ -58,7 +58,8 @@
         "hint": { "$ref": "#/$defs/text" },
         "points": { "type": "integer", "minimum": 1, "maximum": 50, "description": "Maximum points. Without it, every gap, row or question gives 1 point." },
         "explanation": { "$ref": "#/$defs/text", "description": "Shown after grading." },
-        "solutionText": { "$ref": "#/$defs/text", "description": "Optional text for 'show solutions'. Without it, the app builds one." }
+        "solutionText": { "$ref": "#/$defs/text", "description": "Optional text for 'show solutions'. Without it, the app builds one." },
+        "image": { "$ref": "#/$defs/image", "description": "A picture the whole exercise refers to, e.g. a map or a diagram." }
       }
     },
     "exercise": {
@@ -81,7 +82,7 @@
       "description": "Gap text. Every ___ in text is a gap; gaps[i] belongs to the i-th gap.",
       "required": ["text", "gaps"],
       "properties": {
-        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
         "text": { "type": "string", "minLength": 1, "maxLength": 2000, "pattern": "___" },
         "wordBank": {
           "description": "If present, gaps are shown as drop-downs with these words. Otherwise as text inputs.",
@@ -98,13 +99,13 @@
       "description": "Every row gets one of the options via a drop-down. An option may fit several rows.",
       "required": ["options", "rows"],
       "properties": {
-        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
         "options": { "type": "array", "minItems": 2, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
         "rows": {
           "type": "array", "minItems": 1,
           "items": {
             "type": "object", "required": ["text", "answer"], "additionalProperties": false,
-            "properties": { "text": { "$ref": "#/$defs/text" }, "answer": { "type": "string" }, "explanation": { "$ref": "#/$defs/text" } }
+            "properties": { "text": { "$ref": "#/$defs/text" }, "answer": { "type": "string" }, "explanation": { "$ref": "#/$defs/text" }, "image": { "$ref": "#/$defs/image" } }
           }
         }
       },
@@ -114,7 +115,7 @@
       "description": "Steps in the CORRECT order; the app shuffles them.",
       "required": ["steps"],
       "properties": {
-        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
         "steps": { "type": "array", "minItems": 2, "maxItems": 12, "items": { "type": "string", "minLength": 1, "maxLength": 120 } }
       },
       "additionalProperties": false
@@ -122,12 +123,12 @@
     "trueFalse": {
       "required": ["statements"],
       "properties": {
-        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
         "statements": {
           "type": "array", "minItems": 1,
           "items": {
             "type": "object", "required": ["text", "isTrue"], "additionalProperties": false,
-            "properties": { "text": { "$ref": "#/$defs/text" }, "isTrue": { "type": "boolean" }, "explanation": { "$ref": "#/$defs/text" } }
+            "properties": { "text": { "$ref": "#/$defs/text" }, "isTrue": { "type": "boolean" }, "explanation": { "$ref": "#/$defs/text" }, "image": { "$ref": "#/$defs/image" } }
           }
         }
       },
@@ -137,7 +138,7 @@
       "description": "Text inputs. With anyOrder, every correct answer may be in any field, but each counts only once.",
       "required": ["fields"],
       "properties": {
-        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
         "anyOrder": { "type": "boolean", "default": false },
         "fields": {
           "type": "array", "minItems": 1, "maxItems": 20,
@@ -153,26 +154,51 @@
       "description": "correct is the index (from 0) of the correct option, or a list of indices when several are correct.",
       "required": ["questions"],
       "properties": {
-        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true,
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
         "questions": {
           "type": "array", "minItems": 1,
           "items": {
             "type": "object", "required": ["text", "options", "correct"], "additionalProperties": false,
             "properties": {
               "text": { "$ref": "#/$defs/text" },
-              "options": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "string", "minLength": 1, "maxLength": 200 } },
+              "options": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "$ref": "#/$defs/choiceOption" } },
               "correct": {
                 "oneOf": [
                   { "type": "integer", "minimum": 0 },
                   { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } }
                 ]
               },
-              "explanation": { "$ref": "#/$defs/text" }
+              "explanation": { "$ref": "#/$defs/text" },
+              "image": { "$ref": "#/$defs/image", "description": "A picture the question is about." }
             }
           }
         }
       },
       "additionalProperties": false
+    },
+    "choiceOption": {
+      "description": "An option: a text, or a picture with an optional text under it.",
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 200 },
+        {
+          "type": "object", "required": ["image"], "additionalProperties": false,
+          "properties": { "text": { "type": "string", "minLength": 1, "maxLength": 200 }, "image": { "$ref": "#/$defs/image" } }
+        }
+      ]
+    },
+    "image": {
+      "description": "A picture uploaded together with the JSON. src is the file's path relative to the JSON file; PNG, JPEG, GIF, WebP and SVG are accepted (SVG without scripts or outside links).",
+      "type": "object", "required": ["src", "alt"], "additionalProperties": false,
+      "properties": {
+        "src": {
+          "type": "string", "minLength": 1, "maxLength": 200,
+          "pattern": "^[A-Za-z0-9ÄÖÜäöüß_-][A-Za-z0-9ÄÖÜäöüß_. -]*(/[A-Za-z0-9ÄÖÜäöüß_-][A-Za-z0-9ÄÖÜäöüß_. -]*)*$",
+          "description": "Relative path of the picture file, e.g. 'plants/rose.jpg'. No URLs, no leading '/', no '..'."
+        },
+        "alt": { "type": "string", "minLength": 1, "maxLength": 200, "description": "What the picture shows, in the content language. Read by screen readers and shown when the picture is missing." },
+        "caption": { "type": "string", "minLength": 1, "maxLength": 300, "description": "Text under the picture." },
+        "credit": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Source and licence, e.g. 'Wikimedia Commons, CC0'." }
+      }
     }
   }
 }

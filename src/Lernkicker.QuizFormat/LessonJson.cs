@@ -74,6 +74,7 @@ public sealed class LessonJson : ILessonFormat
                 new JsonDerivedType(typeof(PoemBlock), "poem"),
                 new JsonDerivedType(typeof(FlashcardsBlock), "flashcards"),
                 new JsonDerivedType(typeof(FactsBlock), "facts"),
+                new JsonDerivedType(typeof(ImageBlock), "image"),
             },
         };
     }

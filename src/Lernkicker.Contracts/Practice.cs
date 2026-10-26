@@ -6,7 +6,7 @@ namespace Lernkicker.Contracts;
 public sealed record SheetDto(
     string Id, string Title, string Subject, int GradeLevel, string Language, string? Topic, int? DurationMinutes, int MaxPoints, IReadOnlyList<ExerciseSheetDto> Exercises);
 
-public sealed record SheetItemDto(int Index, string Text);
+public sealed record SheetItemDto(int Index, string Text, ImageDto? Image = null);
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(ClozeSheetDto), "cloze")]
@@ -15,7 +15,10 @@ public sealed record SheetItemDto(int Index, string Text);
 [JsonDerivedType(typeof(TrueFalseSheetDto), "trueFalse")]
 [JsonDerivedType(typeof(FreeTextSheetDto), "freeText")]
 [JsonDerivedType(typeof(MultipleChoiceSheetDto), "multipleChoice")]
-public abstract record ExerciseSheetDto(string Id, string Instruction, string? Hint, int MaxPoints);
+public abstract record ExerciseSheetDto(string Id, string Instruction, string? Hint, int MaxPoints)
+{
+    public ImageDto? Image { get; init; }
+}
 
 /// <summary>Gap i sits between Segments[i] and Segments[i + 1].</summary>
 public sealed record ClozeSheetDto(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<string> Segments, IReadOnlyList<string>? WordBank)
@@ -36,7 +39,8 @@ public sealed record FreeTextSheetDto(string Id, string Instruction, string? Hin
 public sealed record MultipleChoiceSheetDto(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<QuestionSheetDto> Questions)
     : ExerciseSheetDto(Id, Instruction, Hint, MaxPoints);
 
-public sealed record QuestionSheetDto(int Index, string Text, IReadOnlyList<SheetItemDto> Options, bool MultipleAnswers);
+/// <summary>An option's <c>Text</c> is empty when the option is a picture alone.</summary>
+public sealed record QuestionSheetDto(int Index, string Text, IReadOnlyList<SheetItemDto> Options, bool MultipleAnswers, ImageDto? Image = null);
 
 /// <summary>A child's answer to one exercise; all indices refer to the original order (see <see cref="SheetItemDto.Index"/>).</summary>
 public sealed record AnswerDto
