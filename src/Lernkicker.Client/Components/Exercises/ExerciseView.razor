@@ -143,7 +143,7 @@
             <p class="hint" lang="@UiLanguage.Current">@L["Exercise.WordSearchHow"]</p>
             <div class="letter-board size-@size">
                 @* Marker lines behind the letters: one cell is one unit, so a cell's centre is (column + 0.5, row + 0.5) *@
-                <svg class="marks" viewBox="0 0 @size @size" preserveAspectRatio="none" aria-hidden="true">
+                <svg class="found-marks" viewBox="0 0 @size @size" preserveAspectRatio="none" aria-hidden="true">
                     @foreach (var (word, line) in Draft.Found)
                     {
                         <g class="mark color-@(word % 6)">
