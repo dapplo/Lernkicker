@@ -1,0 +1,197 @@
+@* Mau-Mau for two to five: the others' hands show only as card backs, the own hand lies open. Tap a card that fits
+   to play it; a jack asks for the suit to wish for. Who cannot or will not play draws a card, then plays it or
+   passes. The server deals, keeps the deck secret and checks every move. *@
+
+<ul class="mau-players">
+    @foreach (var player in Players.OrderBy(p => p.Seat))
+    {
+        var seat = player.Seat;
+        var count = seat < View.HandSizes.Count ? View.HandSizes[seat] : 0;
+        var gone = View.Out.Contains(seat);
+        <li class="@(seat == View.Turn && !View.Over ? "turn" : "") @(gone ? "out" : "") @(seat == MySeat ? "me" : "")">
+            <b>@(seat == MySeat ? L["Play.You"] : player.Name)</b>
+            @if (gone)
+            {
+                <small>@L["MauMau.Out"]</small>
+            }
+            else
+            {
+                <span class="backs" aria-label="@L["MauMau.Cards", count]">
+                    @for (var i = 0; i < Math.Min(count, 8); i++)
+                    {
+                        <span class="back" aria-hidden="true"></span>
+                    }
+                    <small aria-hidden="true">@count</small>
+                </span>
+            }
+        </li>
+    }
+</ul>
+
+@if (View.Last is { } last)
+{
+    <p class="mau-last" aria-live="polite">@LastText(last)</p>
+}
+
+<div class="mau-table">
+    <button type="button" class="mau-card back deck" disabled="@(Busy || !MyTurn || View.CanPass)" @onclick="Draw"
+            aria-label="@(View.PendingDraw > 0 ? L["MauMau.DrawMany", View.PendingDraw] : L["MauMau.Draw"])">
+        <small>@View.DeckSize</small>
+    </button>
+    <span class="mau-card @SuitClass(View.Top)" role="img" aria-label="@CardName(View.Top)">@Face(View.Top)</span>
+    @if (View.Suit is { } wished)
+    {
+        <span class="mau-wish @SuitClass(wished)">@L["MauMau.Wished"] <b>@Symbol(wished)</b></span>
+    }
+</div>
+
+<p class="game-how">
+    @if (View.Over)
+    {
+        @L["MauMau.Over"]
+    }
+    else if (!MyTurn)
+    {
+        @L["MauMau.TheirTurn", NameOf(View.Turn)]
+    }
+    else if (_jack is not null)
+    {
+        @L["MauMau.WishSuit"]
+    }
+    else if (View.PendingDraw > 0)
+    {
+        @L["MauMau.Sevens", View.PendingDraw]
+    }
+    else if (View.CanPass)
+    {
+        @(View.Playable.Count > 0 ? L["MauMau.PlayDrawnOrPass"] : L["MauMau.Pass"])
+    }
+    else
+    {
+        @L["MauMau.YourTurn"]
+    }
+</p>
+
+@if (_jack is not null)
+{
+    <div class="buttons mau-suits">
+        @foreach (var suit in Suits)
+        {
+            <button type="button" class="btn quiet @SuitClass(suit)" disabled="@Busy" @onclick="() => Play(_jack, suit)">
+                <span class="suit-symbol" aria-hidden="true">@Symbol(suit)</span> @L[$"MauMau.Suit.{suit}"]
+            </button>
+        }
+        <button type="button" class="btn quiet" @onclick="() => _jack = null">@L["Common.Cancel"]</button>
+    </div>
+}
+else if (MyTurn && (View.CanPass || View.PendingDraw > 0))
+{
+    <div class="buttons">
+        @if (View.PendingDraw > 0)
+        {
+            <button type="button" class="btn" disabled="@Busy" @onclick="Draw">@L["MauMau.DrawMany", View.PendingDraw]</button>
+        }
+        @if (View.CanPass)
+        {
+            <button type="button" class="btn" disabled="@Busy" @onclick="Pass">@L["MauMau.PassButton"]</button>
+        }
+    </div>
+}
+
+<div class="mau-hand" aria-label="@L["MauMau.MyHand"]">
+    @foreach (var card in View.Hand)
+    {
+        var playable = MyTurn && View.Playable.Contains(card);
+        <button type="button" class="mau-card @SuitClass(card) @(playable ? "playable" : "") @(card == View.Drawn ? "drawn" : "")"
+                aria-label="@CardName(card)" disabled="@(Busy || !playable)" @onclick="() => Tap(card)">@Face(card)</button>
+    }
+</div>
+
+@code {
+    private static readonly string[] Suits = ["C", "S", "H", "D"];
+    private string? _jack;
+
+    [Parameter, EditorRequired]
+    public required MauMauViewDto View { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<SeatDto> Players { get; set; }
+
+    [Parameter]
+    public int MySeat { get; set; }
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public EventCallback<MoveDto> Move { get; set; }
+
+    private bool MyTurn => !View.Over && View.Turn == MySeat;
+
+    protected override void OnParametersSet()
+    {
+        if (!MyTurn)
+        {
+            _jack = null;
+        }
+    }
+
+    private string NameOf(int seat) => seat == MySeat ? L["Play.You"] : Players.FirstOrDefault(p => p.Seat == seat)?.Name ?? "?";
+
+    private static string Symbol(string suit) => suit switch
+    {
+        "C" => "♣",
+        "S" => "♠",
+        "H" => "♥",
+        _ => "♦",
+    };
+
+    private static string SuitClass(string card) => card[..1] is "H" or "D" ? "red" : "black";
+
+    private string Rank(string card) => L[$"MauMau.Rank.{card[1..]}"];
+
+    /// <summary>The corner of a card: suit symbol and rank, e.g. "♥ 10".</summary>
+    private RenderFragment Face(string card) => builder =>
+    {
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", "suit-symbol");
+        builder.AddContent(2, Symbol(card[..1]));
+        builder.CloseElement();
+        builder.OpenElement(3, "span");
+        builder.AddAttribute(4, "class", "rank");
+        builder.AddContent(5, Rank(card));
+        builder.CloseElement();
+    };
+
+    private string CardName(string card) => L["MauMau.CardName", L[$"MauMau.Suit.{card[..1]}"], L[$"MauMau.RankName.{card[1..]}"]];
+
+    private string LastText(MauMauActionDto last) => last.Kind switch
+    {
+        "play" when last.Suit is { } suit => L["MauMau.Did.Jack", NameOf(last.Seat), CardName(last.Card!), L[$"MauMau.Suit.{suit}"]],
+        "play" => L["MauMau.Did.Play", NameOf(last.Seat), CardName(last.Card!)],
+        "draw" => L["MauMau.Did.Draw", NameOf(last.Seat), last.Count],
+        "pass" => L["MauMau.Did.Pass", NameOf(last.Seat)],
+        _ => L["MauMau.Did.Resign", NameOf(last.Seat)],
+    };
+
+    private Task Tap(string card)
+    {
+        if (card[1..] == "J")
+        {
+            _jack = card;
+            return Task.CompletedTask;
+        }
+
+        return Play(card, null);
+    }
+
+    private Task Play(string card, string? suit)
+    {
+        _jack = null;
+        return Move.InvokeAsync(new MauMauPlayDto(card, suit));
+    }
+
+    private Task Draw() => Move.InvokeAsync(new MauMauDrawDto());
+
+    private Task Pass() => Move.InvokeAsync(new MauMauPassDto());
+}

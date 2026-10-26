@@ -33,8 +33,11 @@ public abstract record GameMove;
 /// <summary>What one player sees of the game.</summary>
 public abstract record GameView;
 
-/// <summary>The outcome of a move: the new state, or why it was refused. <c>Winner</c> ends the game.</summary>
-public sealed record GameStep(string? State, string? Error = null, int? Winner = null)
+/// <summary>
+/// The outcome of a move: the new state, or why it was refused. <c>Over</c> ends the game, won by <c>Winner</c> or
+/// drawn when that is null.
+/// </summary>
+public sealed record GameStep(string? State, string? Error = null, int? Winner = null, bool Over = false)
 {
     public bool IsValid => Error is null;
 
@@ -42,7 +45,10 @@ public sealed record GameStep(string? State, string? Error = null, int? Winner =
 
     public static GameStep Next(string state) => new(state);
 
-    public static GameStep Won(string state, int winner) => new(state, Winner: winner);
+    public static GameStep Won(string state, int winner) => new(state, Winner: winner, Over: true);
+
+    /// <summary>Nobody wins: a full board, or no way left to win.</summary>
+    public static GameStep Drawn(string state) => new(state, Over: true);
 }
 
 /// <summary>Why a move was refused. Codes the UI translates (see Application's ErrorCodes).</summary>
@@ -52,6 +58,11 @@ public static class GameErrors
     public const string MoveInvalid = "play.moveInvalid";
     public const string FleetInvalid = "battleship.fleetInvalid";
     public const string ShotInvalid = "battleship.shotInvalid";
+    public const string ColumnFull = "connectFour.columnFull";
+    public const string MustCapture = "checkers.mustCapture";
+    public const string CardNotPlayable = "mauMau.cardNotPlayable";
+    public const string MustDraw = "mauMau.mustDraw";
+    public const string ChessMoveInvalid = "chess.moveInvalid";
 }
 
 public static class MatchStatus
@@ -79,6 +90,8 @@ public sealed class MatchPlayer
         ChildId = childId;
         FamilyId = familyId;
     }
+
+    internal void MoveTo(int seat) => Seat = seat;
 }
 
 /// <summary>
@@ -154,9 +167,37 @@ public sealed class Match
         UpdatedAt = now;
         if (IsFull)
         {
-            State = rules.Start(Seats, random);
-            Status = MatchStatus.Playing;
+            Begin(rules, random);
         }
+    }
+
+    /// <summary>Whether the host may start before every seat is taken (games for more than two).</summary>
+    public bool CanStartEarly(IGameRules rules) => Status == MatchStatus.Waiting && _players.Count >= rules.MinPlayers;
+
+    /// <summary>The host starts with the players at the table; the empty seats go away.</summary>
+    public void StartEarly(IGameRules rules, Random random, DateTimeOffset now)
+    {
+        if (!CanStartEarly(rules))
+        {
+            throw new InvalidOperationException("Not enough players.");
+        }
+
+        // The rules number seats without gaps; a player who left before the start leaves one
+        var seat = 0;
+        foreach (var player in _players.OrderBy(p => p.Seat).ToList())
+        {
+            player.MoveTo(seat++);
+        }
+
+        Seats = _players.Count;
+        UpdatedAt = now;
+        Begin(rules, random);
+    }
+
+    private void Begin(IGameRules rules, Random random)
+    {
+        State = rules.Start(Seats, random);
+        Status = MatchStatus.Playing;
     }
 
     /// <summary>A player leaves a table that has not started. False for the host: the table closes instead.</summary>
@@ -182,9 +223,9 @@ public sealed class Match
 
         State = step.State;
         UpdatedAt = now;
-        if (step.Winner is { } winner)
+        if (step.Over)
         {
-            Winner = winner;
+            Winner = step.Winner;
             Resigned = resignedSeat;
             Status = MatchStatus.Finished;
         }

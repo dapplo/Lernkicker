@@ -6,8 +6,12 @@ namespace Lernkicker.Domain.Multiplayer;
 public static class MultiplayerGames
 {
     public const string Battleship = "battleship";
+    public const string ConnectFour = "connectFour";
+    public const string Checkers = "checkers";
+    public const string MauMau = "mauMau";
+    public const string Chess = "chess";
 
-    public static readonly IReadOnlyList<IGameRules> All = [new Battleship()];
+    public static readonly IReadOnlyList<IGameRules> All = [new Battleship(), new ConnectFour(), new Checkers(), new MauMau(), new Chess()];
 
     public static IGameRules? Find(string? game) => All.FirstOrDefault(g => g.Game == game);
 }

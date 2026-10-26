@@ -195,6 +195,7 @@ public sealed class Api(HttpClient http)
 
     public Task<MatchDto> OpenTable(string game) => Send<MatchDto>(HttpMethod.Post, "api/play/tables", new NewTable(game));
     public Task<MatchDto> JoinTable(Guid id) => Send<MatchDto>(HttpMethod.Post, $"api/play/tables/{id}/join");
+    public Task<MatchDto> StartTable(Guid id) => Send<MatchDto>(HttpMethod.Post, $"api/play/tables/{id}/start");
     public Task LeaveTable(Guid id) => Send(HttpMethod.Delete, $"api/play/tables/{id}");
     public Task<MatchDto> Match(Guid id) => Get<MatchDto>($"api/play/matches/{id}");
     public Task<MatchDto> Move(Guid id, MoveDto move) => Send<MatchDto>(HttpMethod.Post, $"api/play/matches/{id}/moves", move, typeof(MoveDto));

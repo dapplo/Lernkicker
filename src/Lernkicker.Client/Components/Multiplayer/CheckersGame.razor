@@ -1,0 +1,142 @@
+@* Checkers ("Dame"): tap a piece, then the square to go to; when capturing several pieces in a row, tap each landing
+   square in turn. The server sends the moves allowed now (only captures when one is possible), so the board only
+   offers those. Each player sees their own pieces at the bottom. *@
+
+<p class="game-how">
+    @if (View.Over)
+    {
+        @L["Checkers.Over"]
+    }
+    else if (MyTurn)
+    {
+        @(View.Moves.Any(IsCapture) ? L["Checkers.MustCapture"] : L["Checkers.YourTurn"])
+    }
+    else
+    {
+        @L["Checkers.TheirTurn", Opponent]
+    }
+    <span class="checkers-me"><span class="piece @(View.IAmWhite ? "white" : "black")" aria-hidden="true"></span> @L[View.IAmWhite ? "Checkers.YouWhite" : "Checkers.YouBlack"]</span>
+</p>
+
+<div class="checkers-board" role="grid" aria-label="@L["Play.Game.checkers"]">
+    @for (var row = 0; row < Size; row++)
+    {
+        for (var col = 0; col < Size; col++)
+        {
+            var cell = Square(col, row);
+            var piece = View.Board[cell.Y][cell.X];
+            var dark = (cell.X + cell.Y) % 2 == 1;
+            var css = $"{(dark ? "dark" : "light")} {(_path.Count > 0 && _path[0] == cell ? "selected" : "")} {(Targets.Contains(cell) ? _path.Count == 0 ? "movable" : "goal" : "")} {(View.Last.Contains(cell) ? "last" : "")}";
+            @if (dark)
+            {
+                <button type="button" class="square @css" aria-label="@Label(cell, piece)" disabled="@(Busy || !MyTurn)" @onclick="() => Tap(cell)">
+                    @if (_path.Count > 1 && _path.Skip(1).Contains(cell))
+                    {
+                        <span class="hop" aria-hidden="true"></span>
+                    }
+                    @if (piece != '.')
+                    {
+                        <span class="piece @(char.ToLowerInvariant(piece) == 'w' ? "white" : "black") @(char.IsUpper(piece) ? "king" : "")"></span>
+                    }
+                </button>
+            }
+            else
+            {
+                <span class="square @css" aria-hidden="true"></span>
+            }
+        }
+    }
+</div>
+
+@if (_path.Count > 0)
+{
+    <div class="buttons">
+        <button class="btn quiet" type="button" @onclick="() => _path.Clear()">@L["Checkers.Undo"]</button>
+    </div>
+}
+
+@code {
+    private const int Size = 8;
+    private readonly List<CellDto> _path = [];
+    private IReadOnlyList<IReadOnlyList<CellDto>>? _moves;
+
+    [Parameter, EditorRequired]
+    public required CheckersViewDto View { get; set; }
+
+    [Parameter]
+    public string Opponent { get; set; } = "";
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public EventCallback<MoveDto> Move { get; set; }
+
+    private bool MyTurn => !View.Over && View.IAmWhite == View.WhiteToMove;
+
+    protected override void OnParametersSet()
+    {
+        // A new position from the server: start the selection over
+        if (!ReferenceEquals(_moves, View.Moves))
+        {
+            _moves = View.Moves;
+            _path.Clear();
+        }
+    }
+
+    /// <summary>White sees the board as it is (white at the bottom), black turned around.</summary>
+    private CellDto Square(int col, int row) => View.IAmWhite ? new(col, row) : new(Size - 1 - col, Size - 1 - row);
+
+    /// <summary>The allowed moves that go on from the squares tapped so far.</summary>
+    private IEnumerable<IReadOnlyList<CellDto>> Fitting => View.Moves.Where(m => m.Count > _path.Count && m.Take(_path.Count).SequenceEqual(_path));
+
+    /// <summary>Where the selected piece may go next, or the pieces that may move at all.</summary>
+    private HashSet<CellDto> Targets => MyTurn ? Fitting.Select(m => m[_path.Count]).ToHashSet() : [];
+
+    /// <summary>A move jumps over a piece (the server only sends captures when there is one).</summary>
+    private bool IsCapture(IReadOnlyList<CellDto> move)
+    {
+        var (from, to) = (move[0], move[1]);
+        var (dx, dy) = (Math.Sign(to.X - from.X), Math.Sign(to.Y - from.Y));
+        for (var (x, y) = (from.X + dx, from.Y + dy); x != to.X; x += dx, y += dy)
+        {
+            if (View.Board[y][x] != '.')
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private async Task Tap(CellDto cell)
+    {
+        if (!Targets.Contains(cell))
+        {
+            // Another of the own pieces, or a square that does not fit: start over from there
+            _path.Clear();
+            if (Targets.Contains(cell))
+            {
+                _path.Add(cell);
+            }
+
+            return;
+        }
+
+        _path.Add(cell);
+        if (_path.Count > 1 && View.Moves.Any(m => m.SequenceEqual(_path)) && !Fitting.Any())
+        {
+            await Move.InvokeAsync(new CheckersMoveDto(_path.ToList()));
+        }
+    }
+
+    private string Label(CellDto cell, char piece) =>
+        $"{(char)('a' + cell.X)}{Size - cell.Y}" + piece switch
+        {
+            'w' => ", " + L["Checkers.WhitePiece"],
+            'b' => ", " + L["Checkers.BlackPiece"],
+            'W' => ", " + L["Checkers.WhiteKing"],
+            'B' => ", " + L["Checkers.BlackKing"],
+            _ => "",
+        };
+}
