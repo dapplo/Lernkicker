@@ -103,14 +103,17 @@ public static class Grader
                 .ToList();
         }
 
-        // Any correct answer may sit in any field, but each expected answer counts only once.
+        // Any correct answer may sit in any field, but each expected answer and each typed word counts only once.
         var open = f.Fields.ToList();
+        var typed = new List<string>();
         var parts = f.Fields.Select((_, i) =>
         {
-            var hit = open.FirstOrDefault(o => Matches(At(texts, i), o.Answers));
+            var input = At(texts, i);
+            var hit = typed.Any(t => Matches(input, [t])) ? null : open.FirstOrDefault(o => Matches(input, o.Answers));
             if (hit is not null)
             {
                 open.Remove(hit);
+                typed.Add(input!);
             }
 
             return new PartResult(i, hit is not null, hit?.Answers[0], null);
@@ -118,15 +121,17 @@ public static class Grader
 
         // Wrong fields show the answers that are still missing
         return parts
-            .Select(p => p.Correct || open.Count == 0 ? p : p with { Solution = TakeFirst(open).Answers[0] })
+            .Select(p => p.Correct || open.Count == 0 ? p : p with { Solution = TakeMissing(open, typed) })
             .ToList();
     }
 
-    private static AnswerField TakeFirst(List<AnswerField> open)
+    private static string TakeMissing(List<AnswerField> open, List<string> typed)
     {
         var first = open[0];
         open.RemoveAt(0);
-        return first;
+        var missing = first.Answers.FirstOrDefault(a => !typed.Any(t => Matches(t, [a]))) ?? first.Answers[0];
+        typed.Add(missing);
+        return missing;
     }
 
     private static T? At<T>(IReadOnlyList<T>? list, int i) =>

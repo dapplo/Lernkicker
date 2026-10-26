@@ -74,6 +74,26 @@ public class GraderTests
     }
 
     [Fact]
+    public void Free_text_in_any_order_counts_a_repeated_word_once()
+    {
+        // "Nenne vier Getreidesorten": every field accepts every kind
+        string[] kinds = ["Weizen", "Roggen", "Gerste", "Hafer", "Mais", "Dinkel"];
+        var exercise = new FreeTextExercise
+        {
+            Id = "getreidesorten",
+            Instruction = "Nenne vier Getreidesorten.",
+            AnyOrder = true,
+            Fields = Enumerable.Range(0, 4).Select(_ => new AnswerField(kinds)).ToList(),
+        };
+
+        var result = Grader.GradeExercise(exercise, new ExerciseAnswer { Texts = ["Weizen", " weizen", "Mais", "Dinkel"] });
+
+        Assert.Equal([true, false, true, true], result.Parts.Select(p => p.Correct));
+        // The solution names a kind the child did not write yet
+        Assert.Equal("Roggen", result.Parts[1].Solution);
+    }
+
+    [Fact]
     public void Matching_ignores_case_and_whitespace()
     {
         Assert.True(Grader.Matches("  ährchen ", ["Ährchen"]));
