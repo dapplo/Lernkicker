@@ -153,6 +153,9 @@ namespace Lernkicker.Persistence.Migrations
                     b.Property<int?>("GradeLevel")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsAdult")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -345,7 +348,7 @@ namespace Lernkicker.Persistence.Migrations
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GradeLevel")
+                    b.Property<int?>("GradeLevel")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LessonId")
@@ -397,7 +400,7 @@ namespace Lernkicker.Persistence.Migrations
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GradeLevel")
+                    b.Property<int?>("GradeLevel")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("MaxPoints")
@@ -617,7 +620,7 @@ namespace Lernkicker.Persistence.Migrations
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Mark")
+                    b.Property<int?>("Mark")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("MaxPoints")

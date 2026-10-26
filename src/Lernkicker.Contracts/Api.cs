@@ -58,19 +58,20 @@ public sealed record FamilyOverview(Guid Id, string Name, int Parents, int Child
 // Quizzes
 
 /// <summary><c>Shared</c>: all families on this server can see, preview and copy it.</summary>
-public sealed record QuizOverview(string QuizId, int Version, string Title, string Subject, int GradeLevel, string? Topic, int MaxPoints, DateTimeOffset UploadedAt, bool Shared);
+public sealed record QuizOverview(string QuizId, int Version, string Title, string Subject, int? GradeLevel, string? Topic, int MaxPoints, DateTimeOffset UploadedAt, bool Shared);
 
 public sealed record QuizDeletedResponse(bool Archived);
 
 // Children (for parents)
 
-public sealed record NewChild(string Name, int? GradeLevel, string Pin);
+/// <summary><c>IsAdult</c>: an adult who learns for themselves; no grade level and no school marks.</summary>
+public sealed record NewChild(string Name, int? GradeLevel, string Pin, bool IsAdult = false);
 
-public sealed record ChildDetails(string Name, int? GradeLevel);
+public sealed record ChildDetails(string Name, int? GradeLevel, bool IsAdult = false);
 
 public sealed record ChangePin(string Pin);
 
-public sealed record ChildOverview(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices);
+public sealed record ChildOverview(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult);
 
 public sealed record PairingCodeResponse(string Code, string Link, DateTimeOffset ExpiresAt);
 
@@ -80,7 +81,7 @@ public sealed record NewAssignment(string QuizId, DateOnly? DueOn);
 
 public sealed record AssignmentOverview(Guid Id, string QuizId, int Version, string Title, string Subject, DateOnly? DueOn, DateTimeOffset AssignedAt);
 
-public sealed record AttemptOverview(Guid Id, string QuizId, string Title, string Subject, string Channel, DateTimeOffset SubmittedAt, int Points, int MaxPoints, int Percent, int Mark);
+public sealed record AttemptOverview(Guid Id, string QuizId, string Title, string Subject, string Channel, DateTimeOffset SubmittedAt, int Points, int MaxPoints, int Percent, int? Mark);
 
 // Child's device
 

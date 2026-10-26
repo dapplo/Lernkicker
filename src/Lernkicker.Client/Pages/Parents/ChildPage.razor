@@ -83,7 +83,7 @@ else
             else
             {
                 <div class="table-scroll"><table class="table">
-                    <thead><tr><th>@L["Child.When"]</th><th>@L["Child.Quiz"]</th><th>@L["Child.Points"]</th><th>@L["Child.Mark"]</th></tr></thead>
+                    <thead><tr><th>@L["Child.When"]</th><th>@L["Child.Quiz"]</th><th>@L["Child.Points"]</th>@if (!_child.IsAdult) { <th>@L["Child.Mark"]</th> }</tr></thead>
                     <tbody>
                         @foreach (var attempt in _attempts)
                         {
@@ -91,7 +91,10 @@ else
                                 <td>@Display.Date(attempt.SubmittedAt)</td>
                                 <td>@attempt.Title</td>
                                 <td>@attempt.Points / @attempt.MaxPoints (@attempt.Percent %)</td>
-                                <td>@attempt.Mark</td>
+                                @if (!_child.IsAdult)
+                                {
+                                    <td>@attempt.Mark</td>
+                                }
                             </tr>
                         }
                     </tbody>
@@ -151,7 +154,14 @@ else
             <h2>@L["Child.Settings"]</h2>
             <form class="form" @onsubmit="Save" @onsubmit:preventDefault>
                 <label>@L["Child.Name"] <input @bind="_name" maxlength="50" required /></label>
-                <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_gradeLevel" /></label>
+                <label class="check">
+                    <input type="checkbox" @bind="_isAdult" />
+                    <span>@L["Child.IsAdult"]</span>
+                </label>
+                @if (!_isAdult)
+                {
+                    <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_gradeLevel" /></label>
+                }
                 <button class="btn" type="submit">@L["Common.Save"]</button>
             </form>
             <form class="form" @onsubmit="SavePin" @onsubmit:preventDefault>
@@ -191,6 +201,7 @@ else
     private DateOnly? _dueOn;
     private string _name = "", _pin = "";
     private int? _gradeLevel;
+    private bool _isAdult;
     private string? _message;
     private bool _confirmDelete;
     private IReadOnlyList<string>? _errors;
@@ -230,6 +241,7 @@ else
 
             _name = _child.Name;
             _gradeLevel = _child.GradeLevel;
+            _isAdult = _child.IsAdult;
             _quizzes = await Api.Quizzes();
             await Reload();
         }
@@ -285,8 +297,9 @@ else
 
     private Task Save() => Run(async () =>
     {
-        await Api.UpdateChild(Id, new ChildDetails(_name, _gradeLevel));
-        _child = _child! with { Name = _name.Trim(), GradeLevel = _gradeLevel };
+        var gradeLevel = _isAdult ? null : _gradeLevel;
+        await Api.UpdateChild(Id, new ChildDetails(_name, gradeLevel, _isAdult));
+        _child = _child! with { Name = _name.Trim(), GradeLevel = gradeLevel, IsAdult = _isAdult };
         _message = L["Common.Saved"];
     });
 

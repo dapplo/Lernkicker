@@ -12,7 +12,8 @@ public sealed record Lesson
     public required string Id { get; init; }
     public required string Title { get; init; }
     public required string Subject { get; init; }
-    public required int GradeLevel { get; init; }
+    /// <summary>School year; null for material that is not for a school year (adults, work).</summary>
+    public int? GradeLevel { get; init; }
     public string Language { get; init; } = "de";
     public string? Topic { get; init; }
     public string? Description { get; init; }
@@ -116,7 +117,7 @@ public sealed class StoredLesson : IFamilyOwned
     public string LessonId { get; private set; }
     public string Title { get; private set; }
     public string Subject { get; private set; }
-    public int GradeLevel { get; private set; }
+    public int? GradeLevel { get; private set; }
     public string? Topic { get; private set; }
 
     /// <summary>Number of blocks, so lists need not read the file.</summary>

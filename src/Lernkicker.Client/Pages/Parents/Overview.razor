@@ -38,7 +38,7 @@ else
                     <li>
                         <a class="card" href="parents/children/@child.Id">
                             <span class="title">@child.Name</span>
-                            <span class="subject">@(child.GradeLevel is { } grade ? L["Common.Grade", grade] : "")</span>
+                            <span class="subject">@(child.IsAdult ? L["Child.Adult"] : child.GradeLevel is { } grade ? L["Common.Grade", grade] : "")</span>
                             <span class="due">@(child.Devices switch { 0 => L["Parents.NoDevice"], 1 => L["Parents.OneDevice"], var n => L["Parents.Devices", n] })</span>
                         </a>
                     </li>
@@ -49,7 +49,14 @@ else
                 <summary>@L["Parents.AddChild"]</summary>
                 <form class="form" @onsubmit="AddChild" @onsubmit:preventDefault>
                     <label>@L["Child.Name"] <input @bind="_newName" maxlength="50" required /></label>
-                    <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_newGrade" /></label>
+                    <label class="check">
+                        <input type="checkbox" @bind="_newAdult" />
+                        <span>@L["Child.IsAdult"]</span>
+                    </label>
+                    @if (!_newAdult)
+                    {
+                        <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_newGrade" /></label>
+                    }
                     <label>@L["Child.Pin"] <input inputmode="numeric" pattern="[0-9]{4}" maxlength="4" @bind="_newPin" required /></label>
                     <p class="hint">@L["Parents.AddChildHint"]</p>
                     <Messages Errors="@_childErrors" />
@@ -90,6 +97,7 @@ else
     private string _email = "", _password = "";
     private string _newName = "", _newPin = "";
     private int? _newGrade = 4;
+    private bool _newAdult;
     private IReadOnlyList<string>? _errors, _childErrors;
     private bool _busy;
 
@@ -150,8 +158,9 @@ else
         _childErrors = null;
         try
         {
-            await Api.CreateChild(new NewChild(_newName, _newGrade, _newPin));
+            await Api.CreateChild(new NewChild(_newName, _newAdult ? null : _newGrade, _newPin, _newAdult));
             _newName = _newPin = "";
+            _newAdult = false;
             _children = await Api.Children();
             await LoadUpcoming();
         }

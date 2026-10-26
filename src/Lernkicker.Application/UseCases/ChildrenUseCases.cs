@@ -18,9 +18,9 @@ public sealed class ChildrenUseCases(
 
     public Task<IReadOnlyList<ChildSummary>> ListAsync() => children.ListSummariesAsync();
 
-    public async Task<Result<ChildSummary>> CreateAsync(Guid familyId, string name, int? gradeLevel, string pin)
+    public async Task<Result<ChildSummary>> CreateAsync(Guid familyId, string name, int? gradeLevel, string pin, bool isAdult = false)
     {
-        if (Validate(name, gradeLevel) is { } error)
+        if (Validate(name, gradeLevel, isAdult) is { } error)
         {
             return error;
         }
@@ -30,16 +30,16 @@ public sealed class ChildrenUseCases(
             return AppError.Invalid(ErrorCodes.PinInvalid);
         }
 
-        var child = new Child(familyId, name, gradeLevel);
+        var child = new Child(familyId, name, gradeLevel, isAdult);
         child.SetPinHash(pinHasher.Hash(pin));
         children.Add(child);
         await unitOfWork.SaveChangesAsync();
-        return new ChildSummary(child.Id, child.Name, child.GradeLevel, true, 0);
+        return new ChildSummary(child.Id, child.Name, child.GradeLevel, true, 0, child.IsAdult);
     }
 
-    public async Task<Result> UpdateAsync(Guid childId, string name, int? gradeLevel)
+    public async Task<Result> UpdateAsync(Guid childId, string name, int? gradeLevel, bool isAdult = false)
     {
-        if (Validate(name, gradeLevel) is { } error)
+        if (Validate(name, gradeLevel, isAdult) is { } error)
         {
             return error;
         }
@@ -50,7 +50,7 @@ public sealed class ChildrenUseCases(
             return AppError.NotFound(ErrorCodes.ChildNotFound);
         }
 
-        child.Update(name, gradeLevel);
+        child.Update(name, gradeLevel, isAdult);
         await unitOfWork.SaveChangesAsync();
         return Result.Ok();
     }
@@ -172,13 +172,13 @@ public sealed class ChildrenUseCases(
     public async Task<Result<QuizResult>> AttemptResultAsync(Guid childId, Guid attemptId) =>
         await practice.FindAttemptAsync(childId, attemptId) is { } attempt ? attempt.Result : AppError.NotFound();
 
-    private static AppError? Validate(string? name, int? gradeLevel)
+    private static AppError? Validate(string? name, int? gradeLevel, bool isAdult)
     {
         if (!Child.IsValidName(name))
         {
             return AppError.Invalid(ErrorCodes.ChildNameInvalid);
         }
 
-        return Child.IsValidGradeLevel(gradeLevel) ? null : AppError.Invalid(ErrorCodes.GradeLevelInvalid);
+        return Child.IsValidGradeLevel(gradeLevel, isAdult) ? null : AppError.Invalid(ErrorCodes.GradeLevelInvalid);
     }
 }

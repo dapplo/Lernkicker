@@ -152,6 +152,35 @@ public sealed class FlowTests(LernkickerFactory factory) : IClassFixture<Lernkic
     }
 
     [Fact]
+    public async Task Adult_learns_material_without_grade_and_gets_no_mark()
+    {
+        var parent = await factory.NewFamilyAsync("adult@example.org");
+        var json = System.Text.Json.Nodes.JsonNode.Parse(TestData.HsuJson())!.AsObject();
+        json.Remove("gradeLevel");
+        var quiz = await LernkickerFactory.Json<QuizOverview>(await parent.PostAsync("/api/quizzes", TestData.AsJson(json.ToJsonString())));
+        Assert.Null(quiz.GradeLevel);
+
+        Assert.Equal(ErrorCodes.GradeLevelInvalid,
+            (await LernkickerFactory.Error(await parent.PostAsJsonAsync("/api/children", new NewChild("Robin", 4, "1234", IsAdult: true)), HttpStatusCode.BadRequest)).Code);
+        var adult = await LernkickerFactory.Json<ChildOverview>(await parent.PostAsJsonAsync("/api/children", new NewChild("Robin", null, "1234", IsAdult: true)));
+        Assert.True(adult.IsAdult);
+        await TestData.AssignAsync(parent, adult.Id, quiz.QuizId);
+        var phone = await TestData.ChildPhoneAsync(factory, parent, adult.Id);
+
+        var assignment = Assert.Single(await LernkickerFactory.Json<List<MyAssignment>>(await phone.GetAsync("/api/device/assignments")));
+        var result = await LernkickerFactory.Json<QuizResultDto>(await phone.PostAsJsonAsync(
+            $"/api/device/assignments/{assignment.AssignmentId}/submit", new Submission(TestData.AllCorrect(Lernkicker.Tests.Examples.Hsu())), ApiJson.Options));
+        Assert.Equal((39, 100, (int?)null), (result.Points, result.Percent, result.Mark));
+
+        var attempt = Assert.Single(await LernkickerFactory.Json<List<AttemptOverview>>(await parent.GetAsync($"/api/children/{adult.Id}/attempts")));
+        Assert.Null(attempt.Mark);
+
+        // Back to a child: a grade level is allowed again
+        Assert.Equal(HttpStatusCode.NoContent, (await parent.PutAsJsonAsync($"/api/children/{adult.Id}", new ChildDetails("Robin", 4))).StatusCode);
+        Assert.False(Assert.Single(await LernkickerFactory.Json<List<ChildOverview>>(await parent.GetAsync("/api/children"))).IsAdult);
+    }
+
+    [Fact]
     public async Task Roles_are_separate()
     {
         var parent = await factory.NewFamilyAsync("h@example.org");

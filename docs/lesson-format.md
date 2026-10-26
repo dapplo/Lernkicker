@@ -39,7 +39,7 @@ python3 tools/validate_quizzes.py my-lesson.json
 | `id` | yes | Lowercase letters, digits and hyphens, 3–64 characters. Unique within a family: uploading the same `id` again **replaces** the lesson, and assignments and progress stay |
 | `title` | yes | At most 120 characters |
 | `subject` | yes | Same list as quizzes: `science` (HSU), `german`, `math`, `english`, `religion`, `ethics`, `music`, `art`, `sports`, `crafts`, `other` |
-| `gradeLevel` | yes | School year, 1–13 |
+| `gradeLevel` | no | School year, 1–13. Leave it out for material for adults (e.g. for work) |
 | `language` | no | BCP 47 tag of the content, default `de` |
 | `topic`, `description`, `source` | no | Shown to the child (`topic`, `description`) or kept for parents (`source`, e.g. the worksheet) |
 | `blocks` | yes | 1–30 parts, shown in this order |

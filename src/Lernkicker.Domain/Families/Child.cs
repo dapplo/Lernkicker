@@ -11,23 +11,32 @@ public sealed class Child : IFamilyOwned
     public string Name { get; private set; }
 
     public int? GradeLevel { get; private set; }
+
+    /// <summary>An adult who learns for themselves (e.g. a parent or for work): no school year and no school marks.</summary>
+    public bool IsAdult { get; private set; }
+
     public string? PinHash { get; private set; }
 
-    public Child(Guid familyId, string name, int? gradeLevel)
+    public Child(Guid familyId, string name, int? gradeLevel, bool isAdult = false)
     {
         FamilyId = familyId;
         Name = name.Trim();
         GradeLevel = gradeLevel;
+        IsAdult = isAdult;
     }
 
     public static bool IsValidName(string? name) => !string.IsNullOrWhiteSpace(name) && name.Trim().Length <= MaxNameLength;
 
     public static bool IsValidGradeLevel(int? gradeLevel) => gradeLevel is null or (>= 1 and <= 13);
 
-    public void Update(string name, int? gradeLevel)
+    /// <summary>A school year only for a child; an adult has none.</summary>
+    public static bool IsValidGradeLevel(int? gradeLevel, bool isAdult) => isAdult ? gradeLevel is null : IsValidGradeLevel(gradeLevel);
+
+    public void Update(string name, int? gradeLevel, bool isAdult)
     {
         Name = name.Trim();
         GradeLevel = gradeLevel;
+        IsAdult = isAdult;
     }
 
     public void SetPinHash(string pinHash) => PinHash = pinHash;

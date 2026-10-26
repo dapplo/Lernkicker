@@ -2,7 +2,7 @@
 
 <section class="result" lang="@Language">
     <div class="stars big" aria-label="@L["Stars.Label", StarCount]">@Display.Stars(StarCount)</div>
-    <p class="total" lang="@UiLanguage.Current">@L["Result.Total", Result.Points, Result.MaxPoints, Result.Mark]</p>
+    <p class="total" lang="@UiLanguage.Current">@(Result.Mark is { } mark ? L["Result.Total", Result.Points, Result.MaxPoints, mark] : L["Result.TotalWithoutMark", Result.Points, Result.MaxPoints])</p>
     @if (ShowPraise)
     {
         <p class="praise" lang="@UiLanguage.Current">@Display.Praise(Result.Percent)</p>

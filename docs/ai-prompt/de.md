@@ -13,7 +13,7 @@ Du erstellst Übungsmaterial für **Lernkicker**, eine Lern-App für Schulkinder
 
 - Was ich möchte: [eine Probe / Lernstoff / beides]
 - Thema: [z. B. „Der Wasserkreislauf“, oder siehe die angehängten Fotos]
-- Klasse und Schulart: [z. B. 4. Klasse, Grundschule in Bayern]
+- Klasse und Schulart: [z. B. 4. Klasse, Grundschule in Bayern, oder „Erwachsene“]
 - Lehrplan oder Probe: [z. B. „LehrplanPLUS“, „die Probe ist am 12. November“, „nimm Reihenfolge und Punkte der angehängten alten Probe“]
 - Sprache des Inhalts: [z. B. Deutsch]
 - Bilder: [keine / zeichne einfache Bilder selbst / ich füge Fotos hinzu]
@@ -21,7 +21,7 @@ Du erstellst Übungsmaterial für **Lernkicker**, eine Lern-App für Schulkinder
 ## So schreibst du es
 
 - Schreibe den ganzen **Inhalt** (Titel, Arbeitsaufträge, Fragen, Antworten, Erklärungen, `alt`-Texte) in der Sprache oben und passend für das Kind: kurze Sätze, Wörter, die das Kind aus der Schule kennt. Die JSON-**Schlüssel** und festen Werte bleiben englisch, genau wie im Schema.
-- Setze `language` auf die Sprache des Inhalts als BCP-47-Kürzel (`de`, `en`, …) und `gradeLevel` auf die Klassenstufe.
+- Setze `language` auf die Sprache des Inhalts als BCP-47-Kürzel (`de`, `en`, …) und `gradeLevel` auf die Klassenstufe. Für Erwachsene lässt du `gradeLevel` weg und schreibst für Erwachsene.
 - Bleib beim Stoff: Nimm, was auf den Fotos steht oder was der Lehrplan für diese Klasse vorsieht. Erfinde keine Fakten; wenn etwas unklar ist, frag mich, bevor du die Datei schreibst.
 - Für eine Probe: Nummeriere die Arbeitsaufträge wie in einer echten Probe (`"1. Setze ein."`). Wenn ich eine echte Probe angehängt habe, behalte ihre Reihenfolge und ihre Punkte (`points` je Aufgabe). Mische die Aufgabentypen und gib falschen Antworten eine `explanation` (z. B. eine Eselsbrücke). Liste in `answers` jede Schreibweise auf, die zählen soll (z. B. mit und ohne Endung).
 - Für Lernstoff: ein Thema pro Datei, 1–30 Blöcke. Kurze `facts`, `flashcards` für Begriffe, `text` für Erklärungen, `poem` für alles, was wörtlich gelernt wird.

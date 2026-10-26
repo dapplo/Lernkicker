@@ -37,7 +37,7 @@ python3 tools/validate_quizzes.py my-quiz.json
 | `id` | yes | lower-case letters, digits and `-`, 3–64 characters. Uploading the same `id` again creates a new version; results stay with the old version. |
 | `title` | yes | title the child sees |
 | `subject` | yes | `science` (Bavarian HSU / Sachunterricht), `german`, `math`, `english`, `religion`, `ethics`, `music`, `art`, `sports`, `crafts`, `other`. The app shows the subject name in the user's language. |
-| `gradeLevel` | yes | school year, 1–13 |
+| `gradeLevel` | no | school year, 1–13. Leave it out for material for adults (e.g. for work); the app then shows "for adults". |
 | `language` | no | language of the content as a BCP 47 tag, default `"de"` |
 | `topic` | no | e.g. "Wasser", for filtering |
 | `description` | no | short text for parents |
@@ -189,6 +189,7 @@ Rules:
 - With `points`: points reached = round(correct parts ÷ all parts × `points`), rounding half away from zero. Example: 7 steps, `points: 4`, 5 correct → 2.86 → 3 points.
 - For `multipleChoice` with several correct options, a question counts only when exactly the correct options are selected.
 - The mark is only a rough guide on the German 1–6 scale: from 95 % → 1, 83 % → 2, 67 % → 3, 50 % → 4, 30 % → 5, below → 6.
+- An adult learner (a profile marked as adult) gets no mark, only points and percent.
 
 ## Content rules (checked by the app and `tools/validate_quizzes.py`)
 

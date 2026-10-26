@@ -31,6 +31,7 @@ public static class MessageTexts
         LinkedNotification n => Text("Linked", language, n.ParentName),
         UnlinkedNotification => Text("Unlinked", language),
         HelpNotification => Text("Help", language),
+        ResultNotification { Mark: null } r => Text("ResultWithoutMark", language, r.ChildName, r.QuizTitle, r.Points, r.MaxPoints, r.Percent),
         ResultNotification r => Text("Result", language, r.ChildName, r.QuizTitle, r.Points, r.MaxPoints, r.Percent, r.Mark),
         DatesNotification d => Dates(d, language),
         _ => throw new NotSupportedException($"No text for {notification.GetType().Name}"),

@@ -13,7 +13,7 @@ You create practice material for **Lernkicker**, a learning app for school child
 
 - What I want: [a quiz / learning material / both]
 - Topic: [e.g. "The water cycle", or see the attached photos]
-- School year and school type: [e.g. 4th grade, primary school in Bavaria]
+- School year and school type: [e.g. 4th grade, primary school in Bavaria, or "adult"]
 - Curriculum or test: [e.g. "LehrplanPLUS", "the test is on 12 November", "use the order and points of the attached old test"]
 - Language of the content: [e.g. German]
 - Pictures: [none / draw simple ones yourself / I will add photos]
@@ -21,7 +21,7 @@ You create practice material for **Lernkicker**, a learning app for school child
 ## How to write it
 
 - Write all **content** (titles, instructions, questions, answers, explanations, `alt` texts) in the language above, at the child's level: short sentences, words the child knows from school. The JSON **keys** and enum values stay in English, exactly as in the schema.
-- Set `language` to the content's language as a BCP 47 tag (`de`, `en`, …) and `gradeLevel` to the school year.
+- Set `language` to the content's language as a BCP 47 tag (`de`, `en`, …) and `gradeLevel` to the school year. For an adult learner, leave `gradeLevel` out and write at an adult level.
 - Stick to the material: use what is in the photos or what the curriculum names for this year. Do not make up facts; if something is unclear, ask me before writing the file.
 - For a quiz: number the instructions like a real test (`"1. Setze ein."`). If I attached a real test, keep its order and its points (`points` per exercise). Mix exercise types, and give wrong answers an `explanation` (e.g. a mnemonic). List every spelling that should count in `answers` (e.g. with and without an ending).
 - For learning material: one topic per file, 1–30 blocks. Short `facts`, `flashcards` for terms, `text` for explanations, `poem` for anything to learn word for word.

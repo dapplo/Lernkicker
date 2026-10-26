@@ -99,7 +99,7 @@ A parent can paste any URL, and the server fetches it. That must not become a wa
 
 ## 8. Data protection
 
-- **As little data as possible:** for children only a first name or nickname and the grade, no date of birth, no photo. For parents an email address (as login name), a display name and the UI language.
+- **As little data as possible:** for children (and adult learners) only a first name or nickname and the grade (none for adults), no date of birth, no photo. For parents an email address (as login name), a display name and the UI language.
 - **Consent:** when redeeming the invitation the parent accepts a short privacy notice (`/privacy`: who is responsible, what is stored, where, how to delete it).
 - **Deletion:** parents can delete a child with all results; the admin can delete a whole family. Deletion removes everything from the database at once; backups expire after their retention time. Export as JSON *(planned)*.
 - **Retention** *(planned)*: results older than two school years are deleted automatically.

@@ -35,6 +35,18 @@ public class QuizJsonTests
     }
 
     [Fact]
+    public void Grade_level_is_optional_for_adult_material()
+    {
+        var node = JsonNode.Parse(Examples.HsuJson())!.AsObject();
+        node.Remove("gradeLevel");
+
+        var result = _format.Parse(node.ToJsonString());
+
+        Assert.True(result.IsValid, string.Join(Environment.NewLine, result.Issues));
+        Assert.Null(result.Quiz!.GradeLevel);
+    }
+
+    [Fact]
     public void Stored_source_reads_back_the_same_quiz()
     {
         var quiz = _format.Read(Examples.HsuJson());

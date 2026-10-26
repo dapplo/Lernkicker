@@ -12,7 +12,8 @@ public sealed record Quiz
     public required string Id { get; init; }
     public required string Title { get; init; }
     public required string Subject { get; init; }
-    public required int GradeLevel { get; init; }
+    /// <summary>School year; null for material that is not for a school year (adults, work).</summary>
+    public int? GradeLevel { get; init; }
     public string Language { get; init; } = DefaultLanguage;
     public string? Topic { get; init; }
     public string? Description { get; init; }

@@ -18,7 +18,7 @@ public sealed class StoredQuiz : IFamilyOwned
     public int Version { get; private set; }
     public string Title { get; private set; }
     public string Subject { get; private set; }
-    public int GradeLevel { get; private set; }
+    public int? GradeLevel { get; private set; }
     public string? Topic { get; private set; }
     public int MaxPoints { get; private set; }
     public string Source { get; private set; }
@@ -33,7 +33,7 @@ public sealed class StoredQuiz : IFamilyOwned
     public bool IsShared => SharedAt is not null;
 
     // For the persistence adapter
-    private StoredQuiz(Guid familyId, string quizId, int version, string title, string subject, int gradeLevel, string? topic, int maxPoints, string source, DateTimeOffset uploadedAt)
+    private StoredQuiz(Guid familyId, string quizId, int version, string title, string subject, int? gradeLevel, string? topic, int maxPoints, string source, DateTimeOffset uploadedAt)
     {
         FamilyId = familyId;
         QuizId = quizId;

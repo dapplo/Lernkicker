@@ -40,7 +40,7 @@ else
                 <option value="0">@L["Library.All"]</option>
                 @foreach (var grade in _items.Select(i => i.GradeLevel).Distinct().Order())
                 {
-                    <option value="@grade">@L["Common.Grade", grade]</option>
+                    <option value="@(grade ?? AdultsFilter)">@Display.Grade(grade)</option>
                 }
             </select>
         </label>
@@ -80,12 +80,15 @@ else
     private readonly HashSet<Guid> _copied = [];
     private string _kind = "", _subject = "";
     private int _grade;
+
+    // Grade filter value for quizzes and lessons without a school year
+    private const int AdultsFilter = -1;
     private IReadOnlyList<string>? _errors;
 
     private IEnumerable<SharedOverview> Filtered => _items!
         .Where(i => _kind == "" || i.Kind == _kind)
         .Where(i => _subject == "" || i.Subject == _subject)
-        .Where(i => _grade == 0 || i.GradeLevel == _grade);
+        .Where(i => _grade == 0 || (i.GradeLevel ?? AdultsFilter) == _grade);
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,7 +103,7 @@ else
     }
 
     private string Details(SharedOverview item) => L[item.Kind == SharedKinds.Quiz ? "Library.QuizDetails" : "Library.LessonDetails",
-        Display.Subject(item.Subject), item.GradeLevel, item.Size, Display.Date(item.SharedAt)];
+        Display.Subject(item.Subject), Display.Grade(item.GradeLevel), item.Size, Display.Date(item.SharedAt)];
 
     private async Task Copy(SharedOverview item)
     {

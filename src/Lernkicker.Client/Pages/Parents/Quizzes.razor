@@ -49,7 +49,7 @@ else
             <li class="@Display.SubjectClass(quiz.Subject)">
                 <div>
                     <b>@quiz.Title</b>
-                    <small>@L["Quizzes.Details", Display.Subject(quiz.Subject), quiz.GradeLevel, quiz.MaxPoints, quiz.Version, Display.Date(quiz.UploadedAt)]</small>
+                    <small>@L["Quizzes.Details", Display.Subject(quiz.Subject), Display.Grade(quiz.GradeLevel), quiz.MaxPoints, quiz.Version, Display.Date(quiz.UploadedAt)]</small>
                     @if (quiz.Shared)
                     {
                         <small class="shared-badge">@L["Share.Badge"]</small>

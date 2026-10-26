@@ -30,7 +30,7 @@ else
     @if (_sheet is { } sheet)
     {
         <h1 lang="@sheet.Language">@sheet.Title</h1>
-        <p class="subtitle">@L["Preview.QuizDetails", Display.Subject(sheet.Subject), sheet.GradeLevel, sheet.Exercises.Count, sheet.MaxPoints]</p>
+        <p class="subtitle">@L["Preview.QuizDetails", Display.Subject(sheet.Subject), Display.Grade(sheet.GradeLevel), sheet.Exercises.Count, sheet.MaxPoints]</p>
         @foreach (var draft in _drafts!)
         {
             <div class="preview-exercise">

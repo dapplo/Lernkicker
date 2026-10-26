@@ -4,7 +4,7 @@ namespace Lernkicker.Contracts;
 
 /// <summary>A quiz as the child's device receives it: no solutions. Parts carry their original <c>Index</c>.</summary>
 public sealed record SheetDto(
-    string Id, string Title, string Subject, int GradeLevel, string Language, string? Topic, int? DurationMinutes, int MaxPoints, IReadOnlyList<ExerciseSheetDto> Exercises);
+    string Id, string Title, string Subject, int? GradeLevel, string Language, string? Topic, int? DurationMinutes, int MaxPoints, IReadOnlyList<ExerciseSheetDto> Exercises);
 
 public sealed record SheetItemDto(int Index, string Text, ImageDto? Image = null);
 
@@ -63,5 +63,5 @@ public sealed record PartResultDto(int Index, bool Correct, string? Solution, st
 
 public sealed record ExerciseResultDto(string Id, string Type, string Instruction, int Points, int MaxPoints, IReadOnlyList<PartResultDto> Parts, string? Explanation, string? SolutionText);
 
-/// <summary><c>Mark</c> is a rough German school mark (1 best, 6 worst).</summary>
-public sealed record QuizResultDto(int Points, int MaxPoints, int Percent, int Mark, IReadOnlyList<ExerciseResultDto> Exercises);
+/// <summary><c>Mark</c> is a rough German school mark (1 best, 6 worst); null for an adult.</summary>
+public sealed record QuizResultDto(int Points, int MaxPoints, int Percent, int? Mark, IReadOnlyList<ExerciseResultDto> Exercises);

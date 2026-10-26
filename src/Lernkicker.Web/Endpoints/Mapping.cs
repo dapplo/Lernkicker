@@ -16,7 +16,7 @@ public static class Mapping
 
     public static QuizOverview ToDto(this QuizSummary q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt, q.Shared);
 
-    public static ChildOverview ToDto(this ChildSummary c) => new(c.Id, c.Name, c.GradeLevel, c.HasPin, c.Devices);
+    public static ChildOverview ToDto(this ChildSummary c) => new(c.Id, c.Name, c.GradeLevel, c.HasPin, c.Devices, c.IsAdult);
 
     public static DeviceOverview ToDto(this DeviceSummary d) => new(d.Id, d.Label, d.PairedAt, d.LastUsedAt, d.Locked);
 

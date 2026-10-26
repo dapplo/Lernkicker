@@ -7,7 +7,7 @@ public sealed record ShareRequest(bool Shared);
 /// quiz or the parts of a lesson; <c>InMyLibrary</c>: copying replaces the own one with the same id.
 /// </summary>
 public sealed record SharedOverview(
-    Guid Id, string Kind, string ItemId, string Title, string Subject, int GradeLevel, string? Topic, int Size, DateTimeOffset SharedAt, bool InMyLibrary);
+    Guid Id, string Kind, string ItemId, string Title, string Subject, int? GradeLevel, string? Topic, int Size, DateTimeOffset SharedAt, bool InMyLibrary);
 
 /// <summary>The kinds in <see cref="SharedOverview"/>; the same values as the application's SharedKinds.</summary>
 public static class SharedKinds
