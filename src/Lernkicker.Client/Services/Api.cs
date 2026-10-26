@@ -150,6 +150,7 @@ public sealed class Api(HttpClient http)
     public Task<DeviceStatusResponse> Pair(string code, string? label) => Send<DeviceStatusResponse>(HttpMethod.Post, "api/device/pair", new PairDevice(code, label));
     public Task ChildLogin(string pin) => Send(HttpMethod.Post, "api/device/login", new PinLogin(pin));
     public Task ChildLogout() => Send(HttpMethod.Post, "api/device/logout");
+    public Task Unpair() => Send(HttpMethod.Post, "api/device/unpair");
 
     /// <summary>The child's assignments, or null when the child is not logged in.</summary>
     public async Task<List<MyAssignment>?> MyAssignments()

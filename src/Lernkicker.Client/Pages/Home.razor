@@ -21,12 +21,14 @@ else if (_device.Locked)
     <h1>@L["Home.Hello", _device.ChildName ?? ""]</h1>
     <p class="error">@L["Home.Locked"]</p>
     <button class="btn" @onclick="Reload">@L["Home.TryAgain"]</button>
+    @NotMe()
 }
 else if (_assignments is null)
 {
     <h1>@L["Home.Hello", _device.ChildName ?? ""]</h1>
     <p>@L["Home.EnterPin"]</p>
     <PinPad Entered="Login" Error="@_error" Disabled="@_busy" />
+    @NotMe()
 }
 else
 {
@@ -144,6 +146,23 @@ else
 }
 
 @code {
+    /// <summary>A way out when the device was paired for the wrong child: forget the pairing and start over.</summary>
+    private RenderFragment NotMe() =>
+        @<div class="not-me">
+            @if (_confirmUnpair)
+            {
+                <p>@L["Home.NotMeQuestion", _device?.ChildName ?? ""]</p>
+                <span class="buttons">
+                    <button class="btn danger" disabled="@_busy" @onclick="Unpair">@L["Home.NotMeYes"]</button>
+                    <button class="btn quiet" @onclick="() => _confirmUnpair = false">@L["Common.Cancel"]</button>
+                </span>
+            }
+            else
+            {
+                <button class="btn quiet" @onclick="() => _confirmUnpair = true">@L["Home.NotMe", _device?.ChildName ?? ""]</button>
+            }
+        </div>;
+
     private DeviceStatusResponse? _device;
     private List<MyAssignment>? _assignments;
     private List<MyLesson>? _lessons;
@@ -152,6 +171,7 @@ else
     private string? _error;
     private bool _busy;
     private bool _confirmLogout;
+    private bool _confirmUnpair;
 
     protected override Task OnInitializedAsync() => Reload();
 
@@ -182,6 +202,11 @@ else
             await Api.ChildLogin(pin);
             await Reload();
         }
+        catch (ApiException e) when (e.Error?.Code == "device.notPaired")
+        {
+            // A parent removed this device meanwhile: back to the pairing form
+            await Reload();
+        }
         catch (ApiException e)
         {
             _error = Display.Errors(e)[0];
@@ -189,6 +214,21 @@ else
             {
                 _device = _device! with { Locked = true };
             }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task Unpair()
+    {
+        _busy = true;
+        try
+        {
+            await Api.Unpair();
+            _confirmUnpair = false;
+            await Reload();
         }
         finally
         {

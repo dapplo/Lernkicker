@@ -43,6 +43,12 @@ public static class DeviceEndpoints
             var status = session.Principal?.FindFirst(Claims.Learner) is not null
                 ? await uc.LearnerStatusAsync(session.Principal.ChildIdOf())
                 : await uc.StatusAsync(DeviceToken(http));
+            if (!status.Paired && DeviceToken(http) is not null)
+            {
+                // The parent removed this device: drop the stale cookie so it starts over cleanly
+                DeleteDeviceCookie(http);
+            }
+
             return Results.Json(status.ToDto(), ApiJson.Options);
         });
 
@@ -73,6 +79,15 @@ public static class DeviceEndpoints
             return Results.NoContent();
         });
 
+        // "Not me": the device was paired for the wrong child, so it forgets the pairing and shows the pairing form again
+        device.MapPost("/unpair", async (ChildDeviceUseCases uc, HttpContext http) =>
+        {
+            await uc.UnpairAsync(DeviceToken(http));
+            DeleteDeviceCookie(http);
+            await http.SignOutAsync(Schemes.Child);
+            return Results.NoContent();
+        }).RequireRateLimiting(RateLimits.Child);
+
         var child = device.MapGroup("/").RequireAuthorization(Policies.Child);
 
         child.MapGet("/assignments", async (ClaimsPrincipal user, PracticeUseCases uc) =>
@@ -86,6 +101,9 @@ public static class DeviceEndpoints
     }
 
     private static string? DeviceToken(HttpContext http) => http.Request.Cookies[Cookies.Device];
+
+    private static void DeleteDeviceCookie(HttpContext http) =>
+        http.Response.Cookies.Delete(Cookies.Device, new CookieOptions { Secure = true, SameSite = SameSiteMode.Strict, Path = Path });
 
     /// <summary>A child session for a parent's own profile, tied to the parent login instead of a device (see Program).</summary>
     public static Task SignInLearnerAsync(HttpContext http, LearnerSession session, Guid parentId)
