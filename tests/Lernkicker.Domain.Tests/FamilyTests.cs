@@ -7,6 +7,15 @@ public class FamilyTests
 {
     private static readonly DateTimeOffset Now = new(2026, 10, 25, 12, 0, 0, TimeSpan.Zero);
 
+    [Theory]
+    [InlineData(null, false, true)]
+    [InlineData(4, false, true)]
+    [InlineData(14, false, false)]
+    [InlineData(null, true, true)]
+    [InlineData(4, true, false)]
+    public void Adult_has_no_grade_level(int? gradeLevel, bool isAdult, bool valid) =>
+        Assert.Equal(valid, Child.IsValidGradeLevel(gradeLevel, isAdult));
+
     [Fact]
     public void Device_locks_after_five_wrong_pins_until_unlocked()
     {

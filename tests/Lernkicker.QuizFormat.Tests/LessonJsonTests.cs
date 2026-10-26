@@ -21,6 +21,18 @@ public class LessonJsonTests
     }
 
     [Fact]
+    public void Grade_level_is_optional_for_adult_material()
+    {
+        var node = JsonNode.Parse(Examples.PoemJson())!.AsObject();
+        node.Remove("gradeLevel");
+
+        var result = _format.Parse(node.ToJsonString());
+
+        Assert.True(result.IsValid, string.Join(Environment.NewLine, result.Issues));
+        Assert.Null(result.Lesson!.GradeLevel);
+    }
+
+    [Fact]
     public void Poem_lesson_is_read_completely()
     {
         var lesson = _format.Parse(Examples.PoemJson()).Lesson!;

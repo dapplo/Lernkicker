@@ -15,6 +15,7 @@
 /next – die nächsten 7 Tage
 /stop – Verbindung trennen</value></data>
   <data name="Result" xml:space="preserve"><value>📝 {0} hat „{1}“ geübt: {2} von {3} Punkten ({4} %), Note {5}.</value></data>
+  <data name="ResultWithoutMark" xml:space="preserve"><value>📝 {0} hat „{1}“ geübt: {2} von {3} Punkten ({4} %).</value></data>
   <data name="Dates.Tomorrow" xml:space="preserve"><value>Morgen:</value></data>
   <data name="Dates.NextDays" xml:space="preserve"><value>Die nächsten 7 Tage:</value></data>
   <data name="Dates.None" xml:space="preserve"><value>In den nächsten 7 Tagen gibt es keine Termine.</value></data>

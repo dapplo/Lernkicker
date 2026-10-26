@@ -15,6 +15,7 @@
 /next – the next 7 days
 /stop – disconnect</value></data>
   <data name="Result" xml:space="preserve"><value>📝 {0} practised “{1}”: {2} of {3} points ({4} %), mark {5}.</value></data>
+  <data name="ResultWithoutMark" xml:space="preserve"><value>📝 {0} practised “{1}”: {2} of {3} points ({4} %).</value></data>
   <data name="Dates.Tomorrow" xml:space="preserve"><value>Tomorrow:</value></data>
   <data name="Dates.NextDays" xml:space="preserve"><value>The next 7 days:</value></data>
   <data name="Dates.None" xml:space="preserve"><value>No dates in the next 7 days.</value></data>

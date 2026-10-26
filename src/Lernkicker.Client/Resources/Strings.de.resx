@@ -18,6 +18,7 @@
   <data name="Common.DeleteEllipsis" xml:space="preserve"><value>Löschen …</value></data>
   <data name="Common.Remove" xml:space="preserve"><value>Entfernen</value></data>
   <data name="Common.Grade" xml:space="preserve"><value>{0}. Klasse</value></data>
+  <data name="Common.Adults" xml:space="preserve"><value>für Erwachsene</value></data>
   <data name="Format.Date" xml:space="preserve"><value>d. MMMM yyyy</value></data>
   <data name="Format.DateTime" xml:space="preserve"><value>d. MMM yyyy, HH:mm</value></data>
   <data name="Language.Choose" xml:space="preserve"><value>Sprache</value></data>
@@ -63,6 +64,7 @@
   <data name="Answer.True" xml:space="preserve"><value>Richtig</value></data>
   <data name="Answer.False" xml:space="preserve"><value>Falsch</value></data>
   <data name="Result.Total" xml:space="preserve"><value>{0} von {1} Punkten · Note {2}</value></data>
+  <data name="Result.TotalWithoutMark" xml:space="preserve"><value>{0} von {1} Punkten</value></data>
   <data name="Result.CorrectWouldBe" xml:space="preserve"><value>Richtig wäre:</value></data>
   <data name="Praise.Perfect" xml:space="preserve"><value>Super! Alles richtig!</value></data>
   <data name="Praise.Great" xml:space="preserve"><value>Sehr gut gemacht!</value></data>
@@ -90,16 +92,18 @@
   <data name="Parents.Title" xml:space="preserve"><value>Eltern</value></data>
   <data name="Parents.LoginHeading" xml:space="preserve"><value>Anmelden für Eltern</value></data>
   <data name="Parents.InvitationOnly" xml:space="preserve"><value>Noch kein Konto? Lernkicker funktioniert nur mit Einladung. Frag die Person, die Lernkicker betreibt.</value></data>
-  <data name="Parents.Children" xml:space="preserve"><value>Kinder</value></data>
+  <data name="Parents.Children" xml:space="preserve"><value>Wer lernt</value></data>
   <data name="Parents.NoChildren" xml:space="preserve"><value>Lege zuerst ein Kind an. Danach verbindest du sein Handy mit einem QR-Code.</value></data>
   <data name="Parents.NoDevice" xml:space="preserve"><value>Noch kein Handy verbunden</value></data>
   <data name="Parents.OneDevice" xml:space="preserve"><value>1 Handy verbunden</value></data>
   <data name="Parents.Devices" xml:space="preserve"><value>{0} Handys verbunden</value></data>
-  <data name="Parents.AddChild" xml:space="preserve"><value>Kind anlegen</value></data>
+  <data name="Parents.AddChild" xml:space="preserve"><value>Kind oder Erwachsenen anlegen</value></data>
   <data name="Parents.AddChildHint" xml:space="preserve"><value>Wir speichern nur den Vor- oder Spitznamen. Die PIN braucht dein Kind auf seinem Handy.</value></data>
   <data name="Child.Title" xml:space="preserve"><value>Kind</value></data>
   <data name="Child.Name" xml:space="preserve"><value>Vorname oder Spitzname</value></data>
   <data name="Child.GradeLevel" xml:space="preserve"><value>Klasse</value></data>
+  <data name="Child.IsAdult" xml:space="preserve"><value>Erwachsen, nicht in der Schule (z. B. du selbst): keine Klasse, keine Schulnoten</value></data>
+  <data name="Child.Adult" xml:space="preserve"><value>Erwachsen</value></data>
   <data name="Child.Pin" xml:space="preserve"><value>PIN (4 Ziffern)</value></data>
   <data name="Child.ToPractice" xml:space="preserve"><value>Zum Üben</value></data>
   <data name="Child.NothingAssigned" xml:space="preserve"><value>Noch nichts ausgewählt.</value></data>
@@ -125,7 +129,7 @@
   <data name="Child.NewPin" xml:space="preserve"><value>Neue PIN (4 Ziffern)</value></data>
   <data name="Child.ChangePin" xml:space="preserve"><value>PIN ändern</value></data>
   <data name="Child.PinChanged" xml:space="preserve"><value>Die PIN ist geändert.</value></data>
-  <data name="Child.Delete" xml:space="preserve"><value>Kind löschen</value></data>
+  <data name="Child.Delete" xml:space="preserve"><value>Profil löschen</value></data>
   <data name="Child.DeleteHint" xml:space="preserve"><value>Löscht {0} mit allen Ergebnissen und verbundenen Handys. Das kann nicht rückgängig gemacht werden.</value></data>
   <data name="Child.ReallyDelete" xml:space="preserve"><value>Ja, {0} löschen</value></data>
   <data name="Quizzes.Title" xml:space="preserve"><value>Proben</value></data>
@@ -135,7 +139,7 @@
   <data name="Quizzes.UploadButton" xml:space="preserve"><value>Hochladen</value></data>
   <data name="Quizzes.Saved" xml:space="preserve"><value>„{0}“ gespeichert (Version {1}, {2} Punkte).</value></data>
   <data name="Quizzes.None" xml:space="preserve"><value>Noch keine Proben. Lade die erste hoch.</value></data>
-  <data name="Quizzes.Details" xml:space="preserve"><value>{0} · Klasse {1} · {2} Punkte · Version {3} · {4}</value></data>
+  <data name="Quizzes.Details" xml:space="preserve"><value>{0} · {1} · {2} Punkte · Version {3} · {4}</value></data>
   <data name="Quizzes.ReallyDelete" xml:space="preserve"><value>Wirklich löschen</value></data>
   <data name="Quizzes.ArchiveHint" xml:space="preserve"><value>Hat ein Kind die Probe schon geübt, wird sie archiviert: Die Ergebnisse bleiben, die Probe verschwindet aus der Liste.</value></data>
   <data name="Invitation.Title" xml:space="preserve"><value>Einladung</value></data>
@@ -268,7 +272,7 @@
   <data name="Lessons.UploadHint" xml:space="preserve"><value>Eine Datei im Format &lt;code&gt;lesson/v1&lt;/code&gt; (JSON) mit Text, Gedicht, Lernkarten, Merksätzen oder etwas zum Nachschlagen (z. B. Spielregeln). Lädst du eine Datei mit derselben &lt;code&gt;id&lt;/code&gt; noch einmal hoch, ersetzt sie die alte; der Lernstand deines Kindes bleibt.</value></data>
   <data name="Lessons.Saved" xml:space="preserve"><value>„{0}“ gespeichert.</value></data>
   <data name="Lessons.None" xml:space="preserve"><value>Noch kein Lernstoff. Lade den ersten hoch.</value></data>
-  <data name="Lessons.Details" xml:space="preserve"><value>{0} · Klasse {1} · {2} Teile · {3}</value></data>
+  <data name="Lessons.Details" xml:space="preserve"><value>{0} · {1} · {2} Teile · {3}</value></data>
   <data name="Lessons.DeleteHint" xml:space="preserve"><value>Beim Löschen verschwindet der Lernstoff auch bei deinen Kindern, mit ihrem Lernstand.</value></data>
   <data name="Lessons.Until" xml:space="preserve"><value>Termin {0}</value></data>
   <data name="Error.lesson.notFound" xml:space="preserve"><value>Diesen Lernstoff gibt es nicht.</value></data>
@@ -323,8 +327,8 @@
   <data name="Library.Lessons" xml:space="preserve"><value>Lernstoff</value></data>
   <data name="Library.Subject" xml:space="preserve"><value>Fach</value></data>
   <data name="Library.Grade" xml:space="preserve"><value>Klasse</value></data>
-  <data name="Library.QuizDetails" xml:space="preserve"><value>Probe · {0} · Klasse {1} · {2} Punkte · geteilt am {3}</value></data>
-  <data name="Library.LessonDetails" xml:space="preserve"><value>Lernstoff · {0} · Klasse {1} · {2} Teile · geteilt am {3}</value></data>
+  <data name="Library.QuizDetails" xml:space="preserve"><value>Probe · {0} · {1} · {2} Punkte · geteilt am {3}</value></data>
+  <data name="Library.LessonDetails" xml:space="preserve"><value>Lernstoff · {0} · {1} · {2} Teile · geteilt am {3}</value></data>
   <data name="Library.InMyLibrary" xml:space="preserve"><value>Du hast schon einen mit derselben id; Übernehmen ersetzt ihn durch diesen.</value></data>
   <data name="Library.Copy" xml:space="preserve"><value>In meine Sammlung übernehmen</value></data>
   <data name="Library.Update" xml:space="preserve"><value>Meinen ersetzen</value></data>
@@ -335,7 +339,7 @@
   <data name="Preview.Button" xml:space="preserve"><value>Vorschau</value></data>
   <data name="Preview.QuizHint" xml:space="preserve"><value>Vorschau: So sieht die Probe am Handy des Kindes aus. Du kannst die Aufgaben ausprobieren; nichts wird abgegeben.</value></data>
   <data name="Preview.LessonHint" xml:space="preserve"><value>Vorschau: So sieht der Lernstoff am Handy des Kindes aus.</value></data>
-  <data name="Preview.QuizDetails" xml:space="preserve"><value>{0} · Klasse {1} · {2} Aufgaben · {3} Punkte</value></data>
+  <data name="Preview.QuizDetails" xml:space="preserve"><value>{0} · {1} · {2} Aufgaben · {3} Punkte</value></data>
   <data name="Share.Start" xml:space="preserve"><value>Teilen</value></data>
   <data name="Share.Stop" xml:space="preserve"><value>Nicht mehr teilen</value></data>
   <data name="Share.Badge" xml:space="preserve"><value>Mit allen Familien geteilt</value></data>

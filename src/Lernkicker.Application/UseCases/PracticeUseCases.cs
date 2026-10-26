@@ -41,11 +41,12 @@ public sealed class PracticeUseCases(
             return AppError.NotFound();
         }
 
-        var result = Grader.Grade(found.Quiz, answers);
+        var child = await children.FindAsync(childId);
+        var result = Grader.Grade(found.Quiz, answers, withMark: child is not { IsAdult: true });
         practice.Add(new Attempt(found.Assignment.FamilyId, childId, found.Assignment.StoredQuizId, channel, time.GetUtcNow(), answers, result));
         await unitOfWork.SaveChangesAsync();
 
-        if (await children.FindAsync(childId) is { } child)
+        if (child is not null)
         {
             await telegram.ResultAsync(child.Name, found.Quiz.Title, result);
         }

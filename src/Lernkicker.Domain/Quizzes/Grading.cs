@@ -29,13 +29,13 @@ public sealed record PartResult(int Index, bool Correct, string? Solution, strin
 
 public sealed record ExerciseResult(string Id, string Type, string Instruction, int Points, int MaxPoints, IReadOnlyList<PartResult> Parts, string? Explanation, string? SolutionText);
 
-/// <summary><c>Mark</c> is a rough German school mark (1 best, 6 worst).</summary>
-public sealed record QuizResult(int Points, int MaxPoints, int Percent, int Mark, IReadOnlyList<ExerciseResult> Exercises);
+/// <summary><c>Mark</c> is a rough German school mark (1 best, 6 worst); null for an adult, who gets no school marks.</summary>
+public sealed record QuizResult(int Points, int MaxPoints, int Percent, int? Mark, IReadOnlyList<ExerciseResult> Exercises);
 
 /// <summary>Grades answers as described in docs/quiz-format.md ("Grading").</summary>
 public static class Grader
 {
-    public static QuizResult Grade(Quiz quiz, IReadOnlyDictionary<string, ExerciseAnswer> answers)
+    public static QuizResult Grade(Quiz quiz, IReadOnlyDictionary<string, ExerciseAnswer> answers, bool withMark = true)
     {
         var exercises = quiz.Exercises
             .Select(e => GradeExercise(e, answers.GetValueOrDefault(e.Id) ?? new ExerciseAnswer()))
@@ -43,7 +43,7 @@ public static class Grader
         var points = exercises.Sum(e => e.Points);
         var max = exercises.Sum(e => e.MaxPoints);
         var share = max == 0 ? 0 : (double)points / max;
-        return new QuizResult(points, max, (int)Math.Round(share * 100, MidpointRounding.AwayFromZero), Mark(share), exercises);
+        return new QuizResult(points, max, (int)Math.Round(share * 100, MidpointRounding.AwayFromZero), withMark ? Mark(share) : null, exercises);
     }
 
     /// <summary>Rough German school mark from the share of points (orientation only).</summary>

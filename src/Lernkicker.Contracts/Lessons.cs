@@ -1,6 +1,6 @@
 namespace Lernkicker.Contracts;
 
-public sealed record LessonOverview(string LessonId, string Title, string Subject, int GradeLevel, string? Topic, int Blocks, DateTimeOffset UploadedAt, bool Shared);
+public sealed record LessonOverview(string LessonId, string Title, string Subject, int? GradeLevel, string? Topic, int Blocks, DateTimeOffset UploadedAt, bool Shared);
 
 public sealed record NewLessonAssignment(string LessonId, DateOnly? DueOn);
 

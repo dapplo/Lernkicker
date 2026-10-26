@@ -1,6 +1,6 @@
 # Lernkicker
 
-Lernkicker is a small self-hosted learning app for primary school children. Parents upload practice tests ("quizzes") and assign them to their children, the children practise on their phone, and the parents see the results. Several families can share one installation; each family only sees its own data. The UI is German and English.
+Lernkicker is a small self-hosted learning app for primary school children. Parents upload practice tests ("quizzes") and assign them to their children, the children practise on their phone, and the parents see the results. Several families can share one installation; each family only sees its own data. A parent can also add an adult profile (no grade, no school marks) to learn with their own quizzes and material. The UI is German and English.
 
 It runs as a Docker container on a Synology NAS and is reachable through Tailscale (optionally public via Tailscale Funnel).
 
@@ -76,7 +76,7 @@ Then open http://localhost:8080 and create the admin on the setup page. Login co
 | `/pair#<code>` | child | Opened from the QR code |
 | `/practice/<assignment>` | child | One exercise per screen, hand in, result with solutions |
 | `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, facts, entries to look up; mark parts as known (or jump between parts in a reference lesson) |
-| `/parents` | parent | Login, children, add a child, connect Telegram |
+| `/parents` | parent | Login, children, add a child or adult, connect Telegram |
 | `/parents/quizzes` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete quizzes |
 | `/parents/lessons` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete learning material |
 | `/parents/preview/<quiz\|lesson>/<id>` | parent | Preview as the child sees it |

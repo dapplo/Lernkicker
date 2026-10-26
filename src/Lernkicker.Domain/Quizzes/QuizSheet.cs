@@ -10,7 +10,7 @@ public sealed record QuizSheet(
     string Id,
     string Title,
     string Subject,
-    int GradeLevel,
+    int? GradeLevel,
     string Language,
     string? Topic,
     int? DurationMinutes,

@@ -12,7 +12,7 @@ public sealed record InvitationCreated(string Code, DateTimeOffset ExpiresAt);
 
 public sealed record ParentProfile(string Name, string Email, string FamilyName, bool IsAdmin, string Language);
 
-public sealed record ChildSummary(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices);
+public sealed record ChildSummary(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult);
 
 public sealed record DeviceSummary(Guid Id, string Label, DateTimeOffset PairedAt, DateTimeOffset? LastUsedAt, bool Locked)
 {
@@ -28,7 +28,7 @@ public sealed record DeviceStatus(bool Paired, string? ChildName, bool Locked);
 /// <summary>Who is logged in on a child's device after a correct PIN.</summary>
 public sealed record ChildSession(Guid FamilyId, Guid ChildId, Guid DeviceId, string ChildName);
 
-public sealed record QuizSummary(string QuizId, int Version, string Title, string Subject, int GradeLevel, string? Topic, int MaxPoints, DateTimeOffset UploadedAt, bool Shared)
+public sealed record QuizSummary(string QuizId, int Version, string Title, string Subject, int? GradeLevel, string? Topic, int MaxPoints, DateTimeOffset UploadedAt, bool Shared)
 {
     public static QuizSummary From(StoredQuiz q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt, q.IsShared);
 }
@@ -40,13 +40,13 @@ public sealed record AssignmentSummary(
     Guid Id, Guid StoredQuizId, string QuizId, int Version, string Title, string Subject, string? Topic, int MaxPoints, DateOnly? DueOn, DateTimeOffset AssignedAt);
 
 public sealed record AttemptSummary(
-    Guid Id, Guid StoredQuizId, string QuizId, string Title, string Subject, string Channel, DateTimeOffset SubmittedAt, int Points, int MaxPoints, int Percent, int Mark);
+    Guid Id, Guid StoredQuizId, string QuizId, string Title, string Subject, string Channel, DateTimeOffset SubmittedAt, int Points, int MaxPoints, int Percent, int? Mark);
 
 /// <summary>An assignment as the child sees it, with progress.</summary>
 public sealed record ChildAssignment(
     Guid AssignmentId, string Title, string Subject, string? Topic, int MaxPoints, DateOnly? DueOn, int Attempts, int? BestPercent, int Stars);
 
-public sealed record LessonSummary(string LessonId, string Title, string Subject, int GradeLevel, string? Topic, int Blocks, DateTimeOffset UploadedAt, bool Shared);
+public sealed record LessonSummary(string LessonId, string Title, string Subject, int? GradeLevel, string? Topic, int Blocks, DateTimeOffset UploadedAt, bool Shared);
 
 public static class SharedKinds
 {
@@ -59,7 +59,7 @@ public static class SharedKinds
 /// <c>InMyLibrary</c> says the own library already has one with the same id (copying it replaces that one).
 /// </summary>
 public sealed record SharedSummary(
-    Guid Id, string Kind, string ItemId, string Title, string Subject, int GradeLevel, string? Topic, int Size, DateTimeOffset SharedAt, bool InMyLibrary);
+    Guid Id, string Kind, string ItemId, string Title, string Subject, int? GradeLevel, string? Topic, int Size, DateTimeOffset SharedAt, bool InMyLibrary);
 
 /// <summary>A lesson given to a child, with the child's progress, for parents.</summary>
 public sealed record LessonAssignmentSummary(

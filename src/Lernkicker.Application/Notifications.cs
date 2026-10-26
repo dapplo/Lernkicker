@@ -18,7 +18,7 @@ public sealed record UnlinkedNotification : Notification;
 public sealed record HelpNotification : Notification;
 
 /// <summary>A child handed in a quiz.</summary>
-public sealed record ResultNotification(string ChildName, string QuizTitle, int Points, int MaxPoints, int Percent, int Mark) : Notification;
+public sealed record ResultNotification(string ChildName, string QuizTitle, int Points, int MaxPoints, int Percent, int? Mark) : Notification;
 
 /// <summary>The children's dates: tomorrow's (the evening reminder) or the next days (/next).</summary>
 public sealed record DatesNotification(DatesNotification.Period When, IReadOnlyList<ChildDates> Children) : Notification

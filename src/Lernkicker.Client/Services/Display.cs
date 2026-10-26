@@ -63,6 +63,9 @@ public sealed class Display(IStringLocalizer<Strings> l)
 
     public string Subject(string subject) => Text($"Subject.{subject}", subject);
 
+    /// <summary>"Grade 4", or "for adults" for a quiz or lesson without a school year.</summary>
+    public string Grade(int? gradeLevel) => gradeLevel is { } grade ? l["Common.Grade", grade] : l["Common.Adults"];
+
     /// <summary>CSS class per subject, for the colour of its card.</summary>
     public static string SubjectClass(string subject) => subject switch
     {

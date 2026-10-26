@@ -42,7 +42,7 @@ public sealed class Attempt : IFamilyOwned
     public int Points { get; private set; }
     public int MaxPoints { get; private set; }
     public int Percent { get; private set; }
-    public int Mark { get; private set; }
+    public int? Mark { get; private set; }
     public IReadOnlyDictionary<string, ExerciseAnswer> Answers { get; private set; }
     public QuizResult Result { get; private set; }
 
