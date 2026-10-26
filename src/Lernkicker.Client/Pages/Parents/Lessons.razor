@@ -9,8 +9,9 @@
 <h1>@L["Lessons.Title"]</h1>
 <p class="subtitle">@L["Lessons.Intro"]</p>
 
-<section class="box">
-    <h2>@L["Lessons.Upload"]</h2>
+@* Folded away once there is something in the list, which then stays in view *@
+<details class="box upload" open="@(_lessons is { Count: 0 })">
+    <summary>@L["Lessons.Upload"]</summary>
     <p class="hint">@((MarkupString)L["Lessons.UploadHint"].Value)</p>
     <p class="hint">@L["Upload.PicturesHint"]</p>
     <label class="file">
@@ -27,12 +28,12 @@
         <textarea rows="8" @bind="_json" @bind:event="oninput" spellcheck="false" placeholder='{ "format": "lesson/v1", … }'></textarea>
         <button class="btn" disabled="@(_busy || string.IsNullOrWhiteSpace(_json))" @onclick="() => Upload(_json)">@L["Quizzes.UploadButton"]</button>
     </details>
-    @if (_uploaded is { } uploaded)
-    {
-        <p class="ok" role="status">@L["Lessons.Saved", uploaded.Title]</p>
-    }
-    <Messages Errors="@_errors" />
-</section>
+</details>
+@if (_uploaded is { } uploaded)
+{
+    <p class="ok" role="status">@L["Lessons.Saved", uploaded.Title]</p>
+}
+<Messages Errors="@_errors" />
 
 @if (_lessons is null)
 {
@@ -44,13 +45,18 @@ else if (_lessons.Count == 0)
 }
 else
 {
-    <ul class="list">
-        @foreach (var lesson in _lessons)
+    @if (_lessons.Count > 1)
+    {
+        <ListFilterBar Filter="_filter" Subjects="_lessons.Select(i => i.Subject)" Grades="_lessons.Select(i => i.GradeLevel)"
+                       Shown="Shown.Count()" Total="_lessons.Count" OnChange="StateHasChanged" />
+    }
+    <ul class="list grid">
+        @foreach (var lesson in Shown)
         {
             <li class="@Display.SubjectClass(lesson.Subject)">
                 <div>
                     <b>@lesson.Title</b>
-                    <small>@L["Lessons.Details", Display.Subject(lesson.Subject), Display.Grade(lesson.GradeLevel), lesson.Blocks, Display.Date(lesson.UploadedAt)]</small>
+                    <small>@L["Lessons.Details", Display.Subject(lesson.Subject), Display.Grade(lesson.GradeLevel), lesson.Blocks, Display.Date(DateOnly.FromDateTime(lesson.UploadedAt.LocalDateTime))]</small>
                     @if (lesson.Shared)
                     {
                         <small class="shared-badge">@L["Share.Badge"]</small>
@@ -59,16 +65,16 @@ else
                 @if (_deleting == lesson.LessonId)
                 {
                     <span class="buttons">
-                        <button class="btn danger" @onclick="() => Delete(lesson.LessonId)">@L["Quizzes.ReallyDelete"]</button>
-                        <button class="btn quiet" @onclick="() => _deleting = null">@L["Common.Cancel"]</button>
+                        <button class="btn danger small" @onclick="() => Delete(lesson.LessonId)">@L["Quizzes.ReallyDelete"]</button>
+                        <IconButton Icon="✕" Label="@L["Common.Cancel"]" Class="quiet" OnClick="() => _deleting = null" />
                     </span>
                 }
                 else
                 {
                     <span class="buttons">
-                        <a class="btn quiet" href="parents/preview/lesson/@Uri.EscapeDataString(lesson.LessonId)">@L["Preview.Button"]</a>
-                        <button class="btn quiet" @onclick="() => Share(lesson.LessonId, !lesson.Shared)">@L[lesson.Shared ? "Share.Stop" : "Share.Start"]</button>
-                        <button class="btn quiet" @onclick="() => _deleting = lesson.LessonId">@L["Common.Delete"]</button>
+                        <IconButton Icon="👁️" Label="@L["Preview.Button"]" Class="quiet" Href="@($"parents/preview/lesson/{Uri.EscapeDataString(lesson.LessonId)}")" />
+                        <IconButton Icon="🌍" Label="@L[lesson.Shared ? "Share.Stop" : "Share.Start"]" Class="@(lesson.Shared ? "on" : "quiet")" OnClick="() => Share(lesson.LessonId, !lesson.Shared)" />
+                        <IconButton Icon="🗑️" Label="@L["Common.Delete"]" Class="quiet" OnClick="() => _deleting = lesson.LessonId" />
                     </span>
                 }
             </li>
@@ -84,8 +90,11 @@ else
     private LessonOverview? _uploaded;
     private IReadOnlyList<string>? _errors;
     private string? _deleting;
+    private readonly ListFilter _filter = new();
     private bool _busy;
     private bool _shrinking;
+
+    private IEnumerable<LessonOverview> Shown => _lessons!.Where(i => _filter.Matches(i.Title, i.Topic, i.Subject, Display.Subject(i.Subject), i.GradeLevel));
 
     // The server takes at most 100 files per upload, the JSON included
     private const int MaxFiles = 100;

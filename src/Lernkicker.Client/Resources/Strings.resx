@@ -322,7 +322,6 @@
   <data name="Library.Intro" xml:space="preserve"><value>Tests and learning material other families on this Lernkicker have shared. Look at them first, then copy them into your own collection. The copy is yours: later changes by the other family do not affect it.</value></data>
   <data name="Library.Empty" xml:space="preserve"><value>Nothing shared yet. When you share a test or learning material, other families find it here.</value></data>
   <data name="Library.Kind" xml:space="preserve"><value>Type</value></data>
-  <data name="Library.All" xml:space="preserve"><value>All</value></data>
   <data name="Library.Quizzes" xml:space="preserve"><value>Tests</value></data>
   <data name="Library.Lessons" xml:space="preserve"><value>Learning material</value></data>
   <data name="Library.Subject" xml:space="preserve"><value>Subject</value></data>
@@ -343,6 +342,13 @@
   <data name="Share.Start" xml:space="preserve"><value>Share</value></data>
   <data name="Share.Stop" xml:space="preserve"><value>Stop sharing</value></data>
   <data name="Share.Badge" xml:space="preserve"><value>Shared with all families</value></data>
+  <data name="List.Search" xml:space="preserve"><value>Search title, topic or subject …</value></data>
+  <data name="List.AllSubjects" xml:space="preserve"><value>All subjects</value></data>
+  <data name="List.AllGrades" xml:space="preserve"><value>All grades</value></data>
+  <data name="List.AllKinds" xml:space="preserve"><value>All types</value></data>
+  <data name="List.Clear" xml:space="preserve"><value>Reset filters</value></data>
+  <data name="List.Count" xml:space="preserve"><value>{0} of {1} shown</value></data>
+  <data name="List.NoMatch" xml:space="preserve"><value>Nothing found.</value></data>
   <data name="Share.Hint" xml:space="preserve"><value>Shared items are visible to all families on this Lernkicker. They can preview and copy them; they do not see your name, your children or any results. Copies already made stay when you stop sharing.</value></data>
   <data name="Error.shared.notFound" xml:space="preserve"><value>This is no longer shared.</value></data>
   <data name="Telegram.Title" xml:space="preserve"><value>Telegram</value></data>

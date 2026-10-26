@@ -69,7 +69,7 @@
                     </div>
                     @if (entry.EventId is not null && Edit.HasDelegate)
                     {
-                        <button class="btn quiet" @onclick="() => Edit.InvokeAsync(entry)">@L["Calendar.Edit"]</button>
+                        <IconButton Icon="✏️" Label="@L["Calendar.Edit"]" Class="quiet" OnClick="() => Edit.InvokeAsync(entry)" />
                     }
                 </li>
             }

@@ -40,7 +40,9 @@ else
                             <b>@a.Title</b>
                             <small>@Display.Subject(a.Subject)@(a.DueOn is { } due ? " · " + L["Home.TestOn", Display.Date(due)] : "")</small>
                         </div>
-                        <button class="btn quiet" @onclick="() => Unassign(a.Id)">@L["Common.Remove"]</button>
+                        <span class="buttons">
+                            <IconButton Icon="✕" Label="@L["Common.Remove"]" Class="quiet" OnClick="() => Unassign(a.Id)" />
+                        </span>
                     </li>
                 }
             </ul>
@@ -138,9 +140,9 @@ else
                             <span class="buttons">
                                 @if (device.Locked)
                                 {
-                                    <button class="btn" @onclick="() => Unlock(device.Id)">@L["Child.Unlock"]</button>
+                                    <IconButton Icon="🔓" Label="@L["Child.Unlock"]" OnClick="() => Unlock(device.Id)" />
                                 }
-                                <button class="btn quiet" @onclick="() => RemoveDevice(device.Id)">@L["Common.Remove"]</button>
+                                <IconButton Icon="✕" Label="@L["Common.Remove"]" Class="quiet" OnClick="() => RemoveDevice(device.Id)" />
                             </span>
                         </li>
                     }
