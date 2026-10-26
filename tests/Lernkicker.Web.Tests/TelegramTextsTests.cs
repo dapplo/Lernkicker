@@ -24,6 +24,22 @@ public class TelegramTextsTests
         new DatesNotification(DatesNotification.Period.NextDays, []),
     ];
 
+    [Fact]
+    public void German_dates_use_german_day_names()
+    {
+        // Needs ICU: the container image must not run in globalization-invariant mode
+        var text = MessageTexts.Format(new DatesNotification(DatesNotification.Period.NextDays, [new ChildDates("Calvin", [Test])]), "de");
+
+        Assert.Contains("Di 27.10.", text);
+        Assert.DoesNotContain("Tue", text);
+    }
+
+    [Fact]
+    public void An_unknown_language_falls_back_to_english()
+    {
+        Assert.Equal(MessageTexts.Format(new HelpNotification(), "en"), MessageTexts.Format(new HelpNotification(), "!!"));
+    }
+
     [Theory]
     [MemberData(nameof(Languages))]
     public void Every_notification_has_a_text(string language)

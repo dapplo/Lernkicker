@@ -30,8 +30,9 @@ RUN dotnet publish src/Lernkicker.Web/Lernkicker.Web.csproj -a $TARGETARCH --no-
 # The final image has no shell; create the data folder here so it can be copied with the right owner
 RUN mkdir /data
 
-# Chiseled: no shell, no package manager, runs as the non-root user "app" (uid 1654)
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled
+# Chiseled: no shell, no package manager, runs as the non-root user "app" (uid 1654).
+# "extra" adds ICU, so the Telegram texts can be formatted in German; the plain image only knows the invariant culture.
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled-extra
 WORKDIR /app
 COPY --from=build /app ./
 # Owned by the app user, so a new named volume starts writable (a bind mount still needs chown 1654)
