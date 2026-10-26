@@ -2,6 +2,19 @@ using Lernkicker.Contracts;
 
 namespace Lernkicker.Client.Services;
 
+/// <summary>The games made from a lesson (see LessonGames on the server), in the order they are offered.</summary>
+public static class LessonGameKinds
+{
+    public static string Icon(string kind) => kind switch
+    {
+        "fallingWords" => "🌠",
+        "memory" => "🃏",
+        "crossword" => "✏️",
+        "wordSearch" => "🔍",
+        _ => "🎮",
+    };
+}
+
 /// <summary>The rules of the falling words game that do not need the screen.</summary>
 public static class FallingWords
 {

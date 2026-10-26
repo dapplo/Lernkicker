@@ -27,6 +27,26 @@ else
 
     <LessonBlocks Lesson="@_lesson" Known="@_known" Toggle="Toggle" />
 
+    @if (_lesson.Games.Count > 0)
+    {
+        @* Games made from the lesson's flashcards and entries; the server says which ones its content is enough for *@
+        <section class="lesson-games">
+            <h2><span aria-hidden="true">🎮</span> @L["Game.Section"]</h2>
+            <p class="hint">@L["Game.SectionHint"]</p>
+            <ul class="game-list">
+                @foreach (var kind in _lesson.Games)
+                {
+                    <li>
+                        <a class="game-tile" href="learn/@AssignmentId/play/@kind">
+                            <span class="icon" aria-hidden="true">@LessonGameKinds.Icon(kind)</span>
+                            <span>@L[$"Game.Name.{kind}"]</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
     @if (_lesson.Mode != "reference")
     {
         <div class="lesson-end">

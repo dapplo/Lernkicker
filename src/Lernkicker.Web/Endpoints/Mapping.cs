@@ -1,6 +1,7 @@
 using Lernkicker.Application;
 using Lernkicker.Contracts;
 using Lernkicker.Domain.Calendar;
+using Lernkicker.Domain.Games;
 using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Media;
 using Lernkicker.Domain.Quizzes;
@@ -55,7 +56,25 @@ public static class Mapping
 
     public static LessonDto ToDto(this LessonToLearn l) =>
         new(l.AssignmentId, l.Lesson.Title, l.Lesson.Subject, l.Lesson.Language, l.Lesson.Topic, l.Lesson.Description, l.DueOn,
-            l.KnownBlocks, l.Lesson.Blocks.Select(b => ToDto(b, l.Images)).ToList(), l.Lesson.Mode);
+            l.KnownBlocks, l.Lesson.Blocks.Select(b => ToDto(b, l.Images)).ToList(), l.Lesson.Mode)
+        {
+            Games = LessonGames.Available(l.Lesson),
+        };
+
+    public static LessonGameDto ToDto(this LessonGame g) => g.Round switch
+    {
+        ExerciseRound e => new LessonGameDto(g.AssignmentId, g.Title, g.Language, e.Kind) { Exercise = ToDto(e.Sheet, g.Images) },
+        MemoryRound m => new LessonGameDto(g.AssignmentId, g.Title, g.Language, m.Kind)
+        {
+            Cards = m.Cards.Select(c => new MemoryCardDto(c.Pair, c.Text, c.Image.ToDto(g.Images))).ToList(),
+        },
+        CrosswordRound c => new LessonGameDto(g.AssignmentId, g.Title, g.Language, c.Kind)
+        {
+            Crossword = new CrosswordDto(c.Grid.Width, c.Grid.Height,
+                c.Grid.Words.Select(w => new CrosswordWordDto(w.Number, w.Row, w.Column, w.Down, w.Answer, w.Clue)).ToList()),
+        },
+        _ => throw new NotSupportedException($"Unknown game {g.Round.Kind}"),
+    };
 
     private static LessonBlockDto ToDto(LessonBlock b, IReadOnlyDictionary<string, string> images) => b switch
     {

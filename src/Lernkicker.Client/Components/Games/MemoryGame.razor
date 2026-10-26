@@ -1,0 +1,102 @@
+@* Memory: the cards lie face down; the child turns two at a time and keeps them open when they are a pair (a term
+   and its meaning). Cards keep the lesson's language; the counter and messages are UI texts. *@
+@implements IDisposable
+
+<p class="game-how" lang="@UiLanguage.Current">@L["Memory.How"]</p>
+<div class="memory @(Cards.Count > 12 ? "many" : "")">
+    @for (var i = 0; i < Cards.Count; i++)
+    {
+        var index = i;
+        var card = Cards[index];
+        var open = _matched.Contains(card.Pair) || _open.Contains(index);
+        var state = _matched.Contains(card.Pair) ? "matched" : open ? (_open.Count == 2 && _miss ? "open miss" : "open") : "";
+        <button type="button" class="memory-card @state" aria-pressed="@open" disabled="@_matched.Contains(card.Pair)"
+                aria-label="@(open ? card.Text : L["Memory.Card", index + 1].Value)" @onclick="() => Turn(index)">
+            @if (open)
+            {
+                <Picture Image="@card.Image" Zoom="false" />
+                <span lang="@Language">@card.Text</span>
+            }
+            else
+            {
+                <span class="back" aria-hidden="true">@Theme.Value.Icon</span>
+            }
+        </button>
+    }
+</div>
+<p class="game-score memory-score" lang="@UiLanguage.Current" aria-live="polite">
+    @if (_matched.Count == Cards.Count / 2)
+    {
+        <strong>@L["Memory.Done", _moves]</strong>
+    }
+    else
+    {
+        <span>@(_moves == 1 ? L["Memory.OneMove"] : L["Memory.Moves", _moves])</span>
+    }
+</p>
+
+@code {
+    private readonly HashSet<int> _matched = [];
+    private readonly List<int> _open = [];
+    private CancellationTokenSource _closing = new();
+    private bool _miss;
+    private int _moves;
+
+    [Inject]
+    private CurrentTheme Theme { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<MemoryCardDto> Cards { get; set; }
+
+    [Parameter]
+    public string? Language { get; set; }
+
+    private async Task Turn(int index)
+    {
+        if (_open.Count == 2)
+        {
+            // A third tap closes a wrong pair right away instead of waiting
+            CloseMiss();
+        }
+
+        if (_open.Contains(index))
+        {
+            return;
+        }
+
+        _open.Add(index);
+        if (_open.Count < 2)
+        {
+            return;
+        }
+
+        _moves++;
+        if (Cards[_open[0]].Pair == Cards[_open[1]].Pair)
+        {
+            _matched.Add(Cards[index].Pair);
+            _open.Clear();
+            return;
+        }
+
+        _miss = true;
+        var closing = _closing = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(1500, closing.Token);
+            CloseMiss();
+        }
+        catch (TaskCanceledException)
+        {
+            // Closed by the next tap
+        }
+    }
+
+    private void CloseMiss()
+    {
+        _closing.Cancel();
+        _open.Clear();
+        _miss = false;
+    }
+
+    public void Dispose() => _closing.Cancel();
+}

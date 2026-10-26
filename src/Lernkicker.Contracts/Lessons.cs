@@ -12,10 +12,16 @@ public sealed record LessonAssignmentOverview(
 /// <summary>A lesson in the child's list.</summary>
 public sealed record MyLesson(Guid AssignmentId, string Title, string Subject, string? Topic, DateOnly? DueOn, int KnownBlocks, int Blocks, string Mode);
 
-/// <summary>A lesson to learn or look things up in (<c>Mode</c> learn or reference). Each block has the fields of its <c>Type</c> (text, poem, flashcards, facts, image, entries).</summary>
+/// <summary>
+/// A lesson to learn or look things up in (<c>Mode</c> learn or reference). Each block has the fields of its <c>Type</c>
+/// (text, poem, flashcards, facts, image, entries). <c>Games</c> are the games its content is enough for (see <see cref="LessonGameDto"/>).
+/// </summary>
 public sealed record LessonDto(
     Guid AssignmentId, string Title, string Subject, string Language, string? Topic, string? Description, DateOnly? DueOn,
-    IReadOnlyList<string> KnownBlocks, IReadOnlyList<LessonBlockDto> Blocks, string Mode = "learn");
+    IReadOnlyList<string> KnownBlocks, IReadOnlyList<LessonBlockDto> Blocks, string Mode = "learn")
+{
+    public IReadOnlyList<string> Games { get; init; } = [];
+}
 
 public sealed record LessonBlockDto
 {
@@ -38,3 +44,22 @@ public sealed record FlashcardDto(string Front, string Back, ImageDto? FrontImag
 
 /// <summary>The end of a practice session: the blocks the child knows now.</summary>
 public sealed record LessonPractice(IReadOnlyList<string> KnownBlocks);
+
+/// <summary>
+/// A round of a game made from a lesson (<c>Kind</c>: fallingWords, wordSearch, memory, crossword). Falling words and
+/// word search come as an <c>Exercise</c>, like in a quiz; memory and crossword have their own fields.
+/// </summary>
+public sealed record LessonGameDto(Guid AssignmentId, string Title, string Language, string Kind)
+{
+    public ExerciseSheetDto? Exercise { get; init; }
+    public IReadOnlyList<MemoryCardDto>? Cards { get; init; }
+    public CrosswordDto? Crossword { get; init; }
+}
+
+/// <summary>A memory card; the two cards of a pair share <c>Pair</c>.</summary>
+public sealed record MemoryCardDto(int Pair, string Text, ImageDto? Image = null);
+
+/// <summary>A crossword of <c>Width</c> × <c>Height</c> cells; each word starts at <c>Row</c>, <c>Column</c> (from 0, top left).</summary>
+public sealed record CrosswordDto(int Width, int Height, IReadOnlyList<CrosswordWordDto> Words);
+
+public sealed record CrosswordWordDto(int Number, int Row, int Column, bool Down, string Answer, string Clue);

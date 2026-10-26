@@ -79,6 +79,9 @@ public sealed record LessonToLearn(Guid AssignmentId, Lesson Lesson, DateOnly? D
     public static LessonToLearn Preview(Lesson lesson, IReadOnlyDictionary<string, string> images) => new(Guid.Empty, lesson, null, [], images);
 }
 
+/// <summary>A round of a game made from a lesson's content (see <see cref="Lernkicker.Domain.Games.LessonGames"/>), with the lesson's pictures.</summary>
+public sealed record LessonGame(Guid AssignmentId, string Title, string Language, Lernkicker.Domain.Games.GameRound Round, IReadOnlyDictionary<string, string> Images);
+
 /// <summary>Where a calendar entry comes from.</summary>
 public static class EntrySources
 {

@@ -123,6 +123,19 @@ It works for any text to learn word for word, e.g. a times table rhyme or a shor
 
 A large picture; tapping it shows it full screen. Like every block, the child can mark it with "Kann ich!".
 
+## Games from flashcards and entries
+
+Nothing has to be written for games: the cards of every `flashcards` block (`front`, `back`) and the entries of every `entries` block (`name`, `text`) are pairs of a term and what it means. Under the lesson the child gets a **Spielen / Play** section with each game the pairs are enough for, and every round picks new pairs in a new order. Games are practice only: nothing is graded or stored. [`lessons/science/grain-terms.json`](../lessons/science/grain-terms.json) unlocks all of them.
+
+| Game | Needs at least 4 pairs where | A round |
+| --- | --- | --- |
+| Wörter fangen / Catch the words | the term has at most 40 characters and the meaning at most 60 | up to 12 terms fall; the child taps their meaning (3 shown at a time), like the quiz type `fallingWords` |
+| Memory | the term has at most 30 characters and the meaning at most 60 | 6 pairs, term and meaning on separate cards (the front picture goes on the term's card) |
+| Kreuzworträtsel / Crossword | the term is one word of 3–12 letters and the meaning at most 120 characters | up to 10 words that cross; the meanings are the clues |
+| Suchsel / Word search | the term is one word of 3–12 letters | up to 10 words in a new grid, like the quiz type `wordSearch` (`medium`) |
+
+"One word" ignores a leading article (`der`, `die`, `das`, `ein`, `eine`, `the`, `a`, `an`), so "die Ähre" counts as "Ähre"; terms with spaces, digits or hyphens don't count. `**` and `*` are removed. A term or a meaning that appears twice is used once, so every round has exactly one right answer. To unlock games, write fronts as single words and keep backs short.
+
 ## Pictures
 
 Pictures are files uploaded **together with the JSON**: the JSON names each one in an `image` object, and the parent uploads the JSON with its pictures, either as a `.zip` or by picking all files at once. Without pictures, a file stays exactly as before. Replacing a lesson replaces its pictures too.

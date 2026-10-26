@@ -153,4 +153,34 @@ public sealed class LessonTests(LernkickerFactory factory) : IClassFixture<Lernk
 
         Assert.Single(await LernkickerFactory.Json<List<LessonAssignmentOverview>>(await a.GetAsync($"/api/children/{childA.Id}/lessons")));
     }
+
+    [Fact]
+    public async Task Games_come_from_the_lessons_flashcards()
+    {
+        var parent = await factory.NewFamilyAsync("games@example.org");
+        var child = await TestData.CreateChildAsync(parent);
+        var json = File.ReadAllText(Lernkicker.Tests.Examples.LessonPathOf("science/grain-terms.json"));
+        var lesson = await LernkickerFactory.Json<LessonOverview>(await parent.PostAsync("/api/lessons", TestData.AsJson(json)));
+        var assignment = await TestData.AssignLessonAsync(parent, child.Id, lesson.LessonId);
+        var rules = await LernkickerFactory.Json<LessonOverview>(await parent.PostAsync("/api/lessons", TestData.AsJson(Lernkicker.Tests.Examples.ReferenceJson())));
+        var reference = await TestData.AssignLessonAsync(parent, child.Id, rules.LessonId);
+        var phone = await TestData.ChildPhoneAsync(factory, parent, child.Id);
+
+        var toLearn = await LernkickerFactory.Json<LessonDto>(await phone.GetAsync($"/api/device/lessons/{assignment.Id}"));
+        Assert.Equal(["fallingWords", "memory", "crossword", "wordSearch"], toLearn.Games);
+
+        var falling = await LernkickerFactory.Json<LessonGameDto>(await phone.GetAsync($"/api/device/lessons/{assignment.Id}/games/fallingWords"));
+        Assert.IsType<FallingWordsSheetDto>(falling.Exercise);
+        var memory = await LernkickerFactory.Json<LessonGameDto>(await phone.GetAsync($"/api/device/lessons/{assignment.Id}/games/memory"));
+        Assert.Equal(12, memory.Cards!.Count);
+        var crossword = await LernkickerFactory.Json<LessonGameDto>(await phone.GetAsync($"/api/device/lessons/{assignment.Id}/games/crossword"));
+        Assert.NotEmpty(crossword.Crossword!.Words);
+        var search = await LernkickerFactory.Json<LessonGameDto>(await phone.GetAsync($"/api/device/lessons/{assignment.Id}/games/wordSearch"));
+        Assert.IsType<WordSearchSheetDto>(search.Exercise);
+
+        // The card game rules have long texts and names that are no words: not enough for a game
+        Assert.Empty((await LernkickerFactory.Json<LessonDto>(await phone.GetAsync($"/api/device/lessons/{reference.Id}"))).Games);
+        Assert.Equal(ErrorCodes.GameNotAvailable,
+            (await LernkickerFactory.Error(await phone.GetAsync($"/api/device/lessons/{reference.Id}/games/memory"), HttpStatusCode.NotFound)).Code);
+    }
 }

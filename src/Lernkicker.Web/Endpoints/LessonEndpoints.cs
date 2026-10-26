@@ -74,6 +74,9 @@ public static class LessonEndpoints
         device.MapGet("/{assignmentId:guid}", async (Guid assignmentId, ClaimsPrincipal user, LessonUseCases uc) =>
             (await uc.LessonAsync(user.ChildIdOf(), assignmentId)).ToHttp(l => l.ToDto()));
 
+        device.MapGet("/{assignmentId:guid}/games/{kind}", async (Guid assignmentId, string kind, ClaimsPrincipal user, LessonUseCases uc) =>
+            (await uc.GameAsync(user.ChildIdOf(), assignmentId, kind, Random.Shared)).ToHttp(g => g.ToDto()));
+
         device.MapPost("/{assignmentId:guid}/practice", async (Guid assignmentId, LessonPractice request, ClaimsPrincipal user, LessonUseCases uc) =>
             (await uc.PractisedAsync(user.ChildIdOf(), assignmentId, request.KnownBlocks ?? [])).ToHttp(l => l.ToDto()));
     }
