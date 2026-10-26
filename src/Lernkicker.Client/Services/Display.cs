@@ -50,6 +50,15 @@ public sealed class Display(IStringLocalizer<Strings> l)
         _ => "",
     };
 
+    /// <summary>The icon of a quiz (a test to practise), wherever quizzes are listed or linked.</summary>
+    public const string QuizIcon = "📝";
+
+    /// <summary>The icon of a lesson (material to learn); different from <see cref="QuizIcon"/> so the two are never confused.</summary>
+    public const string LessonIcon = "📚";
+
+    /// <summary>The icon of an item in the shared library, by its kind.</summary>
+    public static string SharedKindIcon(string kind) => kind == SharedKinds.Lesson ? LessonIcon : QuizIcon;
+
     public string Kind(string kind) => Text($"Calendar.Kind.{kind}", kind);
 
     public static string KindIcon(string kind) => kind switch

@@ -39,13 +39,13 @@ else
     }
     else if (_assignments.Count > 0)
     {
-        <p>@L["Home.WhatToPractice"]</p>
+        <h2><span aria-hidden="true">@Display.QuizIcon</span> @L["Home.WhatToPractice"]</h2>
         <ul class="cards">
             @foreach (var assignment in _assignments)
             {
                 <li>
                     <a class="card @Display.SubjectClass(assignment.Subject)" href="practice/@assignment.AssignmentId">
-                        <span class="subject">@Display.Subject(assignment.Subject)</span>
+                        <span class="subject"><span class="kind" aria-hidden="true">@Display.QuizIcon</span> @Display.Subject(assignment.Subject)</span>
                         <span class="title">@assignment.Title</span>
                         @if (assignment.DueOn is { } due)
                         {
@@ -59,13 +59,13 @@ else
     }
     @if (_lessons is { Count: > 0 })
     {
-        <h2>@L["Home.ToLearn"]</h2>
+        <h2><span aria-hidden="true">@Display.LessonIcon</span> @L["Home.ToLearn"]</h2>
         <ul class="cards">
             @foreach (var lesson in _lessons)
             {
                 <li>
                     <a class="card lesson @Display.SubjectClass(lesson.Subject)" href="learn/@lesson.AssignmentId">
-                        <span class="subject">@Display.Subject(lesson.Subject)</span>
+                        <span class="subject"><span class="kind" aria-hidden="true">@Display.LessonIcon</span> @Display.Subject(lesson.Subject)</span>
                         <span class="title">@lesson.Title</span>
                         @if (lesson.DueOn is { } due)
                         {

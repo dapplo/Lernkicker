@@ -22,8 +22,8 @@ else
                    Shown="Filtered.Count()" Total="_items.Count" OnChange="StateHasChanged">
         <select @bind="_filter.Kind" aria-label="@L["Library.Kind"]">
             <option value="">@L["List.AllKinds"]</option>
-            <option value="@SharedKinds.Quiz">@L["Library.Quizzes"]</option>
-            <option value="@SharedKinds.Lesson">@L["Library.Lessons"]</option>
+            <option value="@SharedKinds.Quiz">@Display.QuizIcon @L["Library.Quizzes"]</option>
+            <option value="@SharedKinds.Lesson">@Display.LessonIcon @L["Library.Lessons"]</option>
         </select>
     </ListFilterBar>
     <Messages Errors="@_errors" />
@@ -32,7 +32,7 @@ else
         {
             <li class="@Display.SubjectClass(item.Subject)">
                 <div>
-                    <b>@item.Title</b>
+                    <b><span aria-hidden="true" title="@L[item.Kind == SharedKinds.Lesson ? "Library.Lessons" : "Library.Quizzes"]">@Display.SharedKindIcon(item.Kind)</span> @item.Title</b>
                     <small>@Details(item)</small>
                     @if (_copied.Contains(item.Id))
                     {
