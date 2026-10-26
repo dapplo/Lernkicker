@@ -61,6 +61,9 @@
   <data name="Exercise.Answer" xml:space="preserve"><value>Answer</value></data>
   <data name="Exercise.StartOver" xml:space="preserve"><value>Start over</value></data>
   <data name="Exercise.SeveralCorrect" xml:space="preserve"><value>(several are correct)</value></data>
+  <data name="Exercise.WordSearchHow" xml:space="preserve"><value>Tap the first and then the last letter of a word.</value></data>
+  <data name="Exercise.Letter" xml:space="preserve"><value>{0}, row {1}, column {2}</value></data>
+  <data name="Exercise.WordsFound" xml:space="preserve"><value>{0} of {1} words found</value></data>
   <data name="Answer.True" xml:space="preserve"><value>True</value></data>
   <data name="Answer.False" xml:space="preserve"><value>False</value></data>
   <data name="Result.Total" xml:space="preserve"><value>{0} of {1} points · mark {2}</value></data>
@@ -211,6 +214,9 @@
   <data name="Issue.gapNotInWordBank" xml:space="preserve"><value>No answer of this gap is in the word bank.</value></data>
   <data name="Issue.answerNotInOptions" xml:space="preserve"><value>“{answer}” is not one of the options.</value></data>
   <data name="Issue.correctOutOfRange" xml:space="preserve"><value>correct points to an option that does not exist.</value></data>
+  <data name="Issue.wordNotLetters" xml:space="preserve"><value>“{word}” may only contain letters (no spaces, hyphens or digits).</value></data>
+  <data name="Issue.wordTooLong" xml:space="preserve"><value>“{word}” is longer than the grid ({size} letters).</value></data>
+  <data name="Issue.duplicateWord" xml:space="preserve"><value>“{word}” is in the word list more than once.</value></data>
   <data name="Home.ForParents" xml:space="preserve"><value>For parents</value></data>
   <data name="Home.LogoutQuestion" xml:space="preserve"><value>Log out on this phone? Afterwards the PIN is needed again.</value></data>
   <data name="Home.LogoutYes" xml:space="preserve"><value>Yes, log out</value></data>

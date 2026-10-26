@@ -103,6 +103,15 @@
         { "text": "Welche Tiere sind Säugetiere?", "options": ["Hund", "Forelle", "Fledermaus", "Amsel"], "correct": [0, 2] }
       ],
       "explanation": "Fledermäuse können fliegen, sind aber Säugetiere: Sie säugen ihre Jungen."
+    },
+    {
+      "id": "word-search",
+      "type": "wordSearch",
+      "instruction": "9. Finde die fünf Getreidesorten im Suchsel.",
+      "hint": "Jede Runde gibt es ein neues Gitter. Die Wörter stehen waagrecht, senkrecht oder schräg.",
+      "words": ["Weizen", "Roggen", "Gerste", "Hafer", "Mais"],
+      "diagonal": true,
+      "explanation": "Aus Weizen und Roggen backt man vor allem Brot."
     }
   ]
 }

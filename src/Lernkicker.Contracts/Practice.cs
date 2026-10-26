@@ -15,6 +15,7 @@ public sealed record SheetItemDto(int Index, string Text, ImageDto? Image = null
 [JsonDerivedType(typeof(TrueFalseSheetDto), "trueFalse")]
 [JsonDerivedType(typeof(FreeTextSheetDto), "freeText")]
 [JsonDerivedType(typeof(MultipleChoiceSheetDto), "multipleChoice")]
+[JsonDerivedType(typeof(WordSearchSheetDto), "wordSearch")]
 public abstract record ExerciseSheetDto(string Id, string Instruction, string? Hint, int MaxPoints)
 {
     public ImageDto? Image { get; init; }
@@ -39,13 +40,17 @@ public sealed record FreeTextSheetDto(string Id, string Instruction, string? Hin
 public sealed record MultipleChoiceSheetDto(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<QuestionSheetDto> Questions)
     : ExerciseSheetDto(Id, Instruction, Hint, MaxPoints);
 
+/// <summary><c>Rows</c> is the letter grid, one string per row, one letter per column.</summary>
+public sealed record WordSearchSheetDto(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<string> Rows, IReadOnlyList<SheetItemDto> Words)
+    : ExerciseSheetDto(Id, Instruction, Hint, MaxPoints);
+
 /// <summary>An option's <c>Text</c> is empty when the option is a picture alone.</summary>
 public sealed record QuestionSheetDto(int Index, string Text, IReadOnlyList<SheetItemDto> Options, bool MultipleAnswers, ImageDto? Image = null);
 
 /// <summary>A child's answer to one exercise; all indices refer to the original order (see <see cref="SheetItemDto.Index"/>).</summary>
 public sealed record AnswerDto
 {
-    /// <summary>cloze, matching, freeText: one entry per gap, row or field.</summary>
+    /// <summary>cloze, matching, freeText: one entry per gap, row or field. wordSearch: per word the word if found.</summary>
     public IReadOnlyList<string?>? Texts { get; init; }
 
     /// <summary>trueFalse: one entry per statement, null = not answered.</summary>

@@ -152,6 +152,29 @@ public sealed record MultipleChoiceExercise : Exercise
     }
 }
 
+/// <summary>
+/// A word search: the words are hidden in a grid of letters that is generated anew for every round (see
+/// <see cref="WordSearchGrid"/>). Each word is a part.
+/// </summary>
+public sealed record WordSearchExercise : Exercise
+{
+    public const int MinSize = 5;
+    public const int MaxSize = 14;
+
+    public required IReadOnlyList<string> Words { get; init; }
+
+    /// <summary>Rows and columns of the grid; null picks a size that fits the words.</summary>
+    public int? Size { get; init; }
+
+    /// <summary>Words may also run diagonally.</summary>
+    public bool Diagonal { get; init; }
+
+    /// <summary>Words may also run backwards (right to left, bottom to top).</summary>
+    public bool Backwards { get; init; }
+
+    public override int PartCount => Words.Count;
+}
+
 public sealed record Gap(IReadOnlyList<string> Answers);
 
 public sealed record MatchingRow(string Text, string Answer, string? Explanation = null, ImageRef? Image = null);

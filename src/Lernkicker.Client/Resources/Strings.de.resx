@@ -61,6 +61,9 @@
   <data name="Exercise.Answer" xml:space="preserve"><value>Antwort</value></data>
   <data name="Exercise.StartOver" xml:space="preserve"><value>Von vorne</value></data>
   <data name="Exercise.SeveralCorrect" xml:space="preserve"><value>(mehrere sind richtig)</value></data>
+  <data name="Exercise.WordSearchHow" xml:space="preserve"><value>Tippe den ersten und dann den letzten Buchstaben eines Wortes an.</value></data>
+  <data name="Exercise.Letter" xml:space="preserve"><value>{0}, Zeile {1}, Spalte {2}</value></data>
+  <data name="Exercise.WordsFound" xml:space="preserve"><value>{0} von {1} Wörtern gefunden</value></data>
   <data name="Answer.True" xml:space="preserve"><value>Richtig</value></data>
   <data name="Answer.False" xml:space="preserve"><value>Falsch</value></data>
   <data name="Result.Total" xml:space="preserve"><value>{0} von {1} Punkten · Note {2}</value></data>
@@ -211,6 +214,9 @@
   <data name="Issue.gapNotInWordBank" xml:space="preserve"><value>Keine Antwort dieser Lücke steht in der Wortliste (wordBank).</value></data>
   <data name="Issue.answerNotInOptions" xml:space="preserve"><value>„{answer}“ ist keine der Auswahlmöglichkeiten (options).</value></data>
   <data name="Issue.correctOutOfRange" xml:space="preserve"><value>correct verweist auf eine Option, die es nicht gibt.</value></data>
+  <data name="Issue.wordNotLetters" xml:space="preserve"><value>„{word}“ darf nur Buchstaben enthalten (keine Leerzeichen, Bindestriche oder Ziffern).</value></data>
+  <data name="Issue.wordTooLong" xml:space="preserve"><value>„{word}“ ist länger als das Gitter ({size} Buchstaben).</value></data>
+  <data name="Issue.duplicateWord" xml:space="preserve"><value>„{word}“ steht mehrmals in der Wortliste.</value></data>
   <data name="Home.ForParents" xml:space="preserve"><value>Für Eltern</value></data>
   <data name="Home.LogoutQuestion" xml:space="preserve"><value>Auf diesem Handy abmelden? Danach braucht es wieder die PIN.</value></data>
   <data name="Home.LogoutYes" xml:space="preserve"><value>Ja, abmelden</value></data>

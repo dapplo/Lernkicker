@@ -84,6 +84,7 @@ public sealed class QuizJson : IQuizFormat
                 new JsonDerivedType(typeof(TrueFalseExercise), "trueFalse"),
                 new JsonDerivedType(typeof(FreeTextExercise), "freeText"),
                 new JsonDerivedType(typeof(MultipleChoiceExercise), "multipleChoice"),
+                new JsonDerivedType(typeof(WordSearchExercise), "wordSearch"),
             },
         };
     }

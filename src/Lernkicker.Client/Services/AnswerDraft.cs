@@ -19,6 +19,15 @@ public sealed class AnswerDraft
     public List<int> Order { get; } = [];
     public HashSet<int>[] Choices { get; }
 
+    /// <summary>wordSearch: the cells of each word found (by word index), to mark them in the grid.</summary>
+    public Dictionary<int, IReadOnlyList<Cell>> Found { get; } = [];
+
+    /// <summary>wordSearch: the first letter tapped, waiting for the last one.</summary>
+    public Cell? Start { get; set; }
+
+    /// <summary>wordSearch: the last line tapped that is not a word, shown briefly.</summary>
+    public IReadOnlyList<Cell>? Missed { get; set; }
+
     public static AnswerDraft For(ExerciseSheetDto exercise) => new(exercise, exercise switch
     {
         ClozeSheetDto c => c.Segments.Count - 1,
@@ -27,13 +36,14 @@ public sealed class AnswerDraft
         TrueFalseSheetDto t => t.Statements.Count,
         FreeTextSheetDto f => f.FieldLabels.Count,
         MultipleChoiceSheetDto mc => mc.Questions.Count,
+        WordSearchSheetDto w => w.Words.Count,
         _ => 0,
     });
 
     /// <summary>Number of parts the child has not answered yet.</summary>
     public int Open => Exercise switch
     {
-        ClozeSheetDto or MatchingSheetDto or FreeTextSheetDto => Texts.Count(string.IsNullOrWhiteSpace),
+        ClozeSheetDto or MatchingSheetDto or FreeTextSheetDto or WordSearchSheetDto => Texts.Count(string.IsNullOrWhiteSpace),
         TrueFalseSheetDto => Truths.Count(t => t is null),
         OrderingSheetDto o => o.Steps.Count - Order.Count,
         MultipleChoiceSheetDto => Choices.Count(c => c.Count == 0),
@@ -42,7 +52,7 @@ public sealed class AnswerDraft
 
     public AnswerDto ToAnswer() => Exercise switch
     {
-        ClozeSheetDto or MatchingSheetDto or FreeTextSheetDto => new AnswerDto { Texts = Texts },
+        ClozeSheetDto or MatchingSheetDto or FreeTextSheetDto or WordSearchSheetDto => new AnswerDto { Texts = Texts },
         TrueFalseSheetDto => new AnswerDto { Truths = Truths },
         OrderingSheetDto => new AnswerDto { Order = Order.ToList() },
         MultipleChoiceSheetDto => new AnswerDto { Choices = Choices.Select(c => (IReadOnlyList<int>?)c.ToList()).ToList() },

@@ -69,6 +69,11 @@ public abstract record ExerciseSheet(string Id, string Instruction, string? Hint
             MultipleChoiceExercise mc => new MultipleChoiceSheet(
                 mc.Id, mc.Instruction, mc.Hint, mc.MaxPoints,
                 mc.Questions.Select((q, i) => new QuestionSheet(i, q.Text, Numbered(q.Options.Select(o => (o.Text ?? "", o.Image)), shuffle), q.Correct.Count > 1, q.Image)).ToList()),
+            WordSearchExercise w => new WordSearchSheet(
+                w.Id, w.Instruction, w.Hint, w.MaxPoints,
+                // A new grid every round; where the words are stays on the server
+                WordSearchGrid.Generate(w, random).Rows,
+                Numbered(w.Words.Select(x => (x, (ImageRef?)null)), shuffle)),
             _ => throw new NotSupportedException($"Unknown exercise type {exercise.GetType().Name}"),
         };
         return sheet with { Image = exercise.Image };
@@ -112,3 +117,7 @@ public sealed record MultipleChoiceSheet(string Id, string Instruction, string? 
     : ExerciseSheet(Id, Instruction, Hint, MaxPoints);
 
 public sealed record QuestionSheet(int Index, string Text, IReadOnlyList<SheetItem> Options, bool MultipleAnswers, ImageRef? Image = null);
+
+/// <summary><c>Rows</c> is the letter grid, one string per row; the child finds each of the <c>Words</c> in it.</summary>
+public sealed record WordSearchSheet(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<string> Rows, IReadOnlyList<SheetItem> Words)
+    : ExerciseSheet(Id, Instruction, Hint, MaxPoints);
