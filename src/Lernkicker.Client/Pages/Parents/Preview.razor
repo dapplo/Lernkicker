@@ -29,7 +29,7 @@ else
 
     @if (_sheet is { } sheet)
     {
-        <h1 lang="@sheet.Language">@sheet.Title</h1>
+        <h1><span aria-hidden="true">@Display.QuizIcon</span> <span lang="@sheet.Language">@sheet.Title</span></h1>
         <p class="subtitle">@L["Preview.QuizDetails", Display.Subject(sheet.Subject), Display.Grade(sheet.GradeLevel), sheet.Exercises.Count, sheet.MaxPoints]</p>
         @foreach (var draft in _drafts!)
         {
@@ -40,7 +40,7 @@ else
     }
     else if (_lesson is { } lesson)
     {
-        <h1 lang="@lesson.Language">@lesson.Title</h1>
+        <h1><span aria-hidden="true">@Display.LessonIcon</span> <span lang="@lesson.Language">@lesson.Title</span></h1>
         <p class="subtitle">@Display.Subject(lesson.Subject)</p>
         @if (lesson.Description is { } description)
         {

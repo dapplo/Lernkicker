@@ -6,7 +6,7 @@
 <PageTitle>@L["Quizzes.Title"] · Lernkicker</PageTitle>
 
 <ParentsNav />
-<h1>@L["Quizzes.Title"]</h1>
+<h1><span aria-hidden="true">@Display.QuizIcon</span> @L["Quizzes.Title"]</h1>
 
 @* Folded away once there is something in the list, which then stays in view *@
 <details class="box upload" open="@(_quizzes is { Count: 0 })">

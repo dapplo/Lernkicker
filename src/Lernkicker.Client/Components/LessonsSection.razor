@@ -2,7 +2,7 @@
 
 @* The lessons a child has to learn, with progress, for parents *@
 <section class="box">
-    <h2>@L["Child.ToLearn"]</h2>
+    <h2><span aria-hidden="true">@Display.LessonIcon</span> @L["Child.ToLearn"]</h2>
     <Messages Errors="@_errors" />
     @if (_assignments.Count == 0)
     {
@@ -13,7 +13,7 @@
         {
             <li class="@Display.SubjectClass(a.Subject)">
                 <div>
-                    <b>@a.Title</b>
+                    <b><span aria-hidden="true">@Display.LessonIcon</span> @a.Title</b>
                     <small>@Display.Subject(a.Subject)@(a.DueOn is { } due ? " · " + L["Lessons.Until", Display.Date(due)] : "")</small>
                     <small>@Progress(a)</small>
                 </div>
