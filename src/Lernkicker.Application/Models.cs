@@ -12,7 +12,8 @@ public sealed record InvitationCreated(string Code, DateTimeOffset ExpiresAt);
 
 public sealed record ParentProfile(string Name, string Email, string FamilyName, bool IsAdmin, string Language);
 
-public sealed record ChildSummary(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult, string Theme);
+/// <summary><c>LearnerParentId</c>: the parent who learns with this profile from their own login.</summary>
+public sealed record ChildSummary(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult, string Theme, Guid? LearnerParentId = null);
 
 public sealed record DeviceSummary(Guid Id, string Label, DateTimeOffset PairedAt, DateTimeOffset? LastUsedAt, bool Locked)
 {
@@ -23,7 +24,11 @@ public sealed record PairingCodeCreated(string Code, DateTimeOffset ExpiresAt);
 
 public sealed record PairedDevice(string Token, string ChildName, string Theme);
 
-public sealed record DeviceStatus(bool Paired, string? ChildName, bool Locked, string? Theme = null);
+/// <summary><c>Learner</c>: a parent learning with their own profile, logged in through the parent login and no device.</summary>
+public sealed record DeviceStatus(bool Paired, string? ChildName, bool Locked, string? Theme = null, bool Learner = false);
+
+/// <summary>A parent learning with their own adult profile.</summary>
+public sealed record LearnerSession(Guid FamilyId, Guid ChildId, string ChildName);
 
 /// <summary>Who is logged in on a child's device after a correct PIN.</summary>
 public sealed record ChildSession(Guid FamilyId, Guid ChildId, Guid DeviceId, string ChildName);

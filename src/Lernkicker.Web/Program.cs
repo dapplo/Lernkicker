@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Lernkicker.Application.Ports;
 using Lernkicker.Application.UseCases;
@@ -10,6 +11,7 @@ using Lernkicker.Web;
 using Lernkicker.Web.Endpoints;
 using Lernkicker.Web.Play;
 using Lernkicker.Web.Security;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -111,11 +113,25 @@ builder.Services.AddAuthentication()
         o.Cookie.Name = Cookies.Child;
         ApiCookie(o);
         o.ExpireTimeSpan = TimeSpan.FromDays(30);
-        // A removed or locked device ends the child's session immediately
+        // A removed or locked device ends the child's session immediately. A parent learning with their own
+        // profile has no device: the session lasts only as long as their parent login and the profile stay theirs.
         o.Events.OnValidatePrincipal = async context =>
         {
-            var deviceId = Guid.TryParse(context.Principal?.FindFirst(Claims.DeviceId)?.Value, out var id) ? id : Guid.Empty;
             var devices = context.HttpContext.RequestServices.GetRequiredService<ChildDeviceUseCases>();
+            if (Guid.TryParse(context.Principal?.FindFirst(Claims.Learner)?.Value, out var learner))
+            {
+                var parent = await context.HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+                var childId = Guid.TryParse(context.Principal?.FindFirst(Claims.ChildId)?.Value, out var child) ? child : Guid.Empty;
+                if (parent.Principal?.FindFirstValue(ClaimTypes.NameIdentifier) != learner.ToString()
+                    || !await devices.IsLearnerActiveAsync(childId, learner))
+                {
+                    context.RejectPrincipal();
+                }
+
+                return;
+            }
+
+            var deviceId = Guid.TryParse(context.Principal?.FindFirst(Claims.DeviceId)?.Value, out var id) ? id : Guid.Empty;
             if (!await devices.IsDeviceActiveAsync(deviceId))
             {
                 context.RejectPrincipal();

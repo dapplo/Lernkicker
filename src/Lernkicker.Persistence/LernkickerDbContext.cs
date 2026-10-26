@@ -82,6 +82,7 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
             e.Property(x => x.Name).HasMaxLength(Child.MaxNameLength);
             e.Property(x => x.Theme).HasMaxLength(20).HasDefaultValue(ChildThemes.Default);
             e.HasOne<Family>().WithMany().HasForeignKey(x => x.FamilyId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<ParentUser>().WithMany().HasForeignKey(x => x.LearnerParentId).OnDelete(DeleteBehavior.SetNull);
             e.HasQueryFilter(x => x.FamilyId == FamilyId);
         });
 

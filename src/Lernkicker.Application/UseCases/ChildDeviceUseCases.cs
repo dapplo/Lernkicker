@@ -64,6 +64,16 @@ public sealed class ChildDeviceUseCases(IChildRepository children, IPinHasher pi
 
     public Task<bool> IsDeviceActiveAsync(Guid deviceId) => children.IsDeviceActiveAnyFamilyAsync(deviceId);
 
+    /// <summary>False once the profile is deleted or no longer the parent's own.</summary>
+    public async Task<bool> IsLearnerActiveAsync(Guid childId, Guid parentId) =>
+        (await children.FindAnyFamilyAsync(childId))?.LearnerParentId == parentId;
+
+    public async Task<DeviceStatus> LearnerStatusAsync(Guid childId)
+    {
+        var child = await children.FindAnyFamilyAsync(childId);
+        return child is null ? new DeviceStatus(false, null, false) : new DeviceStatus(true, child.Name, false, child.Theme, Learner: true);
+    }
+
     private async Task<ChildDevice?> DeviceAsync(string? token) =>
         string.IsNullOrEmpty(token) ? null : await children.FindDeviceByTokenAnyFamilyAsync(Secrets.Hash(token));
 }

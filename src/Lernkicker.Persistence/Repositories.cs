@@ -49,8 +49,11 @@ internal sealed class ChildRepository(LernkickerDbContext db) : IChildRepository
     {
         var devices = await db.ChildDevices.GroupBy(d => d.ChildId).Select(g => new { g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Key, x => x.Count);
         var children = await db.Children.OrderBy(c => c.Name).ToListAsync();
-        return children.Select(c => new ChildSummary(c.Id, c.Name, c.GradeLevel, c.PinHash is not null, devices.GetValueOrDefault(c.Id), c.IsAdult, c.Theme)).ToList();
+        return children.Select(c => new ChildSummary(c.Id, c.Name, c.GradeLevel, c.PinHash is not null, devices.GetValueOrDefault(c.Id), c.IsAdult, c.Theme, c.LearnerParentId)).ToList();
     }
+
+    public Task<Child?> FindLearnerProfileAsync(Guid parentId) =>
+        db.Children.OrderBy(c => c.Name).FirstOrDefaultAsync(c => c.LearnerParentId == parentId);
 
     public async Task<bool> DeleteAsync(Guid id) => await db.Children.Where(c => c.Id == id).ExecuteDeleteAsync() > 0;
 

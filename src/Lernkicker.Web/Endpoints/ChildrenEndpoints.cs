@@ -12,14 +12,34 @@ public static class ChildrenEndpoints
     {
         var children = app.MapGroup("/api/children").RequireAuthorization(Policies.Parent);
 
-        children.MapGet("/", async (ChildrenUseCases uc) =>
-            Results.Json((await uc.ListAsync()).Select(c => c.ToDto()), ApiJson.Options));
+        children.MapGet("/", async (ChildrenUseCases uc, ClaimsPrincipal user) =>
+            Results.Json((await uc.ListAsync()).Select(c => c.ToDto(user.ParentId())), ApiJson.Options));
+
+        // A parent learns with their own adult profile right here: the parent login stands in for device and PIN
+        children.MapPost("/learn", async (ChildrenUseCases uc, ClaimsPrincipal user, HttpContext http) =>
+        {
+            var session = await uc.LearnMyselfAsync(user.RequiredFamily(), user.ParentId(), user.FindFirstValue(ClaimTypes.GivenName) ?? "");
+            await DeviceEndpoints.SignInLearnerAsync(http, session, user.ParentId());
+            return Results.NoContent();
+        });
+
+        children.MapPost("/{id:guid}/learn", async (Guid id, ChildrenUseCases uc, ClaimsPrincipal user, HttpContext http) =>
+        {
+            var session = await uc.LearnAsAsync(id, user.ParentId());
+            if (!session.IsSuccess)
+            {
+                return ApiResults.Error(session.Error!);
+            }
+
+            await DeviceEndpoints.SignInLearnerAsync(http, session.Value, user.ParentId());
+            return Results.NoContent();
+        });
 
         children.MapPost("/", async (NewChild request, ClaimsPrincipal user, ChildrenUseCases uc) =>
         {
             var created = await uc.CreateAsync(user.RequiredFamily(), request.Name, request.GradeLevel, request.Pin, request.IsAdult, request.Theme);
             return created.IsSuccess
-                ? Results.Json(created.Value.ToDto(), ApiJson.Options, statusCode: StatusCodes.Status201Created)
+                ? Results.Json(created.Value.ToDto(user.ParentId()), ApiJson.Options, statusCode: StatusCodes.Status201Created)
                 : ApiResults.Error(created.Error!);
         });
 

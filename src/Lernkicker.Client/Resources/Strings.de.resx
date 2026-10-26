@@ -160,6 +160,8 @@
   <data name="Child.PairHint" xml:space="preserve"><value>Öffne Lernkicker auf dem Handy von {0} und scanne den QR-Code, oder tippe den Code ein. Er gilt 10 Minuten und nur einmal.</value></data>
   <data name="Child.ValidUntil" xml:space="preserve"><value>Gültig bis {0} Uhr.</value></data>
   <data name="Child.NewQrCode" xml:space="preserve"><value>Neuen QR-Code zeigen</value></data>
+  <data name="Child.UseThisDevice" xml:space="preserve"><value>Dieses Gerät für {0} verwenden</value></data>
+  <data name="Child.UseThisDeviceHint" xml:space="preserve"><value>Übt {0} auf diesem Gerät (z. B. einem gemeinsamen Tablet)? Dann verbinde es direkt hier, ganz ohne Code. {0} meldet sich danach mit der PIN an.</value></data>
   <data name="Child.PairedDevices" xml:space="preserve"><value>Verbundene Handys</value></data>
   <data name="Child.Locked" xml:space="preserve"><value>gesperrt</value></data>
   <data name="Child.PairedOn" xml:space="preserve"><value>verbunden am {0}</value></data>
@@ -585,4 +587,12 @@
   <data name="Error.play.moveInvalid" xml:space="preserve"><value>Dieser Zug geht nicht.</value></data>
   <data name="Error.battleship.fleetInvalid" xml:space="preserve"><value>Deine Flotte ist nicht vollständig, oder Schiffe berühren sich.</value></data>
   <data name="Error.battleship.shotInvalid" xml:space="preserve"><value>Dahin kannst du nicht schießen.</value></data>
+  <data name="Parents.LearnMyself" xml:space="preserve"><value>Selbst lernen</value></data>
+  <data name="Parents.LearnMyselfHint" xml:space="preserve"><value>Mach Quizze und Lernstoff selbst, direkt hier mit deiner Anmeldung: kein Handy verbinden, keine PIN. Weise sie deinem eigenen Profil zu wie bei einem Kind.</value></data>
+  <data name="Child.LearnHereTitle" xml:space="preserve"><value>Selbst lernen</value></data>
+  <data name="Child.LearnHereHint" xml:space="preserve"><value>Bist du {0}? Dann lerne direkt hier mit deiner Eltern-Anmeldung, ohne Handy verbinden und ohne PIN.</value></data>
+  <data name="Child.LearnHere" xml:space="preserve"><value>Das bin ich: hier lernen</value></data>
+  <data name="Home.BackToParents" xml:space="preserve"><value>Zur Elternseite</value></data>
+  <data name="Home.StopLearning" xml:space="preserve"><value>Lernen beenden</value></data>
+  <data name="Error.child.notOwnProfile" xml:space="preserve"><value>Nur ein Erwachsenen-Profil, das kein anderer Elternteil nutzt, kann dein eigenes sein.</value></data>
 </root>
