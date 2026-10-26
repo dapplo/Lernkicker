@@ -1,0 +1,167 @@
+@page "/play/{Id:guid}"
+@implements IAsyncDisposable
+@inject Api Api
+@inject PlayConnection Connection
+@inject NavigationManager Navigation
+
+@* One game with others. The server checks every move; this page shows what the child may see and updates itself *@
+
+<PageTitle>@(_match is null ? L["Play.Title"] : L[$"Play.Game.{_match.Match.Game}"]) · Lernkicker</PageTitle>
+
+<header class="practice-header">
+    <a href="play" class="close" aria-label="@L["Play.BackToLobby"]">✕</a>
+    <span>@L["Play.Title"]</span>
+</header>
+
+@if (_match is null)
+{
+    <Messages Errors="@_errors" />
+    @if (_errors is null)
+    {
+        <p class="loading-text">@L["Common.OneMoment"]</p>
+    }
+    else
+    {
+        <a class="btn" href="play">@L["Play.BackToLobby"]</a>
+    }
+}
+else
+{
+    var match = _match.Match;
+    <h1><span aria-hidden="true">@PlayGames.Icon(match.Game)</span> @L[$"Play.Game.{match.Game}"]</h1>
+    <p class="play-players">@string.Join(" · ", match.Players.Select(p => p.Seat == match.MySeat ? L["Play.You"].Value : p.Name))</p>
+    <p class="play-status @(match.MyTurn ? "my-turn" : "")" role="status" aria-live="polite">
+        @(_match.Resigned is { } resigned && match.Status == "finished"
+            ? resigned == match.MySeat ? L["Play.YouGaveUp"] : L["Play.GaveUp", match.Players.FirstOrDefault(p => p.Seat == resigned)?.Name ?? "?"]
+            : PlayGames.Status(L, match))
+    </p>
+    <Messages Errors="@_errors" />
+
+    @switch (_match.View)
+    {
+        case BattleshipViewDto battleship:
+            <BattleshipGame View="@battleship" MySeat="@(match.MySeat ?? 0)" Opponent="@Opponent" Busy="@_busy" Move="Move" />
+            break;
+        case null when match.Status == "waiting":
+            <div class="empty">
+                <div class="ball" aria-hidden="true">⏳</div>
+                <p>@L["Play.WaitingHint"]</p>
+            </div>
+            break;
+    }
+
+    <div class="buttons">
+        <a class="btn quiet" href="play">@L["Play.BackToLobby"]</a>
+        @if (match.Status == "waiting")
+        {
+            <button class="btn quiet" disabled="@_busy" @onclick="Leave">@(match.MySeat == 0 ? L["Play.CloseTable"] : L["Play.LeaveTable"])</button>
+        }
+    </div>
+
+    @if (match.Status == "playing" && !match.Abandoned)
+    {
+        @* Tucked away with a second step, so nobody gives up by accident *@
+        <details class="grown-ups">
+            <summary>@L["Play.GiveUp"]</summary>
+            <p>@L["Play.GiveUpQuestion"]</p>
+            <button class="btn danger" disabled="@_busy" @onclick="Resign">@L["Play.GiveUpYes"]</button>
+        </details>
+    }
+}
+
+@code {
+    private MatchDto? _match;
+    private IReadOnlyList<string>? _errors;
+    private bool _busy;
+    private bool _connected;
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private string Opponent => _match?.Match.Players.FirstOrDefault(p => p.Seat != _match.Match.MySeat)?.Name ?? "?";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Connection.MatchChanged += Changed;
+        _connected = true;
+        await Connection.AcquireAsync();
+    }
+
+    protected override Task OnParametersSetAsync() => Load();
+
+    private async Task Load()
+    {
+        try
+        {
+            _match = await Api.Match(Id);
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("");
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+
+    private Task Changed(Guid id) => id != Id ? Task.CompletedTask : InvokeAsync(async () =>
+    {
+        // A closed table is gone; back to the lobby
+        try
+        {
+            _match = await Api.Match(Id);
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.NotFound)
+        {
+            Navigation.NavigateTo("play");
+            return;
+        }
+        catch (ApiException)
+        {
+            // Keep what is shown; the next change or a reload brings it up to date
+        }
+
+        StateHasChanged();
+    });
+
+    private Task Move(MoveDto move) => Run(async () => _match = await Api.Move(Id, move));
+
+    private Task Resign() => Run(async () => _match = await Api.Resign(Id));
+
+    private Task Leave() => Run(async () =>
+    {
+        await Api.LeaveTable(Id);
+        Navigation.NavigateTo("play");
+    });
+
+    private async Task Run(Func<Task> action)
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            await action();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+            await Load();
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Connection.MatchChanged -= Changed;
+        if (_connected)
+        {
+            Connection.Release();
+        }
+
+        return ValueTask.CompletedTask;
+    }
+}

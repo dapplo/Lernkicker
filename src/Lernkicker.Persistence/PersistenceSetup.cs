@@ -33,6 +33,7 @@ public static class PersistenceSetup
         services.AddScoped<ITelegramRepository, TelegramRepository>();
         services.AddScoped<IServerSecrets, ServerSecrets>();
         services.AddScoped<IServerSettings, ServerSettings>();
+        services.AddScoped<IPlayRepository, PlayRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IParentAccounts, ParentAccounts>();
         services.AddSingleton<IPinHasher, PinHasher>();

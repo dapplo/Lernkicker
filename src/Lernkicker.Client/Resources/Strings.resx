@@ -499,4 +499,90 @@
   <data name="Child.Tab.Results" xml:space="preserve"><value>Results</value></data>
   <data name="Child.Tab.Devices" xml:space="preserve"><value>Phones</value></data>
   <data name="Child.Tab.Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Child.Tab.Games" xml:space="preserve"><value>Games</value></data>
+  <data name="Play.Title" xml:space="preserve"><value>Play together</value></data>
+  <data name="Play.Game.battleship" xml:space="preserve"><value>Battleship</value></data>
+  <data name="Play.NothingUnlocked" xml:space="preserve"><value>No games unlocked yet. Ask your parents!</value></data>
+  <data name="Play.MyGames" xml:space="preserve"><value>My games</value></data>
+  <data name="Play.OpenTables" xml:space="preserve"><value>Who wants to play?</value></data>
+  <data name="Play.WantsToPlay" xml:space="preserve"><value>{0} is waiting for a partner</value></data>
+  <data name="Play.Join" xml:space="preserve"><value>Join in</value></data>
+  <data name="Play.NewGame" xml:space="preserve"><value>Start a game</value></data>
+  <data name="Play.OpenTable" xml:space="preserve"><value>Start {0}</value></data>
+  <data name="Play.OpenTableHint" xml:space="preserve"><value>Your game shows up here for everyone you may play with. The first one to join plays with you.</value></data>
+  <data name="Play.Online" xml:space="preserve"><value>Here right now</value></data>
+  <data name="Play.NobodyOnline" xml:space="preserve"><value>Nobody else is here right now. You can still start a game: others can join later.</value></data>
+  <data name="Play.WaitingForPlayers" xml:space="preserve"><value>Waiting for a partner …</value></data>
+  <data name="Play.Against" xml:space="preserve"><value>against {0}</value></data>
+  <data name="Play.Abandoned" xml:space="preserve"><value>Ended: a player is gone</value></data>
+  <data name="Play.YouWon" xml:space="preserve"><value>You won! 🏆</value></data>
+  <data name="Play.Won" xml:space="preserve"><value>{0} won</value></data>
+  <data name="Play.YourTurn" xml:space="preserve"><value>Your turn!</value></data>
+  <data name="Play.TheirTurn" xml:space="preserve"><value>Wait for your partner</value></data>
+  <data name="Play.BackToLobby" xml:space="preserve"><value>Back to the games</value></data>
+  <data name="Play.You" xml:space="preserve"><value>You</value></data>
+  <data name="Play.YouGaveUp" xml:space="preserve"><value>You gave up.</value></data>
+  <data name="Play.GaveUp" xml:space="preserve"><value>{0} gave up. You won!</value></data>
+  <data name="Play.WaitingHint" xml:space="preserve"><value>As soon as someone joins, the game starts. You can leave this page; the game waits for you.</value></data>
+  <data name="Play.CloseTable" xml:space="preserve"><value>Cancel game</value></data>
+  <data name="Play.LeaveTable" xml:space="preserve"><value>Leave</value></data>
+  <data name="Play.GiveUp" xml:space="preserve"><value>Give up</value></data>
+  <data name="Play.GiveUpQuestion" xml:space="preserve"><value>Really give up? Your partner wins.</value></data>
+  <data name="Play.GiveUpYes" xml:space="preserve"><value>Yes, give up</value></data>
+  <data name="Play.ToLobby" xml:space="preserve"><value>Play with others</value></data>
+  <data name="Play.YourTurnInOne" xml:space="preserve"><value>Your turn in a game!</value></data>
+  <data name="Play.YourTurnIn" xml:space="preserve"><value>Your turn in {0} games!</value></data>
+  <data name="Play.TablesOpen" xml:space="preserve"><value>{0} waiting for a partner</value></data>
+  <data name="PlaySettings.Title" xml:space="preserve"><value>Play together</value></data>
+  <data name="PlaySettings.Hint" xml:space="preserve"><value>Games {0} can play with others on their device. Nothing is unlocked until you do it here.</value></data>
+  <data name="PlaySettings.Games" xml:space="preserve"><value>Unlocked games</value></data>
+  <data name="PlaySettings.With" xml:space="preserve"><value>Play with</value></data>
+  <data name="PlaySettings.Reach.family" xml:space="preserve"><value>Only our family</value></data>
+  <data name="PlaySettings.Reach.family.Hint" xml:space="preserve"><value>Brothers, sisters and the other profiles of your family, e.g. your own.</value></data>
+  <data name="PlaySettings.Reach.selected" xml:space="preserve"><value>Our family and chosen ones</value></data>
+  <data name="PlaySettings.Reach.selected.Hint" xml:space="preserve"><value>Pick families or single children below.</value></data>
+  <data name="PlaySettings.Reach.everyone" xml:space="preserve"><value>Everyone on this server</value></data>
+  <data name="PlaySettings.Reach.everyone.Hint" xml:space="preserve"><value>Every child whose parents allow it too.</value></data>
+  <data name="PlaySettings.Families" xml:space="preserve"><value>Families</value></data>
+  <data name="PlaySettings.NoFamilies" xml:space="preserve"><value>There are no other families on this server yet.</value></data>
+  <data name="PlaySettings.Children" xml:space="preserve"><value>Single children</value></data>
+  <data name="PlaySettings.ChildrenHint" xml:space="preserve"><value>Only children whose parents allow playing with {0} are listed.</value></data>
+  <data name="PlaySettings.BothSides" xml:space="preserve"><value>Two children only meet when both families allow it.</value></data>
+  <data name="Battleship.HowToPlace" xml:space="preserve"><value>Place your ships: tap where a ship should start. Ships must not touch, not even at a corner. Tap a ship to take it back.</value></data>
+  <data name="Battleship.PlaceNext" xml:space="preserve"><value>Next: {0}</value></data>
+  <data name="Battleship.AllPlaced" xml:space="preserve"><value>All ships are on the sea.</value></data>
+  <data name="Battleship.Ship" xml:space="preserve"><value>ship</value></data>
+  <data name="Battleship.Ship5" xml:space="preserve"><value>battleship (5)</value></data>
+  <data name="Battleship.Ship4" xml:space="preserve"><value>cruiser (4)</value></data>
+  <data name="Battleship.Ship3" xml:space="preserve"><value>destroyer (3)</value></data>
+  <data name="Battleship.Ship2" xml:space="preserve"><value>submarine (2)</value></data>
+  <data name="Battleship.Across" xml:space="preserve"><value>Across</value></data>
+  <data name="Battleship.Down" xml:space="preserve"><value>Down</value></data>
+  <data name="Battleship.Mix" xml:space="preserve"><value>Mix</value></data>
+  <data name="Battleship.Clear" xml:space="preserve"><value>Start over</value></data>
+  <data name="Battleship.Ready" xml:space="preserve"><value>Ready!</value></data>
+  <data name="Battleship.DoesNotFit" xml:space="preserve"><value>The ship does not fit there. It has to stay on the sea and must not touch another ship.</value></data>
+  <data name="Battleship.WaitingForFleet" xml:space="preserve"><value>Waiting for {0} to place their ships …</value></data>
+  <data name="Battleship.Shoot" xml:space="preserve"><value>Your turn: tap a field on the other sea. A hit lets you shoot again.</value></data>
+  <data name="Battleship.TheyShoot" xml:space="preserve"><value>{0} is shooting …</value></data>
+  <data name="Battleship.TheirSea" xml:space="preserve"><value>{0}'s sea</value></data>
+  <data name="Battleship.MySea" xml:space="preserve"><value>My sea</value></data>
+  <data name="Battleship.FleetLeft" xml:space="preserve"><value>Still afloat:</value></data>
+  <data name="Battleship.MyFleetLeft" xml:space="preserve"><value>My fleet:</value></data>
+  <data name="Battleship.Hit" xml:space="preserve"><value>hit</value></data>
+  <data name="Battleship.Miss" xml:space="preserve"><value>miss</value></data>
+  <data name="Battleship.Sunk" xml:space="preserve"><value>sunk</value></data>
+  <data name="Error.play.settingsInvalid" xml:space="preserve"><value>These settings are not possible.</value></data>
+  <data name="Error.play.gameUnknown" xml:space="preserve"><value>This game does not exist.</value></data>
+  <data name="Error.play.notUnlocked" xml:space="preserve"><value>Your parents have not unlocked this game.</value></data>
+  <data name="Error.play.notAllowed" xml:space="preserve"><value>You may not play with this child.</value></data>
+  <data name="Error.play.matchNotFound" xml:space="preserve"><value>This game is not there (any more).</value></data>
+  <data name="Error.play.tableClosed" xml:space="preserve"><value>Someone else was faster, or the game has started already.</value></data>
+  <data name="Error.play.tooManyTables" xml:space="preserve"><value>You are already waiting at three games. Cancel one first.</value></data>
+  <data name="Error.play.tooManyMatches" xml:space="preserve"><value>You already have ten games running. Finish one first.</value></data>
+  <data name="Error.play.matchOver" xml:space="preserve"><value>This game is over.</value></data>
+  <data name="Error.play.notYourTurn" xml:space="preserve"><value>It is not your turn.</value></data>
+  <data name="Error.play.moveInvalid" xml:space="preserve"><value>That move is not possible.</value></data>
+  <data name="Error.battleship.fleetInvalid" xml:space="preserve"><value>Your fleet is not complete or ships touch each other.</value></data>
+  <data name="Error.battleship.shotInvalid" xml:space="preserve"><value>You cannot shoot there.</value></data>
 </root>

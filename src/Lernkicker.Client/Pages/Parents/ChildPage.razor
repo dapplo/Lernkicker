@@ -74,6 +74,10 @@ else
     {
         <CalendarSection Child="@_child" />
     }
+    else if (Tab == "games")
+    {
+        <PlaySection Child="@_child" />
+    }
     else if (Tab == "results")
     {
         <section class="box">
@@ -229,6 +233,7 @@ else
         ("calendar", "📅", "Child.Tab.Calendar"),
         ("results", "📊", "Child.Tab.Results"),
         ("devices", "📱", "Child.Tab.Devices"),
+        ("games", "🎲", "Child.Tab.Games"),
         ("settings", "⚙️", "Child.Tab.Settings"),
     ];
 

@@ -1,0 +1,218 @@
+@inject Api Api
+
+@* Battleship ("Schiffe versenken"): first each player places the fleet on their own sea, then they take turns
+   shooting at the other sea. The server keeps the other fleet secret and checks every move; placing is also checked
+   here, so a child sees at once when a ship does not fit. *@
+
+@if (View.Phase == "placing" && View.MyShips is null)
+{
+    <p class="game-how">@L["Battleship.HowToPlace"]</p>
+    <p class="battleship-next" aria-live="polite">
+        @if (Next is { } next)
+        {
+            @L["Battleship.PlaceNext", ShipName(next)]
+        }
+        else
+        {
+            @L["Battleship.AllPlaced"]
+        }
+    </p>
+    <div class="sea placing" role="grid" aria-label="@L["Battleship.MySea"]">
+        @for (var y = 0; y < View.Size; y++)
+        {
+            for (var x = 0; x < View.Size; x++)
+            {
+                var (cx, cy) = (x, y);
+                var ship = _placed.Any(s => Covers(s, cx, cy));
+                <button type="button" class="cell @(ship ? "ship" : "")" aria-label="@(ship ? $"{Coordinate(cx, cy)}, {L["Battleship.Ship"]}" : Coordinate(cx, cy))"
+                        disabled="@Busy" @onclick="() => Place(cx, cy)"></button>
+            }
+        }
+    </div>
+    @if (_hint is { } hint)
+    {
+        <p class="error" role="alert">@hint</p>
+    }
+    <div class="buttons">
+        <button class="btn quiet" type="button" @onclick="() => _horizontal = !_horizontal">
+            <span aria-hidden="true">@(_horizontal ? "↔" : "↕")</span> @(_horizontal ? L["Battleship.Across"] : L["Battleship.Down"])
+        </button>
+        <button class="btn quiet" type="button" disabled="@Busy" @onclick="Mix"><span aria-hidden="true">🔀</span> @L["Battleship.Mix"]</button>
+        <button class="btn quiet" type="button" disabled="@(_placed.Count == 0)" @onclick="Clear">@L["Battleship.Clear"]</button>
+        <button class="btn" type="button" disabled="@(Busy || Next is not null)" @onclick="Ready">@L["Battleship.Ready"]</button>
+    </div>
+}
+else
+{
+    @if (View.Phase == "placing")
+    {
+        <p class="game-how">@L["Battleship.WaitingForFleet", Opponent]</p>
+    }
+    else if (View.Phase == "shooting")
+    {
+        <p class="game-how">@(MyTurn ? L["Battleship.Shoot"] : L["Battleship.TheyShoot", Opponent])</p>
+    }
+
+    <div class="seas">
+        @if (View.Phase != "placing")
+        {
+            <section class="sea-box @(MyTurn ? "my-turn" : "")">
+                <h2>@L["Battleship.TheirSea", Opponent]</h2>
+                <div class="sea" role="grid" aria-label="@L["Battleship.TheirSea", Opponent]">
+                    @for (var y = 0; y < View.Size; y++)
+                    {
+                        for (var x = 0; x < View.Size; x++)
+                        {
+                            var (cx, cy) = (x, y);
+                            var shot = View.MyShots.FirstOrDefault(s => s.X == cx && s.Y == cy);
+                            var sunk = View.SunkShips.Any(s => Covers(s, cx, cy));
+                            var css = sunk ? (shot is null ? "ship revealed" : "ship sunk") : shot is null ? "" : shot.Hit ? "hit" : "miss";
+                            var last = View.MyShots.Count > 0 && View.MyShots[^1] == shot;
+                            <button type="button" class="cell @css @(last ? "last" : "")" aria-label="@CellLabel(cx, cy, shot, sunk)"
+                                    disabled="@(Busy || !MyTurn || shot is not null)" @onclick="() => Shoot(cx, cy)">@Mark(shot)</button>
+                        }
+                    }
+                </div>
+                <p class="fleet-left">@L["Battleship.FleetLeft"] @Fleet(View.SunkShips)</p>
+            </section>
+        }
+        <section class="sea-box">
+            <h2>@L["Battleship.MySea"]</h2>
+            <div class="sea mine" role="grid" aria-label="@L["Battleship.MySea"]">
+                @for (var y = 0; y < View.Size; y++)
+                {
+                    for (var x = 0; x < View.Size; x++)
+                    {
+                        var (cx, cy) = (x, y);
+                        var shot = View.TheirShots.FirstOrDefault(s => s.X == cx && s.Y == cy);
+                        var ship = View.MyShips?.FirstOrDefault(s => Covers(s, cx, cy));
+                        var sunk = ship is not null && Sunk(ship, View.TheirShots);
+                        var css = ship is null ? (shot is null ? "" : "miss") : sunk ? "ship sunk" : shot is null ? "ship" : "ship hit";
+                        var last = View.TheirShots.Count > 0 && View.TheirShots[^1] == shot;
+                        <span class="cell @css @(last ? "last" : "")" role="gridcell" aria-label="@CellLabel(cx, cy, shot, sunk)">@Mark(shot)</span>
+                    }
+                }
+            </div>
+            <p class="fleet-left">@L["Battleship.MyFleetLeft"] @Fleet(View.MyShips?.Where(s => Sunk(s, View.TheirShots)) ?? [])</p>
+        </section>
+    </div>
+}
+
+@code {
+    private List<ShipDto> _placed = [];
+    private bool _horizontal = true;
+    private string? _hint;
+
+    [Parameter, EditorRequired]
+    public required BattleshipViewDto View { get; set; }
+
+    [Parameter]
+    public int MySeat { get; set; }
+
+    [Parameter]
+    public string Opponent { get; set; } = "";
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public EventCallback<MoveDto> Move { get; set; }
+
+    private bool MyTurn => View.Phase == "shooting" && View.Turn == MySeat;
+
+    /// <summary>The next ship to place: the fleet in order, minus what is on the sea already.</summary>
+    private int? Next
+    {
+        get
+        {
+            var left = View.Fleet.ToList();
+            foreach (var ship in _placed)
+            {
+                left.Remove(ship.Length);
+            }
+
+            return left.Count > 0 ? left[0] : null;
+        }
+    }
+
+    private static bool Covers(ShipDto ship, int x, int y) =>
+        ship.Horizontal ? y == ship.Y && x >= ship.X && x < ship.X + ship.Length : x == ship.X && y >= ship.Y && y < ship.Y + ship.Length;
+
+    private static IEnumerable<(int X, int Y)> Cells(ShipDto ship) =>
+        Enumerable.Range(0, ship.Length).Select(i => ship.Horizontal ? (ship.X + i, ship.Y) : (ship.X, ship.Y + i));
+
+    private static bool Sunk(ShipDto ship, IReadOnlyList<ShotDto> shots) =>
+        Cells(ship).All(c => shots.Any(s => s.X == c.X && s.Y == c.Y));
+
+    /// <summary>Like the server's rule: on the sea, and no other ship around it, not even at a corner.</summary>
+    private bool Fits(ShipDto ship) =>
+        Cells(ship).All(c => c.X >= 0 && c.X < View.Size && c.Y >= 0 && c.Y < View.Size)
+        && _placed.All(other => Cells(other).All(o => Cells(ship).All(c => Math.Abs(c.X - o.X) > 1 || Math.Abs(c.Y - o.Y) > 1)));
+
+    private static string Coordinate(int x, int y) => $"{(char)('A' + x)}{y + 1}";
+
+    private string CellLabel(int x, int y, ShotDto? shot, bool sunk) =>
+        Coordinate(x, y) + (sunk ? ", " + L["Battleship.Sunk"] : shot is null ? "" : shot.Hit ? ", " + L["Battleship.Hit"] : ", " + L["Battleship.Miss"]);
+
+    private static string Mark(ShotDto? shot) => shot is null ? "" : shot.Hit ? "✕" : "•";
+
+    private string ShipName(int length) => L[$"Battleship.Ship{length}"];
+
+    /// <summary>The fleet as ship sizes, the sunk ones crossed out.</summary>
+    private RenderFragment Fleet(IEnumerable<ShipDto> sunk) => builder =>
+    {
+        var gone = sunk.Select(s => s.Length).ToList();
+        var seq = 0;
+        foreach (var length in View.Fleet)
+        {
+            var isGone = gone.Remove(length);
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", isGone ? "fleet-ship gone" : "fleet-ship");
+            builder.AddAttribute(seq++, "title", ShipName(length));
+            builder.AddContent(seq++, new string('■', length));
+            builder.CloseElement();
+        }
+    };
+
+    private void Place(int x, int y)
+    {
+        _hint = null;
+        var hit = _placed.FirstOrDefault(s => Covers(s, x, y));
+        if (hit is not null)
+        {
+            _placed.Remove(hit);
+            return;
+        }
+
+        if (Next is not { } length)
+        {
+            return;
+        }
+
+        var ship = new ShipDto(x, y, length, _horizontal);
+        if (Fits(ship))
+        {
+            _placed.Add(ship);
+        }
+        else
+        {
+            _hint = L["Battleship.DoesNotFit"];
+        }
+    }
+
+    private void Clear()
+    {
+        _placed = [];
+        _hint = null;
+    }
+
+    private async Task Mix()
+    {
+        _hint = null;
+        _placed = await Api.RandomFleet();
+    }
+
+    private Task Ready() => Move.InvokeAsync(new BattleshipPlaceDto(_placed));
+
+    private Task Shoot(int x, int y) => Move.InvokeAsync(new BattleshipShootDto(x, y));
+}

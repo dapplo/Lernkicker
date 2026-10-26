@@ -861,3 +861,65 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .ai-help { margin: 12px 0; }
 .ai-help > summary { cursor: pointer; font-weight: 600; color: var(--green-dark); }
 .ai-help ol { padding-left: 1.4em; }
+
+/* Playing with others: the lobby, the game page and battleship. Every rule is scoped to its component's class. */
+.play-card { border-left-color: var(--math); }
+.play-card.my-turn { border-left-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); }
+.play-card.my-turn .due { color: var(--text); font-weight: 700; }
+.play-card.finished { opacity: 0.75; }
+.play-games { flex-wrap: wrap; }
+.play-tables li { align-items: center; }
+.chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chips li { background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+.chips small { color: var(--muted); }
+.play-players { margin: 0; color: var(--muted); font-weight: 600; }
+.play-status { font-size: 1.15rem; font-weight: 700; margin: 4px 0 8px; }
+.play-status.my-turn { color: var(--green-dark); }
+.play-settings fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 14px 12px; }
+.play-settings legend { font-weight: 700; padding: 0 6px; }
+.play-settings .check small { display: block; color: var(--muted); }
+
+.seas { display: grid; gap: 16px; }
+@media (min-width: 700px) { .seas { grid-template-columns: 1fr 1fr; } }
+.sea-box { background: var(--paper); border-radius: var(--radius); padding: 12px; box-shadow: 0 1px 3px rgb(0 0 0 / 8%); }
+.sea-box.my-turn { box-shadow: 0 0 0 3px var(--gold); }
+.sea-box h2 { font-size: 1.05rem; margin-bottom: 8px; }
+.battleship-next { font-weight: 700; }
+.sea {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 2px;
+    width: 100%;
+    max-width: 420px;
+    padding: 3px;
+    border-radius: 10px;
+    background: #2f6fa3;
+}
+.sea .cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: #a9d6f5;
+    color: #12385a;
+    font: inherit;
+    font-weight: 700;
+    line-height: 1;
+}
+.sea button.cell:not(:disabled) { cursor: pointer; }
+.sea button.cell:not(:disabled):hover { background: #d4ecfc; }
+.sea .cell.ship { background: #5f6b76; color: #fff; }
+.sea .cell.hit { background: #f08c00; color: #fff; }
+.sea .cell.ship.hit { background: #e8590c; }
+.sea .cell.sunk { background: #9b2c2c; color: #fff; }
+.sea .cell.revealed { background: #8c99a6; }
+.sea .cell.miss { color: #2f6fa3; }
+.sea .cell.last { outline: 3px solid var(--gold); outline-offset: -3px; }
+.sea.placing .cell.ship { background: #495057; }
+.fleet-left { margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; color: var(--muted); font-size: 0.95rem; }
+.fleet-ship { letter-spacing: -2px; color: var(--text); }
+.fleet-ship.gone { color: var(--muted); text-decoration: line-through; opacity: 0.5; }

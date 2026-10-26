@@ -6,6 +6,7 @@ using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
 using Lernkicker.Domain.Media;
 using Lernkicker.Domain.Messaging;
+using Lernkicker.Domain.Multiplayer;
 using Lernkicker.Domain.Practice;
 using Lernkicker.Domain.Quizzes;
 using Lernkicker.Domain.Settings;
@@ -52,6 +53,9 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
     public DbSet<DocumentImage> DocumentImages => Set<DocumentImage>();
     public DbSet<ServerSecret> ServerSecrets => Set<ServerSecret>();
     public DbSet<ServerSetting> ServerSettings => Set<ServerSetting>();
+    public DbSet<PlaySettings> PlaySettings => Set<PlaySettings>();
+    public DbSet<Match> Matches => Set<Match>();
+    public DbSet<MatchPlayer> MatchPlayers => Set<MatchPlayer>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -236,6 +240,45 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
             e.HasKey(x => x.Name);
             e.Property(x => x.Name).HasMaxLength(64);
             e.Property(x => x.Value).HasMaxLength(2048);
+        });
+
+        builder.Entity<PlaySettings>(e =>
+        {
+            e.HasKey(x => x.ChildId);
+            e.Property(x => x.Reach).HasMaxLength(20);
+            // Short lists, only ever read as a whole: stored as JSON
+            e.Property(x => x.Games).HasConversion(
+                v => JsonSerializer.Serialize(v, Json),
+                v => JsonSerializer.Deserialize<List<string>>(v, Json)!,
+                new ValueComparer<IReadOnlyList<string>>((a, b) => a!.SequenceEqual(b!), v => v.Aggregate(0, (h, s) => HashCode.Combine(h, s)), v => v.ToList()));
+            e.Property(x => x.Families).HasConversion(
+                v => JsonSerializer.Serialize(v, Json),
+                v => JsonSerializer.Deserialize<List<Guid>>(v, Json)!,
+                new ValueComparer<IReadOnlyList<Guid>>((a, b) => a!.SequenceEqual(b!), v => v.Aggregate(0, (h, g) => HashCode.Combine(h, g)), v => v.ToList()));
+            e.Property(x => x.Children).HasConversion(
+                v => JsonSerializer.Serialize(v, Json),
+                v => JsonSerializer.Deserialize<List<Guid>>(v, Json)!,
+                new ValueComparer<IReadOnlyList<Guid>>((a, b) => a!.SequenceEqual(b!), v => v.Aggregate(0, (h, g) => HashCode.Combine(h, g)), v => v.ToList()));
+            e.HasOne<Child>().WithOne().HasForeignKey<PlaySettings>(x => x.ChildId).OnDelete(DeleteBehavior.Cascade);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        // Not owned by a family: children of several families play one match; the use cases check who may see it
+        builder.Entity<Match>(e =>
+        {
+            e.HasIndex(x => x.Status);
+            e.Property(x => x.Game).HasMaxLength(32);
+            e.Property(x => x.Status).HasMaxLength(20);
+            e.HasMany(x => x.Players).WithOne().HasForeignKey(x => x.MatchId).OnDelete(DeleteBehavior.Cascade);
+            e.Navigation(x => x.Players).HasField("_players").UsePropertyAccessMode(PropertyAccessMode.Field).AutoInclude();
+        });
+
+        builder.Entity<MatchPlayer>(e =>
+        {
+            e.HasKey(x => new { x.MatchId, x.Seat });
+            e.HasIndex(x => x.ChildId);
+            // A deleted child leaves the game; the match then counts as abandoned
+            e.HasOne<Child>().WithMany().HasForeignKey(x => x.ChildId).OnDelete(DeleteBehavior.Cascade);
         });
 
         // SQLite cannot order or compare DateTimeOffset; store as UTC ticks.

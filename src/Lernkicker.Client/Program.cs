@@ -15,5 +15,6 @@ builder.Services.AddScoped<Display>();
 builder.Services.AddScoped<CurrentTheme>();
 builder.Services.AddScoped<UiLanguage>();
 builder.Services.AddScoped<UploadFiles>();
+builder.Services.AddScoped<PlayConnection>();
 
 await builder.Build().RunAsync();
