@@ -598,4 +598,18 @@
   <data name="Home.BackToParents" xml:space="preserve"><value>To the parents' page</value></data>
   <data name="Home.StopLearning" xml:space="preserve"><value>Stop learning</value></data>
   <data name="Error.child.notOwnProfile" xml:space="preserve"><value>Only an adult profile that no other parent uses can be your own.</value></data>
+  <data name="Learn.Type.vocabulary" xml:space="preserve"><value>Vocabulary</value></data>
+  <data name="Vocabulary.Speak" xml:space="preserve"><value>Read “{0}” aloud</value></data>
+  <data name="Vocabulary.NoVoice" xml:space="preserve"><value>This device has no voice for {0}. To hear the words, install it in the phone's settings under “Text-to-speech”.</value></data>
+  <data name="Vocabulary.Mode.List" xml:space="preserve"><value>Words</value></data>
+  <data name="Vocabulary.Mode.Cards" xml:space="preserve"><value>Cards</value></data>
+  <data name="Vocabulary.Mode.Write" xml:space="preserve"><value>Write</value></data>
+  <data name="Vocabulary.Left" xml:space="preserve"><value>{0} of {1} words left</value></data>
+  <data name="Vocabulary.AllDone" xml:space="preserve"><value>You know all {0} words!</value></data>
+  <data name="Vocabulary.Ask" xml:space="preserve"><value>{0} → {1}</value></data>
+  <data name="Vocabulary.Check" xml:space="preserve"><value>Check</value></data>
+  <data name="Vocabulary.Right" xml:space="preserve"><value>✓ Right!</value></data>
+  <data name="Vocabulary.Almost" xml:space="preserve"><value>Almost! Look closely:</value></data>
+  <data name="Vocabulary.Wrong" xml:space="preserve"><value>Not quite. It is:</value></data>
+  <data name="Vocabulary.Next" xml:space="preserve"><value>Next</value></data>
 </root>

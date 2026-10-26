@@ -1,0 +1,28 @@
+{
+  "$schema": "../../schema/quiz-v1.schema.json",
+  "format": "quiz/v1",
+  "id": "dutch-animals-test",
+  "title": "Niederländisch: Tiere (Test)",
+  "subject": "other",
+  "gradeLevel": 4,
+  "language": "de",
+  "topic": "Niederländisch",
+  "exercises": [
+    {
+      "id": "animals", "type": "vocabulary",
+      "instruction": "Übersetze. Schreibe den Artikel mit.",
+      "hint": "Niederländisch: de oder het. Deutsch: der, die oder das.",
+      "wordLanguage": "nl", "direction": "both",
+      "words": [
+        { "word": "de hond", "translation": "der Hund" },
+        { "word": "de kat", "translation": "die Katze", "translationAlternatives": ["der Kater"] },
+        { "word": "het paard", "translation": "das Pferd" },
+        { "word": "de koe", "translation": "die Kuh" },
+        { "word": "het varken", "translation": "das Schwein" },
+        { "word": "de vogel", "translation": "der Vogel" },
+        { "word": "de vis", "translation": "der Fisch" },
+        { "word": "het konijn", "translation": "das Kaninchen" }
+      ]
+    }
+  ]
+}

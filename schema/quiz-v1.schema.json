@@ -66,7 +66,7 @@
       "type": "object",
       "required": ["type"],
       "properties": {
-        "type": { "enum": ["cloze", "matching", "ordering", "trueFalse", "freeText", "multipleChoice", "wordSearch", "fallingWords"] }
+        "type": { "enum": ["cloze", "matching", "ordering", "trueFalse", "freeText", "multipleChoice", "wordSearch", "fallingWords", "vocabulary"] }
       },
       "allOf": [
         { "$ref": "#/$defs/base" },
@@ -77,7 +77,8 @@
         { "if": { "properties": { "type": { "const": "freeText" } } }, "then": { "$ref": "#/$defs/freeText" } },
         { "if": { "properties": { "type": { "const": "multipleChoice" } } }, "then": { "$ref": "#/$defs/multipleChoice" } },
         { "if": { "properties": { "type": { "const": "wordSearch" } } }, "then": { "$ref": "#/$defs/wordSearch" } },
-        { "if": { "properties": { "type": { "const": "fallingWords" } } }, "then": { "$ref": "#/$defs/fallingWords" } }
+        { "if": { "properties": { "type": { "const": "fallingWords" } } }, "then": { "$ref": "#/$defs/fallingWords" } },
+        { "if": { "properties": { "type": { "const": "vocabulary" } } }, "then": { "$ref": "#/$defs/vocabulary" } }
       ]
     },
     "cloze": {
@@ -225,6 +226,32 @@
         }
       },
       "additionalProperties": false
+    },
+    "vocabulary": {
+      "description": "Vocabulary test: the child types the translation of each word, or the word for each translation, or both. Each question is a part; an answer counts when it is spelled right (a capital first letter, extra spaces and a full stop at the end don't matter).",
+      "required": ["wordLanguage", "words"],
+      "properties": {
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
+        "wordLanguage": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$", "description": "BCP 47 tag of the words, e.g. 'nl' or 'en'. The device reads them aloud in this language." },
+        "translationLanguage": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$", "description": "BCP 47 tag of the translations. Default: the file's language." },
+        "direction": {
+          "enum": ["both", "wordToTranslation", "translationToWord"], "default": "both",
+          "description": "wordToTranslation: the word is shown and the translation typed. translationToWord: the other way. both: both ways."
+        },
+        "words": { "type": "array", "minItems": 1, "maxItems": 50, "items": { "$ref": "#/$defs/vocabularyWord" } }
+      },
+      "additionalProperties": false
+    },
+    "vocabularyWord": {
+      "description": "A word in the language being learned and its translation. The alternatives also count as right when typed, e.g. without the article or a synonym.",
+      "type": "object", "required": ["word", "translation"], "additionalProperties": false,
+      "properties": {
+        "word": { "type": "string", "minLength": 1, "maxLength": 100, "description": "In wordLanguage, e.g. 'de hond'." },
+        "translation": { "type": "string", "minLength": 1, "maxLength": 100, "description": "In translationLanguage, e.g. 'der Hund'." },
+        "wordAlternatives": { "type": "array", "maxItems": 10, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+        "translationAlternatives": { "type": "array", "maxItems": 10, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+        "image": { "$ref": "#/$defs/image", "description": "A picture of the word, shown with the question either way." }
+      }
     },
     "choiceOption": {
       "description": "An option: a text, or a picture with an optional text under it.",

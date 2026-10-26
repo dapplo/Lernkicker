@@ -97,6 +97,30 @@
             </ul>
             break;
 
+        case VocabularySheetDto vocabulary:
+            <ol class="fields vocab-questions">
+                @foreach (var question in vocabulary.Questions)
+                {
+                    var index = question.Index;
+                    var answerLanguage = question.AsksWord ? vocabulary.WordLanguage : vocabulary.TranslationLanguage;
+                    var promptLanguage = question.AsksWord ? vocabulary.TranslationLanguage : vocabulary.WordLanguage;
+                    <li @key="index">
+                        <Picture Image="@question.Image" Zoom="false" />
+                        <label>
+                            <span>
+                                <span lang="@promptLanguage">@question.Prompt</span>
+                                <small class="vocab-to" lang="@UiLanguage.Current">→ @answerLanguage.ToUpperInvariant()</small>
+                            </span>
+                            <input lang="@answerLanguage" autocomplete="off" autocapitalize="off" spellcheck="false" value="@Draft.Texts[index]" @onchange="e => Set(index, e)" />
+                        </label>
+                        @if (!question.AsksWord)
+                        {
+                            <SpeakButton Text="@question.Prompt" Language="@vocabulary.WordLanguage" />
+                        }
+                    </li>
+                }
+            </ol>
+            break;
         case FreeTextSheetDto freeText:
             <ol class="fields">
                 @for (var i = 0; i < freeText.FieldLabels.Count; i++)

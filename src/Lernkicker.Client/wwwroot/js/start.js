@@ -24,6 +24,17 @@
     document.documentElement.lang = language;
     document.querySelectorAll('[data-text]').forEach(e => e.textContent = texts[language][e.dataset.text]);
 
+    // The device's voice for a language: one for exactly that tag (e.g. nl-NL) if there is, else any of the language.
+    function voiceFor(language) {
+        const tag = language.toLowerCase();
+        const base = tag.split('-')[0];
+        const voices = speechSynthesis.getVoices();
+        const normal = v => v.lang.toLowerCase().replace('_', '-');
+        return voices.find(v => normal(v) === tag)
+            ?? voices.find(v => normal(v).split('-')[0] === base && v.default)
+            ?? voices.find(v => normal(v).split('-')[0] === base);
+    }
+
     window.lernkicker = {
         setLanguage(code) {
             try {
@@ -70,6 +81,45 @@
 
         stopFall(element) {
             element?.getAnimations().forEach(a => a.cancel());
+        },
+
+        // Reading words aloud uses the device's own voices (Web Speech API), so nothing is sent anywhere. Voices load
+        // late on some browsers, so wait a moment for them before saying there is none for the language.
+        async hasVoice(language) {
+            if (!('speechSynthesis' in window)) {
+                return false;
+            }
+
+            if (speechSynthesis.getVoices().length === 0) {
+                await new Promise(resolve => {
+                    speechSynthesis.addEventListener('voiceschanged', resolve, { once: true });
+                    setTimeout(resolve, 1500);
+                });
+            }
+
+            return voiceFor(language) !== undefined;
+        },
+
+        speak(text, language) {
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = language;
+            try {
+                utterance.voice = voiceFor(language) ?? null;
+            } catch {
+                // Not a voice of this browser: the language tag alone picks one
+            }
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        },
+
+        // The name of a language in the UI language, e.g. 'nl' → 'Niederländisch'.
+        languageName(code) {
+            try {
+                return new Intl.DisplayNames([document.documentElement.lang], { type: 'language' }).of(code) ?? code;
+            } catch {
+                return code;
+            }
         },
 
         scrollIntoView(element) {

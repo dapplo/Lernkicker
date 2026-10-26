@@ -1,6 +1,6 @@
 # Lesson format `lesson/v1`
 
-Learning material is **one JSON file** (UTF-8): a poem to learn by heart, a text to read, flashcards, key facts, or a guide to look things up in (e.g. the rules of a game). Unlike a quiz it is not graded. The child reads and practises it on the phone and marks each part they know with "Kann ich!", and parents see that progress.
+Learning material is **one JSON file** (UTF-8): a poem to learn by heart, a text to read, flashcards, vocabulary in another language, key facts, or a guide to look things up in (e.g. the rules of a game). Unlike a quiz it is not graded. The child reads and practises it on the phone and marks each part they know with "Kann ich!", and parents see that progress.
 
 Parents upload a lesson under **Lernstoff verwalten / Manage learning material**, then give it to a child on the child's page, optionally with a due date (e.g. the day the poem is recited). The due date also shows up in the child's calendar. On upload, Lernkicker checks the file against [`schema/lesson-v1.schema.json`](../schema/lesson-v1.schema.json) and the rules below. The examples are [`lessons/german/poem-septembermorgen.json`](../lessons/german/poem-septembermorgen.json) and, for a guide to look things up in, [`lessons/other/game-mau-mau.json`](../lessons/other/game-mau-mau.json).
 
@@ -94,6 +94,27 @@ It works for any text to learn word for word, e.g. a times table rhyme or a shor
 
 1–100 cards with `front` and `back` (at most 300 characters each). `frontImage` and `backImage` put a picture above the text of that side, e.g. a picture on the front and its name on the back. The child turns a card over and says "Wusste ich" (done) or "Nochmal" (comes again at the end), until every card is done. The order is shuffled.
 
+### `vocabulary`: words in another language
+
+```json
+{ "id": "animals", "type": "vocabulary", "title": "Tiere",
+  "wordLanguage": "nl", "direction": "both",
+  "words": [
+    { "word": "de hond", "translation": "der Hund" },
+    { "word": "de kip", "translation": "das Huhn", "wordAlternatives": ["de hen"], "translationAlternatives": ["die Henne"] }
+  ] }
+```
+
+A list of words in the language being learned (`word`, in `wordLanguage`) with their `translation` (in `translationLanguage`, default the lesson's `language`). `direction` says which way they are practised: `both` (default), `wordToTranslation` (see the word, give the translation) or `translationToWord`. 1–200 words, each `word` and `translation` at most 100 characters; `wordAlternatives` and `translationAlternatives` list other answers that count when typed, and an optional `image` is shown with the word. [`lessons/other/dutch-animals.json`](../lessons/other/dutch-animals.json) is an example (Dutch–German).
+
+The app offers three modes:
+
+- **Wörter / Words:** the whole list.
+- **Karten / Cards:** like flashcards. With `both`, each card shows a random side, and a card that comes again may show the other side.
+- **Schreiben / Write:** the child types the answer and taps "Prüfen". Right is done; "Fast!" (wrong capitals, a wrong or missing article, or one letter wrong, missing or extra) and wrong show the right answer, and the word comes again at the end. Spelling is checked like the quiz type [`vocabulary`](quiz-format.md#vocabulary-translate-words-one-way-or-both).
+
+A 🔊 button reads each word aloud in `wordLanguage`, with the voices built into the child's device: nothing is sent anywhere. iPhones and most Android phones have voices for the common languages; when a device has none for the language, the block says so and the voice can be installed in the phone's settings (text-to-speech). For a graded test of the same words, use the quiz type `vocabulary`.
+
 ### `facts`: remember this
 
 ```json
@@ -125,7 +146,7 @@ A large picture; tapping it shows it full screen. Like every block, the child ca
 
 ## Games from flashcards and entries
 
-Nothing has to be written for games: the cards of every `flashcards` block (`front`, `back`) and the entries of every `entries` block (`name`, `text`) are pairs of a term and what it means. Under the lesson the child gets a **Spielen / Play** section with each game the pairs are enough for, and every round picks new pairs in a new order. Games are practice only: nothing is graded or stored. [`lessons/science/grain-terms.json`](../lessons/science/grain-terms.json) unlocks all of them.
+Nothing has to be written for games: the cards of every `flashcards` block (`front`, `back`), the entries of every `entries` block (`name`, `text`) and the words of every `vocabulary` block (`word`, `translation`) are pairs of a term and what it means. For vocabulary the word in the language being learned is the term, so it is what the child finds in the word search and writes in the crossword, with the translation as the clue. Under the lesson the child gets a **Spielen / Play** section with each game the pairs are enough for, and every round picks new pairs in a new order. Games are practice only: nothing is graded or stored. [`lessons/science/grain-terms.json`](../lessons/science/grain-terms.json) unlocks all of them.
 
 | Game | Needs at least 4 pairs where | A round |
 | --- | --- | --- |
@@ -134,7 +155,7 @@ Nothing has to be written for games: the cards of every `flashcards` block (`fro
 | Kreuzworträtsel / Crossword | the term is one word of 3–12 letters and the meaning at most 120 characters | up to 10 words that cross; the meanings are the clues |
 | Suchsel / Word search | the term is one word of 3–12 letters | up to 10 words in a new grid, like the quiz type `wordSearch` (`medium`) |
 
-"One word" ignores a leading article (`der`, `die`, `das`, `ein`, `eine`, `the`, `a`, `an`), so "die Ähre" counts as "Ähre"; terms with spaces, digits or hyphens don't count. `**` and `*` are removed. A term or a meaning that appears twice is used once, so every round has exactly one right answer. To unlock games, write fronts as single words and keep backs short.
+"One word" ignores a leading article (`der`, `die`, `das`, `ein`, `eine`, `the`, `a`, `an`, `to`, `de`, `het`, `een`), so "die Ähre" counts as "Ähre" and "de hond" as "hond"; terms with spaces, digits or hyphens don't count. `**` and `*` are removed. A term or a meaning that appears twice is used once, so every round has exactly one right answer. To unlock games, write fronts as single words and keep backs short.
 
 ## Pictures
 

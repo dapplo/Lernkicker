@@ -1,0 +1,35 @@
+{
+  "$schema": "../../schema/lesson-v1.schema.json",
+  "format": "lesson/v1",
+  "id": "dutch-animals",
+  "title": "Niederländisch: Tiere",
+  "subject": "other",
+  "gradeLevel": 4,
+  "language": "de",
+  "topic": "Niederländisch",
+  "description": "Zwölf Tiere auf Niederländisch, in beide Richtungen. Tippe auf 🔊, um ein Wort zu hören.",
+  "blocks": [
+    {
+      "id": "tips", "type": "text", "title": "So lernst du Vokabeln",
+      "text": "Hör dir jedes Wort an und sprich es **laut nach**.\n\n- Lerne erst mit den Karten.\n- Dann schreibe die Wörter.\n- *de* und *het* sind wie *der*, *die* und *das*: Lerne sie gleich mit."
+    },
+    {
+      "id": "animals", "type": "vocabulary", "title": "Tiere",
+      "wordLanguage": "nl", "direction": "both",
+      "words": [
+        { "word": "de hond", "translation": "der Hund" },
+        { "word": "de kat", "translation": "die Katze", "translationAlternatives": ["der Kater"] },
+        { "word": "het paard", "translation": "das Pferd" },
+        { "word": "de koe", "translation": "die Kuh" },
+        { "word": "het varken", "translation": "das Schwein" },
+        { "word": "de vogel", "translation": "der Vogel" },
+        { "word": "de vis", "translation": "der Fisch" },
+        { "word": "het konijn", "translation": "das Kaninchen" },
+        { "word": "de muis", "translation": "die Maus" },
+        { "word": "het schaap", "translation": "das Schaf" },
+        { "word": "de eend", "translation": "die Ente" },
+        { "word": "de kip", "translation": "das Huhn", "wordAlternatives": ["de hen"], "translationAlternatives": ["die Henne"] }
+      ]
+    }
+  ]
+}

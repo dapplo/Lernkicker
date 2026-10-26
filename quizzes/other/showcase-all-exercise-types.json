@@ -130,6 +130,21 @@
         { "text": "Mais", "answer": "Getreide", "explanation": "Mais ist ein Getreide, auch wenn man ihn oft wie Gemüse isst." }
       ],
       "level": "medium"
+    },
+    {
+      "id": "vocabulary",
+      "type": "vocabulary",
+      "instruction": "11. Übersetze ins Englische und zurück.",
+      "hint": "Ein großer Anfangsbuchstabe ist egal, aber deutsche Nomen schreibst du groß.",
+      "wordLanguage": "en",
+      "translationLanguage": "de",
+      "direction": "both",
+      "words": [
+        { "word": "wheat", "translation": "der Weizen", "translationAlternatives": ["Weizen"] },
+        { "word": "bread", "translation": "das Brot", "translationAlternatives": ["Brot"] },
+        { "word": "to bake", "translation": "backen", "wordAlternatives": ["bake"] }
+      ],
+      "explanation": "Im Englischen schreibt man Nomen klein."
     }
   ]
 }
