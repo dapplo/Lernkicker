@@ -28,7 +28,7 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 
 | Project | Role | May reference |
 | --- | --- | --- |
-| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed`, `TelegramLink`, `TelegramLinkCode`, `ServerSecret`, `ImageRef` (a picture in a quiz or lesson), `StoredImage`, `DocumentImage` | the BCL only |
+| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed`, `TelegramLink`, `TelegramLinkCode`, `ServerSecret`, `ImageRef` (a picture in a quiz or lesson), `StoredImage`, `DocumentImage`, `PlaySettings`, `Match` and the games for several players (`IGameRules`, `Battleship`) | the BCL only |
 | `Lernkicker.Application` | Use cases (`*UseCases`), ports (`Ports/Ports.cs`), `Result`/`AppError` and the stable `ErrorCodes` | Domain |
 | `Lernkicker.QuizFormat` | Driven adapter for `IQuizFormat`, `ILessonFormat` and `ISvgSanitizer`: reads `quiz/v1` and `lesson/v1` JSON, validates against the embedded schemas, cleans uploaded SVG pictures | Application, Domain, JsonSchema.Net |
 | `Lernkicker.Calendar` | Driven adapter for `ICalendarSource` (fetches ICS over HTTP, only from public addresses), `ICalendarWriter` (the ICS feed) and `ILocalClock` (today in the family's time zone) | Application, Domain, Ical.Net, NodaTime |
@@ -50,8 +50,18 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 - Background work without a login (the calendar sync, the ICS feed) enters a family explicitly with `IFamilyScope.Enter`, so the query filter still applies; it refuses to switch away from a logged-in family.
 - Time comes from `TimeProvider`, randomness from `Random`/`RandomNumberGenerator` passed in, so the domain stays testable.
 
+## Playing with others
+
+Children play turn-based games with each other (battleship for now), on their own devices.
+
+- **Permissions:** a parent unlocks games per child and chooses with whom: only the own family, the own family plus picked families or children, or everyone on the server (`PlaySettings`). Two children meet only when both sides allow it (`PlaySettings.CanPlayWith`), so nobody can open another family's child to strangers. Within a family it is enough to unlock the game, which also lets a parent test a game with their own adult profile against a second profile on another device.
+- **Matches** are the one entity that belongs to several families, so it has no family filter; `MatchUseCases` checks the seat for every read and move. A table opens with the host on seat 0; when the last seat is taken the game starts. The state is the game's own JSON in `Match.State`, stored after every move, so nobody has to be online at the same time. Changes to matches run one at a time (an in-memory lock; Lernkicker is one process).
+- **Rules** live in the domain behind `IGameRules`: start, play a move, give up, whose move it is, and the view of one seat (no hidden ships or cards ever leave the server). Games for one player against the computer are out of scope.
+- **Live updates:** the web adapter's SignalR hub (`/hubs/play`, child login only) only says "lobby changed" or "match changed" (`IPlayNotifier`); the pages then load again through the API, with the usual checks. Whoever is connected counts as online in the lobby (`IPlayPresence`).
+
 ## Adding things
 
+- **A new game for several players:** a class implementing `IGameRules` with its move and view records in `Domain/Multiplayer`, an entry in `MultiplayerGames.All`, a view DTO and move DTOs in `Contracts/Play.cs` with their `JsonDerivedType`, the cases in `PlayMapping`, `PlayGames.All` and its icon in the client, a component in `Components/Multiplayer` and a case in `MatchPage.razor`, `Play.Game.<game>` in both resx files, and tests.
 - **A new exercise type:** domain record + `QuizSheet` + `Grader` + schema + `docs/quiz-format.md` + `QuizJson.ExerciseTypes` + a sheet DTO in Contracts + a view in `ExerciseView.razor` + tests.
 - **A new lesson block type:** domain record + schema + `docs/lesson-format.md` + `LessonJson` + `Mapping` (block DTO) + a case in `Learn.razor` + a `Learn.Type.<type>` text + tests.
 - **A new place for a picture:** an `ImageRef?` on the domain record and its `Images(path)` (so uploads check it), the schema (`"image": { "$ref": "#/$defs/image" }`), both format docs, `Mapping` (an `ImageDto` via `ToDto(images)`), a `<Picture>` in the view, and the example with pictures.

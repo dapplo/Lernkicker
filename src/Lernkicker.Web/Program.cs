@@ -9,6 +9,7 @@ using Lernkicker.QuizFormat;
 using Lernkicker.Telegram;
 using Lernkicker.Web;
 using Lernkicker.Web.Endpoints;
+using Lernkicker.Web.Play;
 using Lernkicker.Web.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -68,6 +69,14 @@ builder.Services.AddScoped<LessonUseCases>();
 builder.Services.AddScoped<SharedLibraryUseCases>();
 builder.Services.AddScoped<TelegramUseCases>();
 builder.Services.AddScoped<TelegramBotUseCases>();
+builder.Services.AddScoped<PlaySettingsUseCases>();
+builder.Services.AddScoped<MatchUseCases>();
+
+// Playing with others: a live connection tells open play pages that something changed
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<PlayPresence>();
+builder.Services.AddSingleton<IPlayPresence>(sp => sp.GetRequiredService<PlayPresence>());
+builder.Services.AddSingleton<IPlayNotifier, PlayNotifier>();
 builder.Services.AddSingleton<ISecretProtector, DataProtectionSecrets>();
 
 // Keys for cookies survive restarts and image updates
@@ -229,6 +238,8 @@ app.MapLessons();
 app.MapLibrary();
 app.MapMedia();
 app.MapFormat();
+app.MapPlay();
+app.MapHub<PlayHub>(PlayEvents.Path).RequireAuthorization(Policies.Child);
 app.Map("/api/{**rest}", ApiResults.NotFound);
 
 // The PWA (Lernkicker.Client). Fingerprinted files are cached forever; every other path is a page of the app.

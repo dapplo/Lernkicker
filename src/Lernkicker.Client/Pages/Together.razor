@@ -1,0 +1,179 @@
+@page "/play"
+@implements IAsyncDisposable
+@inject Api Api
+@inject PlayConnection Connection
+@inject NavigationManager Navigation
+
+@* The lobby: where children meet to play with each other, as far as their parents allow it *@
+
+<PageTitle>@L["Play.Title"] · Lernkicker</PageTitle>
+
+<header class="practice-header">
+    <a href="" class="close" aria-label="@L["Common.Back"]">✕</a>
+    <span>@L["Play.Title"]</span>
+</header>
+<h1><span aria-hidden="true">🎲</span> @L["Play.Title"]</h1>
+<Messages Errors="@_errors" />
+
+@if (_lobby is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else if (_lobby.Games.Count == 0 && _lobby.MyMatches.Count == 0)
+{
+    <div class="empty">
+        <div class="ball" aria-hidden="true">🎲</div>
+        <p>@L["Play.NothingUnlocked"]</p>
+    </div>
+}
+else
+{
+    @if (_lobby.MyMatches.Count > 0)
+    {
+        <h2>@L["Play.MyGames"]</h2>
+        <ul class="cards play-list">
+            @foreach (var match in _lobby.MyMatches)
+            {
+                <li>
+                    <a class="card play-card @(match.MyTurn ? "my-turn" : "") @match.Status" href="play/@match.Id">
+                        <span class="subject"><span aria-hidden="true">@PlayGames.Icon(match.Game)</span> @L[$"Play.Game.{match.Game}"]</span>
+                        <span class="title">@Opponents(match)</span>
+                        <span class="due">@PlayGames.Status(L, match)</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (_lobby.Tables.Count > 0)
+    {
+        <h2>@L["Play.OpenTables"]</h2>
+        <ul class="list play-tables">
+            @foreach (var table in _lobby.Tables)
+            {
+                <li>
+                    <div>
+                        <b><span aria-hidden="true">@PlayGames.Icon(table.Game)</span> @L[$"Play.Game.{table.Game}"]</b>
+                        <small>@L["Play.WantsToPlay", string.Join(", ", table.Players.Select(PlayGames.NameWithFamily))]</small>
+                    </div>
+                    <button class="btn" disabled="@_busy" @onclick="() => Join(table.Id)">@L["Play.Join"]</button>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (_lobby.Games.Count > 0)
+    {
+        <h2>@L["Play.NewGame"]</h2>
+        <div class="buttons play-games">
+            @foreach (var game in _lobby.Games)
+            {
+                <button class="btn" disabled="@_busy" @onclick="() => Open(game)">
+                    <span aria-hidden="true">@PlayGames.Icon(game)</span> @L["Play.OpenTable", L[$"Play.Game.{game}"]]
+                </button>
+            }
+        </div>
+        <p class="hint">@L["Play.OpenTableHint"]</p>
+
+        <h2>@L["Play.Online"]</h2>
+        @if (_lobby.Online.Count == 0)
+        {
+            <p class="hint">@L["Play.NobodyOnline"]</p>
+        }
+        else
+        {
+            <ul class="chips">
+                @foreach (var player in _lobby.Online)
+                {
+                    <li><span aria-hidden="true">🟢</span> @player.Name <small>@player.FamilyName</small></li>
+                }
+            </ul>
+        }
+    }
+}
+
+@code {
+    private LobbyDto? _lobby;
+    private IReadOnlyList<string>? _errors;
+    private bool _busy;
+    private bool _connected;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Connection.LobbyChanged += Changed;
+        Connection.MatchChanged += MatchChanged;
+        await Load();
+        if (_lobby is not null)
+        {
+            _connected = true;
+            await Connection.AcquireAsync();
+            // Coming online changed the lobby for the others; for this page the list may be a moment old
+            await Load();
+        }
+    }
+
+    private async Task Load()
+    {
+        try
+        {
+            _lobby = await Api.Lobby();
+            if (_lobby is null)
+            {
+                Navigation.NavigateTo("");
+            }
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+
+    private Task Changed() => InvokeAsync(async () =>
+    {
+        await Load();
+        StateHasChanged();
+    });
+
+    private Task MatchChanged(Guid _) => Changed();
+
+    private string Opponents(MatchOverview match) =>
+        match.Players.Count <= 1
+            ? L["Play.WaitingForPlayers"]
+            : L["Play.Against", string.Join(", ", match.Players.Where(p => p.Seat != match.MySeat).Select(PlayGames.Name))];
+
+    private Task Open(string game) => Go(() => Api.OpenTable(game));
+
+    private Task Join(Guid id) => Go(() => Api.JoinTable(id));
+
+    private async Task Go(Func<Task<MatchDto>> action)
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            var match = await action();
+            Navigation.NavigateTo($"play/{match.Match.Id}");
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+            await Load();
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Connection.LobbyChanged -= Changed;
+        Connection.MatchChanged -= MatchChanged;
+        if (_connected)
+        {
+            Connection.Release();
+        }
+
+        return ValueTask.CompletedTask;
+    }
+}

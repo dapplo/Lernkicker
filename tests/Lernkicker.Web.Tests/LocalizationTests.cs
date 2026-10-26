@@ -85,6 +85,18 @@ public partial class LocalizationTests
     public void Every_lesson_game_has_a_name() =>
         Assert.DoesNotContain(Lernkicker.Domain.Games.GameKinds.All, k => !English.ContainsKey($"Game.Name.{k}"));
 
+    [Fact]
+    public void Every_game_for_several_players_has_a_name_and_a_place_in_the_parents_settings()
+    {
+        var games = Lernkicker.Domain.Multiplayer.MultiplayerGames.All.Select(g => g.Game).ToList();
+        Assert.Equal(games, Client.Services.PlayGames.All);
+        Assert.DoesNotContain(games, g => !English.ContainsKey($"Play.Game.{g}"));
+    }
+
+    [Fact]
+    public void Every_play_reach_has_a_name() =>
+        Assert.DoesNotContain(Lernkicker.Domain.Multiplayer.PlayReach.All, r => !English.ContainsKey($"PlaySettings.Reach.{r}") || !English.ContainsKey($"PlaySettings.Reach.{r}.Hint"));
+
     private static Dictionary<string, string> Texts(CultureInfo culture) =>
         Strings.GetResourceSet(culture, createIfNotExists: true, tryParents: false)!
             .Cast<DictionaryEntry>()

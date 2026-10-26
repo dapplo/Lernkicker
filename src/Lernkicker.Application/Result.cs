@@ -121,6 +121,20 @@ public static class ErrorCodes
     public const string NotACalendar = "calendar.notACalendar";
     public const string CalendarRangeInvalid = "calendar.rangeInvalid";
 
+    public const string PlaySettingsInvalid = "play.settingsInvalid";
+    public const string PlayGameUnknown = "play.gameUnknown";
+    public const string PlayNotUnlocked = "play.notUnlocked";
+    public const string PlayNotAllowed = "play.notAllowed";
+    public const string MatchNotFound = "play.matchNotFound";
+    public const string TableClosed = "play.tableClosed";
+    public const string TooManyTables = "play.tooManyTables";
+    public const string TooManyMatches = "play.tooManyMatches";
+    public const string MatchOver = "play.matchOver";
+    public const string NotYourTurn = Domain.Multiplayer.GameErrors.NotYourTurn;
+    public const string MoveInvalid = Domain.Multiplayer.GameErrors.MoveInvalid;
+    public const string FleetInvalid = Domain.Multiplayer.GameErrors.FleetInvalid;
+    public const string ShotInvalid = Domain.Multiplayer.GameErrors.ShotInvalid;
+
     /// <summary>Prefix for account errors from the identity adapter, e.g. "account.DuplicateEmail".</summary>
     public const string AccountPrefix = "account.";
 }

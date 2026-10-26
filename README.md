@@ -76,12 +76,14 @@ Then open http://localhost:8080 and create the admin on the setup page. Login co
 | `/pair#<code>` | child | Opened from the QR code |
 | `/practice/<assignment>` | child | One exercise per screen, hand in, result with solutions |
 | `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, facts, entries to look up; mark parts as known (or jump between parts in a reference lesson) |
+| `/play` | child | Play together: the games the parents unlocked, open tables to join, own games (with "your turn"), who is around |
+| `/play/<match>` | child | One game with others (battleship: place the fleet, then take turns shooting); updates live |
 | `/parents` | parent | Login, children, add a child or adult, connect Telegram |
 | `/parents/quizzes` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete quizzes |
 | `/parents/lessons` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete learning material |
 | `/parents/preview/<quiz\|lesson>/<id>` | parent | Preview as the child sees it |
 | `/parents/library` | parent | Shared library: what other families shared, with preview (`/parents/library/<kind>/<id>`) and copy |
-| `/parents/children/<id>` | parent | Assign quizzes and learning material (with progress), dates, subscribed calendars, feed link, results, QR code for pairing, devices, settings |
+| `/parents/children/<id>` | parent | Assign quizzes and learning material (with progress), dates, subscribed calendars, feed link, results, QR code for pairing, devices, games to play with others (which games, with whom), settings |
 | `/invitation#<code>` | new parent | Create an account from an invitation |
 | `/setup` | first visitor | Fresh server only: create the admin account and family, or start from a backup (tailnet only, once) |
 | `/admin` | admin | Invite families, delete families, set the Telegram bot token, download a backup (tailnet only) |
@@ -102,6 +104,8 @@ All endpoints are under `/api`, take and return JSON, and answer errors with `{ 
 | `GET /api/media/{hash}` (a picture of a quiz or lesson the caller may see) | parents, children |
 | `GET/POST /api/children`, `PUT/DELETE /api/children/{id}`, `PUT …/pin`, `POST …/pairing`, `GET …/devices`, `DELETE …/devices/{deviceId}`, `POST …/devices/{deviceId}/unlock`, `GET/POST …/assignments`, `DELETE …/assignments/{assignmentId}`, `GET …/attempts`, `GET …/attempts/{attemptId}` | parents |
 | `GET/POST /api/children/{id}/calendar` (`?from=&to=`), `PUT/DELETE …/calendar/{eventId}`, `GET/POST …/subscriptions`, `POST …/subscriptions/{subscriptionId}/sync`, `DELETE …/subscriptions/{subscriptionId}`, `POST/DELETE …/feed` | parents |
+| `GET/PUT /api/children/{id}/play` (unlocked games and with whom), `GET …/play/partners` (families and children to pick) | parents |
+| `GET /api/play/lobby`, `POST /api/play/tables`, `POST /api/play/tables/{id}/join`, `DELETE /api/play/tables/{id}`, `GET /api/play/matches/{id}`, `POST …/{id}/moves`, `POST …/{id}/resign`, `GET /api/play/battleship/random-fleet`; live connection (SignalR) at `/hubs/play` | child |
 | `GET /calendar/{token}.ics` | calendar apps (secret link, no login) |
 | `POST /api/device/pair`, `GET /api/device/status`, `POST /api/device/login`, `POST /api/device/logout` | child's device |
 | `GET /api/device/calendar`, `GET /api/device/assignments`, `GET /api/device/assignments/{id}`, `POST /api/device/assignments/{id}/submit`, `GET /api/device/lessons`, `GET /api/device/lessons/{id}`, `POST /api/device/lessons/{id}/practice` | child |

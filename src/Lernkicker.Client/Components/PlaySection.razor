@@ -1,0 +1,138 @@
+@inject Api Api
+
+@* What a parent unlocks for playing with others: which games, and with whom. Both families have to agree before
+   two children meet, so opening up never exposes another family's child. *@
+<section class="box play-settings">
+    <h2><span aria-hidden="true">🎲</span> @L["PlaySettings.Title"]</h2>
+    <p class="hint">@L["PlaySettings.Hint", Child.Name]</p>
+    <Messages Errors="@_errors" />
+    @if (_settings is null)
+    {
+        <p class="loading-text">@L["Common.OneMoment"]</p>
+    }
+    else
+    {
+        <form class="form" @onsubmit="Save" @onsubmit:preventDefault>
+            <fieldset>
+                <legend>@L["PlaySettings.Games"]</legend>
+                @foreach (var game in PlayGames.All)
+                {
+                    <label class="check">
+                        <input type="checkbox" checked="@_games.Contains(game)" @onchange="e => Toggle(_games, game, e)" />
+                        <span><span aria-hidden="true">@PlayGames.Icon(game)</span> @L[$"Play.Game.{game}"]</span>
+                    </label>
+                }
+            </fieldset>
+            <fieldset>
+                <legend>@L["PlaySettings.With"]</legend>
+                @foreach (var reach in Reaches)
+                {
+                    <label class="check">
+                        <input type="radio" name="reach" checked="@(_reach == reach)" @onchange="() => _reach = reach" />
+                        <span>@L[$"PlaySettings.Reach.{reach}"] <small>@L[$"PlaySettings.Reach.{reach}.Hint"]</small></span>
+                    </label>
+                }
+            </fieldset>
+            @if (_reach == "selected" && _partners is not null)
+            {
+                <fieldset>
+                    <legend>@L["PlaySettings.Families"]</legend>
+                    @if (_partners.Families.Count == 0)
+                    {
+                        <p class="hint">@L["PlaySettings.NoFamilies"]</p>
+                    }
+                    @foreach (var family in _partners.Families)
+                    {
+                        <label class="check">
+                            <input type="checkbox" checked="@_families.Contains(family.Id)" @onchange="e => Toggle(_families, family.Id, e)" />
+                            <span>@family.Name</span>
+                        </label>
+                    }
+                </fieldset>
+                <fieldset>
+                    <legend>@L["PlaySettings.Children"]</legend>
+                    <p class="hint">@L["PlaySettings.ChildrenHint", Child.Name]</p>
+                    @foreach (var other in _partners.Children)
+                    {
+                        <label class="check">
+                            <input type="checkbox" checked="@_children.Contains(other.Id)" @onchange="e => Toggle(_children, other.Id, e)" />
+                            <span>@other.Name <small>@other.FamilyName</small></span>
+                        </label>
+                    }
+                </fieldset>
+            }
+            <p class="hint">@L["PlaySettings.BothSides"]</p>
+            <button class="btn" type="submit">@L["Common.Save"]</button>
+            @if (_saved)
+            {
+                <p class="ok" role="status">@L["Common.Saved"]</p>
+            }
+        </form>
+    }
+</section>
+
+@code {
+    private static readonly string[] Reaches = ["family", "selected", "everyone"];
+
+    private PlaySettingsDto? _settings;
+    private PlayPartnersDto? _partners;
+    private HashSet<string> _games = [];
+    private HashSet<Guid> _families = [];
+    private HashSet<Guid> _children = [];
+    private string _reach = "family";
+    private bool _saved;
+    private IReadOnlyList<string>? _errors;
+
+    [Parameter, EditorRequired]
+    public required ChildOverview Child { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            Show(await Api.PlaySettings(Child.Id));
+            _partners = await Api.PlayPartners(Child.Id);
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+
+    private void Show(PlaySettingsDto settings)
+    {
+        _settings = settings;
+        _games = [.. settings.Games];
+        _reach = settings.Reach;
+        _families = [.. settings.Families];
+        _children = [.. settings.Children];
+    }
+
+    private void Toggle<T>(HashSet<T> set, T item, ChangeEventArgs e)
+    {
+        _saved = false;
+        if (e.Value is true)
+        {
+            set.Add(item);
+        }
+        else
+        {
+            set.Remove(item);
+        }
+    }
+
+    private async Task Save()
+    {
+        _errors = null;
+        _saved = false;
+        try
+        {
+            Show(await Api.SavePlaySettings(Child.Id, new PlaySettingsDto([.. _games], _reach, [.. _families], [.. _children])));
+            _saved = true;
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+}

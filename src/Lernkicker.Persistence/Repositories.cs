@@ -6,6 +6,7 @@ using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
 using Lernkicker.Domain.Media;
 using Lernkicker.Domain.Messaging;
+using Lernkicker.Domain.Multiplayer;
 using Lernkicker.Domain.Practice;
 using Lernkicker.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -320,4 +321,42 @@ internal sealed class ServerSettings(LernkickerDbContext db) : IServerSettings
     public Task<ServerSetting?> FindAsync(string name) => db.ServerSettings.FirstOrDefaultAsync(s => s.Name == name);
 
     public void Add(ServerSetting setting) => db.ServerSettings.Add(setting);
+}
+
+internal sealed class PlayRepository(LernkickerDbContext db) : IPlayRepository
+{
+    public Task<PlaySettings?> FindSettingsAsync(Guid childId) => db.PlaySettings.SingleOrDefaultAsync(s => s.ChildId == childId);
+
+    public Task<PlaySettings?> FindSettingsAnyFamilyAsync(Guid childId) =>
+        db.PlaySettings.IgnoreQueryFilters().SingleOrDefaultAsync(s => s.ChildId == childId);
+
+    // The games are a JSON list, so the filter runs here; there is one row per child at most
+    public async Task<IReadOnlyList<PlaySettings>> ListUnlockedAnyFamilyAsync() =>
+        (await db.PlaySettings.IgnoreQueryFilters().ToListAsync()).Where(s => s.AnyUnlocked).ToList();
+
+    public void Add(PlaySettings settings) => db.PlaySettings.Add(settings);
+
+    public void Add(Match match) => db.Matches.Add(match);
+
+    public void Remove(Match match) => db.Matches.Remove(match);
+
+    public Task<Match?> FindMatchAsync(Guid id) => db.Matches.SingleOrDefaultAsync(m => m.Id == id);
+
+    public async Task<IReadOnlyList<Match>> ListOpenTablesAsync() =>
+        await db.Matches.Where(m => m.Status == MatchStatus.Waiting).ToListAsync();
+
+    public async Task<IReadOnlyList<Match>> ListMatchesOfAsync(Guid childId, DateTimeOffset finishedSince) =>
+        await db.Matches
+            .Where(m => m.Players.Any(p => p.ChildId == childId) && (m.Status != MatchStatus.Finished || m.UpdatedAt >= finishedSince))
+            .ToListAsync();
+
+    public async Task<IReadOnlyList<PlayerInfo>> PlayersAnyFamilyAsync(IReadOnlyCollection<Guid> childIds) =>
+        await (from c in db.Children.IgnoreQueryFilters()
+               join f in db.Families on c.FamilyId equals f.Id
+               where childIds.Contains(c.Id)
+               select new PlayerInfo(c.Id, c.FamilyId, c.Name, f.Name))
+            .ToListAsync();
+
+    public async Task<IReadOnlyList<FamilyName>> OtherFamiliesAsync(Guid familyId) =>
+        await db.Families.Where(f => f.Id != familyId).OrderBy(f => f.Name).Select(f => new FamilyName(f.Id, f.Name)).ToListAsync();
 }

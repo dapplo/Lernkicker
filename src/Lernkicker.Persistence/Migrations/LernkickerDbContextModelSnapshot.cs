@@ -586,6 +586,98 @@ namespace Lernkicker.Persistence.Migrations
                     b.ToTable("TelegramLinkCodes");
                 });
 
+            modelBuilder.Entity("Lernkicker.Domain.Multiplayer.Match", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Game")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("Resigned")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Seats")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("State")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Winner")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("Matches");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Multiplayer.MatchPlayer", b =>
+                {
+                    b.Property<Guid>("MatchId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Seat")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MatchId", "Seat");
+
+                    b.HasIndex("ChildId");
+
+                    b.ToTable("MatchPlayers");
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Multiplayer.PlaySettings", b =>
+                {
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Children")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Families")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Games")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Reach")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ChildId");
+
+                    b.ToTable("PlaySettings");
+                });
+
             modelBuilder.Entity("Lernkicker.Domain.Practice.Assignment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1053,6 +1145,30 @@ namespace Lernkicker.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Lernkicker.Domain.Multiplayer.MatchPlayer", b =>
+                {
+                    b.HasOne("Lernkicker.Domain.Families.Child", null)
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lernkicker.Domain.Multiplayer.Match", null)
+                        .WithMany("Players")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Multiplayer.PlaySettings", b =>
+                {
+                    b.HasOne("Lernkicker.Domain.Families.Child", null)
+                        .WithOne()
+                        .HasForeignKey("Lernkicker.Domain.Multiplayer.PlaySettings", "ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Lernkicker.Domain.Practice.Assignment", b =>
                 {
                     b.HasOne("Lernkicker.Domain.Families.Child", null)
@@ -1141,6 +1257,11 @@ namespace Lernkicker.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Lernkicker.Domain.Multiplayer.Match", b =>
+                {
+                    b.Navigation("Players");
                 });
 #pragma warning restore 612, 618
         }

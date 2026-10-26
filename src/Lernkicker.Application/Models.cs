@@ -125,3 +125,34 @@ public sealed record BotReply(string Language, Notification Notification);
 
 /// <summary>The bot as the admin sees it. <c>FromFile</c>: the token is configured outside the app and cannot be changed here.</summary>
 public sealed record TelegramBotSettings(bool Configured, bool FromFile, string? BotUsername, DateTimeOffset? SetAt);
+
+/// <summary>What a parent unlocked for a child to play with others (see <see cref="Domain.Multiplayer.PlaySettings"/>).</summary>
+public sealed record PlaySettingsSummary(IReadOnlyList<string> Games, string Reach, IReadOnlyList<Guid> Families, IReadOnlyList<Guid> Children);
+
+/// <summary>
+/// Whom a parent can pick: the other families on the server, and the children of other families whose parents
+/// opened them to this child (to everyone, to this family or to this child), plus the ones picked before.
+/// </summary>
+public sealed record PlayPartners(IReadOnlyList<Ports.FamilyName> Families, IReadOnlyList<Ports.PlayerInfo> Children);
+
+/// <summary>A player at a table, shown with the family's name so two children called Max can be told apart.</summary>
+public sealed record SeatInfo(int Seat, Guid ChildId, string Name, string FamilyName);
+
+/// <summary>
+/// A table or game as a child sees it in the lobby. <c>MySeat</c> is null at someone else's open table;
+/// <c>MyTurn</c> says the child has to move.
+/// </summary>
+public sealed record MatchSummary(
+    Guid Id, string Game, string Status, int Seats, IReadOnlyList<SeatInfo> Players, int? MySeat, bool MyTurn, int? Winner, bool Abandoned, DateTimeOffset UpdatedAt);
+
+/// <summary>Someone the child could play with who has the play page open, and which games they share.</summary>
+public sealed record LobbyPlayer(Guid ChildId, string Name, string FamilyName, IReadOnlyList<string> Games);
+
+/// <summary>
+/// The meeting place: the games unlocked for the child, who is around, the open tables the child may join and
+/// the child's own tables and games.
+/// </summary>
+public sealed record Lobby(IReadOnlyList<string> Games, IReadOnlyList<LobbyPlayer> Online, IReadOnlyList<MatchSummary> Tables, IReadOnlyList<MatchSummary> MyMatches);
+
+/// <summary>A game with what this player may see of it; <c>View</c> is null while the table waits for players.</summary>
+public sealed record MatchState(MatchSummary Match, Domain.Multiplayer.GameView? View, int? Resigned);

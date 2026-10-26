@@ -31,7 +31,7 @@ else if (_assignments is null)
 else
 {
     <h1>@L["Home.Hello", _device.ChildName ?? ""]</h1>
-    @if (_assignments.Count == 0 && _lessons is not { Count: > 0 })
+    @if (_assignments.Count == 0 && _lessons is not { Count: > 0 } && _lobby is not { Games.Count: > 0 })
     {
         <div class="empty">
             <div class="ball" aria-hidden="true">@Theme.Value.Icon</div>
@@ -76,6 +76,27 @@ else
                     </a>
                 </li>
             }
+        </ul>
+    }
+    @if (_lobby is { } lobby && (lobby.Games.Count > 0 || lobby.MyMatches.Count > 0))
+    {
+        var myTurn = lobby.MyMatches.Count(m => m.MyTurn);
+        <h2><span aria-hidden="true">🎲</span> @L["Play.Title"]</h2>
+        <ul class="cards">
+            <li>
+                <a class="card play-card @(myTurn > 0 ? "my-turn" : "")" href="play">
+                    <span class="subject"><span aria-hidden="true">@string.Concat(lobby.Games.Select(PlayGames.Icon))</span> @string.Join(", ", lobby.Games.Select(g => L[$"Play.Game.{g}"].Value))</span>
+                    <span class="title">@L["Play.ToLobby"]</span>
+                    @if (myTurn > 0)
+                    {
+                        <span class="due">@(myTurn == 1 ? L["Play.YourTurnInOne"] : L["Play.YourTurnIn", myTurn])</span>
+                    }
+                    else if (lobby.Tables.Count > 0)
+                    {
+                        <span class="due">@L["Play.TablesOpen", lobby.Tables.Count]</span>
+                    }
+                </a>
+            </li>
         </ul>
     }
     @if (_dates is { Count: > 0 })
@@ -127,6 +148,7 @@ else
     private List<MyAssignment>? _assignments;
     private List<MyLesson>? _lessons;
     private List<CalendarEntryDto>? _dates;
+    private LobbyDto? _lobby;
     private string? _error;
     private bool _busy;
     private bool _confirmLogout;
@@ -149,6 +171,7 @@ else
         _lessons = _assignments is null ? null : await Api.MyLessons();
         // Tests and lessons already have their card; the list shows the other dates
         _dates = _assignments is null ? null : (await Api.MyCalendar())?.Where(d => d.Source is not ("assignment" or "lesson")).ToList();
+        _lobby = _assignments is null ? null : await Api.Lobby();
     }
 
     private async Task Login(string pin)

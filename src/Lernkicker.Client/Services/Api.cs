@@ -127,6 +127,11 @@ public sealed class Api(HttpClient http)
     public Task<List<AttemptOverview>> Attempts(Guid id) => Get<List<AttemptOverview>>($"api/children/{id}/attempts");
     public Task<QuizResultDto> Attempt(Guid id, Guid attemptId) => Get<QuizResultDto>($"api/children/{id}/attempts/{attemptId}");
 
+    // Playing with others (for parents)
+    public Task<PlaySettingsDto> PlaySettings(Guid id) => Get<PlaySettingsDto>($"api/children/{id}/play");
+    public Task<PlaySettingsDto> SavePlaySettings(Guid id, PlaySettingsDto settings) => Send<PlaySettingsDto>(HttpMethod.Put, $"api/children/{id}/play", settings);
+    public Task<PlayPartnersDto> PlayPartners(Guid id) => Get<PlayPartnersDto>($"api/children/{id}/play/partners");
+
     // Calendar (for parents)
     public Task<List<CalendarEntryDto>> Calendar(Guid id) => Get<List<CalendarEntryDto>>($"api/children/{id}/calendar");
     public Task<List<CalendarEntryDto>> Calendar(Guid id, DateOnly from, DateOnly to) => Get<List<CalendarEntryDto>>($"api/children/{id}/calendar?from={from:yyyy-MM-dd}&to={to:yyyy-MM-dd}");
@@ -179,18 +184,35 @@ public sealed class Api(HttpClient http)
     public Task<QuizResultDto> Submit(Guid assignmentId, Dictionary<string, AnswerDto> answers) =>
         Send<QuizResultDto>(HttpMethod.Post, $"api/device/assignments/{assignmentId}/submit", new Submission(answers));
 
+    // Playing with others (child's device)
+    /// <summary>The lobby, or null when the child is not logged in.</summary>
+    public async Task<LobbyDto?> Lobby()
+    {
+        var response = await http.GetAsync("api/play/lobby");
+        return response.StatusCode == HttpStatusCode.Unauthorized ? null : await Read<LobbyDto>(response);
+    }
+
+    public Task<MatchDto> OpenTable(string game) => Send<MatchDto>(HttpMethod.Post, "api/play/tables", new NewTable(game));
+    public Task<MatchDto> JoinTable(Guid id) => Send<MatchDto>(HttpMethod.Post, $"api/play/tables/{id}/join");
+    public Task LeaveTable(Guid id) => Send(HttpMethod.Delete, $"api/play/tables/{id}");
+    public Task<MatchDto> Match(Guid id) => Get<MatchDto>($"api/play/matches/{id}");
+    public Task<MatchDto> Move(Guid id, MoveDto move) => Send<MatchDto>(HttpMethod.Post, $"api/play/matches/{id}/moves", move, typeof(MoveDto));
+    public Task<MatchDto> Resign(Guid id) => Send<MatchDto>(HttpMethod.Post, $"api/play/matches/{id}/resign");
+    public Task<List<ShipDto>> RandomFleet() => Get<List<ShipDto>>("api/play/battleship/random-fleet");
+
     private async Task<T> Get<T>(string url) => await Read<T>(await http.GetAsync(url));
 
-    private async Task<T> Send<T>(HttpMethod method, string url, object? body = null) => await Read<T>(await Exchange(method, url, body));
+    /// <summary><paramref name="bodyType"/>: the declared type of a polymorphic body, so its "type" is sent.</summary>
+    private async Task<T> Send<T>(HttpMethod method, string url, object? body = null, Type? bodyType = null) => await Read<T>(await Exchange(method, url, body, bodyType));
 
     private async Task Send(HttpMethod method, string url, object? body = null) => await Check(await Exchange(method, url, body));
 
-    private Task<HttpResponseMessage> Exchange(HttpMethod method, string url, object? body)
+    private Task<HttpResponseMessage> Exchange(HttpMethod method, string url, object? body, Type? bodyType = null)
     {
         var request = new HttpRequestMessage(method, url);
         if (body is not null)
         {
-            request.Content = JsonContent.Create(body, body.GetType(), options: ApiJson.Options);
+            request.Content = JsonContent.Create(body, bodyType ?? body.GetType(), options: ApiJson.Options);
         }
 
         return http.SendAsync(request);
