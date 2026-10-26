@@ -17,6 +17,7 @@ public sealed record SheetItemDto(int Index, string Text, ImageDto? Image = null
 [JsonDerivedType(typeof(MultipleChoiceSheetDto), "multipleChoice")]
 [JsonDerivedType(typeof(WordSearchSheetDto), "wordSearch")]
 [JsonDerivedType(typeof(FallingWordsSheetDto), "fallingWords")]
+[JsonDerivedType(typeof(VocabularySheetDto), "vocabulary")]
 public abstract record ExerciseSheetDto(string Id, string Instruction, string? Hint, int MaxPoints)
 {
     public ImageDto? Image { get; init; }
@@ -53,6 +54,16 @@ public sealed record FallingWordsSheetDto(
     string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<string> Options, IReadOnlyList<FallingWordDto> Words, int TargetCount, int FallSeconds)
     : ExerciseSheetDto(Id, Instruction, Hint, MaxPoints);
 
+/// <summary>
+/// A vocabulary test: per question the <c>Prompt</c> shown; <c>AsksWord</c> says whether the answer is typed in
+/// <c>WordLanguage</c> (else in <c>TranslationLanguage</c>). The answer for a question goes to <c>Texts[Index]</c>.
+/// </summary>
+public sealed record VocabularySheetDto(
+    string Id, string Instruction, string? Hint, int MaxPoints, string WordLanguage, string TranslationLanguage, IReadOnlyList<VocabularyQuestionDto> Questions)
+    : ExerciseSheetDto(Id, Instruction, Hint, MaxPoints);
+
+public sealed record VocabularyQuestionDto(int Index, string Prompt, bool AsksWord, ImageDto? Image = null);
+
 public sealed record FallingWordDto(int Index, string Text, string Answer, ImageDto? Image = null);
 
 /// <summary>An option's <c>Text</c> is empty when the option is a picture alone.</summary>
@@ -61,7 +72,7 @@ public sealed record QuestionSheetDto(int Index, string Text, IReadOnlyList<Shee
 /// <summary>A child's answer to one exercise; all indices refer to the original order (see <see cref="SheetItemDto.Index"/>).</summary>
 public sealed record AnswerDto
 {
-    /// <summary>cloze, matching, freeText: one entry per gap, row or field. wordSearch: per word the word if found. fallingWords: per word the option it landed on.</summary>
+    /// <summary>cloze, matching, freeText: one entry per gap, row or field. vocabulary: one per question. wordSearch: per word the word if found. fallingWords: per word the option it landed on.</summary>
     public IReadOnlyList<string?>? Texts { get; init; }
 
     /// <summary>trueFalse: one entry per statement, null = not answered.</summary>

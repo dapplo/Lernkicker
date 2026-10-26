@@ -14,7 +14,7 @@ public sealed record MyLesson(Guid AssignmentId, string Title, string Subject, s
 
 /// <summary>
 /// A lesson to learn or look things up in (<c>Mode</c> learn or reference). Each block has the fields of its <c>Type</c>
-/// (text, poem, flashcards, facts, image, entries). <c>Games</c> are the games its content is enough for (see <see cref="LessonGameDto"/>).
+/// (text, poem, flashcards, facts, image, entries, vocabulary). <c>Games</c> are the games its content is enough for (see <see cref="LessonGameDto"/>).
 /// </summary>
 public sealed record LessonDto(
     Guid AssignmentId, string Title, string Subject, string Language, string? Topic, string? Description, DateOnly? DueOn,
@@ -36,7 +36,17 @@ public sealed record LessonBlockDto
     public IReadOnlyList<string>? Items { get; init; }
     public ImageDto? Image { get; init; }
     public IReadOnlyList<EntryDto>? Entries { get; init; }
+
+    /// <summary>vocabulary: the words, their languages and which way they are asked (both, wordToTranslation, translationToWord).</summary>
+    public IReadOnlyList<VocabularyWordDto>? Words { get; init; }
+    public string? WordLanguage { get; init; }
+    public string? TranslationLanguage { get; init; }
+    public string? Direction { get; init; }
 }
+
+/// <summary>A word to learn and its translation; the alternatives count as right too.</summary>
+public sealed record VocabularyWordDto(
+    string Word, string Translation, IReadOnlyList<string>? WordAlternatives = null, IReadOnlyList<string>? TranslationAlternatives = null, ImageDto? Image = null);
 
 public sealed record EntryDto(string Name, string Text, ImageDto? Image = null);
 

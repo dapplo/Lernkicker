@@ -7,7 +7,7 @@ Copy this whole text into an AI chat (Claude, ChatGPT, Gemini, …), fill in the
 You create practice material for **Lernkicker**, a learning app for school children. Parents upload what you make in the parents' area of the app. There are two kinds of file:
 
 - a **quiz** (`quiz/v1`): a practice test that the app grades, like the real test at school;
-- **learning material** (`lesson/v1`): something to read and learn that is not graded: a text, a poem to learn by heart, flashcards, key facts, pictures, or a guide to look things up in (e.g. the rules of a game).
+- **learning material** (`lesson/v1`): something to read and learn that is not graded: a text, a poem to learn by heart, flashcards, vocabulary in another language, key facts, pictures, or a guide to look things up in (e.g. the rules of a game).
 
 ## My request
 
@@ -25,7 +25,8 @@ You create practice material for **Lernkicker**, a learning app for school child
 - Stick to the material: use what is in the photos or what the curriculum names for this year. Do not make up facts; if something is unclear, ask me before writing the file.
 - For a quiz: number the instructions like a real test (`"1. Setze ein."`). If I attached a real test, keep its order and its points (`points` per exercise). Mix exercise types, and give wrong answers an `explanation` (e.g. a mnemonic). List every spelling that should count in `answers` (e.g. with and without an ending).
 - For learning material: one topic per file, 1–30 blocks. Short `facts`, `flashcards` for terms, `text` for explanations, `poem` for anything to learn word for word. For a guide to look things up in (game rules, a glossary), set `"mode": "reference"` and use an `entries` block: one entry per card or term, with `name` and a short `text`.
-- Games come for free: flashcards and entries unlock games in the app (catch the words, memory, crossword, word search) when there are at least 4 of them. Write the term on the front as **one word** where you can (an article like "die Ähre" is fine) and keep the back **short (up to 60 characters)**, e.g. "Weizen" → "Getreide für helles Brot und Nudeln".
+- Vocabulary (e.g. Dutch–German): in learning material use a `vocabulary` block, in a quiz a `vocabulary` exercise. Both take the same `words` list: `word` in the language being learned (set `wordLanguage`, e.g. `nl`) and its `translation`. Write nouns with their article (`de hond` → `der Hund`) and list other answers that should count in `wordAlternatives` / `translationAlternatives`. `direction: "both"` (the default) practises and asks both ways. The app reads the words aloud, so spell them exactly.
+- Games come for free: flashcards, entries and vocabulary unlock games in the app (catch the words, memory, crossword, word search) when there are at least 4 of them. Write the term on the front as **one word** where you can (an article like "die Ähre" is fine) and keep the back **short (up to 60 characters)**, e.g. "Weizen" → "Getreide für helles Brot und Nudeln".
 - `id`: lower-case letters, digits and `-`, 3–64 characters, describing the topic (e.g. `hsu-water-cycle`). Exercise and block ids: short and unique within the file.
 
 ## Rules the schema does not check
@@ -38,6 +39,7 @@ Lernkicker refuses a file that breaks one of these:
 - `ordering`: list the `steps` in the **correct** order; the app shuffles them.
 - `wordSearch`: `words` are letters only (umlauts and ß are fine), no spaces or hyphens, 2–14 letters, each word once. The app builds a new grid every round; use `"level": "medium"` (diagonal, crossing words) or `"hard"` (also backwards) for older children; the default `easy` suits grades 1–3.
 - `fallingWords`: every word's `answer` is exactly one of the `options`. Keep options short (a word or a few), because up to four sit side by side on a phone.
+- `vocabulary`: answers are checked for exact spelling, including capitals and the article (only a capital first letter is forgiven). With `both`, every word gives two questions, so keep a quiz to about 10–20 words.
 - Exercise ids are unique within a quiz, block ids unique within a lesson.
 - A quiz has at most 50 exercises; a lesson file is at most 256 KB.
 
@@ -48,8 +50,8 @@ Pictures are optional. Use them where the real test has them (maps, diagrams, ph
 - A picture is an `image` object: `{ "src": "water-cycle/clouds.svg", "alt": "…", "caption": "…", "credit": "…" }`. `src` and `alt` are required. `alt` says in the content language what matters in the picture for the task.
 - `src` is a path **relative to the JSON file**, e.g. `water-cycle/clouds.svg`. No URLs, no leading `/`, no `..`. Use letters, digits, `-`, `_` and `.` in file names.
 - Allowed: PNG, JPEG, GIF, WebP and SVG, at most 2 MB per picture and 20 MB per file together. The app removes scripts, links and anything else that is not drawing from an SVG.
-- Where pictures can go in a quiz: on any exercise (`image`), on a `matching` row or a `fallingWords` word, a `trueFalse` statement, a `multipleChoice` question, and as picture answers (an option `{ "image": {…}, "text": "optional" }` instead of a text).
-- Where pictures can go in a lesson: on `text` and `facts` blocks, on flashcards (`frontImage`, `backImage`), on `entries` and as an `image` block of its own.
+- Where pictures can go in a quiz: on any exercise (`image`), on a `matching` row, a `fallingWords` or `vocabulary` word, a `trueFalse` statement, a `multipleChoice` question, and as picture answers (an option `{ "image": {…}, "text": "optional" }` instead of a text).
+- Where pictures can go in a lesson: on `text` and `facts` blocks, on flashcards (`frontImage`, `backImage`), on `entries`, on `vocabulary` words and as an `image` block of its own.
 - If you draw pictures yourself, draw simple, clear SVGs (shapes, diagrams, a map sketch) with a `viewBox`, no text that gives the answer away, and no external fonts or links.
 - For pictures from the internet (e.g. Wikimedia Commons), fill in `credit` with the source and the licence, and only use pictures whose licence allows it.
 

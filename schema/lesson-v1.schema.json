@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/dapplo/lernkicker/main/schema/lesson-v1.schema.json",
   "title": "Lernkicker learning material (lesson/v1)",
-  "description": "Learning material for Lernkicker: text, a poem to learn by heart, flashcards, key facts, or a guide to look things up in. See docs/lesson-format.md.",
+  "description": "Learning material for Lernkicker: text, a poem to learn by heart, flashcards, vocabulary, key facts, or a guide to look things up in. See docs/lesson-format.md.",
   "type": "object",
   "required": ["format", "id", "title", "subject", "blocks"],
   "additionalProperties": false,
@@ -49,7 +49,7 @@
       "type": "object",
       "required": ["id", "type"],
       "properties": {
-        "type": { "enum": ["text", "poem", "flashcards", "facts", "image", "entries"] }
+        "type": { "enum": ["text", "poem", "flashcards", "facts", "image", "entries", "vocabulary"] }
       },
       "allOf": [
         { "if": { "properties": { "type": { "const": "text" } } }, "then": { "$ref": "#/$defs/text" } },
@@ -57,7 +57,8 @@
         { "if": { "properties": { "type": { "const": "flashcards" } } }, "then": { "$ref": "#/$defs/flashcards" } },
         { "if": { "properties": { "type": { "const": "facts" } } }, "then": { "$ref": "#/$defs/facts" } },
         { "if": { "properties": { "type": { "const": "image" } } }, "then": { "$ref": "#/$defs/imageBlock" } },
-        { "if": { "properties": { "type": { "const": "entries" } } }, "then": { "$ref": "#/$defs/entries" } }
+        { "if": { "properties": { "type": { "const": "entries" } } }, "then": { "$ref": "#/$defs/entries" } },
+        { "if": { "properties": { "type": { "const": "vocabulary" } } }, "then": { "$ref": "#/$defs/vocabulary" } }
       ]
     },
     "blockId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 32 },
@@ -147,6 +148,34 @@
             }
           }
         }
+      }
+    },
+    "vocabulary": {
+      "description": "Words to learn in another language: shown as a list, as cards to flip and to type, one way or both. The device reads the words aloud. The words also unlock the games.",
+      "required": ["id", "type", "wordLanguage", "words"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/blockId" },
+        "type": true,
+        "title": { "$ref": "#/$defs/blockTitle" },
+        "wordLanguage": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$", "description": "BCP 47 tag of the words, e.g. 'nl' or 'en'. The device reads them aloud in this language." },
+        "translationLanguage": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$", "description": "BCP 47 tag of the translations. Default: the file's language." },
+        "direction": {
+          "enum": ["both", "wordToTranslation", "translationToWord"], "default": "both",
+          "description": "wordToTranslation: the word is shown and the translation typed. translationToWord: the other way. both: both ways."
+        },
+        "words": { "type": "array", "minItems": 1, "maxItems": 200, "items": { "$ref": "#/$defs/vocabularyWord" } }
+      }
+    },
+    "vocabularyWord": {
+      "description": "A word in the language being learned and its translation. The alternatives also count as right when typed, e.g. without the article or a synonym.",
+      "type": "object", "required": ["word", "translation"], "additionalProperties": false,
+      "properties": {
+        "word": { "type": "string", "minLength": 1, "maxLength": 100, "description": "In wordLanguage, e.g. 'de hond'." },
+        "translation": { "type": "string", "minLength": 1, "maxLength": 100, "description": "In translationLanguage, e.g. 'der Hund'." },
+        "wordAlternatives": { "type": "array", "maxItems": 10, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+        "translationAlternatives": { "type": "array", "maxItems": 10, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+        "image": { "$ref": "#/$defs/image", "description": "A picture of the word, shown with the question either way." }
       }
     },
     "imageBlock": {

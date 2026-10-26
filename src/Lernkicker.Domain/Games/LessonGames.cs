@@ -15,7 +15,7 @@ public static class GameKinds
     public static readonly IReadOnlyList<string> All = [FallingWords, Memory, Crossword, WordSearch];
 }
 
-/// <summary>A term and what it means, taken from a lesson: a flashcard (front, back) or an entry (name, text).</summary>
+/// <summary>A term and what it means, taken from a lesson: a flashcard (front, back), an entry (name, text) or a vocabulary word (word, translation).</summary>
 public sealed record GamePair(string Term, string Description, ImageRef? Image = null);
 
 /// <summary>One round of a game, new every time it is asked for.</summary>
@@ -59,6 +59,8 @@ public static partial class LessonGames
         {
             FlashcardsBlock f => f.Cards.Select(c => new GamePair(Plain(c.Front), Plain(c.Back), c.FrontImage)),
             EntriesBlock e => e.Entries.Select(x => new GamePair(Plain(x.Name), Plain(x.Text), x.Image)),
+            // The word in the language being learned is what the child finds in the grids
+            VocabularyBlock v => v.Words.Select(w => new GamePair(Plain(w.Word), Plain(w.Translation), w.Image)),
             _ => [],
         })
         .Where(p => p.Term.Length > 0 && p.Description.Length > 0)
@@ -118,7 +120,8 @@ public static partial class LessonGames
     }
 
     /// <summary>
-    /// The term as a single word for a grid of letters, without a leading article ("der Weizen" → "Weizen"), or
+    /// The term as a single word for a grid of letters, without a leading article ("der Weizen" → "Weizen", "de hond"
+    /// → "hond", "to run" → "run"), or
     /// null when it is not one word of letters of a fitting length.
     /// </summary>
     public static string? Word(string term)
@@ -153,6 +156,6 @@ public static partial class LessonGames
 
     private static string Plain(string text) => text.Replace("**", "").Replace("*", "").Trim();
 
-    [GeneratedRegex(@"^(der|die|das|ein|eine|the|a|an)\s+", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"^(der|die|das|ein|eine|the|a|an|to|de|het|een)\s+", RegexOptions.IgnoreCase)]
     private static partial Regex Article();
 }

@@ -689,4 +689,18 @@
   <data name="Home.BackToParents" xml:space="preserve"><value>Zur Elternseite</value></data>
   <data name="Home.StopLearning" xml:space="preserve"><value>Lernen beenden</value></data>
   <data name="Error.child.notOwnProfile" xml:space="preserve"><value>Nur ein Erwachsenen-Profil, das kein anderer Elternteil nutzt, kann dein eigenes sein.</value></data>
+  <data name="Learn.Type.vocabulary" xml:space="preserve"><value>Vokabeln</value></data>
+  <data name="Vocabulary.Speak" xml:space="preserve"><value>„{0}“ vorlesen</value></data>
+  <data name="Vocabulary.NoVoice" xml:space="preserve"><value>Dieses Gerät hat keine Stimme für {0}. Damit du die Wörter hörst, installiere sie in den Einstellungen des Handys unter „Text-in-Sprache“.</value></data>
+  <data name="Vocabulary.Mode.List" xml:space="preserve"><value>Wörter</value></data>
+  <data name="Vocabulary.Mode.Cards" xml:space="preserve"><value>Karten</value></data>
+  <data name="Vocabulary.Mode.Write" xml:space="preserve"><value>Schreiben</value></data>
+  <data name="Vocabulary.Left" xml:space="preserve"><value>Noch {0} von {1} Wörtern</value></data>
+  <data name="Vocabulary.AllDone" xml:space="preserve"><value>Du kannst alle {0} Wörter!</value></data>
+  <data name="Vocabulary.Ask" xml:space="preserve"><value>{0} → {1}</value></data>
+  <data name="Vocabulary.Check" xml:space="preserve"><value>Prüfen</value></data>
+  <data name="Vocabulary.Right" xml:space="preserve"><value>✓ Richtig!</value></data>
+  <data name="Vocabulary.Almost" xml:space="preserve"><value>Fast! Schau genau:</value></data>
+  <data name="Vocabulary.Wrong" xml:space="preserve"><value>Leider nicht. Richtig ist:</value></data>
+  <data name="Vocabulary.Next" xml:space="preserve"><value>Weiter</value></data>
 </root>

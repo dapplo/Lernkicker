@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lernkicker.Contracts\Lernkicker.Contracts.csproj" />
+    <!-- Lesson practice checks typed vocabulary the same way as the quiz grader; the client references no domain -->
+    <Compile Include="..\Lernkicker.Domain\Quizzes\Spelling.cs" Link="Services\Spelling.cs" />
   </ItemGroup>
 
   <ItemGroup>

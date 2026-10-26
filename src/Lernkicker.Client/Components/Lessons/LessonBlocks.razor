@@ -43,6 +43,9 @@
                 case "entries":
                     <EntriesView Entries="@(block.Entries!)" />
                     break;
+                case "vocabulary":
+                    <VocabularyView Block="@block" />
+                    break;
             }
         </div>
         @if (Toggle.HasDelegate && !IsReference)
