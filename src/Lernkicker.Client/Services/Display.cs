@@ -63,7 +63,8 @@ public sealed class Display(IStringLocalizer<Strings> l)
 
     public static string KindIcon(string kind) => kind switch
     {
-        "test" => "📝",
+        "test" => QuizIcon,
+        "lesson" => LessonIcon,
         "football" => "⚽",
         _ => "📅",
     };

@@ -9,6 +9,9 @@ public static class EventKinds
     public const string Football = "football";
     public const string Other = "other";
 
+    /// <summary>The due date of a lesson. Only set by the app, so not in <see cref="All"/>: parents can't pick it.</summary>
+    public const string Lesson = "lesson";
+
     public static readonly IReadOnlyList<string> All = [Test, Football, Other];
 
     public static bool IsValid(string? kind) => kind is not null && All.Contains(kind);

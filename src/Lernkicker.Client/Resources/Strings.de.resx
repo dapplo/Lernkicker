@@ -226,6 +226,7 @@
   <data name="Calendar.Kind" xml:space="preserve"><value>Art</value></data>
   <data name="Calendar.Kind.test" xml:space="preserve"><value>Probe</value></data>
   <data name="Calendar.Kind.football" xml:space="preserve"><value>Fußball</value></data>
+  <data name="Calendar.Kind.lesson" xml:space="preserve"><value>Lernstoff</value></data>
   <data name="Calendar.Kind.other" xml:space="preserve"><value>Sonstiges</value></data>
   <data name="Calendar.Source.imported" xml:space="preserve"><value>abonniert</value></data>
   <data name="Calendar.Source.assignment" xml:space="preserve"><value>zum Üben</value></data>

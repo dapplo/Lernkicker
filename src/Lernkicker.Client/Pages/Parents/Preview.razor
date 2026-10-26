@@ -75,7 +75,13 @@ else
     [Parameter]
     public Guid? SharedId { get; set; }
 
-    private string BackLink => SharedId is not null ? "parents/library" : Kind == SharedKinds.Quiz ? "parents/quizzes" : "parents/lessons";
+    /// <summary>The parents' page that opened the preview, e.g. the calendar; only a path inside the app.</summary>
+    [SupplyParameterFromQuery(Name = "back")]
+    public string? Back { get; set; }
+
+    private string BackLink =>
+        Back is { } back && back.StartsWith("parents", StringComparison.Ordinal) && !back.Contains("//") && !back.Contains(':') && !back.Contains('\\') ? back
+        : SharedId is not null ? "parents/library" : Kind == SharedKinds.Quiz ? "parents/quizzes" : "parents/lessons";
 
     private RenderFragment CopyButton => __builder =>
     {

@@ -90,10 +90,12 @@ public static class EntrySources
 
 /// <summary>
 /// A date in a child's calendar: an event, or the due date of an assignment. <c>Uid</c> is stable across
-/// requests (for the ICS feed); <c>EventId</c> is set for events a parent may change.
+/// requests (for the ICS feed); <c>EventId</c> is set for events a parent may change; <c>ItemId</c> is the
+/// quiz or lesson id of a due date, so parents can open it.
 /// </summary>
 public sealed record CalendarEntry(
-    string Uid, string Kind, string Title, DateOnly Date, TimeOnly? StartTime, TimeOnly? EndTime, string? Location, string Source, Guid? EventId);
+    string Uid, string Kind, string Title, DateOnly Date, TimeOnly? StartTime, TimeOnly? EndTime, string? Location, string Source, Guid? EventId,
+    string? ItemId = null);
 
 /// <summary>A subscription as parents see it. Only the host of the URL is shown, as private calendar URLs contain secrets.</summary>
 public sealed record SubscriptionSummary(Guid Id, string Label, string Host, string Kind, DateTimeOffset? LastSyncedAt, string? LastError, int EventCount)

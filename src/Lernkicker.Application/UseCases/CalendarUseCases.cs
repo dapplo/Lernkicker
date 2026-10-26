@@ -288,7 +288,7 @@ public sealed class CalendarUseCases(
         var events = await calendar.ListEventsAsync(childId, from, to);
         var dueDates = (await practice.ListAssignmentSummariesAsync(childId))
             .Where(a => a.DueOn is { } due && due >= from && due <= to)
-            .Select(a => new CalendarEntry($"assignment-{a.Id}", EventKinds.Test, a.Title, a.DueOn!.Value, null, null, null, EntrySources.Assignment, null));
+            .Select(a => new CalendarEntry($"assignment-{a.Id}", EventKinds.Test, a.Title, a.DueOn!.Value, null, null, null, EntrySources.Assignment, null, a.QuizId));
         var lessonDates = await LessonDatesAsync(childId, from, to);
 
         return events
@@ -310,10 +310,12 @@ public sealed class CalendarUseCases(
             return [];
         }
 
-        var titles = (await lessons.ListAsync()).ToDictionary(l => l.Id, l => l.Title);
+        var stored = (await lessons.ListAsync()).ToDictionary(l => l.Id);
         return due
-            .Where(a => titles.ContainsKey(a.StoredLessonId))
-            .Select(a => new CalendarEntry($"lesson-{a.Id}", EventKinds.Test, titles[a.StoredLessonId], a.DueOn!.Value, null, null, null, EntrySources.Lesson, null));
+            .Where(a => stored.ContainsKey(a.StoredLessonId))
+            .Select(a => (Assignment: a, Lesson: stored[a.StoredLessonId]))
+            .Select(x => new CalendarEntry($"lesson-{x.Assignment.Id}", EventKinds.Lesson, x.Lesson.Title, x.Assignment.DueOn!.Value,
+                null, null, null, EntrySources.Lesson, null, x.Lesson.LessonId));
     }
 
     private static CalendarEntry Entry(CalendarEvent e) =>

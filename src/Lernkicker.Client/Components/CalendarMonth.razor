@@ -1,5 +1,6 @@
 @using System.Globalization
 @inject Api Api
+@inject NavigationManager Navigation
 
 @* One month of one or more children's dates as a grid; tapping a day lists its dates *@
 <div class="month">
@@ -62,7 +63,14 @@
             {
                 <li class="@ChildClass(child.Id)">
                     <div>
-                        <b><span aria-hidden="true">@Display.KindIcon(entry.Kind)</span> @entry.Title</b>
+                        @if (PreviewLink(entry) is { } link)
+                        {
+                            <b><a href="@link"><span aria-hidden="true">@Display.KindIcon(entry.Kind)</span> @entry.Title</a></b>
+                        }
+                        else
+                        {
+                            <b><span aria-hidden="true">@Display.KindIcon(entry.Kind)</span> @entry.Title</b>
+                        }
                         <small>
                             @(Children.Count > 1 ? child.Name + " · " : "")@(Display.Times(entry.StartTime, entry.EndTime) is { Length: > 0 } times ? times + " · " : "")@(entry.Location is { Length: > 0 } location ? location + " · " : "")@Display.Kind(entry.Kind)@(entry.Source == "manual" ? "" : " · " + L[$"Calendar.Source.{entry.Source}"])
                         </small>
@@ -146,6 +154,14 @@
         string.Concat(entries.Select(e => e.Entry.Kind).Distinct().Select(Display.KindIcon));
 
     /// <summary>A colour per child (up to four), so their dates can be told apart.</summary>
+    /// <summary>The preview of the quiz or lesson behind a due date, or null for other dates.</summary>
+    private string? PreviewLink(CalendarEntryDto entry) => (entry.Source, entry.ItemId) switch
+    {
+        ("assignment", { } quizId) => $"parents/preview/quiz/{Uri.EscapeDataString(quizId)}?back={Uri.EscapeDataString(Navigation.ToBaseRelativePath(Navigation.Uri))}",
+        ("lesson", { } lessonId) => $"parents/preview/lesson/{Uri.EscapeDataString(lessonId)}?back={Uri.EscapeDataString(Navigation.ToBaseRelativePath(Navigation.Uri))}",
+        _ => null,
+    };
+
     private string ChildClass(Guid id) => Children.Count > 1 ? $"child-{Children.ToList().FindIndex(c => c.Id == id) % 4}" : "";
 
     private void Toggle(Guid id)
