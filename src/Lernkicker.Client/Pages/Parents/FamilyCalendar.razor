@@ -1,0 +1,48 @@
+@page "/parents/calendar"
+@inject Api Api
+@inject NavigationManager Navigation
+
+@* All children's dates in one month view *@
+
+<PageTitle>@L["Calendar.Title"] · Lernkicker</PageTitle>
+
+<ParentsNav />
+
+@if (_children is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else if (_children.Count == 0)
+{
+    <h1>@L["Calendar.Title"]</h1>
+    <p>@L["Parents.NoChildren"]</p>
+}
+else
+{
+    <section class="box calendar">
+        <CalendarMonth Children="@_children" />
+    </section>
+    <p class="hint">@L["Calendar.ManageHint"]</p>
+    <p class="buttons">
+        @foreach (var child in _children)
+        {
+            <a class="btn quiet" href="parents/children/@child.Id?tab=calendar">@child.Name</a>
+        }
+    </p>
+}
+
+@code {
+    private List<ChildOverview>? _children;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _children = await Api.Children();
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("parents");
+        }
+    }
+}

@@ -90,7 +90,6 @@
   <data name="Parents.Title" xml:space="preserve"><value>Parents</value></data>
   <data name="Parents.LoginHeading" xml:space="preserve"><value>Log in for parents</value></data>
   <data name="Parents.InvitationOnly" xml:space="preserve"><value>No account yet? Lernkicker works by invitation only. Ask the person who runs Lernkicker.</value></data>
-  <data name="Parents.ManageQuizzes" xml:space="preserve"><value>Manage tests</value></data>
   <data name="Parents.Children" xml:space="preserve"><value>Children</value></data>
   <data name="Parents.NoChildren" xml:space="preserve"><value>Add a child first. Then connect the child's phone with a QR code.</value></data>
   <data name="Parents.NoDevice" xml:space="preserve"><value>No phone connected yet</value></data>
@@ -264,7 +263,6 @@
   <data name="Error.calendar.tooLarge" xml:space="preserve"><value>The calendar is larger than 2 MB.</value></data>
   <data name="Error.calendar.notACalendar" xml:space="preserve"><value>There is no calendar (ICS) at this address. Maybe it is a web page?</value></data>
   <data name="Error.calendar.rangeInvalid" xml:space="preserve"><value>This period is too long.</value></data>
-  <data name="Parents.ManageLessons" xml:space="preserve"><value>Manage learning material</value></data>
   <data name="Lessons.Title" xml:space="preserve"><value>Learning material</value></data>
   <data name="Lessons.Intro" xml:space="preserve"><value>Material your child reads and learns on the phone: a poem to recite, words, key facts.</value></data>
   <data name="Lessons.Upload" xml:space="preserve"><value>Upload learning material</value></data>
@@ -317,7 +315,6 @@
   <data name="Learn.Poem.NextLine" xml:space="preserve"><value>Show next line</value></data>
   <data name="Learn.Poem.Done" xml:space="preserve"><value>You recited the whole poem!</value></data>
   <data name="Learn.Poem.FromStart" xml:space="preserve"><value>From the start</value></data>
-  <data name="Parents.Library" xml:space="preserve"><value>Shared library</value></data>
   <data name="Library.Title" xml:space="preserve"><value>Shared library</value></data>
   <data name="Library.Intro" xml:space="preserve"><value>Tests and learning material other families on this Lernkicker have shared. Look at them first, then copy them into your own collection. The copy is yours: later changes by the other family do not affect it.</value></data>
   <data name="Library.Empty" xml:space="preserve"><value>Nothing shared yet. When you share a test or learning material, other families find it here.</value></data>
@@ -400,4 +397,24 @@
   <data name="Error.setup.familyInvalid" xml:space="preserve"><value>Please enter a family name (up to 100 characters).</value></data>
   <data name="Error.telegram.unavailable" xml:space="preserve"><value>The bot cannot reach Telegram right now. Please try again in a few minutes.</value></data>
   <data name="Error.telegram.disabled" xml:space="preserve"><value>Telegram is not set up on this Lernkicker.</value></data>
+  <data name="Nav.Label" xml:space="preserve"><value>Parents menu</value></data>
+  <data name="Nav.Overview" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav.Calendar" xml:space="preserve"><value>Dates</value></data>
+  <data name="Nav.Quizzes" xml:space="preserve"><value>Tests</value></data>
+  <data name="Nav.Lessons" xml:space="preserve"><value>Learning</value></data>
+  <data name="Nav.Library" xml:space="preserve"><value>Library</value></data>
+  <data name="Nav.Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Account.Title" xml:space="preserve"><value>Account</value></data>
+  <data name="Parents.ToCalendar" xml:space="preserve"><value>All dates</value></data>
+  <data name="Calendar.PreviousMonth" xml:space="preserve"><value>Previous month</value></data>
+  <data name="Calendar.NextMonth" xml:space="preserve"><value>Next month</value></data>
+  <data name="Calendar.Today" xml:space="preserve"><value>Today</value></data>
+  <data name="Calendar.Children" xml:space="preserve"><value>Show the dates of</value></data>
+  <data name="Calendar.NothingThatDay" xml:space="preserve"><value>Nothing on this day.</value></data>
+  <data name="Calendar.ManageHint" xml:space="preserve"><value>Add dates and subscribe to calendars on each child's page:</value></data>
+  <data name="Child.Tab.Tasks" xml:space="preserve"><value>Tasks</value></data>
+  <data name="Child.Tab.Calendar" xml:space="preserve"><value>Dates</value></data>
+  <data name="Child.Tab.Results" xml:space="preserve"><value>Results</value></data>
+  <data name="Child.Tab.Devices" xml:space="preserve"><value>Phones</value></data>
+  <data name="Child.Tab.Settings" xml:space="preserve"><value>Settings</value></data>
 </root>
