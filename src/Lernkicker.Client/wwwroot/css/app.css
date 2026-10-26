@@ -1100,3 +1100,7 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .mau-suits .red { color: #c62828; }
 .mau-suits .suit-symbol { font-size: 1.3rem; }
 .checkers-board .square.movable { box-shadow: inset 0 0 0 3px rgb(255 214 0 / 80%); }
+
+/* API keys on the account page */
+.api-keys .new-key { border: 2px solid var(--gold); border-radius: var(--radius); padding: 12px; margin: 12px 0; }
+.api-keys .new-key input.link { font-family: ui-monospace, monospace; }

@@ -44,6 +44,8 @@ public static class Mapping
     public static LessonAssignmentOverview ToDto(this LessonAssignmentSummary a) =>
         new(a.Id, a.LessonId, a.Title, a.Subject, a.DueOn, a.AssignedAt, a.PracticeCount, a.LastPracticedAt, a.KnownBlocks, a.Blocks, a.Mode);
 
+    public static ApiKeyOverview ToDto(this ApiKeySummary k) => new(k.Id, k.Name, k.Hint, k.ReadOnly, k.CreatedAt, k.LastUsedAt);
+
     public static TelegramStatusDto ToDto(this TelegramStatus s) => new(s.Enabled, s.BotUsername, s.LinkedAt);
 
     public static TelegramBotDto ToDto(this TelegramBotSettings s) => new(s.Configured, s.FromFile, s.BotUsername, s.SetAt);

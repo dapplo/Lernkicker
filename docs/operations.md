@@ -99,6 +99,10 @@ To change the hour of the reminder, set `Lernkicker__Telegram__ReminderHour` (0�
 
 **Token as a file instead:** if you prefer to keep the token out of the database, mount a file readable by uid 1654 (e.g. `./secrets:/run/secrets:ro`) and set `Lernkicker__Telegram__BotTokenFile: /run/secrets/telegram-bot-token`. A token from the configuration wins; the admin page then only shows the bot's status.
 
+## 7. AI assistants (optional)
+
+Parents can let an AI assistant such as Claude manage their quizzes, lessons, todo lists and calendar through MCP: they create an API key on the account page and add the address `https://lernkicker.<tailnet>.ts.net/mcp` with that key to their assistant. Details and config examples: [AI assistants (MCP)](mcp.md). Assistants that run in the cloud need Funnel on; those on a device in the tailnet don't. To turn the feature off for the whole server, set `Lernkicker__Mcp__Enabled: "false"`.
+
 ## Updates
 
 Container Manager → Project → `lernkicker` → Action → Build (pulls `latest`), or pin `LERNKICKER_TAG` to a version and change it. The database is migrated on start.

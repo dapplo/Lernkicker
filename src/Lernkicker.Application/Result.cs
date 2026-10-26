@@ -93,6 +93,7 @@ public static class ErrorCodes
     public const string UploadNoDocument = "upload.noDocument";
     public const string UploadSeveralDocuments = "upload.severalDocuments";
     public const string UploadInvalidZip = "upload.invalidZip";
+    public const string UploadInvalidPicture = "upload.invalidPicture";
     public const string TelegramDisabled = "telegram.disabled";
     public const string TelegramUnavailable = "telegram.unavailable";
     public const string TelegramTokenInvalid = "telegram.tokenInvalid";
@@ -120,6 +121,10 @@ public static class ErrorCodes
     public const string CalendarTooLarge = "calendar.tooLarge";
     public const string NotACalendar = "calendar.notACalendar";
     public const string CalendarRangeInvalid = "calendar.rangeInvalid";
+
+    public const string ApiKeyNameInvalid = "apiKey.nameInvalid";
+    public const string ApiKeyTooMany = "apiKey.tooMany";
+    public const string ApiKeyNotFound = "apiKey.notFound";
 
     public const string PlaySettingsInvalid = "play.settingsInvalid";
     public const string PlayGameUnknown = "play.gameUnknown";

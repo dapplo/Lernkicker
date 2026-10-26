@@ -156,3 +156,15 @@ public sealed record Lobby(IReadOnlyList<string> Games, IReadOnlyList<LobbyPlaye
 
 /// <summary>A game with what this player may see of it; <c>View</c> is null while the table waits for players.</summary>
 public sealed record MatchState(MatchSummary Match, Domain.Multiplayer.GameView? View, int? Resigned);
+
+/// <summary>An API key as parents see it: never the key itself, only its last characters.</summary>
+public sealed record ApiKeySummary(Guid Id, string Name, string Hint, bool ReadOnly, DateTimeOffset CreatedAt, DateTimeOffset? LastUsedAt)
+{
+    public static ApiKeySummary From(Domain.Families.ApiKey k) => new(k.Id, k.Name, k.Hint, k.ReadOnly, k.CreatedAt, k.LastUsedAt);
+}
+
+/// <summary>A new key; <c>Token</c> is shown this one time.</summary>
+public sealed record ApiKeyCreated(ApiKeySummary Key, string Token);
+
+/// <summary>Whom a presented API key acts for.</summary>
+public sealed record ApiKeySession(Guid FamilyId, Guid ParentId, Guid KeyId, bool ReadOnly);

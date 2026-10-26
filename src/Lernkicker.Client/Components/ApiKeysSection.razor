@@ -1,0 +1,108 @@
+@inject Api Api
+
+@* API keys for AI assistants (MCP, docs/mcp.md): create (the key is shown once), list, revoke *@
+<section class="box api-keys">
+    <h2>@L["ApiKeys.Title"]</h2>
+    <p>@L["ApiKeys.Intro"]</p>
+
+    @if (_keys.Count > 0)
+    {
+        <ul class="list">
+            @foreach (var key in _keys)
+            {
+                <li>
+                    <div>
+                        <b>@key.Name</b> <code>…@key.Hint</code>
+                        <small>
+                            @(key.ReadOnly ? L["ApiKeys.ReadOnly"] : L["ApiKeys.ReadWrite"])
+                            · @L["ApiKeys.CreatedOn", Display.Date(key.CreatedAt)]
+                            · @(key.LastUsedAt is { } used ? L["ApiKeys.LastUsed", Display.Date(used)] : L["ApiKeys.NeverUsed"])
+                        </small>
+                    </div>
+                    <span class="buttons">
+                        <IconButton Icon="✕" Label="@L["ApiKeys.Revoke"]" Class="quiet" OnClick="() => Revoke(key.Id)" />
+                    </span>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (_created is { } created)
+    {
+        <div class="new-key form">
+            <p><b>@L["ApiKeys.CopyNow"]</b></p>
+            <label>@L["ApiKeys.Key"] <input class="link" readonly value="@created.Token" onfocus="this.select()" /></label>
+            <label>@L["ApiKeys.Address"] <input class="link" readonly value="@created.McpUrl" onfocus="this.select()" /></label>
+            <p class="hint">@L["ApiKeys.ClaudeCode"]</p>
+            <p><input class="link" readonly value="@ClaudeCommand(created)" aria-label="@L["ApiKeys.ClaudeCode"]" onfocus="this.select()" /></p>
+            <p><button class="btn quiet" @onclick="() => _created = null">@L["ApiKeys.Done"]</button></p>
+        </div>
+    }
+
+    <details>
+        <summary>@L["ApiKeys.Create"]</summary>
+        <form class="form" @onsubmit="Create" @onsubmit:preventDefault>
+            <label>@L["ApiKeys.Name"] <input @bind="_name" maxlength="60" required placeholder="@L["ApiKeys.NamePlaceholder"]" /></label>
+            <label class="check">
+                <input type="checkbox" @bind="_readOnly" />
+                <span>@L["ApiKeys.ReadOnlyOption"]</span>
+            </label>
+            <button class="btn" type="submit" disabled="@_busy">@L["ApiKeys.Create"]</button>
+        </form>
+    </details>
+    <p class="hint">@L["ApiKeys.Warning"]</p>
+    <Messages Errors="@_errors" />
+</section>
+
+@code {
+    private List<ApiKeyOverview> _keys = [];
+    private ApiKeyCreatedResponse? _created;
+    private IReadOnlyList<string>? _errors;
+    private string _name = "";
+    private bool _readOnly;
+    private bool _busy;
+
+    protected override Task OnInitializedAsync() => Run(Load);
+
+    private async Task Load() => _keys = await Api.ApiKeys();
+
+    private Task Create() => Run(async () =>
+    {
+        _created = await Api.CreateApiKey(new NewApiKey(_name, _readOnly));
+        _name = "";
+        _readOnly = false;
+        await Load();
+    });
+
+    private Task Revoke(Guid id) => Run(async () =>
+    {
+        await Api.RevokeApiKey(id);
+        if (_created?.Key.Id == id)
+        {
+            _created = null;
+        }
+
+        await Load();
+    });
+
+    private static string ClaudeCommand(ApiKeyCreatedResponse created) =>
+        $"claude mcp add --transport http lernkicker {created.McpUrl} --header \"Authorization: Bearer {created.Token}\"";
+
+    private async Task Run(Func<Task> action)
+    {
+        _busy = true;
+        _errors = null;
+        try
+        {
+            await action();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

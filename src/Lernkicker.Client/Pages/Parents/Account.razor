@@ -2,7 +2,7 @@
 @inject Api Api
 @inject NavigationManager Navigation
 
-@* The parent's own things: Telegram, administration, privacy and logging out *@
+@* The parent's own things: Telegram, API keys for AI assistants, administration, privacy and logging out *@
 
 <PageTitle>@L["Account.Title"] · Lernkicker</PageTitle>
 
@@ -29,6 +29,7 @@ else
     </section>
 
     <TelegramSection />
+    <ApiKeysSection />
 }
 
 @code {

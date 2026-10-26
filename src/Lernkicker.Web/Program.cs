@@ -9,6 +9,7 @@ using Lernkicker.QuizFormat;
 using Lernkicker.Telegram;
 using Lernkicker.Web;
 using Lernkicker.Web.Endpoints;
+using Lernkicker.Web.Mcp;
 using Lernkicker.Web.Play;
 using Lernkicker.Web.Security;
 using Microsoft.AspNetCore.Authentication;
@@ -71,6 +72,14 @@ builder.Services.AddScoped<TelegramUseCases>();
 builder.Services.AddScoped<TelegramBotUseCases>();
 builder.Services.AddScoped<PlaySettingsUseCases>();
 builder.Services.AddScoped<MatchUseCases>();
+builder.Services.AddScoped<ApiKeyUseCases>();
+
+// AI assistants work with a family's API key over MCP (docs/mcp.md); Lernkicker:Mcp:Enabled = false turns it off
+var mcpEnabled = builder.Configuration.GetValue("Lernkicker:Mcp:Enabled", true);
+if (mcpEnabled)
+{
+    builder.Services.AddLernkickerMcp(builder.Configuration);
+}
 
 // Playing with others: a live connection tells open play pages that something changed
 builder.Services.AddSignalR();
@@ -137,7 +146,8 @@ builder.Services.AddAuthentication()
                 context.RejectPrincipal();
             }
         };
-    });
+    })
+    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(Schemes.ApiKey, null);
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.Parent, p => p
@@ -155,7 +165,17 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.Viewer, p => p
         .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme, Schemes.Child)
         .RequireAuthenticatedUser()
-        .RequireClaim(Claims.FamilyId));
+        .RequireClaim(Claims.FamilyId))
+    .AddPolicy(Policies.ApiKey, p => p
+        .AddAuthenticationSchemes(Schemes.ApiKey)
+        .RequireAuthenticatedUser()
+        .RequireClaim(Claims.FamilyId)
+        .RequireClaim(Claims.ApiKey))
+    .AddPolicy(Policies.ApiKeyWrite, p => p
+        .AddAuthenticationSchemes(Schemes.ApiKey)
+        .RequireAuthenticatedUser()
+        .RequireClaim(Claims.FamilyId)
+        .RequireClaim(Claims.Access, Claims.WriteAccess));
 
 var loginsPerMinute = builder.Configuration.GetValue("Lernkicker:Limits:LoginsPerMinute", 10);
 var childRequestsPerMinute = builder.Configuration.GetValue("Lernkicker:Limits:ChildLoginsPerMinute", 20);
@@ -239,6 +259,12 @@ app.MapLibrary();
 app.MapMedia();
 app.MapFormat();
 app.MapPlay();
+app.MapApiKeys();
+if (mcpEnabled)
+{
+    app.MapLernkickerMcp();
+}
+
 app.MapHub<PlayHub>(PlayEvents.Path).RequireAuthorization(Policies.Child);
 app.Map("/api/{**rest}", ApiResults.NotFound);
 

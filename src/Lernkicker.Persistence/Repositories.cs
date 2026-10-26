@@ -307,6 +307,20 @@ internal sealed class TelegramRepository(LernkickerDbContext db) : ITelegramRepo
         await db.TelegramLinks.IgnoreQueryFilters().Select(l => l.FamilyId).Distinct().ToListAsync();
 }
 
+internal sealed class ApiKeyRepository(LernkickerDbContext db) : IApiKeyRepository
+{
+    public void Add(ApiKey key) => db.ApiKeys.Add(key);
+
+    public void Remove(ApiKey key) => db.ApiKeys.Remove(key);
+
+    public async Task<IReadOnlyList<ApiKey>> ListAsync() => await db.ApiKeys.ToListAsync();
+
+    public Task<ApiKey?> FindAsync(Guid id) => db.ApiKeys.SingleOrDefaultAsync(k => k.Id == id);
+
+    public Task<ApiKey?> FindByHashAnyFamilyAsync(string tokenHash) =>
+        db.ApiKeys.IgnoreQueryFilters().SingleOrDefaultAsync(k => k.TokenHash == tokenHash);
+}
+
 internal sealed class ServerSecrets(LernkickerDbContext db) : IServerSecrets
 {
     public Task<ServerSecret?> FindAsync(string name) => db.ServerSecrets.FirstOrDefaultAsync(s => s.Name == name);
