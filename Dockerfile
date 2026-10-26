@@ -19,6 +19,7 @@ COPY src/Lernkicker.Web/Lernkicker.Web.csproj src/Lernkicker.Web/
 RUN dotnet restore src/Lernkicker.Web/Lernkicker.Web.csproj -a $TARGETARCH
 
 COPY schema/ schema/
+COPY docs/ai-prompt/ docs/ai-prompt/
 COPY src/ src/
 # Shown on the admin page and in the log; declared after the restore so they don't invalidate its cache.
 # Not named VERSION: build args are environment variables, and MSBuild would take that as $(Version).

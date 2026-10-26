@@ -407,6 +407,12 @@
   <data name="Issue.imagesTooLarge" xml:space="preserve"><value>Alle Bilder zusammen sind größer als {maxMb} MB.</value></data>
   <data name="Learn.Type.image" xml:space="preserve"><value>Bild</value></data>
   <data name="Picture.Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="AiHelp.Title" xml:space="preserve"><value>Mit einer KI erstellen</value></data>
+  <data name="AiHelp.Step1" xml:space="preserve"><value>Lade die Anleitung herunter und kopiere ihren ganzen Text in einen KI-Chat (z. B. Claude, ChatGPT oder Gemini).</value></data>
+  <data name="AiHelp.Step2" xml:space="preserve"><value>Trage Thema, Klasse und Sprache ein und hänge Fotos der Arbeitsblätter oder Hefteinträge an.</value></data>
+  <data name="AiHelp.Step3" xml:space="preserve"><value>Lade die Datei, die du von der KI bekommst, hier hoch: die JSON-Datei oder, mit Bildern, die Zip-Datei.</value></data>
+  <data name="AiHelp.Prompt" xml:space="preserve"><value>Anleitung für die KI herunterladen</value></data>
+  <data name="AiHelp.Schemas" xml:space="preserve"><value>Die Formate einzeln, für Werkzeuge, die mit JSON-Schemas arbeiten:</value></data>
   <data name="Upload.ChooseFiles" xml:space="preserve"><value>Dateien auswählen</value></data>
   <data name="Upload.PicturesHint" xml:space="preserve"><value>Mit Bildern: Wähle die JSON-Datei und ihre Bilder zusammen aus, oder eine Zip-Datei mit allem. Große Fotos werden vor dem Hochladen verkleinert.</value></data>
   <data name="Upload.Shrinking" xml:space="preserve"><value>Bilder werden vorbereitet …</value></data>

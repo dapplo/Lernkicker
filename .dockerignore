@@ -7,6 +7,7 @@
 .idea/
 deploy/
 docs/
+!docs/ai-prompt/
 quizzes/
 tests/
 tools/
