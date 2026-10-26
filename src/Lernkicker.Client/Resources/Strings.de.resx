@@ -90,7 +90,6 @@
   <data name="Parents.Title" xml:space="preserve"><value>Eltern</value></data>
   <data name="Parents.LoginHeading" xml:space="preserve"><value>Anmelden für Eltern</value></data>
   <data name="Parents.InvitationOnly" xml:space="preserve"><value>Noch kein Konto? Lernkicker funktioniert nur mit Einladung. Frag die Person, die Lernkicker betreibt.</value></data>
-  <data name="Parents.ManageQuizzes" xml:space="preserve"><value>Proben verwalten</value></data>
   <data name="Parents.Children" xml:space="preserve"><value>Kinder</value></data>
   <data name="Parents.NoChildren" xml:space="preserve"><value>Lege zuerst ein Kind an. Danach verbindest du sein Handy mit einem QR-Code.</value></data>
   <data name="Parents.NoDevice" xml:space="preserve"><value>Noch kein Handy verbunden</value></data>
@@ -263,7 +262,6 @@
   <data name="Error.calendar.tooLarge" xml:space="preserve"><value>Der Kalender ist größer als 2 MB.</value></data>
   <data name="Error.calendar.notACalendar" xml:space="preserve"><value>Unter dieser Adresse ist kein Kalender (ICS). Vielleicht ist es eine Webseite?</value></data>
   <data name="Error.calendar.rangeInvalid" xml:space="preserve"><value>Dieser Zeitraum ist zu lang.</value></data>
-  <data name="Parents.ManageLessons" xml:space="preserve"><value>Lernstoff verwalten</value></data>
   <data name="Lessons.Title" xml:space="preserve"><value>Lernstoff</value></data>
   <data name="Lessons.Intro" xml:space="preserve"><value>Stoff, den dein Kind am Handy liest und lernt: ein Gedicht zum Aufsagen, Begriffe, das Wichtigste zum Merken.</value></data>
   <data name="Lessons.Upload" xml:space="preserve"><value>Lernstoff hochladen</value></data>
@@ -316,7 +314,6 @@
   <data name="Learn.Poem.NextLine" xml:space="preserve"><value>Nächste Zeile zeigen</value></data>
   <data name="Learn.Poem.Done" xml:space="preserve"><value>Du hast das ganze Gedicht aufgesagt!</value></data>
   <data name="Learn.Poem.FromStart" xml:space="preserve"><value>Von vorne</value></data>
-  <data name="Parents.Library" xml:space="preserve"><value>Gemeinsame Sammlung</value></data>
   <data name="Library.Title" xml:space="preserve"><value>Gemeinsame Sammlung</value></data>
   <data name="Library.Intro" xml:space="preserve"><value>Proben und Lernstoff, die andere Familien auf diesem Lernkicker geteilt haben. Schau sie dir zuerst an und übernimm sie dann in deine eigene Sammlung. Die Kopie gehört dir: Spätere Änderungen der anderen Familie ändern sie nicht.</value></data>
   <data name="Library.Empty" xml:space="preserve"><value>Noch nichts geteilt. Wenn du eine Probe oder Lernstoff teilst, finden andere Familien sie hier.</value></data>
@@ -414,4 +411,24 @@
   <data name="Upload.PicturesHint" xml:space="preserve"><value>Mit Bildern: Wähle die JSON-Datei und ihre Bilder zusammen aus, oder eine Zip-Datei mit allem. Große Fotos werden vor dem Hochladen verkleinert.</value></data>
   <data name="Upload.Shrinking" xml:space="preserve"><value>Bilder werden vorbereitet …</value></data>
   <data name="Upload.FileTooLarge" xml:space="preserve"><value>„{0}“ ist zu groß.</value></data>
+  <data name="Nav.Label" xml:space="preserve"><value>Menü für Eltern</value></data>
+  <data name="Nav.Overview" xml:space="preserve"><value>Übersicht</value></data>
+  <data name="Nav.Calendar" xml:space="preserve"><value>Termine</value></data>
+  <data name="Nav.Quizzes" xml:space="preserve"><value>Proben</value></data>
+  <data name="Nav.Lessons" xml:space="preserve"><value>Lernstoff</value></data>
+  <data name="Nav.Library" xml:space="preserve"><value>Sammlung</value></data>
+  <data name="Nav.Account" xml:space="preserve"><value>Konto</value></data>
+  <data name="Account.Title" xml:space="preserve"><value>Konto</value></data>
+  <data name="Parents.ToCalendar" xml:space="preserve"><value>Alle Termine</value></data>
+  <data name="Calendar.PreviousMonth" xml:space="preserve"><value>Voriger Monat</value></data>
+  <data name="Calendar.NextMonth" xml:space="preserve"><value>Nächster Monat</value></data>
+  <data name="Calendar.Today" xml:space="preserve"><value>Heute</value></data>
+  <data name="Calendar.Children" xml:space="preserve"><value>Termine zeigen von</value></data>
+  <data name="Calendar.NothingThatDay" xml:space="preserve"><value>An diesem Tag ist nichts.</value></data>
+  <data name="Calendar.ManageHint" xml:space="preserve"><value>Termine eintragen und Kalender abonnieren kannst du bei jedem Kind:</value></data>
+  <data name="Child.Tab.Tasks" xml:space="preserve"><value>Aufgaben</value></data>
+  <data name="Child.Tab.Calendar" xml:space="preserve"><value>Termine</value></data>
+  <data name="Child.Tab.Results" xml:space="preserve"><value>Ergebnisse</value></data>
+  <data name="Child.Tab.Devices" xml:space="preserve"><value>Handys</value></data>
+  <data name="Child.Tab.Settings" xml:space="preserve"><value>Einstellungen</value></data>
 </root>

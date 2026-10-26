@@ -53,10 +53,6 @@
     [Parameter, EditorRequired]
     public Guid ChildId { get; set; }
 
-    /// <summary>Called after a change, e.g. so the calendar shows the new due date.</summary>
-    [Parameter]
-    public EventCallback Changed { get; set; }
-
     protected override async Task OnParametersSetAsync()
     {
         _lessons = await Api.Lessons();
@@ -83,7 +79,6 @@
         {
             await action();
             _assignments = await Api.LessonAssignments(ChildId);
-            await Changed.InvokeAsync();
         }
         catch (ApiException e)
         {

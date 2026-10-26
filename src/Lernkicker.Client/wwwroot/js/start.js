@@ -51,6 +51,10 @@
             const shrunk = new Uint8Array(await blob.arrayBuffer());
             return shrunk.length < bytes.length ? shrunk : bytes;
         },
+
+        scrollIntoView(element) {
+            element?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        },
     };
 
     Blazor.start({ applicationCulture: language });

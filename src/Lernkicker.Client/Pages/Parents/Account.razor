@@ -1,0 +1,51 @@
+@page "/parents/account"
+@inject Api Api
+@inject NavigationManager Navigation
+
+@* The parent's own things: Telegram, administration, privacy and logging out *@
+
+<PageTitle>@L["Account.Title"] · Lernkicker</PageTitle>
+
+<ParentsNav />
+<h1>@L["Account.Title"]</h1>
+
+@if (_me is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else
+{
+    <section class="box">
+        <p><b>@_me.Name</b> · @_me.Email</p>
+        <p class="subtitle">@_me.Family</p>
+        <p class="buttons">
+            @if (_me.IsAdmin)
+            {
+                <a class="btn quiet" href="admin">@L["Admin.Title"]</a>
+            }
+            <a class="btn quiet" href="privacy">@L["Privacy.Title"]</a>
+            <button class="btn quiet" @onclick="Logout">@L["Common.Logout"]</button>
+        </p>
+    </section>
+
+    <TelegramSection />
+}
+
+@code {
+    private Me? _me;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _me = await Api.Me();
+        if (_me is null)
+        {
+            Navigation.NavigateTo("parents");
+        }
+    }
+
+    private async Task Logout()
+    {
+        await Api.Logout();
+        Navigation.NavigateTo("parents");
+    }
+}

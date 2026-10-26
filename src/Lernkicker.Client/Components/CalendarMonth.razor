@@ -1,0 +1,172 @@
+@using System.Globalization
+@inject Api Api
+
+@* One month of one or more children's dates as a grid; tapping a day lists its dates *@
+<div class="month">
+    <div class="month-main">
+        <div class="month-head">
+            <button class="btn quiet" @onclick="() => Move(-1)" aria-label="@L["Calendar.PreviousMonth"]">‹</button>
+            <h2>@_month.ToString("MMMM yyyy", CultureInfo.CurrentCulture)</h2>
+            <button class="btn quiet" @onclick="() => Move(1)" aria-label="@L["Calendar.NextMonth"]">›</button>
+        </div>
+        @if (_month != FirstOfMonth(Today))
+        {
+            <p class="month-today"><button class="btn quiet" @onclick="ShowToday">@L["Calendar.Today"]</button></p>
+        }
+
+        @if (Children.Count > 1)
+        {
+            <div class="chips" role="group" aria-label="@L["Calendar.Children"]">
+                @foreach (var child in Children)
+                {
+                    <button class="@ChildClass(child.Id) @(_hidden.Contains(child.Id) ? "" : "on")" aria-pressed="@(!_hidden.Contains(child.Id))" @onclick="() => Toggle(child.Id)">@child.Name</button>
+                }
+            </div>
+        }
+
+        <Messages Errors="@_errors" />
+
+        <div class="month-grid" role="grid">
+            @foreach (var day in WeekDays)
+            {
+                <span class="weekday" role="columnheader">@CultureInfo.CurrentCulture.DateTimeFormat.GetShortestDayName(day)</span>
+            }
+            @for (var date = _first; date <= _last; date = date.AddDays(1))
+            {
+                var day = date;
+                var entries = On(day).ToList();
+                <button role="gridcell"
+                        class="day @(day.Month != _month.Month ? "other" : "") @(day == Today ? "today" : "") @(day == _selected ? "selected" : "")"
+                        aria-label="@($"{Display.Date(day)}: {L["Calendar.DateCount", entries.Count]}")"
+                        @onclick="() => _selected = day">
+                    <span class="number">@day.Day</span>
+                    <span class="marks" aria-hidden="true">@Marks(entries)</span>
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="month-day">
+        <h3>@Display.Date(_selected)</h3>
+        @{ var selected = On(_selected).ToList(); }
+        @if (!_loaded)
+        {
+            <p class="loading-text">@L["Common.OneMoment"]</p>
+        }
+        else if (selected.Count == 0)
+        {
+            <p class="hint">@L["Calendar.NothingThatDay"]</p>
+        }
+        <ul class="list">
+            @foreach (var (child, entry) in selected)
+            {
+                <li class="@ChildClass(child.Id)">
+                    <div>
+                        <b><span aria-hidden="true">@Display.KindIcon(entry.Kind)</span> @entry.Title</b>
+                        <small>
+                            @(Children.Count > 1 ? child.Name + " · " : "")@(Display.Times(entry.StartTime, entry.EndTime) is { Length: > 0 } times ? times + " · " : "")@(entry.Location is { Length: > 0 } location ? location + " · " : "")@Display.Kind(entry.Kind)@(entry.Source == "manual" ? "" : " · " + L[$"Calendar.Source.{entry.Source}"])
+                        </small>
+                    </div>
+                    @if (entry.EventId is not null && Edit.HasDelegate)
+                    {
+                        <button class="btn quiet" @onclick="() => Edit.InvokeAsync(entry)">@L["Calendar.Edit"]</button>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+    private DateOnly _month = FirstOfMonth(Today), _selected = Today, _first, _last;
+    private List<(ChildOverview Child, CalendarEntryDto Entry)> _entries = [];
+    private readonly HashSet<Guid> _hidden = [];
+    private bool _loaded;
+    private IReadOnlyList<string>? _errors;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<ChildOverview> Children { get; set; } = [];
+
+    /// <summary>When set, a parent's own dates get an edit button.</summary>
+    [Parameter]
+    public EventCallback<CalendarEntryDto> Edit { get; set; }
+
+    private static DateOnly Today => DateOnly.FromDateTime(DateTime.Now);
+
+    private static DateOnly FirstOfMonth(DateOnly date) => new(date.Year, date.Month, 1);
+
+    /// <summary>The days of a week, starting with the culture's first day (Monday in German).</summary>
+    private static IEnumerable<DayOfWeek> WeekDays
+    {
+        get
+        {
+            var first = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+            return Enumerable.Range(0, 7).Select(i => (DayOfWeek)((first + i) % 7));
+        }
+    }
+
+    protected override Task OnInitializedAsync() => Load();
+
+    /// <summary>Loads the shown month again, e.g. after a date was added.</summary>
+    public async Task Reload()
+    {
+        await Load();
+        StateHasChanged();
+    }
+
+    private async Task Load()
+    {
+        var firstDay = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+        _first = _month.AddDays(-(((int)_month.DayOfWeek - (int)firstDay + 7) % 7));
+        var end = _month.AddMonths(1).AddDays(-1);
+        _last = end.AddDays(6 - (((int)end.DayOfWeek - (int)firstDay + 7) % 7));
+
+        _errors = null;
+        try
+        {
+            var loaded = await Task.WhenAll(Children.Select(async child =>
+                (await Api.Calendar(child.Id, _first, _last)).Select(entry => (child, entry))));
+            _entries = loaded.SelectMany(e => e)
+                .OrderBy(e => e.entry.Date).ThenBy(e => e.entry.StartTime ?? TimeOnly.MinValue).ThenBy(e => e.child.Name)
+                .ToList();
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+
+        _loaded = true;
+    }
+
+    private IEnumerable<(ChildOverview Child, CalendarEntryDto Entry)> On(DateOnly date) =>
+        _entries.Where(e => e.Entry.Date == date && !_hidden.Contains(e.Child.Id));
+
+    /// <summary>One icon per kind of date that day, e.g. "📝⚽".</summary>
+    private static string Marks(List<(ChildOverview Child, CalendarEntryDto Entry)> entries) =>
+        string.Concat(entries.Select(e => e.Entry.Kind).Distinct().Select(Display.KindIcon));
+
+    /// <summary>A colour per child (up to four), so their dates can be told apart.</summary>
+    private string ChildClass(Guid id) => Children.Count > 1 ? $"child-{Children.ToList().FindIndex(c => c.Id == id) % 4}" : "";
+
+    private void Toggle(Guid id)
+    {
+        if (!_hidden.Remove(id))
+        {
+            _hidden.Add(id);
+        }
+    }
+
+    private async Task Move(int months)
+    {
+        _month = _month.AddMonths(months);
+        _selected = _month == FirstOfMonth(Today) ? Today : _month;
+        await Load();
+    }
+
+    private async Task ShowToday()
+    {
+        _month = FirstOfMonth(Today);
+        _selected = Today;
+        await Load();
+    }
+}
