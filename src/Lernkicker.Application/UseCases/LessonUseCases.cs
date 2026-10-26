@@ -1,5 +1,6 @@
 using System.Text;
 using Lernkicker.Application.Ports;
+using Lernkicker.Domain.Games;
 using Lernkicker.Domain.Lessons;
 
 namespace Lernkicker.Application.UseCases;
@@ -187,6 +188,24 @@ public sealed class LessonUseCases(
         }
 
         return new LessonToLearn(assignment.Id, format.Read(stored.Source), assignment.DueOn, assignment.KnownBlocks, await images.ForLessonAsync(stored.Id));
+    }
+
+    /// <summary>A new round of a game made from the lesson's flashcards and entries.</summary>
+    public async Task<Result<LessonGame>> GameAsync(Guid childId, Guid assignmentId, string kind, Random random)
+    {
+        var assignment = await lessons.FindAssignmentAsync(childId, assignmentId);
+        if (assignment is null || await lessons.FindAsync(assignment.StoredLessonId) is not { } stored)
+        {
+            return AppError.NotFound(ErrorCodes.LessonNotFound);
+        }
+
+        var lesson = format.Read(stored.Source);
+        if (LessonGames.Round(lesson, kind, random) is not { } round)
+        {
+            return AppError.NotFound(ErrorCodes.GameNotAvailable);
+        }
+
+        return new LessonGame(assignment.Id, lesson.Title, lesson.Language, round, await images.ForLessonAsync(stored.Id));
     }
 
     /// <summary>The child finished a practice session and says which blocks they know.</summary>

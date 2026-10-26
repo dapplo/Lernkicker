@@ -83,6 +83,7 @@ public static class ErrorCodes
     public const string QuizInvalid = "quiz.invalid";
     public const string QuizTooLarge = "quiz.tooLarge";
     public const string LessonNotFound = "lesson.notFound";
+    public const string GameNotAvailable = "lesson.gameNotAvailable";
     public const string LessonInvalid = "lesson.invalid";
     public const string LessonTooLarge = "lesson.tooLarge";
     public const string SharedNotFound = "shared.notFound";

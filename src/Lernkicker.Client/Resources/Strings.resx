@@ -80,6 +80,27 @@
   <data name="Game.Caught.unicorn" xml:space="preserve"><value>Magic!</value></data>
   <data name="Game.TooLate" xml:space="preserve"><value>Too late!</value></data>
   <data name="Game.Wrong" xml:space="preserve"><value>Not quite</value></data>
+  <data name="Game.Section" xml:space="preserve"><value>Play</value></data>
+  <data name="Game.SectionHint" xml:space="preserve"><value>Games with the words from this material.</value></data>
+  <data name="Game.Name.fallingWords" xml:space="preserve"><value>Catch the words</value></data>
+  <data name="Game.Name.memory" xml:space="preserve"><value>Memory</value></data>
+  <data name="Game.Name.crossword" xml:space="preserve"><value>Crossword</value></data>
+  <data name="Game.Name.wordSearch" xml:space="preserve"><value>Word search</value></data>
+  <data name="Game.NewRound" xml:space="preserve"><value>New round</value></data>
+  <data name="Game.BackToLesson" xml:space="preserve"><value>Back to the material</value></data>
+  <data name="Memory.How" xml:space="preserve"><value>Find the pairs: a word and what it means.</value></data>
+  <data name="Memory.Card" xml:space="preserve"><value>Card {0}</value></data>
+  <data name="Memory.Moves" xml:space="preserve"><value>{0} moves</value></data>
+  <data name="Memory.OneMove" xml:space="preserve"><value>1 move</value></data>
+  <data name="Memory.Done" xml:space="preserve"><value>All pairs found in {0} moves!</value></data>
+  <data name="Crossword.How" xml:space="preserve"><value>Tap a clue and type the word.</value></data>
+  <data name="Crossword.Across" xml:space="preserve"><value>Across</value></data>
+  <data name="Crossword.Down" xml:space="preserve"><value>Down</value></data>
+  <data name="Crossword.Letters" xml:space="preserve"><value>{0} letters</value></data>
+  <data name="Crossword.Enter" xml:space="preserve"><value>Fill in</value></data>
+  <data name="Crossword.Check" xml:space="preserve"><value>Check</value></data>
+  <data name="Crossword.Wrong" xml:space="preserve"><value>{0} letters are not right yet.</value></data>
+  <data name="Crossword.Done" xml:space="preserve"><value>Great, everything is right!</value></data>
   <data name="Answer.True" xml:space="preserve"><value>True</value></data>
   <data name="Answer.False" xml:space="preserve"><value>False</value></data>
   <data name="Result.Total" xml:space="preserve"><value>{0} of {1} points · mark {2}</value></data>
@@ -300,6 +321,7 @@
   <data name="Lessons.DeleteHint" xml:space="preserve"><value>Deleting also removes it from your children, together with their progress.</value></data>
   <data name="Lessons.Until" xml:space="preserve"><value>Due {0}</value></data>
   <data name="Error.lesson.notFound" xml:space="preserve"><value>This learning material does not exist.</value></data>
+  <data name="Error.lesson.gameNotAvailable" xml:space="preserve"><value>This learning material does not have enough words for this game.</value></data>
   <data name="Error.lesson.invalid" xml:space="preserve"><value>The learning material has errors:</value></data>
   <data name="Error.lesson.tooLarge" xml:space="preserve"><value>The file is larger than 256 KB.</value></data>
   <data name="Calendar.Source.lesson" xml:space="preserve"><value>to learn</value></data>

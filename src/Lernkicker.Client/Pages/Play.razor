@@ -1,0 +1,71 @@
+@page "/learn/{AssignmentId:guid}/play/{Kind}"
+@inject Api Api
+@inject NavigationManager Navigation
+
+<PageTitle>@L[$"Game.Name.{Kind}"] · Lernkicker</PageTitle>
+
+@if (_errors is not null)
+{
+    <Messages Errors="@_errors" />
+    <a class="btn" href="learn/@AssignmentId">@L["Game.BackToLesson"]</a>
+}
+else if (_game is null)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else
+{
+    <header class="practice-header">
+        <a href="learn/@AssignmentId" class="close" aria-label="@L["Game.BackToLesson"]">✕</a>
+        <span lang="@_game.Language">@_game.Title</span>
+    </header>
+    <h1><span aria-hidden="true">@LessonGameKinds.Icon(Kind)</span> @L[$"Game.Name.{Kind}"]</h1>
+
+    @* A new key for every round, so the game starts from scratch *@
+    @switch (_game)
+    {
+        case { Exercise: { } exercise }:
+            <ExerciseView @key="_game" Draft="@AnswerDraft.For(exercise)" Language="@_game.Language" Game="true" />
+            break;
+        case { Cards: { } cards }:
+            <MemoryGame @key="_game" Cards="@cards" Language="@_game.Language" />
+            break;
+        case { Crossword: { } crossword }:
+            <CrosswordGame @key="_game" Grid="@crossword" Language="@_game.Language" />
+            break;
+    }
+
+    <div class="buttons">
+        <button class="btn" @onclick="Load">@L["Game.NewRound"]</button>
+        <a class="btn quiet" href="learn/@AssignmentId">@L["Game.BackToLesson"]</a>
+    </div>
+}
+
+@code {
+    private LessonGameDto? _game;
+    private IReadOnlyList<string>? _errors;
+
+    [Parameter]
+    public Guid AssignmentId { get; set; }
+
+    [Parameter]
+    public string Kind { get; set; } = "";
+
+    protected override Task OnParametersSetAsync() => Load();
+
+    private async Task Load()
+    {
+        try
+        {
+            _game = await Api.LessonGame(AssignmentId, Kind);
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Navigation.NavigateTo("");
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
+}

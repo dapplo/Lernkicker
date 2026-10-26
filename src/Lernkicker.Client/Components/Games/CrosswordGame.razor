@@ -1,0 +1,154 @@
+@* A crossword: the child picks a clue (or a cell of its word), types the whole word in the field under the grid and
+   checks the letters at the end. Typing a word instead of single letters works better on a phone keyboard. *@
+
+<p class="game-how" lang="@UiLanguage.Current">@L["Crossword.How"]</p>
+@* The page CSP forbids inline styles, so the number of columns is a class *@
+<div class="crossword cols-@Grid.Width" lang="@Language">
+    @for (var r = 0; r < Grid.Height; r++)
+    {
+        @for (var c = 0; c < Grid.Width; c++)
+        {
+            var cell = (r, c);
+            if (!_solution.TryGetValue(cell, out var letter))
+            {
+                <span class="cw-cell empty" aria-hidden="true"></span>
+                continue;
+            }
+
+            var number = Grid.Words.FirstOrDefault(w => w.Row == r && w.Column == c)?.Number;
+            var typed = _typed.GetValueOrDefault(cell);
+            var state = (_selected is { } s && Crossword.Cells(s).Contains(cell) ? "selected " : "") + (_checked && typed != default ? typed == letter ? "right" : "wrong" : "");
+            <button type="button" class="cw-cell @state" aria-label="@(typed == default ? "·" : typed.ToString())" @onclick="() => Pick(cell)">
+                @if (number is { } n)
+                {
+                    <small>@n</small>
+                }
+                @(typed == default ? "" : typed.ToString())
+            </button>
+        }
+    }
+</div>
+
+@if (_selected is { } word)
+{
+    <form class="cw-entry" @onsubmit="Enter" @onsubmit:preventDefault>
+        <label>
+            <span><strong lang="@UiLanguage.Current">@word.Number @(word.Down ? L["Crossword.Down"] : L["Crossword.Across"]):</strong> <span lang="@Language">@word.Clue</span></span>
+            <input @ref="_input" @bind="_entry" maxlength="@word.Answer.Length" autocomplete="off" autocapitalize="characters" spellcheck="false"
+                   lang="@Language" placeholder="@L["Crossword.Letters", word.Answer.Length]" />
+        </label>
+        <button class="btn small" type="submit" lang="@UiLanguage.Current">@L["Crossword.Enter"]</button>
+    </form>
+}
+
+@if (Solved)
+{
+    <p class="ok" role="status" lang="@UiLanguage.Current">@L["Crossword.Done"]</p>
+}
+else
+{
+    <div class="buttons" lang="@UiLanguage.Current">
+        <button type="button" class="btn quiet" @onclick="() => _checked = true">@L["Crossword.Check"]</button>
+        @if (_checked && Wrong > 0)
+        {
+            <span class="hint">@L["Crossword.Wrong", Wrong]</span>
+        }
+    </div>
+}
+
+@foreach (var down in new[] { false, true })
+{
+    <h3 lang="@UiLanguage.Current">@(down ? L["Crossword.Down"] : L["Crossword.Across"])</h3>
+    <ol class="cw-clues" lang="@Language">
+        @foreach (var w in Grid.Words.Where(w => w.Down == down))
+        {
+            var done = Crossword.Cells(w).All(c => _typed.GetValueOrDefault(c) != default);
+            <li>
+                <button type="button" class="cw-clue @(w == _selected ? "on" : "") @(done ? "done" : "")" @onclick="() => Select(w)">
+                    <strong>@w.Number</strong> @w.Clue <small>(@w.Answer.Length)</small>
+                </button>
+            </li>
+        }
+    </ol>
+}
+
+@code {
+    private Dictionary<(int, int), char> _solution = [];
+    private readonly Dictionary<(int, int), char> _typed = [];
+    private CrosswordWordDto? _selected;
+    private string _entry = "";
+    private bool _checked, _focus;
+    private ElementReference _input;
+
+    [Parameter, EditorRequired]
+    public required CrosswordDto Grid { get; set; }
+
+    [Parameter]
+    public string? Language { get; set; }
+
+    private bool Solved => _solution.All(s => _typed.GetValueOrDefault(s.Key) == s.Value);
+
+    private int Wrong => _solution.Count(s => _typed.TryGetValue(s.Key, out var t) && t != s.Value);
+
+    protected override void OnParametersSet()
+    {
+        _solution = Grid.Words.SelectMany(w => Crossword.Cells(w).Zip(w.Answer)).DistinctBy(x => x.First).ToDictionary(x => x.First, x => x.Second);
+        _typed.Clear();
+        _selected = Grid.Words.FirstOrDefault();
+        _checked = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focus)
+        {
+            _focus = false;
+            await _input.FocusAsync();
+        }
+    }
+
+    private void Pick((int, int) cell)
+    {
+        // A cell where two words cross picks the other word on the second tap
+        var words = Grid.Words.Where(w => Crossword.Cells(w).Contains(cell)).ToList();
+        Select(words.Count > 1 && words[0] == _selected ? words[1] : words[0]);
+    }
+
+    private void Select(CrosswordWordDto word)
+    {
+        _selected = word;
+        _entry = string.Concat(Crossword.Cells(word).Select(c => _typed.GetValueOrDefault(c) is var t && t != default ? t : ' ')).TrimEnd();
+        _focus = true;
+    }
+
+    private void Enter()
+    {
+        if (_selected is not { } word)
+        {
+            return;
+        }
+
+        var letters = Crossword.Letters(_entry);
+        var cells = Crossword.Cells(word).ToList();
+        for (var i = 0; i < cells.Count; i++)
+        {
+            if (i < letters.Length && letters[i] != ' ')
+            {
+                _typed[cells[i]] = letters[i];
+            }
+            else
+            {
+                _typed.Remove(cells[i]);
+            }
+        }
+
+        _checked = false;
+        // On to the next word that still has empty cells
+        var next = Grid.Words.SkipWhile(w => w != word).Skip(1).Concat(Grid.Words)
+            .FirstOrDefault(w => Crossword.Cells(w).Any(c => !_typed.ContainsKey(c)));
+        if (next is not null)
+        {
+            Select(next);
+        }
+    }
+}

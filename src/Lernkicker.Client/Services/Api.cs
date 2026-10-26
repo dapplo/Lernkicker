@@ -167,6 +167,8 @@ public sealed class Api(HttpClient http)
 
     public Task<LessonDto> Lesson(Guid assignmentId) => Get<LessonDto>($"api/device/lessons/{assignmentId}");
 
+    public Task<LessonGameDto> LessonGame(Guid assignmentId, string kind) => Get<LessonGameDto>($"api/device/lessons/{assignmentId}/games/{Uri.EscapeDataString(kind)}");
+
     public Task<LessonDto> Practised(Guid assignmentId, IReadOnlyList<string> knownBlocks) =>
         Send<LessonDto>(HttpMethod.Post, $"api/device/lessons/{assignmentId}/practice", new LessonPractice(knownBlocks));
 

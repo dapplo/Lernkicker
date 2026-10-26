@@ -25,6 +25,7 @@ You create practice material for **Lernkicker**, a learning app for school child
 - Stick to the material: use what is in the photos or what the curriculum names for this year. Do not make up facts; if something is unclear, ask me before writing the file.
 - For a quiz: number the instructions like a real test (`"1. Setze ein."`). If I attached a real test, keep its order and its points (`points` per exercise). Mix exercise types, and give wrong answers an `explanation` (e.g. a mnemonic). List every spelling that should count in `answers` (e.g. with and without an ending).
 - For learning material: one topic per file, 1–30 blocks. Short `facts`, `flashcards` for terms, `text` for explanations, `poem` for anything to learn word for word. For a guide to look things up in (game rules, a glossary), set `"mode": "reference"` and use an `entries` block: one entry per card or term, with `name` and a short `text`.
+- Games come for free: flashcards and entries unlock games in the app (catch the words, memory, crossword, word search) when there are at least 4 of them. Write the term on the front as **one word** where you can (an article like "die Ähre" is fine) and keep the back **short (up to 60 characters)**, e.g. "Weizen" → "Getreide für helles Brot und Nudeln".
 - `id`: lower-case letters, digits and `-`, 3–64 characters, describing the topic (e.g. `hsu-water-cycle`). Exercise and block ids: short and unique within the file.
 
 ## Rules the schema does not check

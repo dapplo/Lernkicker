@@ -1,0 +1,40 @@
+{
+  "$schema": "../../schema/lesson-v1.schema.json",
+  "format": "lesson/v1",
+  "id": "grain-terms",
+  "title": "Begriffe: Vom Korn zum Brot",
+  "subject": "science",
+  "gradeLevel": 4,
+  "language": "de",
+  "topic": "Vom Korn zum Brot",
+  "description": "Die wichtigsten Wörter rund um Getreide. Mit den Lernkarten kannst du auch spielen.",
+  "source": "Eigene Zusammenstellung nach LehrplanPLUS HSU 4",
+  "blocks": [
+    {
+      "id": "grains", "type": "flashcards", "title": "Getreidesorten",
+      "cards": [
+        { "front": "Weizen", "back": "Getreide für helles Brot und Nudeln" },
+        { "front": "Roggen", "back": "Getreide für dunkles, kräftiges Brot" },
+        { "front": "Gerste", "back": "Getreide für Bier und Graupen" },
+        { "front": "Hafer", "back": "Getreide für Haferflocken" },
+        { "front": "Mais", "back": "Getreide mit großen gelben Körnern am Kolben" },
+        { "front": "Dinkel", "back": "Eine alte Weizenart" }
+      ]
+    },
+    {
+      "id": "terms", "type": "flashcards", "title": "Rund ums Korn",
+      "cards": [
+        { "front": "die Ähre", "back": "Oberer Teil des Halms, in dem die Körner sitzen" },
+        { "front": "der Halm", "back": "Der hohle Stängel der Getreidepflanze" },
+        { "front": "der Mähdrescher", "back": "Maschine, die Getreide mäht und drischt" },
+        { "front": "die Mühle", "back": "Hier wird das Korn zu Mehl gemahlen" },
+        { "front": "die Kleie", "back": "Die Schalen des Korns" },
+        { "front": "das Vollkornmehl", "back": "Mehl aus dem ganzen Korn mit Schale und Keimling" }
+      ]
+    },
+    {
+      "id": "facts", "type": "facts", "title": "Merke",
+      "items": ["Getreide sind Gräser, deren Körner wir essen.", "Im Keimling steckt die neue Pflanze."]
+    }
+  ]
+}

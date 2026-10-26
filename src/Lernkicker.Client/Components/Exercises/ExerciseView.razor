@@ -1,12 +1,15 @@
 @* Shows one exercise of a quiz and records the child's answers in the draft. Quiz texts keep the quiz's language. *@
 
 <section class="exercise" lang="@Language">
-    <h2>@Draft.Exercise.Instruction <span class="points" lang="@UiLanguage.Current">@L["Points.Max", Draft.Exercise.MaxPoints]</span></h2>
-    @if (Draft.Exercise.Hint is { } hint)
+    @if (!Game)
     {
-        <p class="hint">@hint</p>
+        <h2>@Draft.Exercise.Instruction <span class="points" lang="@UiLanguage.Current">@L["Points.Max", Draft.Exercise.MaxPoints]</span></h2>
+        @if (Draft.Exercise.Hint is { } hint)
+        {
+            <p class="hint">@hint</p>
+        }
+        <Picture Image="@Draft.Exercise.Image" />
     }
-    <Picture Image="@Draft.Exercise.Image" />
 
     @switch (Draft.Exercise)
     {
@@ -199,6 +202,10 @@
     /// <summary>Language of the quiz content (BCP 47).</summary>
     [Parameter]
     public string? Language { get; set; }
+
+    /// <summary>A game made from a lesson: no instruction and no points, the page says what to do.</summary>
+    [Parameter]
+    public bool Game { get; set; }
 
     private void Set(int index, ChangeEventArgs e) => Draft.Texts[index] = e.Value?.ToString();
 
