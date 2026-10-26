@@ -23,19 +23,20 @@ public sealed record WordSearchGrid(IReadOnlyList<string> Rows, IReadOnlyList<Wo
     public static string Letters(string word) => word.Normalize(NormalizationForm.FormC).ToUpperInvariant();
 
     /// <summary>
-    /// Hides the words in a new grid. Longer words are placed first, crossing words share a letter. If they do not
-    /// fit after a number of attempts, the grid grows by one row and column.
+    /// Hides the words in a new grid. Longer words are placed first; each word takes the direction used least so
+    /// far, so horizontal, vertical (and diagonal) words come out balanced. Crossing words share a letter if the
+    /// exercise allows overlaps. If the words do not fit after a number of attempts, the grid grows by one.
     /// </summary>
     public static WordSearchGrid Generate(WordSearchExercise exercise, Random random)
     {
         var words = exercise.Words.Select(Letters).ToList();
-        var directions = Directions(exercise.Diagonal, exercise.Backwards);
+        var directions = Directions(exercise.AllowsDiagonal, exercise.AllowsBackwards);
         var filler = Filler(words);
         for (var size = StartSize(exercise, words); ; size++)
         {
             for (var attempt = 0; attempt < AttemptsPerSize; attempt++)
             {
-                if (TryPlace(words, size, directions, random) is { } placed)
+                if (TryPlace(words, size, directions, exercise.AllowsOverlap, random) is { } placed)
                 {
                     return Fill(placed.Cells, placed.Placements, filler, random);
                 }
@@ -69,35 +70,48 @@ public sealed record WordSearchGrid(IReadOnlyList<string> Rows, IReadOnlyList<Wo
         return letters.Any(c => Latin.Contains(c)) ? Latin + letters : letters;
     }
 
-    private static (char?[,] Cells, List<WordPlacement> Placements)? TryPlace(List<string> words, int size, List<(int Row, int Column)> directions, Random random)
+    private static (char?[,] Cells, List<WordPlacement> Placements)? TryPlace(
+        List<string> words, int size, List<(int Row, int Column)> directions, bool overlap, Random random)
     {
         var cells = new char?[size, size];
         var placements = new List<WordPlacement>();
         var order = words.Select((w, i) => (Word: w, Index: i, Tie: random.Next())).OrderByDescending(x => x.Word.Length).ThenBy(x => x.Tie);
         foreach (var (word, index, _) in order)
         {
-            var spots = new List<WordPlacement>();
-            foreach (var (rowStep, columnStep) in directions)
+            // Least used axis (horizontal, vertical, diagonal) first, then least used direction on it
+            var byUse = directions
+                .Select(d => (Direction: d, Axis: placements.Count(p => Axis(p.RowStep, p.ColumnStep) == Axis(d.Row, d.Column)),
+                    Same: placements.Count(p => (p.RowStep, p.ColumnStep) == d), Tie: random.Next()))
+                .OrderBy(x => x.Axis).ThenBy(x => x.Same).ThenBy(x => x.Tie)
+                .Select(x => x.Direction);
+            WordPlacement? chosen = null;
+            foreach (var (rowStep, columnStep) in byUse)
             {
+                var spots = new List<WordPlacement>();
                 for (var row = 0; row < size; row++)
                 {
                     for (var column = 0; column < size; column++)
                     {
                         var spot = new WordPlacement(index, row, column, rowStep, columnStep);
-                        if (Fits(cells, size, word, spot))
+                        if (Fits(cells, size, word, spot, overlap))
                         {
                             spots.Add(spot);
                         }
                     }
                 }
+
+                if (spots.Count > 0)
+                {
+                    chosen = spots[random.Next(spots.Count)];
+                    break;
+                }
             }
 
-            if (spots.Count == 0)
+            if (chosen is null)
             {
                 return null;
             }
 
-            var chosen = spots[random.Next(spots.Count)];
             for (var i = 0; i < word.Length; i++)
             {
                 cells[chosen.Row + i * chosen.RowStep, chosen.Column + i * chosen.ColumnStep] = word[i];
@@ -109,7 +123,10 @@ public sealed record WordSearchGrid(IReadOnlyList<string> Rows, IReadOnlyList<Wo
         return (cells, placements.OrderBy(p => p.Word).ToList());
     }
 
-    private static bool Fits(char?[,] cells, int size, string word, WordPlacement spot)
+    /// <summary>0 horizontal, 1 vertical, 2 diagonal.</summary>
+    private static int Axis(int rowStep, int columnStep) => rowStep == 0 ? 0 : columnStep == 0 ? 1 : 2;
+
+    private static bool Fits(char?[,] cells, int size, string word, WordPlacement spot, bool overlap)
     {
         var endRow = spot.Row + (word.Length - 1) * spot.RowStep;
         var endColumn = spot.Column + (word.Length - 1) * spot.ColumnStep;
@@ -120,7 +137,7 @@ public sealed record WordSearchGrid(IReadOnlyList<string> Rows, IReadOnlyList<Wo
 
         for (var i = 0; i < word.Length; i++)
         {
-            if (cells[spot.Row + i * spot.RowStep, spot.Column + i * spot.ColumnStep] is { } letter && letter != word[i])
+            if (cells[spot.Row + i * spot.RowStep, spot.Column + i * spot.ColumnStep] is { } letter && (!overlap || letter != word[i]))
             {
                 return false;
             }

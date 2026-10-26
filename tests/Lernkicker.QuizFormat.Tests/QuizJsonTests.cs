@@ -35,6 +35,20 @@ public class QuizJsonTests
     }
 
     [Fact]
+    public void Word_search_level_is_read_and_written_in_camel_case()
+    {
+        var quiz = _format.Read(File.ReadAllText(Examples.PathOf("other/showcase-all-exercise-types.json")));
+        var wordSearch = Assert.IsType<WordSearchExercise>(quiz.Exercises[^1]);
+
+        Assert.Equal(WordSearchLevel.Medium, wordSearch.Level);
+        Assert.Null(wordSearch.Diagonal);
+        var written = System.Text.Json.JsonSerializer.Serialize(quiz, QuizJson.Options);
+        Assert.Contains("\"level\":\"medium\"", written);
+        Assert.DoesNotContain("allowsDiagonal", written);
+        Assert.True(_format.Parse(written).IsValid);
+    }
+
+    [Fact]
     public void Grade_level_is_optional_for_adult_material()
     {
         var node = JsonNode.Parse(Examples.HsuJson())!.AsObject();

@@ -136,22 +136,44 @@
             break;
 
         case WordSearchSheetDto wordSearch:
-            var foundCells = Draft.Found.Values.SelectMany(c => c).ToHashSet();
-            var missed = Draft.Missed?.ToHashSet() ?? [];
+            var size = wordSearch.Rows.Count;
             <p class="hint" lang="@UiLanguage.Current">@L["Exercise.WordSearchHow"]</p>
-            @* The page CSP forbids inline styles, so the size is a class *@
-            <div class="letter-grid size-@wordSearch.Rows.Count">
-                @for (var r = 0; r < wordSearch.Rows.Count; r++)
-                {
-                    @for (var c = 0; c < wordSearch.Rows[r].Length; c++)
+            <div class="letter-board size-@size">
+                @* Marker lines behind the letters: one cell is one unit, so a cell's centre is (column + 0.5, row + 0.5) *@
+                <svg class="marks" viewBox="0 0 @size @size" preserveAspectRatio="none" aria-hidden="true">
+                    @foreach (var (word, line) in Draft.Found)
                     {
-                        var cell = new Cell(r, c);
-                        var letter = wordSearch.Rows[r][c];
-                        var start = Draft.Start == cell;
-                        <button type="button" class="letter @(foundCells.Contains(cell) ? "found" : "") @(start ? "start" : "") @(missed.Contains(cell) ? "miss" : "")"
-                                aria-pressed="@start" aria-label="@L["Exercise.Letter", letter, r + 1, c + 1]" @onclick="() => Tap(wordSearch, cell)">@letter</button>
+                        <g class="mark color-@(word % 6)">
+                            <line class="edge" x1="@X(line[0])" y1="@Y(line[0])" x2="@X(line[^1])" y2="@Y(line[^1])" />
+                            <line class="fill" x1="@X(line[0])" y1="@Y(line[0])" x2="@X(line[^1])" y2="@Y(line[^1])" />
+                        </g>
                     }
-                }
+                    @if (Draft.Missed is { } miss)
+                    {
+                        <g class="mark miss">
+                            <line class="edge" x1="@X(miss[0])" y1="@Y(miss[0])" x2="@X(miss[^1])" y2="@Y(miss[^1])" />
+                            <line class="fill" x1="@X(miss[0])" y1="@Y(miss[0])" x2="@X(miss[^1])" y2="@Y(miss[^1])" />
+                        </g>
+                    }
+                    @if (Draft.Start is { } first)
+                    {
+                        <circle class="start" cx="@X(first)" cy="@Y(first)" r="0.42" />
+                    }
+                </svg>
+                @* The page CSP forbids inline styles, so the size is a class *@
+                <div class="letter-grid size-@size">
+                    @for (var r = 0; r < wordSearch.Rows.Count; r++)
+                    {
+                        @for (var c = 0; c < wordSearch.Rows[r].Length; c++)
+                        {
+                            var cell = new Cell(r, c);
+                            var letter = wordSearch.Rows[r][c];
+                            var start = Draft.Start == cell;
+                            <button type="button" class="letter @(start ? "start" : "")"
+                                    aria-pressed="@start" aria-label="@L["Exercise.Letter", letter, r + 1, c + 1]" @onclick="() => Tap(wordSearch, cell)">@letter</button>
+                        }
+                    }
+                </div>
             </div>
             <p class="found-count" lang="@UiLanguage.Current" aria-live="polite">@L["Exercise.WordsFound", Draft.Found.Count, wordSearch.Words.Count]</p>
             <ul class="words">
@@ -212,6 +234,10 @@
             Draft.Missed = line;
         }
     }
+
+    private static string X(Cell cell) => (cell.Column + 0.5).ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string Y(Cell cell) => (cell.Row + 0.5).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     private void ClearWordSearch()
     {

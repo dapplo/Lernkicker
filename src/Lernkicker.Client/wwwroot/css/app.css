@@ -246,42 +246,71 @@ input.gap { width: 9em; }
 .letter-grid {
     display: grid;
     gap: 2px;
-    width: min(100%, calc(var(--size) * 44px));
-    margin: 0 auto;
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
 }
-.letter-grid.size-5 { --size: 5; grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.letter-grid.size-6 { --size: 6; grid-template-columns: repeat(6, minmax(0, 1fr)); }
-.letter-grid.size-7 { --size: 7; grid-template-columns: repeat(7, minmax(0, 1fr)); }
-.letter-grid.size-8 { --size: 8; grid-template-columns: repeat(8, minmax(0, 1fr)); }
-.letter-grid.size-9 { --size: 9; grid-template-columns: repeat(9, minmax(0, 1fr)); }
-.letter-grid.size-10 { --size: 10; grid-template-columns: repeat(10, minmax(0, 1fr)); }
-.letter-grid.size-11 { --size: 11; grid-template-columns: repeat(11, minmax(0, 1fr)); }
-.letter-grid.size-12 { --size: 12; grid-template-columns: repeat(12, minmax(0, 1fr)); }
-.letter-grid.size-13 { --size: 13; grid-template-columns: repeat(13, minmax(0, 1fr)); }
-.letter-grid.size-14 { --size: 14; grid-template-columns: repeat(14, minmax(0, 1fr)); }
-.letter-grid.size-15 { --size: 15; grid-template-columns: repeat(15, minmax(0, 1fr)); }
-.letter-grid.size-16 { --size: 16; grid-template-columns: repeat(16, minmax(0, 1fr)); }
-.letter-grid.size-17 { --size: 17; grid-template-columns: repeat(17, minmax(0, 1fr)); }
-.letter-grid.size-18 { --size: 18; grid-template-columns: repeat(18, minmax(0, 1fr)); }
-.letter-grid.size-19 { --size: 19; grid-template-columns: repeat(19, minmax(0, 1fr)); }
-.letter-grid.size-20 { --size: 20; grid-template-columns: repeat(20, minmax(0, 1fr)); }
+.size-5 { --size: 5; }
+.letter-grid.size-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.size-6 { --size: 6; }
+.letter-grid.size-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.size-7 { --size: 7; }
+.letter-grid.size-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.size-8 { --size: 8; }
+.letter-grid.size-8 { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+.size-9 { --size: 9; }
+.letter-grid.size-9 { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+.size-10 { --size: 10; }
+.letter-grid.size-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+.size-11 { --size: 11; }
+.letter-grid.size-11 { grid-template-columns: repeat(11, minmax(0, 1fr)); }
+.size-12 { --size: 12; }
+.letter-grid.size-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.size-13 { --size: 13; }
+.letter-grid.size-13 { grid-template-columns: repeat(13, minmax(0, 1fr)); }
+.size-14 { --size: 14; }
+.letter-grid.size-14 { grid-template-columns: repeat(14, minmax(0, 1fr)); }
+.size-15 { --size: 15; }
+.letter-grid.size-15 { grid-template-columns: repeat(15, minmax(0, 1fr)); }
+.size-16 { --size: 16; }
+.letter-grid.size-16 { grid-template-columns: repeat(16, minmax(0, 1fr)); }
+.size-17 { --size: 17; }
+.letter-grid.size-17 { grid-template-columns: repeat(17, minmax(0, 1fr)); }
+.size-18 { --size: 18; }
+.letter-grid.size-18 { grid-template-columns: repeat(18, minmax(0, 1fr)); }
+.size-19 { --size: 19; }
+.letter-grid.size-19 { grid-template-columns: repeat(19, minmax(0, 1fr)); }
+.size-20 { --size: 20; }
+.letter-grid.size-20 { grid-template-columns: repeat(20, minmax(0, 1fr)); }
 .letter {
+    position: relative;
     aspect-ratio: 1;
     min-width: 0;
     padding: 0;
     border: 1px solid var(--line);
     border-radius: 6px;
-    background: var(--paper);
+    background: transparent;
     color: var(--text);
     font: 700 clamp(0.8rem, calc(70vw / var(--size)), 1.3rem)/1 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
     cursor: pointer;
 }
-.letter.found { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
-.letter.start { background: var(--green); border-color: var(--green-dark); color: #fff; }
-.letter.miss { background: var(--red-light); border-color: var(--red); }
+.letter.start { color: #fff; }
+
+/* Found words get a marker capsule drawn behind their letters (an SVG under the transparent buttons) */
+.letter-board { position: relative; width: min(100%, calc(var(--size) * 44px)); margin: 0 auto; background: var(--paper); border-radius: 8px; }
+.letter-board .letter-grid { position: relative; width: 100%; }
+.marks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.mark line { stroke-linecap: round; }
+.mark .edge { stroke: var(--mark-edge); stroke-width: 0.84; }
+.mark .fill { stroke: var(--mark-fill); stroke-width: 0.7; }
+.mark.color-0 { --mark-edge: #1f8f4e; --mark-fill: #cdebd8; }
+.mark.color-1 { --mark-edge: #2563eb; --mark-fill: #d6e4fd; }
+.mark.color-2 { --mark-edge: #d97706; --mark-fill: #fde9c8; }
+.mark.color-3 { --mark-edge: #7c3aed; --mark-fill: #e7dcfc; }
+.mark.color-4 { --mark-edge: #db2777; --mark-fill: #fbd9e8; }
+.mark.color-5 { --mark-edge: #0e7490; --mark-fill: #cdeef3; }
+.mark.miss { --mark-edge: var(--red); --mark-fill: var(--red-light); }
+.marks .start { fill: var(--green); }
 .found-count { margin: 10px 0 4px; color: var(--muted); }
 .words { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
 .words li.found { color: var(--green-dark); text-decoration: line-through; }

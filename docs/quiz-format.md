@@ -154,20 +154,30 @@ Each question may have an `image`. An option is either a text or a **picture ans
 
 ### `wordSearch`: find the words in a grid of letters
 
-The app hides the `words` in a square grid and fills the rest with random letters. The grid is **new every round**, so practising again means searching again, not remembering positions. The child taps the first and then the last letter of a word (either order works); a found word turns green and is crossed off the list under the grid. Each word is a part.
+The app hides the `words` in a square grid and fills the rest with random letters. The grid is **new every round**, so practising again means searching again, not remembering positions. The child taps the first and then the last letter of a word (either order works); a found word gets a coloured marker drawn around it and is crossed off the list under the grid. Each word is a part.
 
 ```json
 { "id": "grains", "type": "wordSearch", "instruction": "Finde die fünf Getreidesorten.",
   "words": ["Weizen", "Roggen", "Gerste", "Hafer", "Mais"],
-  "diagonal": true }
+  "level": "medium" }
 ```
 
 | Field | Required | Meaning |
 | --- | --- | --- |
 | `words` | yes | 1–15 words, 2–14 letters each. Letters only (umlauts and `ß` are fine), no spaces, hyphens or digits. Shown in upper case in the grid |
 | `size` | no | rows and columns, 5–14. Without it the app picks 8 to 12, enough for the words; 12 still fits a phone. If the words do not fit, the grid grows |
-| `diagonal` | no | default `false`: words run left to right and top to bottom only. With `true` also diagonally |
-| `backwards` | no | default `false`. With `true` words may also run right to left and bottom to top (harder) |
+| `level` | no | `easy` (default), `medium` or `hard`, see below |
+| `diagonal` | no | words may also run diagonally; overrides the level |
+| `backwards` | no | words may also run right to left and bottom to top; overrides the level |
+| `overlap` | no | words may cross and share a letter; overrides the level |
+
+| `level` | Directions | Words cross |
+| --- | --- | --- |
+| `easy` | left to right, top to bottom | no |
+| `medium` | also diagonal (down and up to the right) | yes |
+| `hard` | also backwards: every direction | yes |
+
+For example `"level": "easy", "diagonal": true` gives diagonal words that never cross. The app spreads the words evenly over the directions it may use, so there are about as many horizontal as vertical (and diagonal) words.
 
 The filler letters are the alphabet plus the words' own letters, so an umlaut in the grid does not give a word away. The word list is shuffled like the other parts (see `shuffle`).
 

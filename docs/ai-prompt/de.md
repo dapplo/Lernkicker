@@ -35,7 +35,7 @@ Lernkicker lehnt eine Datei ab, die eine dieser Regeln verletzt:
 - `matching`: Die `answer` jeder Zeile ist genau eine der `options`.
 - `multipleChoice`: `correct` ist der Index (ab 0) der richtigen Antwort oder eine Liste von Indizes; jeder Index zeigt auf eine vorhandene Antwort. 2–6 Antworten.
 - `ordering`: Liste die `steps` in der **richtigen** Reihenfolge auf; die App mischt sie.
-- `wordSearch`: `words` bestehen nur aus Buchstaben (Umlaute und ß sind erlaubt), ohne Leerzeichen oder Bindestriche, 2–14 Buchstaben, jedes Wort nur einmal. Die App baut jede Runde ein neues Gitter; für ältere Kinder `diagonal: true` setzen.
+- `wordSearch`: `words` bestehen nur aus Buchstaben (Umlaute und ß sind erlaubt), ohne Leerzeichen oder Bindestriche, 2–14 Buchstaben, jedes Wort nur einmal. Die App baut jede Runde ein neues Gitter; für ältere Kinder `"level": "medium"` (schräg, Wörter kreuzen sich) oder `"hard"` (auch rückwärts) setzen; das voreingestellte `easy` passt für die Klassen 1–3.
 - Aufgaben-Ids sind innerhalb einer Probe eindeutig, Block-Ids innerhalb eines Lernstoffs.
 - Eine Probe hat höchstens 50 Aufgaben; eine Lernstoff-Datei ist höchstens 256 KB groß.
 
