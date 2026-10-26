@@ -93,6 +93,22 @@ public static class MessageTexts
         return args.Length == 0 ? text : string.Format(culture, text, args);
     }
 
-    // The English texts are the neutral resources
-    private static CultureInfo Culture(string language) => language == "en" ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(language);
+    // The English texts are the neutral resources. A culture the runtime does not know (globalization-invariant
+    // mode, or an odd language code) falls back to them rather than stopping the bot.
+    private static CultureInfo Culture(string language)
+    {
+        if (language == "en")
+        {
+            return CultureInfo.InvariantCulture;
+        }
+
+        try
+        {
+            return CultureInfo.GetCultureInfo(language);
+        }
+        catch (CultureNotFoundException)
+        {
+            return CultureInfo.InvariantCulture;
+        }
+    }
 }
