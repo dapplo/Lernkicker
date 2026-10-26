@@ -166,13 +166,36 @@ public sealed record WordSearchExercise : Exercise
     /// <summary>Rows and columns of the grid; null picks a size that fits the words.</summary>
     public int? Size { get; init; }
 
-    /// <summary>Words may also run diagonally.</summary>
-    public bool Diagonal { get; init; }
+    /// <summary>Sets which directions are used and whether words may cross; the three switches below override it.</summary>
+    public WordSearchLevel Level { get; init; } = WordSearchLevel.Easy;
 
-    /// <summary>Words may also run backwards (right to left, bottom to top).</summary>
-    public bool Backwards { get; init; }
+    /// <summary>Words may also run diagonally; null takes it from <see cref="Level"/> (medium and up).</summary>
+    public bool? Diagonal { get; init; }
+
+    /// <summary>Words may also run backwards (right to left, bottom to top); null takes it from <see cref="Level"/> (hard).</summary>
+    public bool? Backwards { get; init; }
+
+    /// <summary>Words may cross and share a letter; null takes it from <see cref="Level"/> (medium and up).</summary>
+    public bool? Overlap { get; init; }
+
+    public bool AllowsDiagonal => Diagonal ?? Level >= WordSearchLevel.Medium;
+
+    public bool AllowsBackwards => Backwards ?? Level >= WordSearchLevel.Hard;
+
+    public bool AllowsOverlap => Overlap ?? Level >= WordSearchLevel.Medium;
 
     public override int PartCount => Words.Count;
+}
+
+/// <summary>
+/// How hard a word search is. Easy: left to right and top to bottom, words never cross. Medium: also diagonal,
+/// words may cross. Hard: also backwards.
+/// </summary>
+public enum WordSearchLevel
+{
+    Easy,
+    Medium,
+    Hard,
 }
 
 public sealed record Gap(IReadOnlyList<string> Answers);

@@ -21,6 +21,7 @@ public class WordSearchTests
     [InlineData(2, true, false)]
     [InlineData(3, true, true)]
     [InlineData(4, false, true)]
+    [InlineData(5, true, true)]
     public void Every_word_can_be_read_where_it_was_placed(int seed, bool diagonal, bool backwards)
     {
         var exercise = Grains with { Diagonal = diagonal, Backwards = backwards };
@@ -36,6 +37,54 @@ public class WordSearchTests
             Assert.True(diagonal || p.RowStep == 0 || p.ColumnStep == 0);
             Assert.True(backwards || (p.RowStep >= 0 && p.ColumnStep >= 0) || (p.RowStep == -1 && p.ColumnStep == 1));
         }
+    }
+
+    [Theory]
+    [InlineData(WordSearchLevel.Easy, false, false, false)]
+    [InlineData(WordSearchLevel.Medium, true, false, true)]
+    [InlineData(WordSearchLevel.Hard, true, true, true)]
+    public void The_level_sets_directions_and_overlaps(WordSearchLevel level, bool diagonal, bool backwards, bool overlap)
+    {
+        var exercise = Grains with { Level = level };
+
+        Assert.Equal((diagonal, backwards, overlap), (exercise.AllowsDiagonal, exercise.AllowsBackwards, exercise.AllowsOverlap));
+    }
+
+    [Fact]
+    public void A_switch_overrides_the_level()
+    {
+        var exercise = Grains with { Level = WordSearchLevel.Hard, Overlap = false };
+
+        Assert.False(exercise.AllowsOverlap);
+        Assert.True(exercise.AllowsBackwards);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void Without_overlap_no_letter_is_shared(int seed)
+    {
+        var grid = WordSearchGrid.Generate(Grains with { Diagonal = true }, new Random(seed));
+
+        var cells = grid.Placements.SelectMany(p => Enumerable.Range(0, WordSearchGrid.Letters(Grains.Words[p.Word]).Length)
+            .Select(i => (p.Row + i * p.RowStep, p.Column + i * p.ColumnStep))).ToList();
+        Assert.Equal(cells.Count, cells.Distinct().Count());
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    public void Directions_are_balanced(int seed)
+    {
+        var easy = WordSearchGrid.Generate(Grains with { Words = [.. Grains.Words, "Reis", "Hirse", "Emmer"] }, new Random(seed));
+        var medium = WordSearchGrid.Generate(Grains with { Level = WordSearchLevel.Medium, Words = [.. Grains.Words, "Reis", "Hirse"] }, new Random(seed));
+
+        Assert.Equal(5, easy.Placements.Count(p => p.RowStep == 0));
+        Assert.Equal(5, easy.Placements.Count(p => p.ColumnStep == 0));
+        Assert.All(new[] { 0, 1, 2 }, axis => Assert.Equal(3, medium.Placements.Count(p => (p.RowStep == 0 ? 0 : p.ColumnStep == 0 ? 1 : 2) == axis)));
     }
 
     [Fact]

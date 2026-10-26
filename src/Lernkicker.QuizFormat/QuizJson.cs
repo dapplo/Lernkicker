@@ -61,7 +61,7 @@ public sealed class QuizJson : IQuizFormat
             AllowOutOfOrderMetadataProperties = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             TypeInfoResolver = resolver,
-            Converters = { new ChoiceOptionConverter() },
+            Converters = { new ChoiceOptionConverter(), new JsonStringEnumConverter<WordSearchLevel>(JsonNamingPolicy.CamelCase) },
         };
     }
 
@@ -97,7 +97,7 @@ public sealed class QuizJson : IQuizFormat
         }
 
         // Computed properties are not part of the format
-        foreach (var computed in info.Properties.Where(p => p.Name is "maxPoints" or "partCount" or "gapsInText").ToList())
+        foreach (var computed in info.Properties.Where(p => p.Name is "maxPoints" or "partCount" or "gapsInText" or "allowsDiagonal" or "allowsBackwards" or "allowsOverlap").ToList())
         {
             info.Properties.Remove(computed);
         }
