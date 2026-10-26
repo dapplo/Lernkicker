@@ -1,0 +1,44 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+
+@* The menu of the parent pages: a bar at the bottom on phones, a row at the top on wide screens *@
+<nav class="parents-tabs" aria-label="@L["Nav.Label"]">
+    @foreach (var (href, icon, text) in Items)
+    {
+        <a href="@href" class="@(IsActive(href) ? "on" : "")" aria-current="@(IsActive(href) ? "page" : null)">
+            <span class="icon" aria-hidden="true">@icon</span>
+            <span class="text">@L[text]</span>
+        </a>
+    }
+</nav>
+
+@code {
+    private static readonly (string Href, string Icon, string Text)[] Items =
+    [
+        ("parents", "🏠", "Nav.Overview"),
+        ("parents/calendar", "📅", "Nav.Calendar"),
+        ("parents/quizzes", "📝", "Nav.Quizzes"),
+        ("parents/lessons", "📚", "Nav.Lessons"),
+        ("parents/library", "🌍", "Nav.Library"),
+        ("parents/account", "⚙️", "Nav.Account"),
+    ];
+
+    protected override void OnInitialized() => Navigation.LocationChanged += Changed;
+
+    /// <summary>A child's page belongs to the overview, the admin page to the account.</summary>
+    private bool IsActive(string href)
+    {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].TrimEnd('/');
+        var section = path switch
+        {
+            "admin" => "parents/account",
+            _ when path.StartsWith("parents/children/") => "parents",
+            _ => path,
+        };
+        return section == href;
+    }
+
+    private void Changed(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e) => StateHasChanged();
+
+    public void Dispose() => Navigation.LocationChanged -= Changed;
+}

@@ -262,7 +262,6 @@ input.gap { width: 9em; }
 
 .box { background: var(--paper); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; box-shadow: 0 1px 3px rgb(0 0 0 / 8%); }
 .box > summary { font-weight: 700; cursor: pointer; }
-.parents-nav { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 20px; }
 
 .list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .list li {
@@ -420,3 +419,139 @@ input.gap { width: 9em; }
     z-index: 10;
 }
 #blazor-error-ui .dismiss { position: absolute; right: 16px; cursor: pointer; }
+
+/* Parents' menu: a row at the top; a bar at the bottom on phones held upright */
+.parents-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 0 0 12px;
+    padding: 4px;
+    border-radius: var(--radius);
+    background: var(--paper);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+    overflow-x: auto;
+}
+.parents-tabs a {
+    flex: 1 0 auto;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.parents-tabs a.on { background: var(--green-light); color: var(--green-dark); }
+@media (max-width: 699px) and (min-height: 500px) {
+    .parents-tabs {
+        position: fixed;
+        inset: auto 0 0 0;
+        z-index: 10;
+        margin: 0;
+        padding: 4px 4px max(4px, env(safe-area-inset-bottom));
+        border-radius: 0;
+        box-shadow: 0 -1px 4px rgb(0 0 0 / 10%);
+        overflow: visible;
+    }
+    .parents-tabs a { flex: 1 1 0; flex-direction: column; gap: 0; min-width: 0; padding: 4px 1px; font-size: 0.66rem; }
+    .parents-tabs .icon { font-size: 1.25rem; line-height: 1.3; }
+    .parents-tabs .text { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+    .page:has(.parents-tabs) { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+}
+
+/* Tabs within a page, e.g. a child's page */
+.tabs { display: flex; gap: 6px; margin: 4px 0 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.tabs button {
+    flex: none;
+    min-height: 44px;
+    padding: 6px 14px;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--text);
+    cursor: pointer;
+}
+.tabs button.on { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+
+/* Month view */
+.month-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.month-head h2 { margin: 0; text-transform: capitalize; }
+.month-head .btn { min-width: 48px; padding: 6px 12px; font-size: 1.3rem; }
+.month-today { margin: 4px 0 0; text-align: center; }
+.month-today .btn { min-height: 36px; padding: 4px 14px; }
+.month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; margin: 12px 0; }
+.month-grid .weekday { text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+.month-grid .day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-height: 52px;
+    padding: 4px 0;
+    font: inherit;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: var(--background);
+    color: var(--text);
+    cursor: pointer;
+}
+.month-grid .day.other { opacity: 0.45; }
+.month-grid .day.today .number { background: var(--green); color: #fff; border-radius: 999px; padding: 0 6px; }
+.month-grid .day.selected { border-color: var(--green); background: var(--green-light); }
+.month-grid .number { font-size: 0.95rem; font-weight: 600; }
+.month-grid .marks { font-size: 0.75rem; line-height: 1; letter-spacing: -0.1em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chips button {
+    min-height: 36px;
+    padding: 4px 12px;
+    font: inherit;
+    font-size: 0.9rem;
+    border: 2px solid var(--line);
+    border-left-width: 8px;
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: line-through;
+}
+.chips button.on { color: var(--text); font-weight: 600; text-decoration: none; }
+.child-0 { border-left-color: var(--math) !important; }
+.child-1 { border-left-color: var(--german) !important; }
+.child-2 { border-left-color: var(--gold) !important; }
+.child-3 { border-left-color: var(--english) !important; }
+
+/* Wider screens: tablets and desktop browsers */
+@media (min-width: 700px) {
+    .cards { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+    .month-grid .day { min-height: 68px; }
+    .month-grid .marks { font-size: 0.95rem; }
+}
+@media (min-width: 760px) {
+    .page:has(.parents-tabs) { max-width: 1100px; }
+    .month { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; align-items: start; }
+    .month-day h3 { margin-top: 8px; }
+}
+@media (min-width: 960px) {
+    .overview { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; align-items: start; }
+}
+
+/* Phones held sideways: little height, so less padding and smaller keys */
+@media (max-height: 499px) and (orientation: landscape) {
+    .header { padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: 6px; padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)); }
+    .page { padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)); }
+    .loading { min-height: 60vh; }
+    .keys { gap: 8px; }
+    .keys button { min-height: 48px; width: 52px; font-size: 1.3rem; }
+    .pin-pad { margin-block: 8px; }
+    .month-grid .day { min-height: 44px; }
+}
+
+.table-scroll { overflow-x: auto; }

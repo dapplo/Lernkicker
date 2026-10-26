@@ -21,58 +21,72 @@ else if (_me is null)
 }
 else
 {
+    <ParentsNav />
     <h1>@L["Home.Hello", _me.Name]</h1>
     <p class="subtitle">@_me.Family</p>
 
-    <nav class="parents-nav">
-        <a class="btn" href="parents/quizzes">@L["Parents.ManageQuizzes"]</a>
-        <a class="btn" href="parents/lessons">@L["Parents.ManageLessons"]</a>
-        <a class="btn" href="parents/library">@L["Parents.Library"]</a>
-        @if (_me.IsAdmin)
+    <div class="overview">
+        <section>
+            <h2>@L["Parents.Children"]</h2>
+            @if (_children.Count == 0)
+            {
+                <p>@L["Parents.NoChildren"]</p>
+            }
+            <ul class="cards">
+                @foreach (var child in _children)
+                {
+                    <li>
+                        <a class="card" href="parents/children/@child.Id">
+                            <span class="title">@child.Name</span>
+                            <span class="subject">@(child.GradeLevel is { } grade ? L["Common.Grade", grade] : "")</span>
+                            <span class="due">@(child.Devices switch { 0 => L["Parents.NoDevice"], 1 => L["Parents.OneDevice"], var n => L["Parents.Devices", n] })</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+
+            <details class="box">
+                <summary>@L["Parents.AddChild"]</summary>
+                <form class="form" @onsubmit="AddChild" @onsubmit:preventDefault>
+                    <label>@L["Child.Name"] <input @bind="_newName" maxlength="50" required /></label>
+                    <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_newGrade" /></label>
+                    <label>@L["Child.Pin"] <input inputmode="numeric" pattern="[0-9]{4}" maxlength="4" @bind="_newPin" required /></label>
+                    <p class="hint">@L["Parents.AddChildHint"]</p>
+                    <Messages Errors="@_childErrors" />
+                    <button class="btn" type="submit" disabled="@_busy">@L["Common.Add"]</button>
+                </form>
+            </details>
+        </section>
+
+        @if (_children.Count > 0)
         {
-            <a class="btn quiet" href="admin">@L["Admin.Title"]</a>
+            <section>
+                <h2>@L["Home.NextDates"]</h2>
+                @if (_upcoming.Count == 0)
+                {
+                    <p class="hint">@L["Calendar.Empty"]</p>
+                }
+                <ul class="dates">
+                    @foreach (var (child, entry) in _upcoming)
+                    {
+                        <li>
+                            <span class="icon" aria-hidden="true">@Display.KindIcon(entry.Kind)</span>
+                            <span class="when">@Display.Due(entry.Date)@(Display.Times(entry.StartTime, entry.EndTime) is { Length: > 0 } times ? " · " + times : "")@(_children.Count > 1 ? " · " + child.Name : "")</span>
+                            <span class="what">@entry.Title</span>
+                        </li>
+                    }
+                </ul>
+                <p><a class="btn quiet" href="parents/calendar">@L["Parents.ToCalendar"]</a></p>
+            </section>
         }
-    </nav>
-
-    <h2>@L["Parents.Children"]</h2>
-    @if (_children.Count == 0)
-    {
-        <p>@L["Parents.NoChildren"]</p>
-    }
-    <ul class="cards">
-        @foreach (var child in _children)
-        {
-            <li>
-                <a class="card" href="parents/children/@child.Id">
-                    <span class="title">@child.Name</span>
-                    <span class="subject">@(child.GradeLevel is { } grade ? L["Common.Grade", grade] : "")</span>
-                    <span class="due">@(child.Devices switch { 0 => L["Parents.NoDevice"], 1 => L["Parents.OneDevice"], var n => L["Parents.Devices", n] })</span>
-                </a>
-            </li>
-        }
-    </ul>
-
-    <details class="box">
-        <summary>@L["Parents.AddChild"]</summary>
-        <form class="form" @onsubmit="AddChild" @onsubmit:preventDefault>
-            <label>@L["Child.Name"] <input @bind="_newName" maxlength="50" required /></label>
-            <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_newGrade" /></label>
-            <label>@L["Child.Pin"] <input inputmode="numeric" pattern="[0-9]{4}" maxlength="4" @bind="_newPin" required /></label>
-            <p class="hint">@L["Parents.AddChildHint"]</p>
-            <Messages Errors="@_childErrors" />
-            <button class="btn" type="submit" disabled="@_busy">@L["Common.Add"]</button>
-        </form>
-    </details>
-
-    <TelegramSection />
-
-    <p><button class="btn quiet" @onclick="Logout">@L["Common.Logout"]</button> <a href="privacy">@L["Privacy.Title"]</a></p>
+    </div>
 }
 
 @code {
     private bool _loaded;
     private Me? _me;
     private List<ChildOverview> _children = [];
+    private List<(ChildOverview Child, CalendarEntryDto Entry)> _upcoming = [];
     private string _email = "", _password = "";
     private string _newName = "", _newPin = "";
     private int? _newGrade = 4;
@@ -95,6 +109,19 @@ else
         }
 
         _children = _me is null ? [] : await Api.Children();
+        await LoadUpcoming();
+    }
+
+    /// <summary>The next dates of all children for the coming two weeks.</summary>
+    private async Task LoadUpcoming()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var loaded = await Task.WhenAll(_children.Select(async child =>
+            (await Api.Calendar(child.Id, today, today.AddDays(14))).Select(entry => (child, entry))));
+        _upcoming = loaded.SelectMany(e => e)
+            .OrderBy(e => e.entry.Date).ThenBy(e => e.entry.StartTime ?? TimeOnly.MinValue)
+            .Take(6)
+            .ToList();
     }
 
     private async Task Login()
@@ -126,6 +153,7 @@ else
             await Api.CreateChild(new NewChild(_newName, _newGrade, _newPin));
             _newName = _newPin = "";
             _children = await Api.Children();
+            await LoadUpcoming();
         }
         catch (ApiException e)
         {
@@ -135,12 +163,5 @@ else
         {
             _busy = false;
         }
-    }
-
-    private async Task Logout()
-    {
-        await Api.Logout();
-        _me = null;
-        _children = [];
     }
 }

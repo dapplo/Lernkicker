@@ -121,6 +121,7 @@ public sealed class Api(HttpClient http)
 
     // Calendar (for parents)
     public Task<List<CalendarEntryDto>> Calendar(Guid id) => Get<List<CalendarEntryDto>>($"api/children/{id}/calendar");
+    public Task<List<CalendarEntryDto>> Calendar(Guid id, DateOnly from, DateOnly to) => Get<List<CalendarEntryDto>>($"api/children/{id}/calendar?from={from:yyyy-MM-dd}&to={to:yyyy-MM-dd}");
     public Task<CalendarEntryDto> AddEvent(Guid id, EventRequest request) => Send<CalendarEntryDto>(HttpMethod.Post, $"api/children/{id}/calendar", request);
     public Task<CalendarEntryDto> UpdateEvent(Guid id, Guid eventId, EventRequest request) => Send<CalendarEntryDto>(HttpMethod.Put, $"api/children/{id}/calendar/{eventId}", request);
     public Task DeleteEvent(Guid id, Guid eventId) => Send(HttpMethod.Delete, $"api/children/{id}/calendar/{eventId}");
