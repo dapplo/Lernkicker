@@ -29,6 +29,9 @@
   <data name="Home.Locked" xml:space="preserve"><value>Die PIN war zu oft falsch. Deine Eltern können das Handy in Lernkicker wieder freigeben.</value></data>
   <data name="Home.TryAgain" xml:space="preserve"><value>Nochmal versuchen</value></data>
   <data name="Home.EnterPin" xml:space="preserve"><value>Gib deine PIN ein.</value></data>
+  <data name="Home.NotMe" xml:space="preserve"><value>Nicht {0}?</value></data>
+  <data name="Home.NotMeQuestion" xml:space="preserve"><value>Ist das nicht das Handy von {0}? Dann wird es getrennt, und deine Eltern können es mit einem neuen Code wieder verbinden.</value></data>
+  <data name="Home.NotMeYes" xml:space="preserve"><value>Ja, trennen</value></data>
   <data name="Home.NothingToDo" xml:space="preserve"><value>Gerade gibt es nichts zu üben. Zeit zum Kicken!</value></data>
   <data name="Home.WhatToPractice" xml:space="preserve"><value>Was möchtest du üben?</value></data>
   <data name="Home.TestOn" xml:space="preserve"><value>Probe {0}</value></data>

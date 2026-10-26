@@ -260,6 +260,46 @@ public sealed class FlowTests(LernkickerFactory factory) : IClassFixture<Lernkic
     }
 
     [Fact]
+    public async Task Removed_phone_shows_the_pairing_form_again()
+    {
+        var parent = await factory.NewFamilyAsync("j2@example.org");
+        var child = await TestData.CreateChildAsync(parent);
+        var pairing = await LernkickerFactory.Json<PairingCodeResponse>(await parent.PostAsync($"/api/children/{child.Id}/pairing", null));
+        var phone = factory.Client();
+        await phone.PostAsJsonAsync("/api/device/pair", new PairDevice(pairing.Code, null));
+
+        var device = Assert.Single(await LernkickerFactory.Json<List<DeviceOverview>>(await parent.GetAsync($"/api/children/{child.Id}/devices")));
+        await parent.DeleteAsync($"/api/children/{child.Id}/devices/{device.Id}");
+
+        Assert.False((await LernkickerFactory.Json<DeviceStatusResponse>(await phone.GetAsync("/api/device/status"))).Paired);
+        Assert.Equal(ErrorCodes.DeviceNotPaired, (await LernkickerFactory.Error(await phone.PostAsJsonAsync("/api/device/login", new PinLogin("1234")), HttpStatusCode.Unauthorized)).Code);
+    }
+
+    [Fact]
+    public async Task Phone_paired_for_the_wrong_child_can_unpair_itself()
+    {
+        var parent = await factory.NewFamilyAsync("j3@example.org");
+        var wrong = await TestData.CreateChildAsync(parent, "Mia", "4321");
+        var right = await TestData.CreateChildAsync(parent);
+        var pairing = await LernkickerFactory.Json<PairingCodeResponse>(await parent.PostAsync($"/api/children/{wrong.Id}/pairing", null));
+        var phone = factory.Client();
+        await phone.PostAsJsonAsync("/api/device/pair", new PairDevice(pairing.Code, null));
+        Assert.Equal("Mia", (await LernkickerFactory.Json<DeviceStatusResponse>(await phone.GetAsync("/api/device/status"))).ChildName);
+
+        // Unpairing works from the PIN screen, without knowing the PIN
+        Assert.Equal(HttpStatusCode.NoContent, (await phone.PostAsync("/api/device/unpair", null)).StatusCode);
+
+        Assert.False((await LernkickerFactory.Json<DeviceStatusResponse>(await phone.GetAsync("/api/device/status"))).Paired);
+        Assert.Empty(await LernkickerFactory.Json<List<DeviceOverview>>(await parent.GetAsync($"/api/children/{wrong.Id}/devices")));
+
+        // ...and the phone can be paired for the right child
+        var again = await LernkickerFactory.Json<PairingCodeResponse>(await parent.PostAsync($"/api/children/{right.Id}/pairing", null));
+        var status = await LernkickerFactory.Json<DeviceStatusResponse>(await phone.PostAsJsonAsync("/api/device/pair", new PairDevice(again.Code, null)));
+        Assert.Equal("Calvin", status.ChildName);
+        Assert.Equal(HttpStatusCode.NoContent, (await phone.PostAsJsonAsync("/api/device/login", new PinLogin("1234"))).StatusCode);
+    }
+
+    [Fact]
     public async Task New_version_takes_over_assignments_and_delete_archives_with_results()
     {
         var parent = await factory.NewFamilyAsync("k@example.org");

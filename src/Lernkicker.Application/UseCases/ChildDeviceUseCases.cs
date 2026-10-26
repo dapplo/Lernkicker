@@ -62,6 +62,19 @@ public sealed class ChildDeviceUseCases(IChildRepository children, IPinHasher pi
         return new ChildSession(child.FamilyId, child.Id, device.Id, child.Name);
     }
 
+    /// <summary>Forgets the pairing from the device itself, e.g. when it was paired for the wrong child.</summary>
+    public async Task UnpairAsync(string? token)
+    {
+        var device = await DeviceAsync(token);
+        if (device is null)
+        {
+            return;
+        }
+
+        children.Remove(device);
+        await unitOfWork.SaveChangesAsync();
+    }
+
     public Task<bool> IsDeviceActiveAsync(Guid deviceId) => children.IsDeviceActiveAnyFamilyAsync(deviceId);
 
     /// <summary>False once the profile is deleted or no longer the parent's own.</summary>

@@ -29,6 +29,9 @@
   <data name="Home.Locked" xml:space="preserve"><value>The PIN was wrong too often. Your parents can unlock this phone in Lernkicker.</value></data>
   <data name="Home.TryAgain" xml:space="preserve"><value>Try again</value></data>
   <data name="Home.EnterPin" xml:space="preserve"><value>Enter your PIN.</value></data>
+  <data name="Home.NotMe" xml:space="preserve"><value>Not {0}?</value></data>
+  <data name="Home.NotMeQuestion" xml:space="preserve"><value>Is this not {0}'s phone? It will be disconnected, and a parent can connect it again with a new code.</value></data>
+  <data name="Home.NotMeYes" xml:space="preserve"><value>Yes, disconnect</value></data>
   <data name="Home.NothingToDo" xml:space="preserve"><value>Nothing to practise right now. Time to play football!</value></data>
   <data name="Home.WhatToPractice" xml:space="preserve"><value>What would you like to practise?</value></data>
   <data name="Home.TestOn" xml:space="preserve"><value>Test {0}</value></data>
