@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/dapplo/lernkicker/main/schema/lesson-v1.schema.json",
   "title": "Lernkicker learning material (lesson/v1)",
-  "description": "Learning material for Lernkicker: text, a poem to learn by heart, flashcards, key facts. See docs/lesson-format.md.",
+  "description": "Learning material for Lernkicker: text, a poem to learn by heart, flashcards, key facts, or a guide to look things up in. See docs/lesson-format.md.",
   "type": "object",
   "required": ["format", "id", "title", "subject", "gradeLevel", "blocks"],
   "additionalProperties": false,
@@ -31,6 +31,11 @@
     "topic": { "type": "string", "maxLength": 120 },
     "description": { "type": "string", "maxLength": 500 },
     "source": { "type": "string", "maxLength": 200, "description": "Where the material comes from, e.g. a worksheet." },
+    "mode": {
+      "enum": ["learn", "reference"],
+      "default": "learn",
+      "description": "'learn': the child marks each part as known. 'reference': something to look things up in (e.g. the rules of a game): no 'I know this' marks, a list of the parts at the top to jump to."
+    },
     "blocks": {
       "type": "array",
       "minItems": 1,
@@ -44,14 +49,15 @@
       "type": "object",
       "required": ["id", "type"],
       "properties": {
-        "type": { "enum": ["text", "poem", "flashcards", "facts", "image"] }
+        "type": { "enum": ["text", "poem", "flashcards", "facts", "image", "entries"] }
       },
       "allOf": [
         { "if": { "properties": { "type": { "const": "text" } } }, "then": { "$ref": "#/$defs/text" } },
         { "if": { "properties": { "type": { "const": "poem" } } }, "then": { "$ref": "#/$defs/poem" } },
         { "if": { "properties": { "type": { "const": "flashcards" } } }, "then": { "$ref": "#/$defs/flashcards" } },
         { "if": { "properties": { "type": { "const": "facts" } } }, "then": { "$ref": "#/$defs/facts" } },
-        { "if": { "properties": { "type": { "const": "image" } } }, "then": { "$ref": "#/$defs/imageBlock" } }
+        { "if": { "properties": { "type": { "const": "image" } } }, "then": { "$ref": "#/$defs/imageBlock" } },
+        { "if": { "properties": { "type": { "const": "entries" } } }, "then": { "$ref": "#/$defs/entries" } }
       ]
     },
     "blockId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 32 },
@@ -118,6 +124,29 @@
         "title": { "$ref": "#/$defs/blockTitle" },
         "items": { "type": "array", "minItems": 1, "maxItems": 30, "items": { "$ref": "#/$defs/line" } },
         "image": { "$ref": "#/$defs/image", "description": "A picture shown above the facts." }
+      }
+    },
+    "entries": {
+      "description": "Things to look up, e.g. what each card of a game does: each entry has a name, a short text and optionally a picture. The app shows them as a compact list with a search field.",
+      "required": ["id", "type", "entries"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/blockId" },
+        "type": true,
+        "title": { "$ref": "#/$defs/blockTitle" },
+        "entries": {
+          "type": "array", "minItems": 1, "maxItems": 100,
+          "items": {
+            "type": "object",
+            "required": ["name", "text"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+              "text": { "type": "string", "minLength": 1, "maxLength": 2000, "description": "Same formatting as a text block: paragraphs, '- ' lists, **bold**, *italic*." },
+              "image": { "$ref": "#/$defs/image", "description": "A small picture next to the entry." }
+            }
+          }
+        }
       }
     },
     "imageBlock": {

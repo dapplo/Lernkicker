@@ -71,7 +71,7 @@ else
                         {
                             <span class="due">@L["Lessons.Until", Display.Due(due)]</span>
                         }
-                        <span class="known">@L["Home.Known", lesson.KnownBlocks, lesson.Blocks]</span>
+                        <span class="known">@(lesson.Mode == "reference" ? L["Home.Reference"] : L["Home.Known", lesson.KnownBlocks, lesson.Blocks])</span>
                     </a>
                 </li>
             }

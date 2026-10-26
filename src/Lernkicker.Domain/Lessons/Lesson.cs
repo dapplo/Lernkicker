@@ -17,11 +17,21 @@ public sealed record Lesson
     public string? Topic { get; init; }
     public string? Description { get; init; }
     public string? Source { get; init; }
+
+    /// <summary><see cref="LessonModes.Learn"/> (marked as known part by part) or <see cref="LessonModes.Reference"/> (looked up, e.g. game rules).</summary>
+    public string Mode { get; init; } = LessonModes.Learn;
+
     public required IReadOnlyList<LessonBlock> Blocks { get; init; }
 
     /// <summary>Every picture the lesson names, in file order.</summary>
     public IEnumerable<ImageUse> Images() =>
         Blocks.SelectMany((block, i) => block.Images($"blocks/{i}"));
+}
+
+public static class LessonModes
+{
+    public const string Learn = "learn";
+    public const string Reference = "reference";
 }
 
 public abstract record LessonBlock
@@ -89,6 +99,25 @@ public sealed record FactsBlock : LessonBlock
     public override IEnumerable<ImageUse> Images(string path) => Image is null ? [] : [new ImageUse($"{path}/image", Image)];
 }
 
+/// <summary>Things to look up, e.g. what each card of a game does: a name, a short text and a picture each; the app can filter them.</summary>
+public sealed record EntriesBlock : LessonBlock
+{
+    public required IReadOnlyList<LessonEntry> Entries { get; init; }
+
+    public override IEnumerable<ImageUse> Images(string path)
+    {
+        for (var i = 0; i < Entries.Count; i++)
+        {
+            if (Entries[i].Image is { } image)
+            {
+                yield return new ImageUse($"{path}/entries/{i}/image", image);
+            }
+        }
+    }
+}
+
+public sealed record LessonEntry(string Name, string Text, ImageRef? Image = null);
+
 public static class LessonLimits
 {
     public const int MaxBytes = 256 * 1024;
@@ -118,6 +147,9 @@ public sealed class StoredLesson : IFamilyOwned
     public string Subject { get; private set; }
     public int GradeLevel { get; private set; }
     public string? Topic { get; private set; }
+
+    /// <summary>The lesson's <see cref="LessonModes">mode</see>, so lists need not read the file.</summary>
+    public string Mode { get; private set; } = LessonModes.Learn;
 
     /// <summary>Number of blocks, so lists need not read the file.</summary>
     public int BlockCount { get; private set; }
@@ -151,6 +183,7 @@ public sealed class StoredLesson : IFamilyOwned
         Subject = lesson.Subject;
         GradeLevel = lesson.GradeLevel;
         Topic = lesson.Topic;
+        Mode = lesson.Mode;
         BlockCount = lesson.Blocks.Count;
         Source = source;
         UploadedAt = uploadedAt;
