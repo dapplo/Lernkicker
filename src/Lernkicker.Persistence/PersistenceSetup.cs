@@ -29,6 +29,7 @@ public static class PersistenceSetup
         services.AddScoped<IPracticeRepository, PracticeRepository>();
         services.AddScoped<ICalendarRepository, CalendarRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
+        services.AddScoped<IImageStore, ImageStore>();
         services.AddScoped<ITelegramRepository, TelegramRepository>();
         services.AddScoped<IServerSecrets, ServerSecrets>();
         services.AddScoped<IServerSettings, ServerSettings>();

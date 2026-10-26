@@ -8,7 +8,11 @@
             @switch (block.Type)
             {
                 case "text":
+                    <Picture Image="@block.Image" />
                     <TextView Text="@(block.Text!)" />
+                    break;
+                case "image":
+                    <Picture Image="@block.Image" Class="large" />
                     break;
                 case "poem":
                     <PoemView Block="@block" />
@@ -17,6 +21,7 @@
                     <FlashcardsView Cards="@(block.Cards!)" />
                     break;
                 case "facts":
+                    <Picture Image="@block.Image" />
                     <ul class="facts">
                         @foreach (var item in block.Items!)
                         {

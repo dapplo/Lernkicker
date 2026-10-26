@@ -30,6 +30,9 @@ public static class Policies
     public const string Admin = nameof(Admin);
     public const string Child = nameof(Child);
 
+    /// <summary>A parent or a child: whoever may look at the family's quizzes and lessons (their pictures).</summary>
+    public const string Viewer = nameof(Viewer);
+
     /// <summary>Calendar feeds and subscription imports (which fetch from the internet).</summary>
     public const string Calendar = nameof(Calendar);
 }

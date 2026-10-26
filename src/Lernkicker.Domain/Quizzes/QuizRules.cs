@@ -20,6 +20,10 @@ public static class QuizIssueCodes
     public const string GapNotInWordBank = "gapNotInWordBank";
     public const string AnswerNotInOptions = "answerNotInOptions";
     public const string CorrectOutOfRange = "correctOutOfRange";
+    public const string MissingImage = "missingImage";
+    public const string ImageType = "imageType";
+    public const string ImageTooLarge = "imageTooLarge";
+    public const string ImagesTooLarge = "imagesTooLarge";
 }
 
 /// <summary>Content rules that JSON Schema cannot express (same rules as tools/validate_quizzes.py).</summary>

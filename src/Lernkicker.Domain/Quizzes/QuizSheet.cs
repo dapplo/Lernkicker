@@ -1,3 +1,5 @@
+using Lernkicker.Domain.Media;
+
 namespace Lernkicker.Domain.Quizzes;
 
 /// <summary>
@@ -15,6 +17,12 @@ public sealed record QuizSheet(
     int MaxPoints,
     IReadOnlyList<ExerciseSheet> Exercises)
 {
+    /// <summary>
+    /// For each picture <c>src</c> the hash of the stored picture, so the web adapter can link it. Filled by the
+    /// use cases from the stored quiz; a <c>src</c> missing here is shown by its description only.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> Images { get; init; } = new Dictionary<string, string>();
+
     /// <summary>Builds the child's sheet. Pass a seeded <see cref="Random"/> for a reproducible order.</summary>
     public static QuizSheet For(Quiz quiz, Random random)
     {
@@ -24,19 +32,21 @@ public sealed record QuizSheet(
 }
 
 /// <summary>A numbered part; <c>Index</c> is its position in the original quiz.</summary>
-public sealed record SheetItem(int Index, string Text);
+public sealed record SheetItem(int Index, string Text, ImageRef? Image = null);
 
 public abstract record ExerciseSheet(string Id, string Instruction, string? Hint, int MaxPoints)
 {
+    public ImageRef? Image { get; init; }
+
     public static ExerciseSheet For(Exercise exercise, bool shuffle, Random random)
     {
-        List<SheetItem> Numbered(IEnumerable<string> texts, bool mayShuffle)
+        List<SheetItem> Numbered(IEnumerable<(string Text, ImageRef? Image)> parts, bool mayShuffle)
         {
-            var items = texts.Select((t, i) => new SheetItem(i, t)).ToList();
+            var items = parts.Select((p, i) => new SheetItem(i, p.Text, p.Image)).ToList();
             return mayShuffle ? Shuffled(items, random) : items;
         }
 
-        return exercise switch
+        ExerciseSheet sheet = exercise switch
         {
             ClozeExercise c => new ClozeSheet(
                 c.Id, c.Instruction, c.Hint, c.MaxPoints,
@@ -45,22 +55,23 @@ public abstract record ExerciseSheet(string Id, string Instruction, string? Hint
             MatchingExercise m => new MatchingSheet(
                 m.Id, m.Instruction, m.Hint, m.MaxPoints,
                 m.Options,
-                Numbered(m.Rows.Select(r => r.Text), shuffle)),
+                Numbered(m.Rows.Select(r => (r.Text, r.Image)), shuffle)),
             OrderingExercise o => new OrderingSheet(
                 o.Id, o.Instruction, o.Hint, o.MaxPoints,
                 // Always shuffled, otherwise the exercise solves itself
-                NotInOriginalOrder(Numbered(o.Steps, true), random)),
+                NotInOriginalOrder(Numbered(o.Steps.Select(s => (s, (ImageRef?)null)), true), random)),
             TrueFalseExercise t => new TrueFalseSheet(
                 t.Id, t.Instruction, t.Hint, t.MaxPoints,
-                Numbered(t.Statements.Select(s => s.Text), shuffle)),
+                Numbered(t.Statements.Select(s => (s.Text, s.Image)), shuffle)),
             FreeTextExercise f => new FreeTextSheet(
                 f.Id, f.Instruction, f.Hint, f.MaxPoints,
                 f.Fields.Select(x => x.Label).ToList()),
             MultipleChoiceExercise mc => new MultipleChoiceSheet(
                 mc.Id, mc.Instruction, mc.Hint, mc.MaxPoints,
-                mc.Questions.Select((q, i) => new QuestionSheet(i, q.Text, Numbered(q.Options, shuffle), q.Correct.Count > 1)).ToList()),
+                mc.Questions.Select((q, i) => new QuestionSheet(i, q.Text, Numbered(q.Options.Select(o => (o.Text ?? "", o.Image)), shuffle), q.Correct.Count > 1, q.Image)).ToList()),
             _ => throw new NotSupportedException($"Unknown exercise type {exercise.GetType().Name}"),
         };
+        return sheet with { Image = exercise.Image };
     }
 
     private static List<T> Shuffled<T>(List<T> items, Random random)
@@ -100,4 +111,4 @@ public sealed record FreeTextSheet(string Id, string Instruction, string? Hint, 
 public sealed record MultipleChoiceSheet(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<QuestionSheet> Questions)
     : ExerciseSheet(Id, Instruction, Hint, MaxPoints);
 
-public sealed record QuestionSheet(int Index, string Text, IReadOnlyList<SheetItem> Options, bool MultipleAnswers);
+public sealed record QuestionSheet(int Index, string Text, IReadOnlyList<SheetItem> Options, bool MultipleAnswers, ImageRef? Image = null);

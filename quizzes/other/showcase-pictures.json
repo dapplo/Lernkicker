@@ -1,0 +1,61 @@
+{
+  "$schema": "../../schema/quiz-v1.schema.json",
+  "format": "quiz/v1",
+  "id": "showcase-pictures",
+  "title": "Bilder in Aufgaben zum Ausprobieren",
+  "subject": "other",
+  "gradeLevel": 4,
+  "language": "de",
+  "topic": "Beispiel",
+  "description": "Zeigt jede Stelle, an der quiz/v1 Bilder erlaubt (docs/quiz-format.md). Lade die JSON-Datei zusammen mit dem Ordner showcase-pictures hoch, z. B. als Zip.",
+  "source": "Beispiel aus dem Lernkicker-Repository",
+  "exercises": [
+    {
+      "id": "picture-options",
+      "type": "multipleChoice",
+      "instruction": "1. Tippe auf das richtige Bild.",
+      "hint": "Antworten können Bilder sein, mit oder ohne Text darunter.",
+      "questions": [
+        {
+          "text": "Welche Form ist ein Dreieck?",
+          "options": [
+            { "image": { "src": "showcase-pictures/circle.svg", "alt": "Ein roter Kreis" } },
+            { "image": { "src": "showcase-pictures/triangle.svg", "alt": "Ein grünes Dreieck" } },
+            { "image": { "src": "showcase-pictures/square.svg", "alt": "Ein blaues Quadrat" } }
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Welche Form hat keine Ecken?",
+          "options": [
+            { "text": "Quadrat", "image": { "src": "showcase-pictures/square.svg", "alt": "Ein blaues Quadrat" } },
+            { "text": "Kreis", "image": { "src": "showcase-pictures/circle.svg", "alt": "Ein roter Kreis" } }
+          ],
+          "correct": 1,
+          "explanation": "Ein Kreis ist rund und hat deshalb keine Ecken."
+        }
+      ]
+    },
+    {
+      "id": "picture-exercise",
+      "type": "trueFalse",
+      "instruction": "2. Schau dir das Bild an. Richtig oder falsch?",
+      "image": { "src": "showcase-pictures/shapes.png", "alt": "Links ein roter Kreis, rechts ein blaues Quadrat", "caption": "Zwei Formen", "credit": "Lernkicker, CC0" },
+      "statements": [
+        { "text": "Der Kreis ist rot.", "isTrue": true },
+        { "text": "Das Quadrat ist grün.", "isTrue": false, "explanation": "Das Quadrat ist blau." }
+      ]
+    },
+    {
+      "id": "picture-rows",
+      "type": "matching",
+      "instruction": "3. Wie heißt die Form?",
+      "hint": "Auch einzelne Zeilen, Aussagen und Fragen können ein Bild haben.",
+      "options": ["Kreis", "Dreieck", "Quadrat"],
+      "rows": [
+        { "text": "Diese Form hat drei Ecken.", "answer": "Dreieck", "image": { "src": "showcase-pictures/triangle.svg", "alt": "Ein grünes Dreieck" } },
+        { "text": "Diese Form hat vier gleich lange Seiten.", "answer": "Quadrat", "image": { "src": "showcase-pictures/square.svg", "alt": "Ein blaues Quadrat" } }
+      ]
+    }
+  ]
+}

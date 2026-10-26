@@ -4,6 +4,7 @@ using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Families;
 using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Library;
+using Lernkicker.Domain.Media;
 using Lernkicker.Domain.Messaging;
 using Lernkicker.Domain.Practice;
 using Lernkicker.Domain.Quizzes;
@@ -47,6 +48,8 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
     public DbSet<LessonAssignment> LessonAssignments => Set<LessonAssignment>();
     public DbSet<TelegramLink> TelegramLinks => Set<TelegramLink>();
     public DbSet<TelegramLinkCode> TelegramLinkCodes => Set<TelegramLinkCode>();
+    public DbSet<StoredImage> Images => Set<StoredImage>();
+    public DbSet<DocumentImage> DocumentImages => Set<DocumentImage>();
     public DbSet<ServerSecret> ServerSecrets => Set<ServerSecret>();
     public DbSet<ServerSetting> ServerSettings => Set<ServerSetting>();
 
@@ -195,6 +198,27 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
             e.HasIndex(x => x.CodeHash).IsUnique();
             e.Property(x => x.CodeHash).HasMaxLength(64);
             e.HasOne<ParentUser>().WithMany().HasForeignKey(x => x.ParentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        // Not owned by a family: a picture is stored once however many families use it; DocumentImages decide who sees it
+        builder.Entity<StoredImage>(e =>
+        {
+            e.HasKey(x => x.Hash);
+            e.Property(x => x.Hash).HasMaxLength(64);
+            e.Property(x => x.ContentType).HasMaxLength(20);
+        });
+
+        builder.Entity<DocumentImage>(e =>
+        {
+            e.HasIndex(x => x.StoredQuizId);
+            e.HasIndex(x => x.StoredLessonId);
+            e.HasIndex(x => x.Hash);
+            e.Property(x => x.Name).HasMaxLength(200);
+            e.Property(x => x.Hash).HasMaxLength(64);
+            e.HasOne<Family>().WithMany().HasForeignKey(x => x.FamilyId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<StoredQuiz>().WithMany().HasForeignKey(x => x.StoredQuizId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<StoredLesson>().WithMany().HasForeignKey(x => x.StoredLessonId).OnDelete(DeleteBehavior.Cascade);
             e.HasQueryFilter(x => x.FamilyId == FamilyId);
         });
 

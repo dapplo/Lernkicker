@@ -132,7 +132,6 @@
   <data name="Quizzes.Title" xml:space="preserve"><value>Proben</value></data>
   <data name="Quizzes.Upload" xml:space="preserve"><value>Probe hochladen</value></data>
   <data name="Quizzes.UploadHint" xml:space="preserve"><value>Eine Datei im Format &lt;code&gt;quiz/v1&lt;/code&gt; (JSON). Lädst du eine Probe mit derselben &lt;code&gt;id&lt;/code&gt; noch einmal hoch, wird sie eine neue Version; Zuweisungen ziehen mit.</value></data>
-  <data name="Quizzes.ChooseFile" xml:space="preserve"><value>Datei auswählen</value></data>
   <data name="Quizzes.OrPaste" xml:space="preserve"><value>Oder JSON einfügen</value></data>
   <data name="Quizzes.UploadButton" xml:space="preserve"><value>Hochladen</value></data>
   <data name="Quizzes.Saved" xml:space="preserve"><value>„{0}“ gespeichert (Version {1}, {2} Punkte).</value></data>
@@ -400,4 +399,19 @@
   <data name="Error.setup.familyInvalid" xml:space="preserve"><value>Bitte gib einen Familiennamen ein (bis 100 Zeichen).</value></data>
   <data name="Error.telegram.unavailable" xml:space="preserve"><value>Der Bot erreicht Telegram gerade nicht. Bitte versuch es in ein paar Minuten noch einmal.</value></data>
   <data name="Error.telegram.disabled" xml:space="preserve"><value>Telegram ist auf diesem Lernkicker nicht eingerichtet.</value></data>
+  <data name="Error.upload.tooLarge" xml:space="preserve"><value>Der Upload ist größer als 25 MB.</value></data>
+  <data name="Error.upload.tooManyFiles" xml:space="preserve"><value>Zu viele Dateien auf einmal (höchstens 100).</value></data>
+  <data name="Error.upload.noDocument" xml:space="preserve"><value>Im Upload ist keine JSON-Datei.</value></data>
+  <data name="Error.upload.severalDocuments" xml:space="preserve"><value>Im Upload ist mehr als eine JSON-Datei. Lade eine Probe oder einen Lernstoff nach dem anderen hoch.</value></data>
+  <data name="Error.upload.invalidZip" xml:space="preserve"><value>Die Zip-Datei lässt sich nicht lesen oder enthält unsichere Dateinamen.</value></data>
+  <data name="Issue.missingImage" xml:space="preserve"><value>Das Bild „{src}“ fehlt. Wähle es zusammen mit der JSON-Datei aus oder pack es mit in die Zip-Datei.</value></data>
+  <data name="Issue.imageType" xml:space="preserve"><value>„{src}“ ist kein PNG-, JPEG-, GIF-, WebP- oder SVG-Bild.</value></data>
+  <data name="Issue.imageTooLarge" xml:space="preserve"><value>Das Bild „{src}“ ist größer als {maxMb} MB.</value></data>
+  <data name="Issue.imagesTooLarge" xml:space="preserve"><value>Alle Bilder zusammen sind größer als {maxMb} MB.</value></data>
+  <data name="Learn.Type.image" xml:space="preserve"><value>Bild</value></data>
+  <data name="Picture.Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Upload.ChooseFiles" xml:space="preserve"><value>Dateien auswählen</value></data>
+  <data name="Upload.PicturesHint" xml:space="preserve"><value>Mit Bildern: Wähle die JSON-Datei und ihre Bilder zusammen aus, oder eine Zip-Datei mit allem. Große Fotos werden vor dem Hochladen verkleinert.</value></data>
+  <data name="Upload.Shrinking" xml:space="preserve"><value>Bilder werden vorbereitet …</value></data>
+  <data name="Upload.FileTooLarge" xml:space="preserve"><value>„{0}“ ist zu groß.</value></data>
 </root>

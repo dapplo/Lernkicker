@@ -1,0 +1,44 @@
+{
+  "$schema": "../../schema/lesson-v1.schema.json",
+  "format": "lesson/v1",
+  "id": "shapes-with-pictures",
+  "title": "Formen erkennen (mit Bildern)",
+  "subject": "math",
+  "gradeLevel": 1,
+  "language": "de",
+  "topic": "Geometrie",
+  "description": "Zeigt jede Stelle, an der lesson/v1 Bilder erlaubt (docs/lesson-format.md). Lade die JSON-Datei zusammen mit dem Ordner shapes hoch, z. B. als Zip.",
+  "source": "Beispiel aus dem Lernkicker-Repository",
+  "blocks": [
+    {
+      "id": "overview",
+      "type": "image",
+      "title": "Zwei Formen",
+      "image": { "src": "shapes/shapes.png", "alt": "Links ein roter Kreis, rechts ein blaues Quadrat", "caption": "Kreis und Quadrat", "credit": "Lernkicker, CC0" }
+    },
+    {
+      "id": "triangle",
+      "type": "text",
+      "title": "Das Dreieck",
+      "image": { "src": "shapes/triangle.svg", "alt": "Ein grünes Dreieck" },
+      "text": "Ein Dreieck hat **drei Ecken** und **drei Seiten**."
+    },
+    {
+      "id": "cards",
+      "type": "flashcards",
+      "title": "Wie heißt die Form?",
+      "cards": [
+        { "front": "Wie heißt diese Form?", "back": "Kreis", "frontImage": { "src": "shapes/circle.svg", "alt": "Ein roter Kreis" } },
+        { "front": "Wie heißt diese Form?", "back": "Quadrat", "frontImage": { "src": "shapes/square.svg", "alt": "Ein blaues Quadrat" } },
+        { "front": "Dreieck", "back": "So sieht es aus.", "backImage": { "src": "shapes/triangle.svg", "alt": "Ein grünes Dreieck" } }
+      ]
+    },
+    {
+      "id": "facts",
+      "type": "facts",
+      "title": "Merke",
+      "image": { "src": "shapes/square.svg", "alt": "Ein blaues Quadrat" },
+      "items": ["Ein Quadrat hat vier gleich lange Seiten.", "Ein Kreis hat keine Ecken."]
+    }
+  ]
+}

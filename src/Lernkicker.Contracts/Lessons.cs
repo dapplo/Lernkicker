@@ -12,7 +12,7 @@ public sealed record LessonAssignmentOverview(
 /// <summary>A lesson in the child's list.</summary>
 public sealed record MyLesson(Guid AssignmentId, string Title, string Subject, string? Topic, DateOnly? DueOn, int KnownBlocks, int Blocks);
 
-/// <summary>A lesson to learn. Each block has the fields of its <c>Type</c> (text, poem, flashcards, facts).</summary>
+/// <summary>A lesson to learn. Each block has the fields of its <c>Type</c> (text, poem, flashcards, facts, image).</summary>
 public sealed record LessonDto(
     Guid AssignmentId, string Title, string Subject, string Language, string? Topic, string? Description, DateOnly? DueOn,
     IReadOnlyList<string> KnownBlocks, IReadOnlyList<LessonBlockDto> Blocks);
@@ -28,9 +28,10 @@ public sealed record LessonBlockDto
     public IReadOnlyList<IReadOnlyList<string>>? Stanzas { get; init; }
     public IReadOnlyList<FlashcardDto>? Cards { get; init; }
     public IReadOnlyList<string>? Items { get; init; }
+    public ImageDto? Image { get; init; }
 }
 
-public sealed record FlashcardDto(string Front, string Back);
+public sealed record FlashcardDto(string Front, string Back, ImageDto? FrontImage = null, ImageDto? BackImage = null);
 
 /// <summary>The end of a practice session: the blocks the child knows now.</summary>
 public sealed record LessonPractice(IReadOnlyList<string> KnownBlocks);

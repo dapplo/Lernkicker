@@ -1,5 +1,4 @@
 using Lernkicker.Application.Ports;
-using Lernkicker.Domain.Lessons;
 using Lernkicker.Domain.Quizzes;
 
 namespace Lernkicker.Application.UseCases;
@@ -11,7 +10,7 @@ namespace Lernkicker.Application.UseCases;
 /// </summary>
 public sealed class SharedLibraryUseCases(
     IQuizLibrary quizzes, ILessonRepository lessons, IQuizFormat quizFormat, ILessonFormat lessonFormat,
-    QuizLibraryUseCases quizLibrary, LessonUseCases lessonLibrary)
+    QuizLibraryUseCases quizLibrary, LessonUseCases lessonLibrary, ImageUseCases images)
 {
     /// <summary>What other families shared, newest first.</summary>
     public async Task<IReadOnlyList<SharedSummary>> ListAsync(Guid familyId)
@@ -31,23 +30,23 @@ public sealed class SharedLibraryUseCases(
 
     public async Task<Result<QuizSheet>> PreviewQuizAsync(Guid id, Random random) =>
         await quizzes.FindSharedAnyFamilyAsync(id) is { } quiz
-            ? QuizSheet.For(quizFormat.Read(quiz.Source), random)
+            ? QuizSheet.For(quizFormat.Read(quiz.Source), random) with { Images = await images.ForQuizAsync(quiz.Id, anyFamily: true) }
             : AppError.NotFound(ErrorCodes.SharedNotFound);
 
-    public async Task<Result<Lesson>> PreviewLessonAsync(Guid id) =>
+    public async Task<Result<LessonToLearn>> PreviewLessonAsync(Guid id) =>
         await lessons.FindSharedAnyFamilyAsync(id) is { } lesson
-            ? lessonFormat.Read(lesson.Source)
+            ? LessonToLearn.Preview(lessonFormat.Read(lesson.Source), await images.ForLessonAsync(lesson.Id, anyFamily: true))
             : AppError.NotFound(ErrorCodes.SharedNotFound);
 
     /// <summary>Copies the quiz into the own library, as a new version if a quiz with the same id is there already.</summary>
     public async Task<Result<QuizSummary>> CopyQuizAsync(Guid familyId, Guid id) =>
         await quizzes.FindSharedAnyFamilyAsync(id) is { } quiz && quiz.FamilyId != familyId
-            ? await quizLibrary.UploadAsync(familyId, quiz.Source)
+            ? await quizLibrary.UploadAsync(familyId, quiz.Source, await images.QuizFilesAsync(quiz.Id, anyFamily: true))
             : AppError.NotFound(ErrorCodes.SharedNotFound);
 
     /// <summary>Copies the lesson into the own library, replacing one with the same id (progress stays).</summary>
     public async Task<Result<LessonSummary>> CopyLessonAsync(Guid familyId, Guid id) =>
         await lessons.FindSharedAnyFamilyAsync(id) is { } lesson && lesson.FamilyId != familyId
-            ? await lessonLibrary.UploadAsync(familyId, lesson.Source)
+            ? await lessonLibrary.UploadAsync(familyId, lesson.Source, await images.LessonFilesAsync(lesson.Id, anyFamily: true))
             : AppError.NotFound(ErrorCodes.SharedNotFound);
 }

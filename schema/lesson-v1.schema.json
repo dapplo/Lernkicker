@@ -44,13 +44,14 @@
       "type": "object",
       "required": ["id", "type"],
       "properties": {
-        "type": { "enum": ["text", "poem", "flashcards", "facts"] }
+        "type": { "enum": ["text", "poem", "flashcards", "facts", "image"] }
       },
       "allOf": [
         { "if": { "properties": { "type": { "const": "text" } } }, "then": { "$ref": "#/$defs/text" } },
         { "if": { "properties": { "type": { "const": "poem" } } }, "then": { "$ref": "#/$defs/poem" } },
         { "if": { "properties": { "type": { "const": "flashcards" } } }, "then": { "$ref": "#/$defs/flashcards" } },
-        { "if": { "properties": { "type": { "const": "facts" } } }, "then": { "$ref": "#/$defs/facts" } }
+        { "if": { "properties": { "type": { "const": "facts" } } }, "then": { "$ref": "#/$defs/facts" } },
+        { "if": { "properties": { "type": { "const": "image" } } }, "then": { "$ref": "#/$defs/imageBlock" } }
       ]
     },
     "blockId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 32 },
@@ -63,7 +64,8 @@
         "id": { "$ref": "#/$defs/blockId" },
         "type": true,
         "title": { "$ref": "#/$defs/blockTitle" },
-        "text": { "type": "string", "minLength": 1, "maxLength": 10000 }
+        "text": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "image": { "$ref": "#/$defs/image", "description": "A picture shown above the text." }
       }
     },
     "poem": {
@@ -96,7 +98,12 @@
             "type": "object",
             "required": ["front", "back"],
             "additionalProperties": false,
-            "properties": { "front": { "$ref": "#/$defs/line" }, "back": { "$ref": "#/$defs/line" } }
+            "properties": {
+              "front": { "$ref": "#/$defs/line" },
+              "back": { "$ref": "#/$defs/line" },
+              "frontImage": { "$ref": "#/$defs/image", "description": "A picture on the front, above the text." },
+              "backImage": { "$ref": "#/$defs/image", "description": "A picture on the back, above the text." }
+            }
           }
         }
       }
@@ -109,7 +116,33 @@
         "id": { "$ref": "#/$defs/blockId" },
         "type": true,
         "title": { "$ref": "#/$defs/blockTitle" },
-        "items": { "type": "array", "minItems": 1, "maxItems": 30, "items": { "$ref": "#/$defs/line" } }
+        "items": { "type": "array", "minItems": 1, "maxItems": 30, "items": { "$ref": "#/$defs/line" } },
+        "image": { "$ref": "#/$defs/image", "description": "A picture shown above the facts." }
+      }
+    },
+    "imageBlock": {
+      "description": "A picture on its own, shown large; tap it to see it full screen.",
+      "required": ["id", "type", "image"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/blockId" },
+        "type": true,
+        "title": { "$ref": "#/$defs/blockTitle" },
+        "image": { "$ref": "#/$defs/image" }
+      }
+    },
+    "image": {
+      "description": "A picture uploaded together with the JSON. src is the file's path relative to the JSON file; PNG, JPEG, GIF, WebP and SVG are accepted (SVG without scripts or outside links).",
+      "type": "object", "required": ["src", "alt"], "additionalProperties": false,
+      "properties": {
+        "src": {
+          "type": "string", "minLength": 1, "maxLength": 200,
+          "pattern": "^[A-Za-z0-9ÄÖÜäöüß_-][A-Za-z0-9ÄÖÜäöüß_. -]*(/[A-Za-z0-9ÄÖÜäöüß_-][A-Za-z0-9ÄÖÜäöüß_. -]*)*$",
+          "description": "Relative path of the picture file, e.g. 'plants/rose.jpg'. No URLs, no leading '/', no '..'."
+        },
+        "alt": { "type": "string", "minLength": 1, "maxLength": 200, "description": "What the picture shows, in the content language. Read by screen readers and shown when the picture is missing." },
+        "caption": { "type": "string", "minLength": 1, "maxLength": 300, "description": "Text under the picture." },
+        "credit": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Source and licence, e.g. 'Wikimedia Commons, CC0'." }
       }
     }
   }

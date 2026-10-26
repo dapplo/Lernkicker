@@ -1,4 +1,5 @@
 using Lernkicker.Domain.Families;
+using Lernkicker.Domain.Media;
 using Lernkicker.Domain.Quizzes;
 
 namespace Lernkicker.Domain.Lessons;
@@ -17,18 +18,35 @@ public sealed record Lesson
     public string? Description { get; init; }
     public string? Source { get; init; }
     public required IReadOnlyList<LessonBlock> Blocks { get; init; }
+
+    /// <summary>Every picture the lesson names, in file order.</summary>
+    public IEnumerable<ImageUse> Images() =>
+        Blocks.SelectMany((block, i) => block.Images($"blocks/{i}"));
 }
 
 public abstract record LessonBlock
 {
     public required string Id { get; init; }
     public string? Title { get; init; }
+
+    public virtual IEnumerable<ImageUse> Images(string path) => [];
 }
 
-/// <summary>Text to read; paragraphs, **bold**, *italic* and "- " lists.</summary>
+/// <summary>Text to read; paragraphs, **bold**, *italic* and "- " lists; optionally a picture above it.</summary>
 public sealed record TextBlock : LessonBlock
 {
     public required string Text { get; init; }
+    public ImageRef? Image { get; init; }
+
+    public override IEnumerable<ImageUse> Images(string path) => Image is null ? [] : [new ImageUse($"{path}/image", Image)];
+}
+
+/// <summary>A picture on its own, shown large.</summary>
+public sealed record ImageBlock : LessonBlock
+{
+    public required ImageRef Image { get; init; }
+
+    public override IEnumerable<ImageUse> Images(string path) => [new ImageUse($"{path}/image", Image)];
 }
 
 /// <summary>A poem to learn by heart: stanzas of lines.</summary>
@@ -42,14 +60,33 @@ public sealed record PoemBlock : LessonBlock
 public sealed record FlashcardsBlock : LessonBlock
 {
     public required IReadOnlyList<Flashcard> Cards { get; init; }
+
+    public override IEnumerable<ImageUse> Images(string path)
+    {
+        for (var i = 0; i < Cards.Count; i++)
+        {
+            if (Cards[i].FrontImage is { } front)
+            {
+                yield return new ImageUse($"{path}/cards/{i}/frontImage", front);
+            }
+
+            if (Cards[i].BackImage is { } back)
+            {
+                yield return new ImageUse($"{path}/cards/{i}/backImage", back);
+            }
+        }
+    }
 }
 
-public sealed record Flashcard(string Front, string Back);
+public sealed record Flashcard(string Front, string Back, ImageRef? FrontImage = null, ImageRef? BackImage = null);
 
-/// <summary>Key facts to remember.</summary>
+/// <summary>Key facts to remember; optionally a picture above them.</summary>
 public sealed record FactsBlock : LessonBlock
 {
     public required IReadOnlyList<string> Items { get; init; }
+    public ImageRef? Image { get; init; }
+
+    public override IEnumerable<ImageUse> Images(string path) => Image is null ? [] : [new ImageUse($"{path}/image", Image)];
 }
 
 public static class LessonLimits

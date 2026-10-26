@@ -11,6 +11,7 @@ else
     var card = Cards[_queue[0]];
     <p class="counter">@L["Learn.CardsLeft", _queue.Count, Cards.Count]</p>
     <button class="flashcard @(_flipped ? "flipped" : "")" @onclick="() => _flipped = !_flipped" aria-live="polite">
+        <Picture Image="@(_flipped ? card.BackImage : card.FrontImage)" Zoom="false" />
         <span class="side">@(_flipped ? card.Back : card.Front)</span>
         <small>@(_flipped ? L["Learn.Answer"] : L["Learn.TapToFlip"])</small>
     </button>

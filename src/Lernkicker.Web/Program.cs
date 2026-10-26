@@ -25,6 +25,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IFamilyScope, HttpFamilyScope>();
 builder.Services.AddSingleton<IQuizFormat, QuizJson>();
 builder.Services.AddSingleton<ILessonFormat, LessonJson>();
+builder.Services.AddSingleton<ISvgSanitizer, SvgSanitizer>();
 
 // Calendars: dates and times are in the family's time zone (one per installation)
 var timeZone = builder.Configuration["Lernkicker:TimeZone"] ?? "Europe/Berlin";
@@ -55,6 +56,7 @@ builder.Services.AddSingleton<IAppRestart, AppRestart>();
 builder.Services.AddScoped<AdminUseCases>();
 builder.Services.AddScoped<AccountUseCases>();
 builder.Services.AddScoped<SetupUseCases>();
+builder.Services.AddScoped<ImageUseCases>();
 builder.Services.AddScoped<QuizLibraryUseCases>();
 builder.Services.AddScoped<ChildrenUseCases>();
 builder.Services.AddScoped<ChildDeviceUseCases>();
@@ -124,7 +126,11 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.Child, p => p
         .AddAuthenticationSchemes(Schemes.Child)
         .RequireAuthenticatedUser()
-        .RequireClaim(Claims.ChildId));
+        .RequireClaim(Claims.ChildId))
+    .AddPolicy(Policies.Viewer, p => p
+        .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme, Schemes.Child)
+        .RequireAuthenticatedUser()
+        .RequireClaim(Claims.FamilyId));
 
 var loginsPerMinute = builder.Configuration.GetValue("Lernkicker:Limits:LoginsPerMinute", 10);
 var childRequestsPerMinute = builder.Configuration.GetValue("Lernkicker:Limits:ChildLoginsPerMinute", 20);
@@ -205,6 +211,7 @@ app.MapDevice();
 app.MapCalendar();
 app.MapLessons();
 app.MapLibrary();
+app.MapMedia();
 app.Map("/api/{**rest}", ApiResults.NotFound);
 
 // The PWA (Lernkicker.Client). Fingerprinted files are cached forever; every other path is a page of the app.

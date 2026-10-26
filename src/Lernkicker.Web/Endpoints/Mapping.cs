@@ -2,6 +2,7 @@ using Lernkicker.Application;
 using Lernkicker.Contracts;
 using Lernkicker.Domain.Calendar;
 using Lernkicker.Domain.Lessons;
+using Lernkicker.Domain.Media;
 using Lernkicker.Domain.Quizzes;
 
 namespace Lernkicker.Web.Endpoints;
@@ -50,45 +51,52 @@ public static class Mapping
     public static SharedOverview ToDto(this SharedSummary s) =>
         new(s.Id, s.Kind, s.ItemId, s.Title, s.Subject, s.GradeLevel, s.Topic, s.Size, s.SharedAt, s.InMyLibrary);
 
-    /// <summary>A lesson outside an assignment, for the parents' preview.</summary>
-    public static LessonDto ToPreviewDto(this Lesson lesson) => new LessonToLearn(Guid.Empty, lesson, null, []).ToDto();
-
     public static MyLesson ToDto(this ChildLesson l) => new(l.AssignmentId, l.Title, l.Subject, l.Topic, l.DueOn, l.KnownBlocks, l.Blocks);
 
     public static LessonDto ToDto(this LessonToLearn l) =>
         new(l.AssignmentId, l.Lesson.Title, l.Lesson.Subject, l.Lesson.Language, l.Lesson.Topic, l.Lesson.Description, l.DueOn,
-            l.KnownBlocks, l.Lesson.Blocks.Select(ToDto).ToList());
+            l.KnownBlocks, l.Lesson.Blocks.Select(b => ToDto(b, l.Images)).ToList());
 
-    private static LessonBlockDto ToDto(LessonBlock b) => b switch
+    private static LessonBlockDto ToDto(LessonBlock b, IReadOnlyDictionary<string, string> images) => b switch
     {
-        TextBlock t => new LessonBlockDto { Id = t.Id, Type = "text", Title = t.Title, Text = t.Text },
+        TextBlock t => new LessonBlockDto { Id = t.Id, Type = "text", Title = t.Title, Text = t.Text, Image = t.Image.ToDto(images) },
         PoemBlock p => new LessonBlockDto { Id = p.Id, Type = "poem", Title = p.Title, Author = p.Author, Hint = p.Hint, Stanzas = p.Stanzas },
         FlashcardsBlock f => new LessonBlockDto
         {
-            Id = f.Id, Type = "flashcards", Title = f.Title, Cards = f.Cards.Select(c => new FlashcardDto(c.Front, c.Back)).ToList(),
+            Id = f.Id, Type = "flashcards", Title = f.Title,
+            Cards = f.Cards.Select(c => new FlashcardDto(c.Front, c.Back, c.FrontImage.ToDto(images), c.BackImage.ToDto(images))).ToList(),
         },
-        FactsBlock f => new LessonBlockDto { Id = f.Id, Type = "facts", Title = f.Title, Items = f.Items },
+        FactsBlock f => new LessonBlockDto { Id = f.Id, Type = "facts", Title = f.Title, Items = f.Items, Image = f.Image.ToDto(images) },
+        ImageBlock i => new LessonBlockDto { Id = i.Id, Type = "image", Title = i.Title, Image = i.Image.ToDto(images) },
         _ => throw new NotSupportedException($"Unknown block type {b.GetType().Name}"),
     };
+
+    /// <summary>A picture with the link to its stored bytes, or without a link when it is missing.</summary>
+    private static ImageDto? ToDto(this ImageRef? image, IReadOnlyDictionary<string, string> images) =>
+        image is null ? null : new ImageDto(images.TryGetValue(image.Src, out var hash) ? MediaEndpoints.Url(hash) : null, image.Alt, image.Caption, image.Credit);
 
     public static EventDetails ToDomain(this EventRequest r) => new(r.Kind, r.Title, r.Date, r.StartTime, r.EndTime, r.Location);
 
     public static SheetDto ToDto(this QuizSheet s) =>
-        new(s.Id, s.Title, s.Subject, s.GradeLevel, s.Language, s.Topic, s.DurationMinutes, s.MaxPoints, s.Exercises.Select(ToDto).ToList());
+        new(s.Id, s.Title, s.Subject, s.GradeLevel, s.Language, s.Topic, s.DurationMinutes, s.MaxPoints, s.Exercises.Select(e => ToDto(e, s.Images)).ToList());
 
-    private static ExerciseSheetDto ToDto(ExerciseSheet e) => e switch
+    private static ExerciseSheetDto ToDto(ExerciseSheet e, IReadOnlyDictionary<string, string> images)
     {
-        ClozeSheet c => new ClozeSheetDto(c.Id, c.Instruction, c.Hint, c.MaxPoints, c.Segments, c.WordBank),
-        MatchingSheet m => new MatchingSheetDto(m.Id, m.Instruction, m.Hint, m.MaxPoints, m.Options, Items(m.Rows)),
-        OrderingSheet o => new OrderingSheetDto(o.Id, o.Instruction, o.Hint, o.MaxPoints, Items(o.Steps)),
-        TrueFalseSheet t => new TrueFalseSheetDto(t.Id, t.Instruction, t.Hint, t.MaxPoints, Items(t.Statements)),
-        FreeTextSheet f => new FreeTextSheetDto(f.Id, f.Instruction, f.Hint, f.MaxPoints, f.FieldLabels),
-        MultipleChoiceSheet mc => new MultipleChoiceSheetDto(mc.Id, mc.Instruction, mc.Hint, mc.MaxPoints,
-            mc.Questions.Select(q => new QuestionSheetDto(q.Index, q.Text, Items(q.Options), q.MultipleAnswers)).ToList()),
-        _ => throw new NotSupportedException($"Unknown sheet type {e.GetType().Name}"),
-    };
+        List<SheetItemDto> Items(IEnumerable<SheetItem> items) => items.Select(i => new SheetItemDto(i.Index, i.Text, i.Image.ToDto(images))).ToList();
 
-    private static List<SheetItemDto> Items(IEnumerable<SheetItem> items) => items.Select(i => new SheetItemDto(i.Index, i.Text)).ToList();
+        ExerciseSheetDto sheet = e switch
+        {
+            ClozeSheet c => new ClozeSheetDto(c.Id, c.Instruction, c.Hint, c.MaxPoints, c.Segments, c.WordBank),
+            MatchingSheet m => new MatchingSheetDto(m.Id, m.Instruction, m.Hint, m.MaxPoints, m.Options, Items(m.Rows)),
+            OrderingSheet o => new OrderingSheetDto(o.Id, o.Instruction, o.Hint, o.MaxPoints, Items(o.Steps)),
+            TrueFalseSheet t => new TrueFalseSheetDto(t.Id, t.Instruction, t.Hint, t.MaxPoints, Items(t.Statements)),
+            FreeTextSheet f => new FreeTextSheetDto(f.Id, f.Instruction, f.Hint, f.MaxPoints, f.FieldLabels),
+            MultipleChoiceSheet mc => new MultipleChoiceSheetDto(mc.Id, mc.Instruction, mc.Hint, mc.MaxPoints,
+                mc.Questions.Select(q => new QuestionSheetDto(q.Index, q.Text, Items(q.Options), q.MultipleAnswers, q.Image.ToDto(images))).ToList()),
+            _ => throw new NotSupportedException($"Unknown sheet type {e.GetType().Name}"),
+        };
+        return sheet with { Image = e.Image.ToDto(images) };
+    }
 
     public static QuizResultDto ToDto(this QuizResult r) =>
         new(r.Points, r.MaxPoints, r.Percent, r.Mark, r.Exercises.Select(e => new ExerciseResultDto(

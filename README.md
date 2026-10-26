@@ -76,8 +76,8 @@ Then open http://localhost:8080 and create the admin on the setup page. Login co
 | `/practice/<assignment>` | child | One exercise per screen, hand in, result with solutions |
 | `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, facts; mark parts as known |
 | `/parents` | parent | Login, children, add a child, connect Telegram |
-| `/parents/quizzes` | parent | Upload (file or paste), preview, share and delete quizzes |
-| `/parents/lessons` | parent | Upload (file or paste), preview, share and delete learning material |
+| `/parents/quizzes` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete quizzes |
+| `/parents/lessons` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete learning material |
 | `/parents/preview/<quiz\|lesson>/<id>` | parent | Preview as the child sees it |
 | `/parents/library` | parent | Shared library: what other families shared, with preview (`/parents/library/<kind>/<id>`) and copy |
 | `/parents/children/<id>` | parent | Assign quizzes and learning material (with progress), dates, subscribed calendars, feed link, results, QR code for pairing, devices, settings |
@@ -95,9 +95,10 @@ All endpoints are under `/api`, take and return JSON, and answer errors with `{ 
 | `GET /api/setup`, `POST /api/setup`, `POST /api/setup/restore` (backup zip as body; tailnet only, while no admin exists) | first visitor |
 | `POST /api/account/login`, `POST /api/account/logout`, `GET /api/account/me`, `PUT /api/account/language`, `POST /api/account/invitation`, `GET/DELETE /api/account/telegram`, `POST /api/account/telegram/link` | parents |
 | `POST /api/admin/invitations`, `GET /api/admin/families`, `DELETE /api/admin/families/{id}`, `GET/PUT/DELETE /api/admin/telegram` (bot token, write-only), `GET /api/admin/backup` (zip) | admin, tailnet only |
-| `GET /api/quizzes`, `POST /api/quizzes` (raw JSON body), `GET /api/quizzes/{quizId}`, `GET …/{quizId}/preview`, `PUT …/{quizId}/shared`, `DELETE /api/quizzes/{quizId}` | parents |
-| `GET /api/lessons`, `POST /api/lessons` (raw JSON body), `GET /api/lessons/{lessonId}`, `GET …/{lessonId}/preview`, `PUT …/{lessonId}/shared`, `DELETE /api/lessons/{lessonId}`, `GET/POST /api/children/{id}/lessons`, `DELETE …/lessons/{assignmentId}` | parents |
+| `GET /api/quizzes`, `POST /api/quizzes` (raw JSON body, a zip, or a multipart form with the JSON and its pictures), `GET /api/quizzes/{quizId}`, `GET …/{quizId}/zip` (with pictures), `GET …/{quizId}/preview`, `PUT …/{quizId}/shared`, `DELETE /api/quizzes/{quizId}` | parents |
+| `GET /api/lessons`, `POST /api/lessons` (like quizzes), `GET /api/lessons/{lessonId}`, `GET …/{lessonId}/zip`, `GET …/{lessonId}/preview`, `PUT …/{lessonId}/shared`, `DELETE /api/lessons/{lessonId}`, `GET/POST /api/children/{id}/lessons`, `DELETE …/lessons/{assignmentId}` | parents |
 | `GET /api/library`, `GET /api/library/{quizzes\|lessons}/{id}` (preview), `POST /api/library/{quizzes\|lessons}/{id}/copy` | parents |
+| `GET /api/media/{hash}` (a picture of a quiz or lesson the caller may see) | parents, children |
 | `GET/POST /api/children`, `PUT/DELETE /api/children/{id}`, `PUT …/pin`, `POST …/pairing`, `GET …/devices`, `DELETE …/devices/{deviceId}`, `POST …/devices/{deviceId}/unlock`, `GET/POST …/assignments`, `DELETE …/assignments/{assignmentId}`, `GET …/attempts`, `GET …/attempts/{attemptId}` | parents |
 | `GET/POST /api/children/{id}/calendar` (`?from=&to=`), `PUT/DELETE …/calendar/{eventId}`, `GET/POST …/subscriptions`, `POST …/subscriptions/{subscriptionId}/sync`, `DELETE …/subscriptions/{subscriptionId}`, `POST/DELETE …/feed` | parents |
 | `GET /calendar/{token}.ics` | calendar apps (secret link, no login) |

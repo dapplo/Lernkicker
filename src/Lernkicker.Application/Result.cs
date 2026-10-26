@@ -85,6 +85,11 @@ public static class ErrorCodes
     public const string LessonInvalid = "lesson.invalid";
     public const string LessonTooLarge = "lesson.tooLarge";
     public const string SharedNotFound = "shared.notFound";
+    public const string UploadTooLarge = "upload.tooLarge";
+    public const string UploadTooManyFiles = "upload.tooManyFiles";
+    public const string UploadNoDocument = "upload.noDocument";
+    public const string UploadSeveralDocuments = "upload.severalDocuments";
+    public const string UploadInvalidZip = "upload.invalidZip";
     public const string TelegramDisabled = "telegram.disabled";
     public const string TelegramUnavailable = "telegram.unavailable";
     public const string TelegramTokenInvalid = "telegram.tokenInvalid";

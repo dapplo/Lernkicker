@@ -6,6 +6,7 @@
     {
         <p class="hint">@hint</p>
     }
+    <Picture Image="@Draft.Exercise.Image" />
 
     @switch (Draft.Exercise)
     {
@@ -43,6 +44,7 @@
                 {
                     var index = row.Index;
                     <li>
+                        <Picture Image="@row.Image" />
                         <span>@row.Text</span>
                         <select aria-label="@L["Exercise.Answer"]" value="@Draft.Texts[index]" @onchange="e => Set(index, e)">
                             <option value="">…</option>
@@ -79,6 +81,7 @@
                 {
                     var index = statement.Index;
                     <li>
+                        <Picture Image="@statement.Image" />
                         <span>@statement.Text</span>
                         <span class="choice" lang="@UiLanguage.Current">
                             <button type="button" class="@(Draft.Truths[index] == true ? "on" : "")" aria-pressed="@(Draft.Truths[index] == true)"
@@ -113,16 +116,21 @@
             @foreach (var question in choice.Questions)
             {
                 var questionIndex = question.Index;
+                var pictures = question.Options.Any(o => o.Image is not null);
                 <fieldset class="question">
                     <legend>@question.Text @if (question.MultipleAnswers) { <span lang="@UiLanguage.Current">@L["Exercise.SeveralCorrect"]</span> }</legend>
-                    @foreach (var option in question.Options)
-                    {
-                        var optionIndex = option.Index;
-                        var selected = Draft.Choices[questionIndex].Contains(optionIndex);
-                        <button type="button" class="option @(selected ? "on" : "")" aria-pressed="@selected" @onclick="() => Select(questionIndex, optionIndex, question.MultipleAnswers)">
-                            @option.Text
-                        </button>
-                    }
+                    <Picture Image="@question.Image" />
+                    <div class="@(pictures ? "options pictures" : "options")">
+                        @foreach (var option in question.Options)
+                        {
+                            var optionIndex = option.Index;
+                            var selected = Draft.Choices[questionIndex].Contains(optionIndex);
+                            <button type="button" class="option @(selected ? "on" : "")" aria-pressed="@selected" @onclick="() => Select(questionIndex, optionIndex, question.MultipleAnswers)">
+                                <Picture Image="@option.Image" Zoom="false" />
+                                @option.Text
+                            </button>
+                        }
+                    </div>
                 </fieldset>
             }
             break;

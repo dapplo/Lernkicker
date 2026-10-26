@@ -28,9 +28,9 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 
 | Project | Role | May reference |
 | --- | --- | --- |
-| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed`, `TelegramLink`, `TelegramLinkCode`, `ServerSecret` | the BCL only |
+| `Lernkicker.Domain` | Entities and rules: `Quiz` and its exercise types, `QuizRules`, `QuizSheet` (what a child sees, without solutions), `Grader`, `Family`, `Child`, `ChildDevice`, `StoredQuiz`, `Assignment`, `Attempt`, `Lesson` and its block types, `StoredLesson`, `LessonAssignment`, `CalendarEvent`, `CalendarSubscription`, `CalendarFeed`, `TelegramLink`, `TelegramLinkCode`, `ServerSecret`, `ImageRef` (a picture in a quiz or lesson), `StoredImage`, `DocumentImage` | the BCL only |
 | `Lernkicker.Application` | Use cases (`*UseCases`), ports (`Ports/Ports.cs`), `Result`/`AppError` and the stable `ErrorCodes` | Domain |
-| `Lernkicker.QuizFormat` | Driven adapter for `IQuizFormat` and `ILessonFormat`: reads `quiz/v1` and `lesson/v1` JSON, validates against the embedded schemas | Application, Domain, JsonSchema.Net |
+| `Lernkicker.QuizFormat` | Driven adapter for `IQuizFormat`, `ILessonFormat` and `ISvgSanitizer`: reads `quiz/v1` and `lesson/v1` JSON, validates against the embedded schemas, cleans uploaded SVG pictures | Application, Domain, JsonSchema.Net |
 | `Lernkicker.Calendar` | Driven adapter for `ICalendarSource` (fetches ICS over HTTP, only from public addresses), `ICalendarWriter` (the ICS feed) and `ILocalClock` (today in the family's time zone) | Application, Domain, Ical.Net, NodaTime |
 | `Lernkicker.Telegram` | Adapter for Telegram: drives `TelegramUseCases` with the commands parents send (long polling), implements `IMessenger` (a queue that sends results and reminders; restarts the bot when the admin changes the token) and the daily reminder; the bot's texts in `Resources/Messages*.resx` | Application, Domain, Telegram.Bot |
 | `Lernkicker.Persistence` | Driven adapter for the repositories, `IUnitOfWork`, `IParentAccounts`, `IPinHasher`: EF Core, SQLite, ASP.NET Core Identity, migrations | Application, Domain |
@@ -54,6 +54,7 @@ Lernkicker follows a hexagonal architecture (ports and adapters). The domain and
 
 - **A new exercise type:** domain record + `QuizSheet` + `Grader` + schema + `docs/quiz-format.md` + `QuizJson.ExerciseTypes` + a sheet DTO in Contracts + a view in `ExerciseView.razor` + tests.
 - **A new lesson block type:** domain record + schema + `docs/lesson-format.md` + `LessonJson` + `Mapping` (block DTO) + a case in `Learn.razor` + a `Learn.Type.<type>` text + tests.
+- **A new place for a picture:** an `ImageRef?` on the domain record and its `Images(path)` (so uploads check it), the schema (`"image": { "$ref": "#/$defs/image" }`), both format docs, `Mapping` (an `ImageDto` via `ToDto(images)`), a `<Picture>` in the view, and the example with pictures.
 - **A new error code:** a constant in `ErrorCodes` and an `Error.<code>` text in both resx files (`LocalizationTests` fails otherwise).
 - **A new UI language:** add `Strings.<lang>.resx`, the language to `UiLanguage.Available`, `Languages.Supported`, `SatelliteResourceLanguages` in the client csproj and `supported` plus the loading texts in `wwwroot/js/start.js`.
 - **A new bot message:** a `Notification` record in Application, a case in `MessageTexts.Format` and the text in both `Messages*.resx` (`TelegramTextsTests`).

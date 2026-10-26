@@ -84,7 +84,7 @@ public static class Grader
                 .Select((question, i) => new PartResult(
                     i,
                     At(answer.Choices, i) is { } selected && selected.ToHashSet().SetEquals(question.Correct),
-                    string.Join(", ", question.Correct.Select(c => question.Options[c])),
+                    string.Join(", ", question.Correct.Select(c => question.Options[c].Label)),
                     question.Explanation))
                 .ToList()),
             _ => throw new NotSupportedException($"Unknown exercise type {exercise.GetType().Name}"),
