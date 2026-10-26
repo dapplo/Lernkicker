@@ -6,6 +6,8 @@ Parents upload a lesson under **Lernstoff verwalten / Manage learning material**
 
 As with quizzes, the keys are English and the **content** is in the lesson's `language` (default `de`).
 
+To have an AI assistant write one, give it the [prompt for AI assistants](ai-prompt/README.md); the upload page offers it for download (**Create with an AI**), with both schemas included.
+
 Check locally (the same script checks quizzes and lessons, picked by `format`):
 
 ```sh

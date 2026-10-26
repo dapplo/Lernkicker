@@ -407,6 +407,12 @@
   <data name="Issue.imagesTooLarge" xml:space="preserve"><value>All pictures together are larger than {maxMb} MB.</value></data>
   <data name="Learn.Type.image" xml:space="preserve"><value>Picture</value></data>
   <data name="Picture.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="AiHelp.Title" xml:space="preserve"><value>Create with an AI</value></data>
+  <data name="AiHelp.Step1" xml:space="preserve"><value>Download the instructions and paste their whole text into an AI chat (e.g. Claude, ChatGPT or Gemini).</value></data>
+  <data name="AiHelp.Step2" xml:space="preserve"><value>Fill in the topic, school year and language, and attach photos of the worksheets or notebook pages.</value></data>
+  <data name="AiHelp.Step3" xml:space="preserve"><value>Upload the file the AI gives you here: the JSON file, or the zip if it has pictures.</value></data>
+  <data name="AiHelp.Prompt" xml:space="preserve"><value>Download instructions for the AI</value></data>
+  <data name="AiHelp.Schemas" xml:space="preserve"><value>The formats on their own, for tools that work with JSON schemas:</value></data>
   <data name="Upload.ChooseFiles" xml:space="preserve"><value>Choose files</value></data>
   <data name="Upload.PicturesHint" xml:space="preserve"><value>With pictures: choose the JSON file and its pictures together, or a zip with all of them. Large photos are made smaller before uploading.</value></data>
   <data name="Upload.Shrinking" xml:space="preserve"><value>Preparing pictures …</value></data>

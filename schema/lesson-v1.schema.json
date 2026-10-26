@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/dapplo/lernkicker/schema/lesson-v1.schema.json",
+  "$id": "https://raw.githubusercontent.com/dapplo/lernkicker/main/schema/lesson-v1.schema.json",
   "title": "Lernkicker learning material (lesson/v1)",
   "description": "Learning material for Lernkicker: text, a poem to learn by heart, flashcards, key facts. See docs/lesson-format.md.",
   "type": "object",

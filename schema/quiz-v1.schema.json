@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/dapplo/lernkicker/schema/quiz-v1.schema.json",
+  "$id": "https://raw.githubusercontent.com/dapplo/lernkicker/main/schema/quiz-v1.schema.json",
   "title": "Lernkicker practice quiz (quiz/v1)",
   "description": "A practice quiz for Lernkicker. See docs/quiz-format.md.",
   "type": "object",

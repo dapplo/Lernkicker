@@ -27,6 +27,8 @@ Items marked *(planned)* are not built yet.
 
 ## 2. Login
 
+Without a login, only the app's static files, `/api/status`, the setup on a fresh server and `/api/format/*` answer; the last holds the JSON schemas and the prompt for AI assistants (`docs/ai-prompt/`), no data.
+
 **No open registration.** Accounts only come from invitations, except the very first one: on a fresh server (no admin yet) the setup page creates the admin. It only answers inside the tailnet (`TailnetOnlyFilter`), only while no admin exists (checked under a lock, so two visitors at once cannot both become admin), and is rate limited like the login. Funnel is off by default, so between starting the container and filling in the page only devices in your own tailnet can reach it. Do the setup right after the first start, before turning on Funnel. A fresh server can also start from a backup (`POST /api/setup/restore`, same rules): the zip must carry the backup manifest and a SQLite database with Lernkicker's migrations; key files are only taken as flat `keys/*.xml` names, so no path from the zip reaches the file system.
 
 **Backups** (`GET /api/admin/backup`, admin, tailnet only) contain the whole database and the Data Protection keys, i.e. everything needed to read all data and decrypt the Telegram token. Treat the file like the `data` folder: store it encrypted.

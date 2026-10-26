@@ -582,3 +582,8 @@ input.gap { width: 9em; }
 }
 
 .table-scroll { overflow-x: auto; }
+
+/* Upload: making a file with an AI */
+.ai-help { margin: 12px 0; }
+.ai-help > summary { cursor: pointer; font-weight: 600; color: var(--green-dark); }
+.ai-help ol { padding-left: 1.4em; }

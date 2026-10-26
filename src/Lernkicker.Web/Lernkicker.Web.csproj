@@ -17,6 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Served to parents for their AI assistants (FormatEndpoints) -->
+    <EmbeddedResource Include="..\..\schema\quiz-v1.schema.json" LogicalName="format/quiz-v1.schema.json" />
+    <EmbeddedResource Include="..\..\schema\lesson-v1.schema.json" LogicalName="format/lesson-v1.schema.json" />
+    <EmbeddedResource Include="..\..\docs\ai-prompt\en.md" LogicalName="format/ai-prompt.en.md" />
+    <EmbeddedResource Include="..\..\docs\ai-prompt\de.md" LogicalName="format/ai-prompt.de.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

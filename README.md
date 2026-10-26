@@ -12,7 +12,8 @@ It runs as a Docker container on a Synology NAS and is reachable through Tailsca
 - [Security concept](docs/security.md): Funnel, login, family isolation, data protection, email
 - [Quiz format `quiz/v1`](docs/quiz-format.md): what a quiz looks like as JSON
 - [Lesson format `lesson/v1`](docs/lesson-format.md): learning material (poems, texts, flashcards, facts) as JSON
-- [`schema/`](schema/): JSON Schema for quizzes, [`quizzes/`](quizzes/): example quizzes
+- [`schema/`](schema/): JSON Schema for quizzes and lessons, [`quizzes/`](quizzes/), [`lessons/`](lessons/): examples
+- [Prompt for AI assistants](docs/ai-prompt/README.md): lets parents have an AI write a quiz or lesson (German and English); the app offers it on the upload pages
 - [`tools/validate_quizzes.py`](tools/validate_quizzes.py): validates quizzes locally and in CI
 
 ## Projects

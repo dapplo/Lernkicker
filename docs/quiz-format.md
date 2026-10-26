@@ -4,6 +4,8 @@ A practice quiz is **one JSON file** (UTF-8). Parents upload it in the parents' 
 
 The format's keys are English. The **content** (titles, questions, answers) is in whatever language the child learns in, usually German; declare it with `language`.
 
+To have an AI assistant write one, give it the [prompt for AI assistants](ai-prompt/README.md); the upload page offers it for download (**Create with an AI**), with both schemas included.
+
 Check locally:
 
 ```sh
