@@ -59,7 +59,7 @@ public class PlaySettingsTests
     [Fact]
     public void Unknown_games_and_reaches_are_refused()
     {
-        Assert.False(PlaySettings.IsValid(["chess"], PlayReach.Family, [], []));
+        Assert.False(PlaySettings.IsValid(["go"], PlayReach.Family, [], []));
         Assert.False(PlaySettings.IsValid([MultiplayerGames.Battleship], "world", [], []));
         Assert.True(PlaySettings.IsValid([MultiplayerGames.Battleship], PlayReach.Selected, [FamilyB], []));
     }

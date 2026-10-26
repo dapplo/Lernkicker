@@ -1,0 +1,144 @@
+@* Chess: tap a piece, then where it should go. The server sends every legal move, so only those squares light up;
+   a pawn reaching the last row asks which piece it becomes. Each player sees their own side at the bottom. *@
+
+<p class="game-how">
+    @if (View.Over)
+    {
+        @(View.Ending is { } ending ? L[$"Chess.Ending.{ending}"] : L["Chess.Over"])
+    }
+    else if (MyTurn)
+    {
+        @(View.Check ? L["Chess.YouAreInCheck"] : L["Chess.YourTurn"])
+    }
+    else
+    {
+        @(View.Check ? L["Chess.TheyAreInCheck", Opponent] : L["Chess.TheirTurn", Opponent])
+    }
+    <span class="chess-me">@L[View.IAmWhite ? "Chess.YouWhite" : "Chess.YouBlack"]</span>
+</p>
+
+<div class="chess-board" role="grid" aria-label="@L["Play.Game.chess"]">
+    @for (var row = 0; row < Size; row++)
+    {
+        for (var col = 0; col < Size; col++)
+        {
+            var cell = Square(col, row);
+            var piece = View.Board[cell.Y][cell.X];
+            var css = string.Join(" ",
+                (cell.X + cell.Y) % 2 == 1 ? "dark" : "light",
+                _from == cell ? "selected" : "",
+                Targets.Contains(cell) ? (piece == '.' ? "goal" : "goal take") : "",
+                View.Last is { } last && (last.From == cell || last.To == cell) ? "last" : "",
+                View.Check && piece == (View.WhiteToMove ? 'K' : 'k') ? "in-check" : "");
+            <button type="button" class="square @css" aria-label="@Label(cell, piece)" disabled="@(Busy || !MyTurn)" @onclick="() => Tap(cell)">
+                @if (piece != '.')
+                {
+                    <span class="piece @(char.IsUpper(piece) ? "white" : "black")" aria-hidden="true">@Glyph(piece)</span>
+                }
+                @if (col == 0)
+                {
+                    <span class="rank-label" aria-hidden="true">@(Size - cell.Y)</span>
+                }
+                @if (row == Size - 1)
+                {
+                    <span class="file-label" aria-hidden="true">@((char)('a' + cell.X))</span>
+                }
+            </button>
+        }
+    }
+</div>
+
+@if (_promotion is { } promotion)
+{
+    <p class="game-how">@L["Chess.Promote"]</p>
+    <div class="buttons chess-promotion">
+        @foreach (var choice in Promotions)
+        {
+            <button type="button" class="btn quiet" disabled="@Busy" @onclick="() => Send(promotion with { Promotion = choice })">
+                <span class="piece @(View.IAmWhite ? "white" : "black")" aria-hidden="true">@Glyph(View.IAmWhite ? choice[0] : char.ToLowerInvariant(choice[0]))</span>
+                @L[$"Chess.Piece.{choice}"]
+            </button>
+        }
+        <button type="button" class="btn quiet" @onclick="() => _promotion = null">@L["Common.Cancel"]</button>
+    </div>
+}
+
+@code {
+    private const int Size = 8;
+    private static readonly string[] Promotions = ["Q", "R", "B", "N"];
+    private CellDto? _from;
+    private ChessMoveDto? _promotion;
+    private IReadOnlyList<ChessMoveDto>? _moves;
+
+    [Parameter, EditorRequired]
+    public required ChessViewDto View { get; set; }
+
+    [Parameter]
+    public string Opponent { get; set; } = "";
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public EventCallback<MoveDto> Move { get; set; }
+
+    private bool MyTurn => !View.Over && View.IAmWhite == View.WhiteToMove;
+
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_moves, View.Moves))
+        {
+            _moves = View.Moves;
+            _from = null;
+            _promotion = null;
+        }
+    }
+
+    /// <summary>White sees rank 1 at the bottom, black the board turned around.</summary>
+    private CellDto Square(int col, int row) => View.IAmWhite ? new(col, row) : new(Size - 1 - col, Size - 1 - row);
+
+    private HashSet<CellDto> Targets => _from is null ? [] : View.Moves.Where(m => m.From == _from).Select(m => m.To).ToHashSet();
+
+    private Task Tap(CellDto cell)
+    {
+        _promotion = null;
+        var moves = _from is null ? [] : View.Moves.Where(m => m.From == _from && m.To == cell).ToList();
+        if (moves.Count == 0)
+        {
+            // Select (or switch to) a piece that can move; anything else clears the selection
+            _from = View.Moves.Any(m => m.From == cell) && _from != cell ? cell : null;
+            return Task.CompletedTask;
+        }
+
+        if (moves.Count > 1)
+        {
+            // Several moves to one square only happen when a pawn promotes
+            _promotion = moves[0];
+            return Task.CompletedTask;
+        }
+
+        return Send(moves[0]);
+    }
+
+    private Task Send(ChessMoveDto move)
+    {
+        _promotion = null;
+        return Move.InvokeAsync(new ChessMoveRequestDto(move.From, move.To, move.Promotion));
+    }
+
+    /// <summary>The filled chess glyphs for both sides, coloured by CSS; U+FE0E keeps phones from drawing emoji.</summary>
+    private static string Glyph(char piece) => char.ToUpperInvariant(piece) switch
+    {
+        'K' => "♚︎",
+        'Q' => "♛︎",
+        'R' => "♜︎",
+        'B' => "♝︎",
+        'N' => "♞︎",
+        _ => "♟︎",
+    };
+
+    private string Label(CellDto cell, char piece) =>
+        $"{(char)('a' + cell.X)}{Size - cell.Y}" + (piece == '.'
+            ? ""
+            : $", {L[char.IsUpper(piece) ? "Chess.White" : "Chess.Black"]} {L[$"Chess.Piece.{char.ToUpperInvariant(piece)}"]}");
+}

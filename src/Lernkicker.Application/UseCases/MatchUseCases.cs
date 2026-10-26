@@ -44,7 +44,10 @@ public sealed class MatchUseCases(IPlayRepository play, IPlayPresence presence, 
                 .OrderBy(m => m.Status == MatchStatus.Finished).ThenByDescending(m => m.MyTurn).ThenByDescending(m => m.UpdatedAt).ToList());
     }
 
-    /// <summary>Opens a table in the lobby; <paramref name="seats"/> defaults to the fewest players the game needs.</summary>
+    /// <summary>
+    /// Opens a table in the lobby; <paramref name="seats"/> defaults to the most players the game takes. The game
+    /// starts when every seat is taken, or earlier when the host says so (<see cref="StartAsync"/>).
+    /// </summary>
     public async Task<Result<MatchState>> OpenTableAsync(Guid childId, string game, int? seats)
     {
         var rules = MultiplayerGames.Find(game);
@@ -68,7 +71,7 @@ public sealed class MatchUseCases(IPlayRepository play, IPlayPresence presence, 
                 return AppError.Invalid(ErrorCodes.TooManyTables);
             }
 
-            var match = Match.Open(rules, seats ?? rules.MinPlayers, childId, me.FamilyId, time.GetUtcNow());
+            var match = Match.Open(rules, seats ?? rules.MaxPlayers, childId, me.FamilyId, time.GetUtcNow());
             play.Add(match);
             await unitOfWork.SaveChangesAsync();
             notifier.LobbyChanged();
@@ -118,6 +121,35 @@ public sealed class MatchUseCases(IPlayRepository play, IPlayPresence presence, 
             }
 
             match.Join(MultiplayerGames.Find(match.Game)!, childId, me.FamilyId, random, time.GetUtcNow());
+            await unitOfWork.SaveChangesAsync();
+            Changed(match);
+            return await StateAsync(match, childId);
+        }
+        finally
+        {
+            Gate.Release();
+        }
+    }
+
+    /// <summary>The host starts a game for more players with whoever sits at the table already.</summary>
+    public async Task<Result<MatchState>> StartAsync(Guid childId, Guid matchId, Random random)
+    {
+        await Gate.WaitAsync();
+        try
+        {
+            var match = await play.FindMatchAsync(matchId);
+            if (match?.SeatOf(childId) is null)
+            {
+                return AppError.NotFound(ErrorCodes.MatchNotFound);
+            }
+
+            var rules = MultiplayerGames.Find(match.Game)!;
+            if (match.Host.ChildId != childId || !match.CanStartEarly(rules))
+            {
+                return AppError.Invalid(ErrorCodes.TableClosed);
+            }
+
+            match.StartEarly(rules, random, time.GetUtcNow());
             await unitOfWork.SaveChangesAsync();
             Changed(match);
             return await StateAsync(match, childId);
@@ -242,7 +274,7 @@ public sealed class MatchUseCases(IPlayRepository play, IPlayPresence presence, 
         var rules = MultiplayerGames.Find(m.Game)!;
         var seat = m.SeatOf(childId);
         return new MatchSummary(
-            m.Id, m.Game, m.Status, m.Seats,
+            m.Id, m.Game, m.Status, m.Seats, rules.MinPlayers,
             m.Players.OrderBy(p => p.Seat)
                 .Select(p => names.TryGetValue(p.ChildId, out var n) ? new SeatInfo(p.Seat, p.ChildId, n.Name, n.FamilyName) : null)
                 .OfType<SeatInfo>().ToList(),

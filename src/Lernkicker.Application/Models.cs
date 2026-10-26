@@ -140,10 +140,10 @@ public sealed record SeatInfo(int Seat, Guid ChildId, string Name, string Family
 
 /// <summary>
 /// A table or game as a child sees it in the lobby. <c>MySeat</c> is null at someone else's open table;
-/// <c>MyTurn</c> says the child has to move.
+/// <c>MyTurn</c> says the child has to move; with <c>MinPlayers</c> at the table the host may start early.
 /// </summary>
 public sealed record MatchSummary(
-    Guid Id, string Game, string Status, int Seats, IReadOnlyList<SeatInfo> Players, int? MySeat, bool MyTurn, int? Winner, bool Abandoned, DateTimeOffset UpdatedAt);
+    Guid Id, string Game, string Status, int Seats, int MinPlayers, IReadOnlyList<SeatInfo> Players, int? MySeat, bool MyTurn, int? Winner, bool Abandoned, DateTimeOffset UpdatedAt);
 
 /// <summary>Someone the child could play with who has the play page open, and which games they share.</summary>
 public sealed record LobbyPlayer(Guid ChildId, string Name, string FamilyName, IReadOnlyList<string> Games);

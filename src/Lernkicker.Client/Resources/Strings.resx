@@ -577,6 +577,97 @@
   <data name="Battleship.Hit" xml:space="preserve"><value>hit</value></data>
   <data name="Battleship.Miss" xml:space="preserve"><value>miss</value></data>
   <data name="Battleship.Sunk" xml:space="preserve"><value>sunk</value></data>
+  <data name="Play.Game.connectFour" xml:space="preserve"><value>Connect Four</value></data>
+  <data name="Play.Game.checkers" xml:space="preserve"><value>Checkers</value></data>
+  <data name="Play.Game.mauMau" xml:space="preserve"><value>Mau-Mau</value></data>
+  <data name="Play.Game.chess" xml:space="preserve"><value>Chess</value></data>
+  <data name="Play.Draw" xml:space="preserve"><value>Draw</value></data>
+  <data name="Play.SeatsTaken" xml:space="preserve"><value>{0} of {1} players</value></data>
+  <data name="Play.WaitingHintMany" xml:space="preserve"><value>Up to the full table can join. Once at least {0} are here, you can start; whoever opened the game decides when.</value></data>
+  <data name="Play.StartNow" xml:space="preserve"><value>Start now</value></data>
+  <data name="ConnectFour.YourTurn" xml:space="preserve"><value>Tap a column to drop your disc. Four in a row wins, across, down or slanting.</value></data>
+  <data name="ConnectFour.TheirTurn" xml:space="preserve"><value>{0} is thinking …</value></data>
+  <data name="ConnectFour.Over" xml:space="preserve"><value>The game is over.</value></data>
+  <data name="ConnectFour.YouRed" xml:space="preserve"><value>You play red.</value></data>
+  <data name="ConnectFour.YouYellow" xml:space="preserve"><value>You play yellow.</value></data>
+  <data name="ConnectFour.Column" xml:space="preserve"><value>Column {0}</value></data>
+  <data name="Checkers.YourTurn" xml:space="preserve"><value>Tap one of your pieces, then where it should go.</value></data>
+  <data name="Checkers.MustCapture" xml:space="preserve"><value>You must capture! Tap the piece, then each square it jumps to.</value></data>
+  <data name="Checkers.TheirTurn" xml:space="preserve"><value>{0} is thinking …</value></data>
+  <data name="Checkers.Over" xml:space="preserve"><value>The game is over.</value></data>
+  <data name="Checkers.YouWhite" xml:space="preserve"><value>You play white.</value></data>
+  <data name="Checkers.YouBlack" xml:space="preserve"><value>You play black.</value></data>
+  <data name="Checkers.Undo" xml:space="preserve"><value>Choose again</value></data>
+  <data name="Checkers.WhitePiece" xml:space="preserve"><value>white piece</value></data>
+  <data name="Checkers.BlackPiece" xml:space="preserve"><value>black piece</value></data>
+  <data name="Checkers.WhiteKing" xml:space="preserve"><value>white king</value></data>
+  <data name="Checkers.BlackKing" xml:space="preserve"><value>black king</value></data>
+  <data name="MauMau.Out" xml:space="preserve"><value>gave up</value></data>
+  <data name="MauMau.Cards" xml:space="preserve"><value>{0} cards</value></data>
+  <data name="MauMau.MyHand" xml:space="preserve"><value>My cards</value></data>
+  <data name="MauMau.Draw" xml:space="preserve"><value>Draw a card</value></data>
+  <data name="MauMau.DrawMany" xml:space="preserve"><value>Draw {0} cards</value></data>
+  <data name="MauMau.Wished" xml:space="preserve"><value>Wished:</value></data>
+  <data name="MauMau.Over" xml:space="preserve"><value>The game is over.</value></data>
+  <data name="MauMau.TheirTurn" xml:space="preserve"><value>{0} is playing …</value></data>
+  <data name="MauMau.YourTurn" xml:space="preserve"><value>Play a card of the same suit or rank, or draw one.</value></data>
+  <data name="MauMau.WishSuit" xml:space="preserve"><value>Which suit do you wish for?</value></data>
+  <data name="MauMau.Sevens" xml:space="preserve"><value>A seven! Play a seven too, or draw {0} cards.</value></data>
+  <data name="MauMau.PlayDrawnOrPass" xml:space="preserve"><value>You may play the card you drew, or pass.</value></data>
+  <data name="MauMau.Pass" xml:space="preserve"><value>The card does not fit. Pass on to the next player.</value></data>
+  <data name="MauMau.PassButton" xml:space="preserve"><value>Pass</value></data>
+  <data name="MauMau.CardName" xml:space="preserve"><value>{0} {1}</value></data>
+  <data name="MauMau.Suit.C" xml:space="preserve"><value>Clubs</value></data>
+  <data name="MauMau.Suit.S" xml:space="preserve"><value>Spades</value></data>
+  <data name="MauMau.Suit.H" xml:space="preserve"><value>Hearts</value></data>
+  <data name="MauMau.Suit.D" xml:space="preserve"><value>Diamonds</value></data>
+  <data name="MauMau.Rank.7" xml:space="preserve"><value>7</value></data>
+  <data name="MauMau.Rank.8" xml:space="preserve"><value>8</value></data>
+  <data name="MauMau.Rank.9" xml:space="preserve"><value>9</value></data>
+  <data name="MauMau.Rank.T" xml:space="preserve"><value>10</value></data>
+  <data name="MauMau.Rank.J" xml:space="preserve"><value>J</value></data>
+  <data name="MauMau.Rank.Q" xml:space="preserve"><value>Q</value></data>
+  <data name="MauMau.Rank.K" xml:space="preserve"><value>K</value></data>
+  <data name="MauMau.Rank.A" xml:space="preserve"><value>A</value></data>
+  <data name="MauMau.RankName.7" xml:space="preserve"><value>seven</value></data>
+  <data name="MauMau.RankName.8" xml:space="preserve"><value>eight</value></data>
+  <data name="MauMau.RankName.9" xml:space="preserve"><value>nine</value></data>
+  <data name="MauMau.RankName.T" xml:space="preserve"><value>ten</value></data>
+  <data name="MauMau.RankName.J" xml:space="preserve"><value>jack</value></data>
+  <data name="MauMau.RankName.Q" xml:space="preserve"><value>queen</value></data>
+  <data name="MauMau.RankName.K" xml:space="preserve"><value>king</value></data>
+  <data name="MauMau.RankName.A" xml:space="preserve"><value>ace</value></data>
+  <data name="MauMau.Did.Play" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="MauMau.Did.Jack" xml:space="preserve"><value>{0}: {1}, wishes {2}</value></data>
+  <data name="MauMau.Did.Draw" xml:space="preserve"><value>{0} drew {1} card(s)</value></data>
+  <data name="MauMau.Did.Pass" xml:space="preserve"><value>{0} passed</value></data>
+  <data name="MauMau.Did.Resign" xml:space="preserve"><value>{0} gave up</value></data>
+  <data name="Chess.YourTurn" xml:space="preserve"><value>Tap a piece, then where it should go.</value></data>
+  <data name="Chess.YouAreInCheck" xml:space="preserve"><value>Check! Protect your king.</value></data>
+  <data name="Chess.TheirTurn" xml:space="preserve"><value>{0} is thinking …</value></data>
+  <data name="Chess.TheyAreInCheck" xml:space="preserve"><value>Check! {0} has to protect the king.</value></data>
+  <data name="Chess.Over" xml:space="preserve"><value>The game is over.</value></data>
+  <data name="Chess.YouWhite" xml:space="preserve"><value>You play white.</value></data>
+  <data name="Chess.YouBlack" xml:space="preserve"><value>You play black.</value></data>
+  <data name="Chess.Promote" xml:space="preserve"><value>Your pawn reached the last row. What should it become?</value></data>
+  <data name="Chess.White" xml:space="preserve"><value>white</value></data>
+  <data name="Chess.Black" xml:space="preserve"><value>black</value></data>
+  <data name="Chess.Piece.K" xml:space="preserve"><value>king</value></data>
+  <data name="Chess.Piece.Q" xml:space="preserve"><value>queen</value></data>
+  <data name="Chess.Piece.R" xml:space="preserve"><value>rook</value></data>
+  <data name="Chess.Piece.B" xml:space="preserve"><value>bishop</value></data>
+  <data name="Chess.Piece.N" xml:space="preserve"><value>knight</value></data>
+  <data name="Chess.Piece.P" xml:space="preserve"><value>pawn</value></data>
+  <data name="Chess.Ending.checkmate" xml:space="preserve"><value>Checkmate!</value></data>
+  <data name="Chess.Ending.stalemate" xml:space="preserve"><value>Stalemate: no move left, but no check. Draw.</value></data>
+  <data name="Chess.Ending.repetition" xml:space="preserve"><value>The same position three times: draw.</value></data>
+  <data name="Chess.Ending.fiftyMoves" xml:space="preserve"><value>50 moves without a capture or a pawn move: draw.</value></data>
+  <data name="Chess.Ending.material" xml:space="preserve"><value>Nobody can checkmate any more: draw.</value></data>
+  <data name="Error.connectFour.columnFull" xml:space="preserve"><value>This column is full.</value></data>
+  <data name="Error.checkers.mustCapture" xml:space="preserve"><value>You must capture!</value></data>
+  <data name="Error.mauMau.cardNotPlayable" xml:space="preserve"><value>This card does not fit.</value></data>
+  <data name="Error.mauMau.mustDraw" xml:space="preserve"><value>Play a seven or draw the cards.</value></data>
+  <data name="Error.chess.moveInvalid" xml:space="preserve"><value>That move is not allowed.</value></data>
   <data name="Error.play.settingsInvalid" xml:space="preserve"><value>These settings are not possible.</value></data>
   <data name="Error.play.gameUnknown" xml:space="preserve"><value>This game does not exist.</value></data>
   <data name="Error.play.notUnlocked" xml:space="preserve"><value>Your parents have not unlocked this game.</value></data>

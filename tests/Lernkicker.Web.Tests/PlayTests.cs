@@ -25,7 +25,7 @@ public sealed class PlayTests(LernkickerFactory factory) : IClassFixture<Lernkic
         Assert.Empty(settings.Games);
         Assert.Equal("family", settings.Reach);
 
-        var invalid = await a.PutAsJsonAsync($"/api/children/{calvin.Id}/play", new PlaySettingsDto(["chess"], "family", [], []));
+        var invalid = await a.PutAsJsonAsync($"/api/children/{calvin.Id}/play", new PlaySettingsDto(["go"], "family", [], []));
         Assert.Equal(ErrorCodes.PlaySettingsInvalid, (await LernkickerFactory.Error(invalid, HttpStatusCode.BadRequest)).Code);
 
         var saved = await LernkickerFactory.Json<PlaySettingsDto>(

@@ -134,6 +134,11 @@ public static class ErrorCodes
     public const string MoveInvalid = Domain.Multiplayer.GameErrors.MoveInvalid;
     public const string FleetInvalid = Domain.Multiplayer.GameErrors.FleetInvalid;
     public const string ShotInvalid = Domain.Multiplayer.GameErrors.ShotInvalid;
+    public const string ColumnFull = Domain.Multiplayer.GameErrors.ColumnFull;
+    public const string MustCapture = Domain.Multiplayer.GameErrors.MustCapture;
+    public const string CardNotPlayable = Domain.Multiplayer.GameErrors.CardNotPlayable;
+    public const string MustDraw = Domain.Multiplayer.GameErrors.MustDraw;
+    public const string ChessMoveInvalid = Domain.Multiplayer.GameErrors.ChessMoveInvalid;
 
     /// <summary>Prefix for account errors from the identity adapter, e.g. "account.DuplicateEmail".</summary>
     public const string AccountPrefix = "account.";

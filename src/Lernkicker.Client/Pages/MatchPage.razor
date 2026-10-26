@@ -31,7 +31,7 @@ else
     <h1><span aria-hidden="true">@PlayGames.Icon(match.Game)</span> @L[$"Play.Game.{match.Game}"]</h1>
     <p class="play-players">@string.Join(" · ", match.Players.Select(p => p.Seat == match.MySeat ? L["Play.You"].Value : p.Name))</p>
     <p class="play-status @(match.MyTurn ? "my-turn" : "")" role="status" aria-live="polite">
-        @(_match.Resigned is { } resigned && match.Status == "finished"
+        @(_match.Resigned is { } resigned && match.Status == "finished" && (resigned == match.MySeat || match.Winner == match.MySeat)
             ? resigned == match.MySeat ? L["Play.YouGaveUp"] : L["Play.GaveUp", match.Players.FirstOrDefault(p => p.Seat == resigned)?.Name ?? "?"]
             : PlayGames.Status(L, match))
     </p>
@@ -42,23 +42,43 @@ else
         case BattleshipViewDto battleship:
             <BattleshipGame View="@battleship" MySeat="@(match.MySeat ?? 0)" Opponent="@Opponent" Busy="@_busy" Move="Move" />
             break;
+        case ConnectFourViewDto connectFour:
+            <ConnectFourGame View="@connectFour" MySeat="@(match.MySeat ?? 0)" Opponent="@Opponent" Busy="@_busy" Move="Move" />
+            break;
+        case CheckersViewDto checkers:
+            <CheckersGame View="@checkers" Opponent="@Opponent" Busy="@_busy" Move="Move" />
+            break;
+        case MauMauViewDto mauMau:
+            <MauMauGame View="@mauMau" Players="@match.Players" MySeat="@(match.MySeat ?? 0)" Busy="@_busy" Move="Move" />
+            break;
+        case ChessViewDto chess:
+            <ChessGame View="@chess" Opponent="@Opponent" Busy="@_busy" Move="Move" />
+            break;
         case null when match.Status == "waiting":
             <div class="empty">
                 <div class="ball" aria-hidden="true">⏳</div>
-                <p>@L["Play.WaitingHint"]</p>
+                @if (match.Seats > 2)
+                {
+                    <p><b>@L["Play.SeatsTaken", match.Players.Count, match.Seats]</b></p>
+                }
+                <p>@(match.Seats > 2 ? L["Play.WaitingHintMany", match.MinPlayers] : L["Play.WaitingHint"])</p>
             </div>
             break;
     }
 
     <div class="buttons">
         <a class="btn quiet" href="play">@L["Play.BackToLobby"]</a>
+        @if (match.Status == "waiting" && match.MySeat == 0 && match.Seats > 2)
+        {
+            <button class="btn" disabled="@(_busy || match.Players.Count < match.MinPlayers)" @onclick="Start">@L["Play.StartNow"]</button>
+        }
         @if (match.Status == "waiting")
         {
             <button class="btn quiet" disabled="@_busy" @onclick="Leave">@(match.MySeat == 0 ? L["Play.CloseTable"] : L["Play.LeaveTable"])</button>
         }
     </div>
 
-    @if (match.Status == "playing" && !match.Abandoned)
+    @if (match.Status == "playing" && !match.Abandoned && !(_match.View is MauMauViewDto { } mau && mau.Out.Contains(match.MySeat ?? -1)))
     {
         @* Tucked away with a second step, so nobody gives up by accident *@
         <details class="grown-ups">
@@ -126,6 +146,8 @@ else
     });
 
     private Task Move(MoveDto move) => Run(async () => _match = await Api.Move(Id, move));
+
+    private Task Start() => Run(async () => _match = await Api.StartTable(Id));
 
     private Task Resign() => Run(async () => _match = await Api.Resign(Id));
 

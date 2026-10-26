@@ -33,6 +33,9 @@ public static class PlayEndpoints
         play.MapPost("/tables/{matchId:guid}/join", async (Guid matchId, ClaimsPrincipal user, MatchUseCases uc) =>
             (await uc.JoinAsync(user.ChildIdOf(), matchId, Random.Shared)).ToHttp(m => m.ToDto()));
 
+        play.MapPost("/tables/{matchId:guid}/start", async (Guid matchId, ClaimsPrincipal user, MatchUseCases uc) =>
+            (await uc.StartAsync(user.ChildIdOf(), matchId, Random.Shared)).ToHttp(m => m.ToDto()));
+
         play.MapDelete("/tables/{matchId:guid}", async (Guid matchId, ClaimsPrincipal user, MatchUseCases uc) =>
             (await uc.LeaveTableAsync(user.ChildIdOf(), matchId)).ToHttp());
 

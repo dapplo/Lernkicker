@@ -997,3 +997,149 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .vocab-questions li .picture { grid-column: 1 / -1; margin: 0; }
 .vocab-questions li .picture img { max-height: 120px; }
 .vocab-questions .vocab-to { color: var(--muted); font-weight: 400; margin-left: 6px; }
+
+/* Connect Four: each column is one button; the discs sit in round holes of a blue frame */
+.c4-me, .checkers-me, .chess-me { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; color: var(--muted); font-weight: 600; }
+.c4-board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    width: 100%;
+    max-width: 440px;
+    padding: 6px;
+    border-radius: 12px;
+    background: #1c5fbf;
+}
+.c4-column {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    font: inherit;
+}
+.c4-column:not(:disabled) { cursor: pointer; }
+.c4-column:not(:disabled):hover { background: rgb(255 255 255 / 18%); }
+.c4-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #0f3f86; }
+.c4-cell .c4-disc { width: 86%; height: 86%; }
+.c4-disc { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 50%; background: #f4f8ff; }
+.c4-disc.red { background: radial-gradient(circle at 35% 35%, #ff8a80, #d62828 60%); }
+.c4-disc.yellow { background: radial-gradient(circle at 35% 35%, #fff3a3, #f2c200 60%); }
+.c4-cell.last .c4-disc { box-shadow: 0 0 0 3px #fff; }
+.c4-cell.line .c4-disc { box-shadow: 0 0 0 4px var(--gold), 0 0 12px var(--gold); }
+
+/* Checkers and chess: an 8 × 8 board of buttons; a tapped piece, the squares it may go to and the last move light up */
+.checkers-board, .chess-board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    width: 100%;
+    max-width: 440px;
+    border: 4px solid #6b4423;
+    border-radius: 6px;
+}
+.checkers-board .square, .chess-board .square {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    font: inherit;
+    line-height: 1;
+}
+.checkers-board .square.light, .chess-board .square.light { background: #f0d9b5; }
+.checkers-board .square.dark, .chess-board .square.dark { background: #b58863; }
+.checkers-board .square:disabled, .chess-board .square:disabled { color: inherit; opacity: 1; }
+.checkers-board button.square:not(:disabled), .chess-board button.square:not(:disabled) { cursor: pointer; }
+.checkers-board .square.last, .chess-board .square.last { box-shadow: inset 0 0 0 100px rgb(255 214 0 / 35%); }
+.checkers-board .square.selected, .chess-board .square.selected { box-shadow: inset 0 0 0 4px var(--green); }
+.checkers-board .square.goal::after, .chess-board .square.goal::after {
+    content: "";
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background: rgb(31 143 78 / 70%);
+}
+.chess-board .square.goal.take::after { width: 88%; height: 88%; background: transparent; border: 4px solid rgb(31 143 78 / 70%); }
+.checkers-board .hop { position: absolute; inset: 30%; border-radius: 50%; background: var(--green); }
+
+.checkers-board .piece, .checkers-me .piece {
+    position: relative;
+    display: inline-block;
+    width: 78%;
+    height: 78%;
+    border-radius: 50%;
+}
+.checkers-me .piece { width: 1.1em; height: 1.1em; }
+.checkers-board .piece.white, .checkers-me .piece.white { background: radial-gradient(circle at 40% 35%, #fff, #e6dccb 70%); box-shadow: 0 2px 0 #9c8f78; }
+.checkers-board .piece.black, .checkers-me .piece.black { background: radial-gradient(circle at 40% 35%, #6b6b6b, #1d1d1d 70%); box-shadow: 0 2px 0 #000; }
+.checkers-board .piece.king::after {
+    content: "♛\FE0E";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--gold);
+}
+
+.chess-board .piece { font-size: clamp(1.4rem, 8vw, 2.4rem); }
+.chess-board .piece.white, .chess-promotion .piece.white { color: #fff; text-shadow: 0 0 2px #000, 0 0 1px #000, 0 1px 1px #000; }
+.chess-board .piece.black, .chess-promotion .piece.black { color: #111; text-shadow: 0 0 1px #fff; }
+.chess-board .square.in-check { background: radial-gradient(circle, #ff4d4d 30%, #b58863 75%); }
+.chess-board .square.light.in-check { background: radial-gradient(circle, #ff4d4d 30%, #f0d9b5 75%); }
+.chess-board .rank-label, .chess-board .file-label { position: absolute; font-size: 0.65rem; font-weight: 700; color: rgb(0 0 0 / 45%); }
+.chess-board .rank-label { top: 2px; left: 3px; }
+.chess-board .file-label { bottom: 2px; right: 3px; }
+.chess-promotion .piece { font-size: 1.5rem; }
+
+/* Mau-Mau: the others' card backs, the deck and the pile in the middle, the own hand below */
+.mau-players { list-style: none; padding: 0; margin: 0 0 8px; display: flex; flex-wrap: wrap; gap: 8px; }
+.mau-players li { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); }
+.mau-players li.turn { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); }
+.mau-players li.out { opacity: 0.5; }
+.mau-players .backs { display: inline-flex; align-items: center; }
+.mau-players .back { width: 12px; height: 18px; margin-right: -5px; border-radius: 3px; border: 1px solid #fff; background: repeating-linear-gradient(45deg, #1c5fbf 0 3px, #3b7dd8 3px 6px); }
+.mau-players small { margin-left: 8px; color: var(--muted); }
+.mau-last { margin: 0 0 8px; color: var(--muted); font-weight: 600; }
+.mau-table { display: flex; align-items: center; gap: 16px; padding: 16px; margin-bottom: 8px; border-radius: var(--radius); background: #2b7a4b; }
+.mau-wish { padding: 4px 10px; border-radius: 999px; background: var(--paper); font-weight: 700; }
+.mau-wish b { font-size: 1.4rem; }
+.mau-wish.red b { color: #c62828; }
+.mau-hand { display: flex; flex-wrap: wrap; gap: 6px; }
+.mau-card {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 84px;
+    padding: 0;
+    border: 1px solid #c9c9c9;
+    border-radius: 8px;
+    background: #fff;
+    color: #1d1d1d;
+    font: inherit;
+    font-weight: 700;
+    line-height: 1.1;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 15%);
+}
+.mau-card.red { color: #c62828; }
+.mau-card .suit-symbol { font-size: 1.6rem; }
+.mau-card .rank { font-size: 1.2rem; }
+.mau-card.back { background: repeating-linear-gradient(45deg, #1c5fbf 0 6px, #3b7dd8 6px 12px); border: 3px solid #fff; }
+.mau-card.back small { padding: 2px 6px; border-radius: 6px; background: rgb(255 255 255 / 85%); color: #1d1d1d; }
+.mau-card.deck:not(:disabled) { cursor: pointer; box-shadow: 0 0 0 3px var(--gold); }
+.mau-hand .mau-card:disabled { opacity: 1; filter: grayscale(0.2); }
+.mau-hand .mau-card.playable { cursor: pointer; transform: translateY(-6px); box-shadow: 0 0 0 3px var(--gold), 0 4px 6px rgb(0 0 0 / 20%); }
+.mau-hand .mau-card.drawn { outline: 2px dashed var(--green); outline-offset: 2px; }
+.mau-suits .red { color: #c62828; }
+.mau-suits .suit-symbol { font-size: 1.3rem; }
+.checkers-board .square.movable { box-shadow: inset 0 0 0 3px rgb(255 214 0 / 80%); }
