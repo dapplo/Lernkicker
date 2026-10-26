@@ -18,36 +18,16 @@ else if (_items.Count == 0)
 }
 else
 {
-    <div class="form row filters">
-        <label>@L["Library.Kind"]
-            <select @bind="_kind">
-                <option value="">@L["Library.All"]</option>
-                <option value="@SharedKinds.Quiz">@L["Library.Quizzes"]</option>
-                <option value="@SharedKinds.Lesson">@L["Library.Lessons"]</option>
-            </select>
-        </label>
-        <label>@L["Library.Subject"]
-            <select @bind="_subject">
-                <option value="">@L["Library.All"]</option>
-                @foreach (var subject in _items.Select(i => i.Subject).Distinct().Order())
-                {
-                    <option value="@subject">@Display.Subject(subject)</option>
-                }
-            </select>
-        </label>
-        <label>@L["Library.Grade"]
-            <select @bind="_grade">
-                <option value="0">@L["Library.All"]</option>
-                @foreach (var grade in _items.Select(i => i.GradeLevel).Distinct().Order())
-                {
-                    <option value="@(grade ?? AdultsFilter)">@Display.Grade(grade)</option>
-                }
-            </select>
-        </label>
-    </div>
-
+    <ListFilterBar Filter="_filter" Subjects="_items.Select(i => i.Subject)" Grades="_items.Select(i => i.GradeLevel)"
+                   Shown="Filtered.Count()" Total="_items.Count" OnChange="StateHasChanged">
+        <select @bind="_filter.Kind" aria-label="@L["Library.Kind"]">
+            <option value="">@L["List.AllKinds"]</option>
+            <option value="@SharedKinds.Quiz">@L["Library.Quizzes"]</option>
+            <option value="@SharedKinds.Lesson">@L["Library.Lessons"]</option>
+        </select>
+    </ListFilterBar>
     <Messages Errors="@_errors" />
-    <ul class="list">
+    <ul class="list grid">
         @foreach (var item in Filtered)
         {
             <li class="@Display.SubjectClass(item.Subject)">
@@ -64,10 +44,10 @@ else
                     }
                 </div>
                 <span class="buttons">
-                    <a class="btn quiet" href="parents/library/@item.Kind/@item.Id">@L["Preview.Button"]</a>
+                    <IconButton Icon="👁️" Label="@L["Preview.Button"]" Class="quiet" Href="@($"parents/library/{item.Kind}/{item.Id}")" />
                     @if (!_copied.Contains(item.Id))
                     {
-                        <button class="btn" @onclick="() => Copy(item)">@L[item.InMyLibrary ? "Library.Update" : "Library.Copy"]</button>
+                        <IconButton Icon="@(item.InMyLibrary ? "🔄" : "📥")" Label="@L[item.InMyLibrary ? "Library.Update" : "Library.Copy"]" OnClick="() => Copy(item)" />
                     }
                 </span>
             </li>
@@ -78,17 +58,13 @@ else
 @code {
     private List<SharedOverview>? _items;
     private readonly HashSet<Guid> _copied = [];
-    private string _kind = "", _subject = "";
-    private int _grade;
+    private readonly ListFilter _filter = new();
 
-    // Grade filter value for quizzes and lessons without a school year
-    private const int AdultsFilter = -1;
     private IReadOnlyList<string>? _errors;
 
     private IEnumerable<SharedOverview> Filtered => _items!
-        .Where(i => _kind == "" || i.Kind == _kind)
-        .Where(i => _subject == "" || i.Subject == _subject)
-        .Where(i => _grade == 0 || (i.GradeLevel ?? AdultsFilter) == _grade);
+        .Where(i => _filter.Kind == "" || i.Kind == _filter.Kind)
+        .Where(i => _filter.Matches(i.Title, i.Topic, i.Subject, Display.Subject(i.Subject), i.GradeLevel));
 
     protected override async Task OnInitializedAsync()
     {

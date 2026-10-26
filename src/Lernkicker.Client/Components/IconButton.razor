@@ -1,0 +1,23 @@
+@* A small round button that shows only an icon. The label is the tooltip and what a screen reader says. *@
+
+@if (Href is not null)
+{
+    <a class="btn icon @Class" href="@Href" title="@Label" aria-label="@Label" @attributes="Attributes">
+        <span aria-hidden="true">@Icon</span>
+    </a>
+}
+else
+{
+    <button type="button" class="btn icon @Class" title="@Label" aria-label="@Label" @onclick="OnClick" @attributes="Attributes">
+        <span aria-hidden="true">@Icon</span>
+    </button>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Icon { get; set; } = "";
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? Attributes { get; set; }
+}

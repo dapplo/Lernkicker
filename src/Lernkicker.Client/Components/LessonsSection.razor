@@ -17,7 +17,9 @@
                     <small>@Display.Subject(a.Subject)@(a.DueOn is { } due ? " · " + L["Lessons.Until", Display.Date(due)] : "")</small>
                     <small>@Progress(a)</small>
                 </div>
-                <button class="btn quiet" @onclick="() => Unassign(a.Id)">@L["Common.Remove"]</button>
+                <span class="buttons">
+                    <IconButton Icon="✕" Label="@L["Common.Remove"]" Class="quiet" OnClick="() => Unassign(a.Id)" />
+                </span>
             </li>
         }
     </ul>

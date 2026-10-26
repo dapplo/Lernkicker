@@ -53,8 +53,8 @@
                     }
                 </div>
                 <span class="buttons">
-                    <button class="btn quiet" @onclick="() => Sync(subscription.Id)" disabled="@_busy">@L["Calendar.UpdateNow"]</button>
-                    <button class="btn quiet" @onclick="() => Unsubscribe(subscription.Id)">@L["Common.Remove"]</button>
+                    <IconButton Icon="🔄" Label="@L["Calendar.UpdateNow"]" Class="quiet" OnClick="() => Sync(subscription.Id)" disabled="@_busy" />
+                    <IconButton Icon="✕" Label="@L["Common.Remove"]" Class="quiet" OnClick="() => Unsubscribe(subscription.Id)" />
                 </span>
             </li>
         }

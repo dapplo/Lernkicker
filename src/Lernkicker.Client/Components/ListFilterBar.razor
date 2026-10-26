@@ -1,0 +1,51 @@
+@* Search and filters above a list of tests or learning material. Extra filters (e.g. the kind in the library) go in front. *@
+
+<div class="list-filters" role="search">
+    <input type="search" class="search" @bind="Filter.Text" @bind:event="oninput" @bind:after="Changed"
+           placeholder="@L["List.Search"]" aria-label="@L["List.Search"]" />
+    @ChildContent
+    <select @bind="Filter.Subject" @bind:after="Changed" aria-label="@L["Library.Subject"]">
+        <option value="">@L["List.AllSubjects"]</option>
+        @foreach (var subject in Subjects.Distinct().OrderBy(Display.Subject))
+        {
+            <option value="@subject">@Display.Subject(subject)</option>
+        }
+    </select>
+    <select @bind="Filter.Grade" @bind:after="Changed" aria-label="@L["Library.Grade"]">
+        <option value="0">@L["List.AllGrades"]</option>
+        @foreach (var grade in Grades.Distinct().OrderBy(g => g ?? int.MaxValue))
+        {
+            <option value="@(grade ?? ListFilter.Adults)">@Display.Grade(grade)</option>
+        }
+    </select>
+    @if (Filter.Active)
+    {
+        <IconButton Icon="✕" Label="@L["List.Clear"]" Class="quiet" OnClick="Clear" />
+    }
+</div>
+@if (Shown == 0 && Filter.Active)
+{
+    <p>@L["List.NoMatch"]</p>
+}
+else if (Filter.Active)
+{
+    <p class="hint" role="status">@L["List.Count", Shown, Total]</p>
+}
+
+@code {
+    [Parameter, EditorRequired] public ListFilter Filter { get; set; } = new();
+    [Parameter, EditorRequired] public IEnumerable<string> Subjects { get; set; } = [];
+    [Parameter, EditorRequired] public IEnumerable<int?> Grades { get; set; } = [];
+    [Parameter] public int Shown { get; set; }
+    [Parameter] public int Total { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter, EditorRequired] public EventCallback OnChange { get; set; }
+
+    private Task Changed() => OnChange.InvokeAsync();
+
+    private Task Clear()
+    {
+        Filter.Clear();
+        return Changed();
+    }
+}
