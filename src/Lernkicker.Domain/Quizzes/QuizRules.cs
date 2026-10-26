@@ -85,6 +85,16 @@ public static class QuizRules
                     }
 
                     break;
+                case FallingWordsExercise falling:
+                    for (var j = 0; j < falling.Words.Count; j++)
+                    {
+                        if (!falling.Options.Contains(falling.Words[j].Answer))
+                        {
+                            issues.Add(QuizIssue.Of(QuizIssueCodes.AnswerNotInOptions, $"{at}/words/{j}/answer", ("answer", falling.Words[j].Answer)));
+                        }
+                    }
+
+                    break;
                 case WordSearchExercise wordSearch:
                     CheckWordSearch(wordSearch, at, issues);
                     break;

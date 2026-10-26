@@ -64,6 +64,22 @@
   <data name="Exercise.WordSearchHow" xml:space="preserve"><value>Tippe den ersten und dann den letzten Buchstaben eines Wortes an.</value></data>
   <data name="Exercise.Letter" xml:space="preserve"><value>{0}, Zeile {1}, Spalte {2}</value></data>
   <data name="Exercise.WordsFound" xml:space="preserve"><value>{0} von {1} Wörtern gefunden</value></data>
+  <data name="Game.FallingHow" xml:space="preserve"><value>Von oben fallen Wörter. Tippe an, wo jedes hingehört, bevor es unten aufschlägt!</value></data>
+  <data name="Theme.Label" xml:space="preserve"><value>Aussehen</value></data>
+  <data name="Theme.Hint" xml:space="preserve"><value>Farben der App und Kulisse der Spiele auf den Geräten des Kindes.</value></data>
+  <data name="Theme.football" xml:space="preserve"><value>Fußball</value></data>
+  <data name="Theme.space" xml:space="preserve"><value>Weltraum</value></data>
+  <data name="Theme.unicorn" xml:space="preserve"><value>Einhorn</value></data>
+  <data name="Game.Start" xml:space="preserve"><value>Los geht's</value></data>
+  <data name="Game.Continue" xml:space="preserve"><value>Weiterspielen</value></data>
+  <data name="Game.Result" xml:space="preserve"><value>{0} von {1} gefangen!</value></data>
+  <data name="Game.PlayAgain" xml:space="preserve"><value>Nochmal spielen</value></data>
+  <data name="Game.Word" xml:space="preserve"><value>Wort {0} von {1}</value></data>
+  <data name="Game.Caught.football" xml:space="preserve"><value>Tor!</value></data>
+  <data name="Game.Caught.space" xml:space="preserve"><value>Treffer!</value></data>
+  <data name="Game.Caught.unicorn" xml:space="preserve"><value>Zauberhaft!</value></data>
+  <data name="Game.TooLate" xml:space="preserve"><value>Zu spät!</value></data>
+  <data name="Game.Wrong" xml:space="preserve"><value>Leider falsch</value></data>
   <data name="Answer.True" xml:space="preserve"><value>Richtig</value></data>
   <data name="Answer.False" xml:space="preserve"><value>Falsch</value></data>
   <data name="Result.Total" xml:space="preserve"><value>{0} von {1} Punkten · Note {2}</value></data>
@@ -192,6 +208,7 @@
   <data name="Error.child.notFound" xml:space="preserve"><value>Dieses Kind gibt es nicht.</value></data>
   <data name="Error.child.nameInvalid" xml:space="preserve"><value>Bitte gib einen Namen mit höchstens 50 Zeichen ein.</value></data>
   <data name="Error.child.gradeLevelInvalid" xml:space="preserve"><value>Die Klasse muss zwischen 1 und 13 liegen.</value></data>
+  <data name="Error.child.themeInvalid" xml:space="preserve"><value>Dieses Aussehen gibt es nicht.</value></data>
   <data name="Error.pin.invalid" xml:space="preserve"><value>Die PIN muss genau 4 Ziffern haben.</value></data>
   <data name="Error.pin.wrong" xml:space="preserve"><value>Falsche PIN. Versuch es nochmal.</value></data>
   <data name="Error.device.notPaired" xml:space="preserve"><value>Dieses Handy ist nicht verbunden.</value></data>

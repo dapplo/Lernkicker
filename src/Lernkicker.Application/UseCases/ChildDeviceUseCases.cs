@@ -22,7 +22,7 @@ public sealed class ChildDeviceUseCases(IChildRepository children, IPinHasher pi
         children.Add(new ChildDevice(pairing.FamilyId, pairing.ChildId, Secrets.Hash(token), ChildDevice.CleanLabel(label, DefaultLabel), time.GetUtcNow()));
         children.Remove(pairing);
         await unitOfWork.SaveChangesAsync();
-        return new PairedDevice(token, child.Name);
+        return new PairedDevice(token, child.Name, child.Theme);
     }
 
     public async Task<DeviceStatus> StatusAsync(string? token)
@@ -31,7 +31,7 @@ public sealed class ChildDeviceUseCases(IChildRepository children, IPinHasher pi
         var child = device is null ? null : await children.FindAnyFamilyAsync(device.ChildId);
         return device is null || child is null
             ? new DeviceStatus(false, null, false)
-            : new DeviceStatus(true, child.Name, device.Locked);
+            : new DeviceStatus(true, child.Name, device.Locked, child.Theme);
     }
 
     public async Task<Result<ChildSession>> LoginAsync(string? token, string pin)

@@ -36,6 +36,7 @@ Lernkicker lehnt eine Datei ab, die eine dieser Regeln verletzt:
 - `multipleChoice`: `correct` ist der Index (ab 0) der richtigen Antwort oder eine Liste von Indizes; jeder Index zeigt auf eine vorhandene Antwort. 2–6 Antworten.
 - `ordering`: Liste die `steps` in der **richtigen** Reihenfolge auf; die App mischt sie.
 - `wordSearch`: `words` bestehen nur aus Buchstaben (Umlaute und ß sind erlaubt), ohne Leerzeichen oder Bindestriche, 2–14 Buchstaben, jedes Wort nur einmal. Die App baut jede Runde ein neues Gitter; für ältere Kinder `"level": "medium"` (schräg, Wörter kreuzen sich) oder `"hard"` (auch rückwärts) setzen; das voreingestellte `easy` passt für die Klassen 1–3.
+- `fallingWords`: Die `answer` jedes Worts ist genau eine der `options`. Halte die Antworten kurz (ein Wort oder wenige), weil bis zu vier nebeneinander auf ein Handy passen müssen.
 - Aufgaben-Ids sind innerhalb einer Probe eindeutig, Block-Ids innerhalb eines Lernstoffs.
 - Eine Probe hat höchstens 50 Aufgaben; eine Lernstoff-Datei ist höchstens 256 KB groß.
 
@@ -46,7 +47,7 @@ Bilder sind freiwillig. Nimm sie, wo die echte Probe welche hat (Karten, Schaubi
 - Ein Bild ist ein `image`-Objekt: `{ "src": "water-cycle/clouds.svg", "alt": "…", "caption": "…", "credit": "…" }`. `src` und `alt` sind Pflicht. `alt` sagt in der Sprache des Inhalts, worauf es auf dem Bild für die Aufgabe ankommt.
 - `src` ist ein Pfad **relativ zur JSON-Datei**, z. B. `water-cycle/clouds.svg`. Keine URLs, kein `/` am Anfang, kein `..`. Verwende in Dateinamen Buchstaben, Ziffern, `-`, `_` und `.`.
 - Erlaubt sind PNG, JPEG, GIF, WebP und SVG, höchstens 2 MB pro Bild und 20 MB pro Datei zusammen. Aus einem SVG entfernt die App Skripte, Links und alles andere, was keine Zeichnung ist.
-- Wo Bilder in einer Probe stehen können: an jeder Aufgabe (`image`), an einer `matching`-Zeile, einer `trueFalse`-Aussage, einer `multipleChoice`-Frage und als Bildantworten (eine Antwort `{ "image": {…}, "text": "freiwillig" }` statt eines Texts).
+- Wo Bilder in einer Probe stehen können: an jeder Aufgabe (`image`), an einer `matching`-Zeile oder einem `fallingWords`-Wort, einer `trueFalse`-Aussage, einer `multipleChoice`-Frage und als Bildantworten (eine Antwort `{ "image": {…}, "text": "freiwillig" }` statt eines Texts).
 - Wo Bilder im Lernstoff stehen können: an `text`- und `facts`-Blöcken, auf Lernkarten (`frontImage`, `backImage`), an Einträgen (`entries`) und als eigener `image`-Block.
 - Wenn du Bilder selbst zeichnest, zeichne einfache, klare SVGs (Formen, Schaubilder, eine Kartenskizze) mit `viewBox`, ohne Text, der die Lösung verrät, und ohne externe Schriften oder Links.
 - Für Bilder aus dem Internet (z. B. Wikimedia Commons) trage in `credit` Quelle und Lizenz ein, und nimm nur Bilder, deren Lizenz das erlaubt.

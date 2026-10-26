@@ -18,9 +18,9 @@ public sealed class ChildrenUseCases(
 
     public Task<IReadOnlyList<ChildSummary>> ListAsync() => children.ListSummariesAsync();
 
-    public async Task<Result<ChildSummary>> CreateAsync(Guid familyId, string name, int? gradeLevel, string pin, bool isAdult = false)
+    public async Task<Result<ChildSummary>> CreateAsync(Guid familyId, string name, int? gradeLevel, string pin, bool isAdult = false, string? theme = null)
     {
-        if (Validate(name, gradeLevel, isAdult) is { } error)
+        if (Validate(name, gradeLevel, isAdult, theme) is { } error)
         {
             return error;
         }
@@ -30,16 +30,17 @@ public sealed class ChildrenUseCases(
             return AppError.Invalid(ErrorCodes.PinInvalid);
         }
 
-        var child = new Child(familyId, name, gradeLevel, isAdult);
+        var child = new Child(familyId, name, gradeLevel, isAdult, theme);
         child.SetPinHash(pinHasher.Hash(pin));
         children.Add(child);
         await unitOfWork.SaveChangesAsync();
-        return new ChildSummary(child.Id, child.Name, child.GradeLevel, true, 0, child.IsAdult);
+        return new ChildSummary(child.Id, child.Name, child.GradeLevel, true, 0, child.IsAdult, child.Theme);
     }
 
-    public async Task<Result> UpdateAsync(Guid childId, string name, int? gradeLevel, bool isAdult = false)
+    /// <summary>A null <paramref name="theme"/> keeps the profile's look.</summary>
+    public async Task<Result> UpdateAsync(Guid childId, string name, int? gradeLevel, bool isAdult = false, string? theme = null)
     {
-        if (Validate(name, gradeLevel, isAdult) is { } error)
+        if (Validate(name, gradeLevel, isAdult, theme) is { } error)
         {
             return error;
         }
@@ -50,7 +51,7 @@ public sealed class ChildrenUseCases(
             return AppError.NotFound(ErrorCodes.ChildNotFound);
         }
 
-        child.Update(name, gradeLevel, isAdult);
+        child.Update(name, gradeLevel, isAdult, theme);
         await unitOfWork.SaveChangesAsync();
         return Result.Ok();
     }
@@ -172,11 +173,16 @@ public sealed class ChildrenUseCases(
     public async Task<Result<QuizResult>> AttemptResultAsync(Guid childId, Guid attemptId) =>
         await practice.FindAttemptAsync(childId, attemptId) is { } attempt ? attempt.Result : AppError.NotFound();
 
-    private static AppError? Validate(string? name, int? gradeLevel, bool isAdult)
+    private static AppError? Validate(string? name, int? gradeLevel, bool isAdult, string? theme)
     {
         if (!Child.IsValidName(name))
         {
             return AppError.Invalid(ErrorCodes.ChildNameInvalid);
+        }
+
+        if (!ChildThemes.IsValid(theme))
+        {
+            return AppError.Invalid(ErrorCodes.ThemeInvalid);
         }
 
         return Child.IsValidGradeLevel(gradeLevel, isAdult) ? null : AppError.Invalid(ErrorCodes.GradeLevelInvalid);

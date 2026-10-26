@@ -112,6 +112,24 @@
       "words": ["Weizen", "Roggen", "Gerste", "Hafer", "Mais"],
       "level": "medium",
       "explanation": "Aus Weizen und Roggen backt man vor allem Brot."
+    },
+    {
+      "id": "falling-words",
+      "type": "fallingWords",
+      "instruction": "10. Fang die Wörter! Gehört es zum Getreide, zum Gemüse oder zum Obst?",
+      "hint": "Tippe auf die richtige Antwort, bevor das Wort unten aufschlägt.",
+      "options": ["Getreide", "Gemüse", "Obst"],
+      "words": [
+        { "text": "Weizen", "answer": "Getreide" },
+        { "text": "Karotte", "answer": "Gemüse" },
+        { "text": "Apfel", "answer": "Obst" },
+        { "text": "Roggen", "answer": "Getreide" },
+        { "text": "Brokkoli", "answer": "Gemüse" },
+        { "text": "Kirsche", "answer": "Obst" },
+        { "text": "Hafer", "answer": "Getreide" },
+        { "text": "Mais", "answer": "Getreide", "explanation": "Mais ist ein Getreide, auch wenn man ihn oft wie Gemüse isst." }
+      ],
+      "level": "medium"
     }
   ]
 }

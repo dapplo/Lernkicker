@@ -164,6 +164,20 @@ else
                 {
                     <label>@L["Child.GradeLevel"] <input type="number" min="1" max="13" @bind="_gradeLevel" /></label>
                 }
+                <fieldset class="theme-picker">
+                    <legend>@L["Theme.Label"]</legend>
+                    <p class="hint">@L["Theme.Hint"]</p>
+                    <div class="themes" role="radiogroup" aria-label="@L["Theme.Label"]">
+                        @foreach (var theme in Theme.All)
+                        {
+                            var on = theme.Id == _theme;
+                            <button type="button" role="radio" class="theme-choice theme-@theme.Id @(on ? "on" : "")" aria-checked="@on" @onclick="() => _theme = theme.Id">
+                                <span class="icon" aria-hidden="true">@theme.Icon</span>
+                                @L[$"Theme.{theme.Id}"]
+                            </button>
+                        }
+                    </div>
+                </fieldset>
                 <button class="btn" type="submit">@L["Common.Save"]</button>
             </form>
             <form class="form" @onsubmit="SavePin" @onsubmit:preventDefault>
@@ -204,6 +218,7 @@ else
     private string _name = "", _pin = "";
     private int? _gradeLevel;
     private bool _isAdult;
+    private string _theme = Theme.All[0].Id;
     private string? _message;
     private bool _confirmDelete;
     private IReadOnlyList<string>? _errors;
@@ -244,6 +259,7 @@ else
             _name = _child.Name;
             _gradeLevel = _child.GradeLevel;
             _isAdult = _child.IsAdult;
+            _theme = _child.Theme;
             _quizzes = await Api.Quizzes();
             await Reload();
         }
@@ -300,8 +316,8 @@ else
     private Task Save() => Run(async () =>
     {
         var gradeLevel = _isAdult ? null : _gradeLevel;
-        await Api.UpdateChild(Id, new ChildDetails(_name, gradeLevel, _isAdult));
-        _child = _child! with { Name = _name.Trim(), GradeLevel = gradeLevel, IsAdult = _isAdult };
+        await Api.UpdateChild(Id, new ChildDetails(_name, gradeLevel, _isAdult, _theme));
+        _child = _child! with { Name = _name.Trim(), GradeLevel = gradeLevel, IsAdult = _isAdult, Theme = _theme };
         _message = L["Common.Saved"];
     });
 

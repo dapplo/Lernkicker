@@ -12,6 +12,7 @@ builder.Services.AddLocalization();
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<Api>();
 builder.Services.AddScoped<Display>();
+builder.Services.AddScoped<CurrentTheme>();
 builder.Services.AddScoped<UiLanguage>();
 builder.Services.AddScoped<UploadFiles>();
 

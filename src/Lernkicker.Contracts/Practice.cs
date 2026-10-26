@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Lernkicker.Contracts;
 
-/// <summary>A quiz as the child's device receives it: no solutions. Parts carry their original <c>Index</c>.</summary>
+/// <summary>A quiz as the child's device receives it: no solutions (except in games, see <see cref="FallingWordsSheetDto"/>). Parts carry their original <c>Index</c>.</summary>
 public sealed record SheetDto(
     string Id, string Title, string Subject, int? GradeLevel, string Language, string? Topic, int? DurationMinutes, int MaxPoints, IReadOnlyList<ExerciseSheetDto> Exercises);
 
@@ -16,6 +16,7 @@ public sealed record SheetItemDto(int Index, string Text, ImageDto? Image = null
 [JsonDerivedType(typeof(FreeTextSheetDto), "freeText")]
 [JsonDerivedType(typeof(MultipleChoiceSheetDto), "multipleChoice")]
 [JsonDerivedType(typeof(WordSearchSheetDto), "wordSearch")]
+[JsonDerivedType(typeof(FallingWordsSheetDto), "fallingWords")]
 public abstract record ExerciseSheetDto(string Id, string Instruction, string? Hint, int MaxPoints)
 {
     public ImageDto? Image { get; init; }
@@ -44,13 +45,23 @@ public sealed record MultipleChoiceSheetDto(string Id, string Instruction, strin
 public sealed record WordSearchSheetDto(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<string> Rows, IReadOnlyList<SheetItemDto> Words)
     : ExerciseSheetDto(Id, Instruction, Hint, MaxPoints);
 
+/// <summary>
+/// A falling words game: <c>TargetCount</c> options are shown for each word, the first word falls in <c>FallSeconds</c>.
+/// Each word carries its answer, because the game shows right away whether it landed on the right option.
+/// </summary>
+public sealed record FallingWordsSheetDto(
+    string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<string> Options, IReadOnlyList<FallingWordDto> Words, int TargetCount, int FallSeconds)
+    : ExerciseSheetDto(Id, Instruction, Hint, MaxPoints);
+
+public sealed record FallingWordDto(int Index, string Text, string Answer, ImageDto? Image = null);
+
 /// <summary>An option's <c>Text</c> is empty when the option is a picture alone.</summary>
 public sealed record QuestionSheetDto(int Index, string Text, IReadOnlyList<SheetItemDto> Options, bool MultipleAnswers, ImageDto? Image = null);
 
 /// <summary>A child's answer to one exercise; all indices refer to the original order (see <see cref="SheetItemDto.Index"/>).</summary>
 public sealed record AnswerDto
 {
-    /// <summary>cloze, matching, freeText: one entry per gap, row or field. wordSearch: per word the word if found.</summary>
+    /// <summary>cloze, matching, freeText: one entry per gap, row or field. wordSearch: per word the word if found. fallingWords: per word the option it landed on.</summary>
     public IReadOnlyList<string?>? Texts { get; init; }
 
     /// <summary>trueFalse: one entry per statement, null = not answered.</summary>

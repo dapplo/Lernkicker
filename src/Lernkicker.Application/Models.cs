@@ -12,7 +12,7 @@ public sealed record InvitationCreated(string Code, DateTimeOffset ExpiresAt);
 
 public sealed record ParentProfile(string Name, string Email, string FamilyName, bool IsAdmin, string Language);
 
-public sealed record ChildSummary(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult);
+public sealed record ChildSummary(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult, string Theme);
 
 public sealed record DeviceSummary(Guid Id, string Label, DateTimeOffset PairedAt, DateTimeOffset? LastUsedAt, bool Locked)
 {
@@ -21,9 +21,9 @@ public sealed record DeviceSummary(Guid Id, string Label, DateTimeOffset PairedA
 
 public sealed record PairingCodeCreated(string Code, DateTimeOffset ExpiresAt);
 
-public sealed record PairedDevice(string Token, string ChildName);
+public sealed record PairedDevice(string Token, string ChildName, string Theme);
 
-public sealed record DeviceStatus(bool Paired, string? ChildName, bool Locked);
+public sealed record DeviceStatus(bool Paired, string? ChildName, bool Locked, string? Theme = null);
 
 /// <summary>Who is logged in on a child's device after a correct PIN.</summary>
 public sealed record ChildSession(Guid FamilyId, Guid ChildId, Guid DeviceId, string ChildName);

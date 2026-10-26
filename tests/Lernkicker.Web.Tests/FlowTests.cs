@@ -181,6 +181,24 @@ public sealed class FlowTests(LernkickerFactory factory) : IClassFixture<Lernkic
     }
 
     [Fact]
+    public async Task The_profile_theme_reaches_the_childs_phone()
+    {
+        var parent = await factory.NewFamilyAsync("theme@example.org");
+        var child = await TestData.CreateChildAsync(parent);
+        Assert.Equal("football", child.Theme);
+        var phone = await TestData.ChildPhoneAsync(factory, parent, child.Id);
+
+        Assert.Equal(ErrorCodes.ThemeInvalid,
+            (await LernkickerFactory.Error(await parent.PutAsJsonAsync($"/api/children/{child.Id}", new ChildDetails(child.Name, 4, Theme: "pirates")), HttpStatusCode.BadRequest)).Code);
+        Assert.Equal(HttpStatusCode.NoContent, (await parent.PutAsJsonAsync($"/api/children/{child.Id}", new ChildDetails(child.Name, 4, Theme: "unicorn"))).StatusCode);
+        Assert.Equal("unicorn", (await LernkickerFactory.Json<DeviceStatusResponse>(await phone.GetAsync("/api/device/status"))).Theme);
+
+        // Saving without a theme keeps it
+        Assert.Equal(HttpStatusCode.NoContent, (await parent.PutAsJsonAsync($"/api/children/{child.Id}", new ChildDetails(child.Name, 3))).StatusCode);
+        Assert.Equal("unicorn", Assert.Single(await LernkickerFactory.Json<List<ChildOverview>>(await parent.GetAsync("/api/children"))).Theme);
+    }
+
+    [Fact]
     public async Task Roles_are_separate()
     {
         var parent = await factory.NewFamilyAsync("h@example.org");

@@ -52,6 +52,26 @@
             return shrunk.length < bytes.length ? shrunk : bytes;
         },
 
+        // The falling words game: lets the element fall to the bottom of its parent in the given time, then tells
+        // the game. Web animations are allowed by the CSP, inline styles are not.
+        fall(element, milliseconds, game) {
+            element.getAnimations().forEach(a => a.cancel());
+            const ground = Math.max(0, element.parentElement.clientHeight - element.offsetHeight);
+            const animation = element.animate(
+                [{ transform: 'translateY(0)' }, { transform: `translateY(${ground}px)` }],
+                { duration: milliseconds, easing: 'linear', fill: 'forwards' });
+            animation.finished.then(() => game.invokeMethodAsync('Landed'), () => { /* stopped */ });
+        },
+
+        // Once the child has picked an option, the word drops quickly the rest of the way.
+        dropNow(element) {
+            element.getAnimations().forEach(a => a.updatePlaybackRate(8));
+        },
+
+        stopFall(element) {
+            element?.getAnimations().forEach(a => a.cancel());
+        },
+
         scrollIntoView(element) {
             element?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         },

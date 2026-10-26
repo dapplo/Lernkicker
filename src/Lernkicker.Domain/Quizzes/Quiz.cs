@@ -198,6 +198,53 @@ public enum WordSearchLevel
     Hard,
 }
 
+/// <summary>
+/// A game: the words fall down one after the other, and the child taps the option (a category or a description) at
+/// the bottom that the word belongs to before it hits the ground. Each word is a part.
+/// </summary>
+public sealed record FallingWordsExercise : Exercise
+{
+    /// <summary>The categories or descriptions; each round shows the right one and a few others.</summary>
+    public required IReadOnlyList<string> Options { get; init; }
+
+    /// <summary>The falling words, each with the option it belongs to.</summary>
+    public required IReadOnlyList<MatchingRow> Words { get; init; }
+
+    /// <summary>Sets how many options are shown at a time and how fast the words fall.</summary>
+    public GameLevel Level { get; init; } = GameLevel.Easy;
+
+    /// <summary>Options shown for each word: 2 (easy), 3 (medium) or 4 (hard), at most as many as there are.</summary>
+    public int TargetCount => Math.Min(Options.Count, Level switch
+    {
+        GameLevel.Easy => 2,
+        GameLevel.Medium => 3,
+        _ => 4,
+    });
+
+    /// <summary>Seconds the first word takes from the top to the ground; later words get a little faster.</summary>
+    public int FallSeconds => Level switch
+    {
+        GameLevel.Easy => 10,
+        GameLevel.Medium => 8,
+        _ => 6,
+    };
+
+    public override int PartCount => Words.Count;
+
+    protected override IEnumerable<ImageUse> PartImages(string path) =>
+        Words.Select((w, i) => (w.Image, At: $"{path}/words/{i}/image"))
+            .Where(x => x.Image is not null)
+            .Select(x => new ImageUse(x.At, x.Image!));
+}
+
+/// <summary>How hard a game (<see cref="FallingWordsExercise"/>) is.</summary>
+public enum GameLevel
+{
+    Easy,
+    Medium,
+    Hard,
+}
+
 public sealed record Gap(IReadOnlyList<string> Answers);
 
 public sealed record MatchingRow(string Text, string Answer, string? Explanation = null, ImageRef? Image = null);

@@ -16,7 +16,7 @@ public static class Mapping
 
     public static QuizOverview ToDto(this QuizSummary q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt, q.Shared);
 
-    public static ChildOverview ToDto(this ChildSummary c) => new(c.Id, c.Name, c.GradeLevel, c.HasPin, c.Devices, c.IsAdult);
+    public static ChildOverview ToDto(this ChildSummary c) => new(c.Id, c.Name, c.GradeLevel, c.HasPin, c.Devices, c.IsAdult, c.Theme);
 
     public static DeviceOverview ToDto(this DeviceSummary d) => new(d.Id, d.Label, d.PairedAt, d.LastUsedAt, d.Locked);
 
@@ -28,7 +28,7 @@ public static class Mapping
     public static MyAssignment ToDto(this ChildAssignment a) =>
         new(a.AssignmentId, a.Title, a.Subject, a.Topic, a.MaxPoints, a.DueOn, a.Attempts, a.BestPercent, a.Stars);
 
-    public static DeviceStatusResponse ToDto(this DeviceStatus s) => new(s.Paired, s.ChildName, s.Locked);
+    public static DeviceStatusResponse ToDto(this DeviceStatus s) => new(s.Paired, s.ChildName, s.Locked, s.Theme);
 
     public static CalendarEntryDto ToDto(this CalendarEntry e) =>
         new(e.Uid, e.Kind, e.Title, e.Date, e.StartTime, e.EndTime, e.Location, e.Source, e.EventId, e.ItemId);
@@ -99,6 +99,8 @@ public static class Mapping
             MultipleChoiceSheet mc => new MultipleChoiceSheetDto(mc.Id, mc.Instruction, mc.Hint, mc.MaxPoints,
                 mc.Questions.Select(q => new QuestionSheetDto(q.Index, q.Text, Items(q.Options), q.MultipleAnswers, q.Image.ToDto(images))).ToList()),
             WordSearchSheet w => new WordSearchSheetDto(w.Id, w.Instruction, w.Hint, w.MaxPoints, w.Rows, Items(w.Words)),
+            FallingWordsSheet f => new FallingWordsSheetDto(f.Id, f.Instruction, f.Hint, f.MaxPoints, f.Options,
+                f.Words.Select(w => new FallingWordDto(w.Index, w.Text, w.Answer, w.Image.ToDto(images))).ToList(), f.TargetCount, f.FallSeconds),
             _ => throw new NotSupportedException($"Unknown sheet type {e.GetType().Name}"),
         };
         return sheet with { Image = e.Image.ToDto(images) };

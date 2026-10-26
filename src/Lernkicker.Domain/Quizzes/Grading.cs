@@ -8,7 +8,7 @@ namespace Lernkicker.Domain.Quizzes;
 /// </summary>
 public sealed record ExerciseAnswer
 {
-    /// <summary>cloze, matching, freeText: one entry per gap, row or field (position = index). wordSearch: per word the word if found.</summary>
+    /// <summary>cloze, matching, freeText: one entry per gap, row or field (position = index). wordSearch: per word the word if found. fallingWords: per word the option it landed on.</summary>
     public IReadOnlyList<string?>? Texts { get; init; }
 
     /// <summary>trueFalse: one entry per statement (position = index), null = not answered.</summary>
@@ -89,6 +89,9 @@ public static class Grader
                 .ToList()),
             WordSearchExercise w => ("wordSearch", w.Words
                 .Select((word, i) => new PartResult(i, Matches(At(answer.Texts, i), [word]), word, null))
+                .ToList()),
+            FallingWordsExercise f => ("fallingWords", f.Words
+                .Select((word, i) => new PartResult(i, Matches(At(answer.Texts, i), [word.Answer]), word.Answer, word.Explanation))
                 .ToList()),
             _ => throw new NotSupportedException($"Unknown exercise type {exercise.GetType().Name}"),
         };

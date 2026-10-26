@@ -1,9 +1,24 @@
 @inherits LayoutComponentBase
+@implements IDisposable
+@inject CurrentTheme Theme
 
-<header class="header">
-    <a href="" class="brand"><span aria-hidden="true">⚽</span> Lernkicker</a>
-    <LanguagePicker />
-</header>
-<main class="page">
-    @Body
-</main>
+@* The theme class recolours everything inside (see the themes in app.css) *@
+<div class="shell theme-@Theme.Value.Id">
+    <header class="header">
+        <a href="" class="brand"><span aria-hidden="true">@Theme.Value.Icon</span> Lernkicker</a>
+        <LanguagePicker />
+    </header>
+    <main class="page">
+        @Body
+    </main>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        Theme.Changed += StateHasChanged;
+        await Theme.LoadAsync();
+    }
+
+    public void Dispose() => Theme.Changed -= StateHasChanged;
+}

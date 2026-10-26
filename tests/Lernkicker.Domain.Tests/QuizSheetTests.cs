@@ -10,8 +10,11 @@ public class QuizSheetTests
     [Fact]
     public void Sheet_types_have_no_solution_members()
     {
-        // The sheet goes to the child's phone; solutions must not be reachable there
-        var sheetTypes = typeof(QuizSheet).Assembly.GetTypes().Where(t => t.Name.EndsWith("Sheet") || t == typeof(SheetItem));
+        // The sheet goes to the child's phone; solutions must not be reachable there. Only the falling words game
+        // carries its answers on purpose, because it shows right away whether a word was caught.
+        var sheetTypes = typeof(QuizSheet).Assembly.GetTypes()
+            .Where(t => t.Name.EndsWith("Sheet") || t == typeof(SheetItem))
+            .Where(t => t != typeof(FallingWordsSheet) && t != typeof(FallingWordSheet));
         var members = sheetTypes.SelectMany(t => t.GetProperties()).Select(p => p.Name).ToHashSet();
 
         Assert.DoesNotContain("Answers", members);

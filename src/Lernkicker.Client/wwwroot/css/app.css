@@ -70,6 +70,38 @@ h1:focus { outline: none; }
     padding: 12px 16px calc(48px + env(safe-area-inset-bottom));
 }
 
+/* Themes: a profile's look (ChildThemes on the server, Theme in the client). The class sits on .shell around the
+   whole app and redefines the colours; football is the plain Lernkicker look. */
+.shell { min-height: 100vh; min-height: 100dvh; background: var(--background); color: var(--text); }
+.shell.theme-football .header { background: repeating-linear-gradient(90deg, var(--green) 0 48px, #23994f 48px 96px); }
+
+.shell.theme-space {
+    --green: #7048e8; --green-dark: #c0b0ff; --green-light: #2c2a6b; --background: #0d1230; --paper: #1a2150;
+    --text: #eef0ff; --muted: #aab1dc; --line: #39427a; --red: #ff6b6b; --red-light: #4a1f33; --gold: #ffd43b;
+    --science: #63e6be; --german: #ff8787; --math: #74c0fc; --english: #b197fc; --other: #adb5bd;
+    color-scheme: dark;
+    background:
+        radial-gradient(circle at 12% 18%, rgb(255 255 255 / 70%) 0 1px, transparent 2px),
+        radial-gradient(circle at 68% 42%, rgb(255 255 255 / 55%) 0 1px, transparent 2px),
+        radial-gradient(circle at 38% 76%, rgb(255 255 255 / 60%) 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 8%, rgb(255 255 255 / 45%) 0 1px, transparent 2px),
+        var(--background);
+    background-size: 140px 140px, 190px 190px, 110px 110px, 230px 230px, auto;
+}
+.shell.theme-space .header { background: linear-gradient(90deg, #1b1464, #5f3dc4); }
+.shell.theme-space .languages button.on { color: #3b2a99; }
+.shell.theme-space .btn:not(.quiet):not(.danger) { color: #fff; }
+/* Things that stay on light paper in the dark theme */
+.shell.theme-space .letter-board, .shell.theme-space .facts li { --paper: #fff; --text: #1d2a22; --line: #d5e0d8; color: var(--text); }
+.shell.theme-space .facts li { background: #fff8e1; }
+
+.shell.theme-unicorn {
+    --green: #d6336c; --green-dark: #a61e4d; --green-light: #ffe3ef; --background: #fff5fb; --paper: #fff;
+    --text: #3d2352; --muted: #85699a; --line: #f3d3e6; --gold: #f59f00;
+    background: linear-gradient(180deg, #fff0f7, #f3f0ff 60%, #ebfbee);
+}
+.shell.theme-unicorn .header { background: linear-gradient(90deg, #f783ac, #b197fc 55%, #74c0fc); }
+
 /* Loading */
 .loading { display: grid; place-items: center; min-height: 80vh; text-align: center; color: var(--muted); }
 .ball { font-size: 3.5rem; animation: rollen 1.6s ease-in-out infinite; }
@@ -314,6 +346,93 @@ input.gap { width: 9em; }
 .found-count { margin: 10px 0 4px; color: var(--muted); }
 .words { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
 .words li.found { color: var(--green-dark); text-decoration: line-through; }
+
+/* Falling words game. A theme sets the colours; the word falls by script (js/start.js), it slides over the
+   chosen option by class: with N options, option i sits at (i + 0.5) / N of the width. */
+.game {
+    --game-bg: #2f9e44; --game-text: #fff; --game-word: #fff; --game-word-text: #1d2a22; --game-target: rgb(255 255 255 / 92%);
+    --game-target-text: #1d2a22; --game-target-edge: #fff; --game-right: #2fb344; --game-wrong: #e03131;
+    background: var(--game-bg); color: var(--game-text); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; overflow: hidden;
+}
+.shell.theme-football .game {
+    --game-right: #fab005;
+    background: repeating-linear-gradient(180deg, #2f9e44 0 40px, #37b24d 40px 80px);
+}
+.shell.theme-space .game {
+    --game-bg: #10153a; --game-word: #ffd43b; --game-target: #4c3a9e; --game-target-text: #fff; --game-target-edge: #9775fa;
+    background: radial-gradient(circle at 15% 20%, #fff 0 1px, transparent 2px), radial-gradient(circle at 70% 35%, #fff 0 1px, transparent 2px),
+                radial-gradient(circle at 40% 70%, #fff 0 1px, transparent 2px), radial-gradient(circle at 85% 80%, #fff 0 1px, transparent 2px),
+                linear-gradient(180deg, #10153a, #2b1f5c);
+    background-size: 120px 120px, 150px 150px, 90px 90px, 170px 170px, 100% 100%;
+}
+.shell.theme-unicorn .game {
+    --game-text: #5f3dc4; --game-word: #fff; --game-word-text: #862e9c; --game-target: #fff0f6; --game-target-text: #862e9c; --game-target-edge: #f783ac;
+    --game-right: #20c997; --game-wrong: #f03e3e;
+    background: linear-gradient(160deg, #ffdeeb, #e5dbff 50%, #d3f9d8);
+}
+.game-how { margin: 4px 0 12px; font-weight: 600; }
+.theme-picker { border: none; padding: 0; margin: 0; }
+.theme-picker legend { font-weight: 600; padding: 0; }
+.theme-picker .hint { margin: 0 0 8px; font-weight: 400; }
+.themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.theme-choice {
+    display: grid; justify-items: center; gap: 2px; padding: 10px 4px; border-radius: 12px; border: 3px solid transparent;
+    font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #1d2a22; background: #fff;
+}
+.theme-choice .icon { font-size: 1.8rem; }
+.theme-choice.theme-football { background: #d3f9d8; }
+.theme-choice.theme-space { background: #2b1f5c; color: #fff; }
+.theme-choice.theme-unicorn { background: #ffdeeb; color: #862e9c; }
+.theme-choice.on { border-color: var(--gold); box-shadow: 0 0 0 2px #fff; }
+.game-score { display: flex; justify-content: space-between; margin: 0 0 6px; font-weight: 700; }
+.playfield { position: relative; height: min(46vh, 400px); }
+.drop { position: absolute; top: 0; left: 0; right: 0; }
+.falling {
+    position: relative; left: 50%; width: max-content; max-width: 46%; transform: translateX(-50%);
+    display: grid; justify-items: center; gap: 4px; padding: 8px 14px; border-radius: 999px; text-align: center;
+    background: var(--game-word); color: var(--game-word-text); font-weight: 700; font-size: 1.1rem;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 25%); transition: left 0.25s ease-out;
+}
+.falling .picture { margin: 0; }
+.falling .picture img { max-height: 72px; width: auto; border-radius: 8px; }
+.shell.theme-space .falling { box-shadow: 0 0 14px rgb(255 212 59 / 70%); }
+.shell.theme-unicorn .falling { border: 3px solid #fcc2d7; }
+.falling.of-2.at-0 { left: 25%; } .falling.of-2.at-1 { left: 75%; }
+.falling.of-3.at-0 { left: 16.67%; } .falling.of-3.at-1 { left: 50%; } .falling.of-3.at-2 { left: 83.33%; }
+.falling.of-4.at-0 { left: 12.5%; } .falling.of-4.at-1 { left: 37.5%; } .falling.of-4.at-2 { left: 62.5%; } .falling.of-4.at-3 { left: 87.5%; }
+.falling.of-3, .falling.of-4 { max-width: 32%; font-size: 1rem; }
+.falling.of-4 { max-width: 24%; padding: 6px 8px; overflow-wrap: anywhere; }
+.falling.caught { background: var(--game-right); color: #fff; animation: game-pop 0.4s ease-out; }
+.falling.missed { background: var(--game-wrong); color: #fff; animation: game-shake 0.4s ease-out; }
+.falling.crashed { background: var(--game-wrong); color: #fff; animation: game-squash 0.4s ease-out forwards; }
+.verdict {
+    position: absolute; top: 30%; left: 0; right: 0; margin: 0; text-align: center; font-size: 1.6rem; font-weight: 800;
+    text-shadow: 0 2px 6px rgb(0 0 0 / 35%); animation: game-pop 0.4s ease-out;
+}
+.shell.theme-unicorn .verdict { text-shadow: 0 1px 0 #fff; }
+.targets { display: grid; gap: 6px; }
+.targets.of-2 { grid-template-columns: repeat(2, 1fr); }
+.targets.of-3 { grid-template-columns: repeat(3, 1fr); }
+.targets.of-4 { grid-template-columns: repeat(4, 1fr); }
+.target {
+    min-height: 64px; padding: 8px 6px; border-radius: 12px; border: 3px solid var(--game-target-edge);
+    background: var(--game-target); color: var(--game-target-text); font: inherit; font-size: 0.95rem; font-weight: 600;
+    line-height: 1.25; cursor: pointer; overflow-wrap: anywhere;
+}
+.target:disabled { cursor: default; opacity: 1; }
+.target.chosen { border-color: var(--gold); }
+.target.right { background: var(--game-right); border-color: var(--game-right); color: #fff; }
+.shell.theme-football .target.right, .shell.theme-football .falling.caught { color: #1d2a22; }
+.target.wrong { background: var(--game-wrong); border-color: var(--game-wrong); color: #fff; }
+.shell.theme-football .target { border-style: solid solid none; border-radius: 4px 4px 0 0; background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgb(0 0 0 / 5%) 6px 7px); }
+.shell.theme-space .target { border-radius: 999px; }
+.shell.theme-unicorn .target { border-radius: 24px; }
+.game-done { display: grid; justify-items: center; text-align: center; padding: 16px 0; }
+.game-done .icon { font-size: 3rem; }
+.game-done p { font-size: 1.3rem; font-weight: 700; margin: 6px 0 12px; }
+@keyframes game-pop { 0% { scale: 0.7; } 70% { scale: 1.15; } 100% { scale: 1; } }
+@keyframes game-shake { 25% { translate: -8px 0; } 75% { translate: 8px 0; } }
+@keyframes game-squash { to { scale: 1.3 0.5; opacity: 0.8; } }
 
 .question { border: none; padding: 0; margin: 0 0 18px; display: grid; gap: 8px; }
 .question legend { font-weight: 600; margin-bottom: 8px; padding: 0; }
