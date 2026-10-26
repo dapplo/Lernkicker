@@ -1,0 +1,31 @@
+@* Things to look up: a name, a short text and a small picture each, with a search field once the list gets long *@
+@if (Entries.Count > SearchFrom)
+{
+    <input class="entries-search" type="search" placeholder="@L["Learn.Search"]" aria-label="@L["Learn.Search"]" @bind="_query" @bind:event="oninput" />
+}
+<ul class="entries">
+    @foreach (var entry in Shown)
+    {
+        <li class="entry">
+            <Picture Image="@entry.Image" Class="thumb" />
+            <div>
+                <strong>@entry.Name</strong>
+                <TextView Text="@entry.Text" />
+            </div>
+        </li>
+    }
+</ul>
+@if (!Shown.Any())
+{
+    <p class="hint">@L["Learn.NothingFound"]</p>
+}
+
+@code {
+    private const int SearchFrom = 5;
+    private string _query = "";
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<EntryDto> Entries { get; set; } = [];
+
+    private IEnumerable<EntryDto> Shown => EntrySearch.Filter(Entries, _query);
+}

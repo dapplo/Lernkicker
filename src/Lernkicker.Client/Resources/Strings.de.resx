@@ -265,7 +265,7 @@
   <data name="Lessons.Title" xml:space="preserve"><value>Lernstoff</value></data>
   <data name="Lessons.Intro" xml:space="preserve"><value>Stoff, den dein Kind am Handy liest und lernt: ein Gedicht zum Aufsagen, Begriffe, das Wichtigste zum Merken.</value></data>
   <data name="Lessons.Upload" xml:space="preserve"><value>Lernstoff hochladen</value></data>
-  <data name="Lessons.UploadHint" xml:space="preserve"><value>Eine Datei im Format &lt;code&gt;lesson/v1&lt;/code&gt; (JSON) mit Text, Gedicht, Lernkarten oder Merksätzen. Lädst du eine Datei mit derselben &lt;code&gt;id&lt;/code&gt; noch einmal hoch, ersetzt sie die alte; der Lernstand deines Kindes bleibt.</value></data>
+  <data name="Lessons.UploadHint" xml:space="preserve"><value>Eine Datei im Format &lt;code&gt;lesson/v1&lt;/code&gt; (JSON) mit Text, Gedicht, Lernkarten, Merksätzen oder etwas zum Nachschlagen (z. B. Spielregeln). Lädst du eine Datei mit derselben &lt;code&gt;id&lt;/code&gt; noch einmal hoch, ersetzt sie die alte; der Lernstand deines Kindes bleibt.</value></data>
   <data name="Lessons.Saved" xml:space="preserve"><value>„{0}“ gespeichert.</value></data>
   <data name="Lessons.None" xml:space="preserve"><value>Noch kein Lernstoff. Lade den ersten hoch.</value></data>
   <data name="Lessons.Details" xml:space="preserve"><value>{0} · Klasse {1} · {2} Teile · {3}</value></data>
@@ -406,6 +406,12 @@
   <data name="Issue.imageTooLarge" xml:space="preserve"><value>Das Bild „{src}“ ist größer als {maxMb} MB.</value></data>
   <data name="Issue.imagesTooLarge" xml:space="preserve"><value>Alle Bilder zusammen sind größer als {maxMb} MB.</value></data>
   <data name="Learn.Type.image" xml:space="preserve"><value>Bild</value></data>
+  <data name="Learn.Type.entries" xml:space="preserve"><value>Nachschlagen</value></data>
+  <data name="Learn.Contents" xml:space="preserve"><value>Inhalt</value></data>
+  <data name="Learn.Search" xml:space="preserve"><value>Suchen …</value></data>
+  <data name="Learn.NothingFound" xml:space="preserve"><value>Nichts gefunden.</value></data>
+  <data name="Home.Reference" xml:space="preserve"><value>Zum Nachschlagen</value></data>
+  <data name="Child.ReferenceLesson" xml:space="preserve"><value>Zum Nachschlagen, ohne Fortschritt</value></data>
   <data name="Picture.Close" xml:space="preserve"><value>Schließen</value></data>
   <data name="AiHelp.Title" xml:space="preserve"><value>Mit einer KI erstellen</value></data>
   <data name="AiHelp.Step1" xml:space="preserve"><value>Lade die Anleitung herunter und kopiere ihren ganzen Text in einen KI-Chat (z. B. Claude, ChatGPT oder Gemini).</value></data>

@@ -55,6 +55,10 @@
         scrollIntoView(element) {
             element?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         },
+
+        scrollToId(id) {
+            document.getElementById(id)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        },
     };
 
     Blazor.start({ applicationCulture: language });

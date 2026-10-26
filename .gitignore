@@ -5,6 +5,7 @@ obj/
 *.user
 *.suo
 /data/
+src/Lernkicker.Web/data/
 /ts-state/
 .env
 node_modules/

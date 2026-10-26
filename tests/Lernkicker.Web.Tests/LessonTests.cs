@@ -23,7 +23,7 @@ public sealed class LessonTests(LernkickerFactory factory) : IClassFixture<Lernk
 
         var phone = await TestData.ChildPhoneAsync(factory, parent, child.Id);
         var mine = Assert.Single(await LernkickerFactory.Json<List<MyLesson>>(await phone.GetAsync("/api/device/lessons")));
-        Assert.Equal((assignment.Id, "Gedicht: Septembermorgen", 0, 4), (mine.AssignmentId, mine.Title, mine.KnownBlocks, mine.Blocks));
+        Assert.Equal((assignment.Id, "Gedicht: Septembermorgen", 0, 4, "learn"), (mine.AssignmentId, mine.Title, mine.KnownBlocks, mine.Blocks, mine.Mode));
 
         var toLearn = await LernkickerFactory.Json<LessonDto>(await phone.GetAsync($"/api/device/lessons/{assignment.Id}"));
         Assert.Equal(["text", "poem", "flashcards", "facts"], toLearn.Blocks.Select(b => b.Type));
@@ -39,6 +39,24 @@ public sealed class LessonTests(LernkickerFactory factory) : IClassFixture<Lernk
         Assert.Equal(1, progress.PracticeCount);
         Assert.Equal(["poem"], progress.KnownBlocks);
         Assert.NotNull(progress.LastPracticedAt);
+    }
+
+    [Fact]
+    public async Task Reference_lesson_reaches_the_child_with_its_mode_and_entries()
+    {
+        var parent = await factory.NewFamilyAsync("reference@example.org");
+        var child = await TestData.CreateChildAsync(parent);
+        var lesson = await LernkickerFactory.Json<LessonOverview>(await parent.PostAsync("/api/lessons", TestData.AsJson(Lernkicker.Tests.Examples.ReferenceJson())));
+        var assignment = await TestData.AssignLessonAsync(parent, child.Id, lesson.LessonId);
+        Assert.Equal("reference", assignment.Mode);
+
+        var phone = await TestData.ChildPhoneAsync(factory, parent, child.Id);
+        var mine = Assert.Single(await LernkickerFactory.Json<List<MyLesson>>(await phone.GetAsync("/api/device/lessons")));
+        Assert.Equal("reference", mine.Mode);
+
+        var toLookUp = await LernkickerFactory.Json<LessonDto>(await phone.GetAsync($"/api/device/lessons/{assignment.Id}"));
+        Assert.Equal(("reference", "entries"), (toLookUp.Mode, toLookUp.Blocks[1].Type));
+        Assert.Equal(("8", "Der Nächste muss **aussetzen**."), (toLookUp.Blocks[1].Entries![1].Name, toLookUp.Blocks[1].Entries![1].Text));
     }
 
     [Fact]
