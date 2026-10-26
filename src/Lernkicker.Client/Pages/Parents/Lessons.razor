@@ -16,7 +16,8 @@
     <p class="hint">@L["Upload.PicturesHint"]</p>
     <label class="file">
         @L["Upload.ChooseFiles"]
-        <InputFile multiple accept=".json,application/json,.zip,application/zip,image/*" OnChange="FilesChosen" disabled="@_busy" />
+        @* No accept filter: phones report zips as application/x-zip-compressed or octet-stream and grey them out; the server checks the files *@
+        <InputFile multiple OnChange="FilesChosen" disabled="@_busy" />
     </label>
     @if (_shrinking)
     {
