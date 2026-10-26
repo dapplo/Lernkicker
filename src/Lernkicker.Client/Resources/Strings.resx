@@ -501,4 +501,12 @@
   <data name="Child.Tab.Results" xml:space="preserve"><value>Results</value></data>
   <data name="Child.Tab.Devices" xml:space="preserve"><value>Phones</value></data>
   <data name="Child.Tab.Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Parents.LearnMyself" xml:space="preserve"><value>Learn myself</value></data>
+  <data name="Parents.LearnMyselfHint" xml:space="preserve"><value>Do quizzes and learning material yourself, right here with your login: no phone to connect and no PIN. Assign them to your own profile like for a child.</value></data>
+  <data name="Child.LearnHereTitle" xml:space="preserve"><value>Learn myself</value></data>
+  <data name="Child.LearnHereHint" xml:space="preserve"><value>Is {0} you? Then learn right here with your parent login, without connecting a phone or entering a PIN.</value></data>
+  <data name="Child.LearnHere" xml:space="preserve"><value>This is me: learn here</value></data>
+  <data name="Home.BackToParents" xml:space="preserve"><value>To the parents' page</value></data>
+  <data name="Home.StopLearning" xml:space="preserve"><value>Stop learning</value></data>
+  <data name="Error.child.notOwnProfile" xml:space="preserve"><value>Only an adult profile that no other parent uses can be your own.</value></data>
 </root>

@@ -111,6 +111,14 @@ else
     }
     else if (Tab == "devices")
     {
+        @if (_child.IsAdult && !_child.OtherLearner)
+        {
+            <section class="box">
+                <h2>@L["Child.LearnHereTitle"]</h2>
+                <p>@L["Child.LearnHereHint", _child.Name]</p>
+                <button class="btn" @onclick="LearnHere">@L["Child.LearnHere"]</button>
+            </section>
+        }
         <section class="box">
             <h2>@L["Pair.Title"]</h2>
             <p>@L["Child.PairHint", _child.Name]</p>
@@ -312,12 +320,30 @@ else
     });
 
     // The parent is logged in here, so this browser can redeem a fresh single-use code itself.
-    private Task UseThisDevice() => Run(async () =>
+    private Task UseThisDevice() => StartHere(async () =>
     {
         var pairing = await Api.CreatePairingCode(Id);
         await Api.Pair(pairing.Code, L["Pair.DeviceLabel", Display.Date(DateOnly.FromDateTime(DateTime.Now))]);
-        Navigation.NavigateTo("");
     });
+
+    // The parent's own login stands in for device and PIN
+    private Task LearnHere() => StartHere(() => Api.LearnAs(Id));
+
+    /// <summary>Runs the action and then opens the learning start page in this browser.</summary>
+    private async Task StartHere(Func<Task> action)
+    {
+        _errors = null;
+        _message = null;
+        try
+        {
+            await action();
+            Navigation.NavigateTo("");
+        }
+        catch (ApiException e)
+        {
+            _errors = Display.Errors(e);
+        }
+    }
 
     private Task Unlock(Guid deviceId) => Run(() => Api.UnlockDevice(Id, deviceId));
 

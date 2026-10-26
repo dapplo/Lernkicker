@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Lernkicker.Application;
 using Lernkicker.Application.UseCases;
 using Lernkicker.Contracts;
 using Lernkicker.Domain.Practice;
@@ -37,7 +38,13 @@ public static class DeviceEndpoints
         }).RequireRateLimiting(RateLimits.Child);
 
         device.MapGet("/status", async (ChildDeviceUseCases uc, HttpContext http) =>
-            Results.Json((await uc.StatusAsync(DeviceToken(http))).ToDto(), ApiJson.Options));
+        {
+            var session = await http.AuthenticateAsync(Schemes.Child);
+            var status = session.Principal?.FindFirst(Claims.Learner) is not null
+                ? await uc.LearnerStatusAsync(session.Principal.ChildIdOf())
+                : await uc.StatusAsync(DeviceToken(http));
+            return Results.Json(status.ToDto(), ApiJson.Options);
+        });
 
         device.MapPost("/login", async (PinLogin request, ChildDeviceUseCases uc, HttpContext http) =>
         {
@@ -79,4 +86,18 @@ public static class DeviceEndpoints
     }
 
     private static string? DeviceToken(HttpContext http) => http.Request.Cookies[Cookies.Device];
+
+    /// <summary>A child session for a parent's own profile, tied to the parent login instead of a device (see Program).</summary>
+    public static Task SignInLearnerAsync(HttpContext http, LearnerSession session, Guid parentId)
+    {
+        var identity = new ClaimsIdentity(
+            [
+                new Claim(Claims.FamilyId, session.FamilyId.ToString()),
+                new Claim(Claims.ChildId, session.ChildId.ToString()),
+                new Claim(Claims.Learner, parentId.ToString()),
+                new Claim(ClaimTypes.GivenName, session.ChildName),
+            ],
+            Schemes.Child);
+        return http.SignInAsync(Schemes.Child, new ClaimsPrincipal(identity), new AuthenticationProperties { IsPersistent = true });
+    }
 }

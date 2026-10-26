@@ -20,6 +20,12 @@ public sealed class Child : IFamilyOwned
 
     public string? PinHash { get; private set; }
 
+    /// <summary>
+    /// The parent account that learns with this adult profile itself. That parent opens it from their own login,
+    /// without a paired device or PIN.
+    /// </summary>
+    public Guid? LearnerParentId { get; private set; }
+
     public Child(Guid familyId, string name, int? gradeLevel, bool isAdult = false, string? theme = null)
     {
         FamilyId = familyId;
@@ -45,6 +51,11 @@ public sealed class Child : IFamilyOwned
     }
 
     public void SetPinHash(string pinHash) => PinHash = pinHash;
+
+    /// <summary>Only an adult profile can be a parent's own, and only one parent's.</summary>
+    public bool CanBeLearnedBy(Guid parentId) => IsAdult && (LearnerParentId is null || LearnerParentId == parentId);
+
+    public void SetLearner(Guid? parentId) => LearnerParentId = parentId;
 }
 
 /// <summary>

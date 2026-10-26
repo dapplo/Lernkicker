@@ -93,22 +93,33 @@ else
         </ul>
     }
     <p class="tip">@L["Home.FocusTip"]</p>
-    @* Tucked away with a second step, so a child does not log out by accident *@
-    <details class="grown-ups">
-        <summary>@L["Home.ForParents"]</summary>
-        @if (_confirmLogout)
-        {
-            <p>@L["Home.LogoutQuestion"]</p>
-            <span class="buttons">
-                <button class="btn danger" @onclick="Logout">@L["Home.LogoutYes"]</button>
-                <button class="btn quiet" @onclick="() => _confirmLogout = false">@L["Common.Cancel"]</button>
-            </span>
-        }
-        else
-        {
-            <button class="btn quiet" @onclick="() => _confirmLogout = true">@L["Common.Logout"]</button>
-        }
-    </details>
+    @if (_device.Learner)
+    {
+        @* A parent learning with their own profile: no device to protect, so no second step *@
+        <p class="buttons">
+            <a class="btn quiet" href="parents">@L["Home.BackToParents"]</a>
+            <button class="btn quiet" @onclick="Logout">@L["Home.StopLearning"]</button>
+        </p>
+    }
+    else
+    {
+        @* Tucked away with a second step, so a child does not log out by accident *@
+        <details class="grown-ups">
+            <summary>@L["Home.ForParents"]</summary>
+            @if (_confirmLogout)
+            {
+                <p>@L["Home.LogoutQuestion"]</p>
+                <span class="buttons">
+                    <button class="btn danger" @onclick="Logout">@L["Home.LogoutYes"]</button>
+                    <button class="btn quiet" @onclick="() => _confirmLogout = false">@L["Common.Cancel"]</button>
+                </span>
+            }
+            else
+            {
+                <button class="btn quiet" @onclick="() => _confirmLogout = true">@L["Common.Logout"]</button>
+            }
+        </details>
+    }
 }
 
 @code {
@@ -165,7 +176,14 @@ else
     private async Task Logout()
     {
         _confirmLogout = false;
+        var learner = _device?.Learner == true;
         await Api.ChildLogout();
+        if (learner)
+        {
+            Navigation.NavigateTo("parents");
+            return;
+        }
+
         await Reload();
     }
 }

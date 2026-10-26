@@ -112,6 +112,8 @@ public sealed class Api(HttpClient http)
     public Task UpdateChild(Guid id, ChildDetails request) => Send(HttpMethod.Put, $"api/children/{id}", request);
     public Task ChangePin(Guid id, string pin) => Send(HttpMethod.Put, $"api/children/{id}/pin", new ChangePin(pin));
     public Task DeleteChild(Guid id) => Send(HttpMethod.Delete, $"api/children/{id}");
+    public Task LearnMyself() => Send(HttpMethod.Post, "api/children/learn");
+    public Task LearnAs(Guid id) => Send(HttpMethod.Post, $"api/children/{id}/learn");
     public Task<PairingCodeResponse> CreatePairingCode(Guid id) => Send<PairingCodeResponse>(HttpMethod.Post, $"api/children/{id}/pairing");
     public Task<List<DeviceOverview>> Devices(Guid id) => Get<List<DeviceOverview>>($"api/children/{id}/devices");
     public Task RemoveDevice(Guid id, Guid deviceId) => Send(HttpMethod.Delete, $"api/children/{id}/devices/{deviceId}");

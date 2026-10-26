@@ -77,6 +77,49 @@ public sealed class ChildrenUseCases(
     public async Task<Result> DeleteAsync(Guid childId) =>
         await children.DeleteAsync(childId) ? Result.Ok() : AppError.NotFound(ErrorCodes.ChildNotFound);
 
+    /// <summary>
+    /// The parent's own adult profile, created on first use and named after the parent. The web adapter logs the
+    /// parent into it; their own login stands in for a paired device and PIN.
+    /// </summary>
+    public async Task<LearnerSession> LearnMyselfAsync(Guid familyId, Guid parentId, string parentName)
+    {
+        var child = await children.FindLearnerProfileAsync(parentId);
+        if (child is null)
+        {
+            var name = parentName.Trim();
+            child = new Child(familyId, name[..Math.Min(name.Length, Child.MaxNameLength)], null, isAdult: true);
+            child.SetLearner(parentId);
+            children.Add(child);
+            await unitOfWork.SaveChangesAsync();
+        }
+
+        return new LearnerSession(child.FamilyId, child.Id, child.Name);
+    }
+
+    /// <summary>Makes an existing adult profile the parent's own (instead of any other) and logs the parent into it.</summary>
+    public async Task<Result<LearnerSession>> LearnAsAsync(Guid childId, Guid parentId)
+    {
+        var child = await children.FindAsync(childId);
+        if (child is null)
+        {
+            return AppError.NotFound(ErrorCodes.ChildNotFound);
+        }
+
+        if (!child.CanBeLearnedBy(parentId))
+        {
+            return AppError.Invalid(ErrorCodes.ChildNotOwnProfile);
+        }
+
+        if (await children.FindLearnerProfileAsync(parentId) is { } previous && previous.Id != child.Id)
+        {
+            previous.SetLearner(null);
+        }
+
+        child.SetLearner(parentId);
+        await unitOfWork.SaveChangesAsync();
+        return new LearnerSession(child.FamilyId, child.Id, child.Name);
+    }
+
     /// <summary>A one-time code for the QR code that pairs the child's phone.</summary>
     public async Task<Result<PairingCodeCreated>> CreatePairingCodeAsync(Guid childId)
     {

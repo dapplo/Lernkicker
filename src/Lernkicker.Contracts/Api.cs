@@ -71,7 +71,8 @@ public sealed record ChildDetails(string Name, int? GradeLevel, bool IsAdult = f
 
 public sealed record ChangePin(string Pin);
 
-public sealed record ChildOverview(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult, string Theme = "football");
+/// <summary><c>Mine</c>: the logged-in parent learns with this profile; <c>OtherLearner</c>: another parent does.</summary>
+public sealed record ChildOverview(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult, string Theme = "football", bool Mine = false, bool OtherLearner = false);
 
 public sealed record PairingCodeResponse(string Code, string Link, DateTimeOffset ExpiresAt);
 
@@ -88,7 +89,8 @@ public sealed record AttemptOverview(Guid Id, string QuizId, string Title, strin
 public sealed record PairDevice(string Code, string? Label);
 
 /// <summary><c>Theme</c>: the look of the paired child's profile (football, space, unicorn).</summary>
-public sealed record DeviceStatusResponse(bool Paired, string? ChildName, bool Locked, string? Theme = null);
+/// <summary><c>Learner</c>: a parent learning with their own profile; there is no device, and logging out leads back to the parents' page.</summary>
+public sealed record DeviceStatusResponse(bool Paired, string? ChildName, bool Locked, string? Theme = null, bool Learner = false);
 
 public sealed record PinLogin(string Pin);
 

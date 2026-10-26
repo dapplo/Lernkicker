@@ -156,6 +156,9 @@ namespace Lernkicker.Persistence.Migrations
                     b.Property<bool>("IsAdult")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid?>("LearnerParentId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -174,6 +177,8 @@ namespace Lernkicker.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FamilyId");
+
+                    b.HasIndex("LearnerParentId");
 
                     b.ToTable("Children");
                 });
@@ -945,6 +950,11 @@ namespace Lernkicker.Persistence.Migrations
                         .HasForeignKey("FamilyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Lernkicker.Persistence.ParentUser", null)
+                        .WithMany()
+                        .HasForeignKey("LearnerParentId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("Lernkicker.Domain.Families.ChildDevice", b =>
