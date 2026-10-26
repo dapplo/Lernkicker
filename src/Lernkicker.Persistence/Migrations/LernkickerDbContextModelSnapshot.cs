@@ -164,6 +164,13 @@ namespace Lernkicker.Persistence.Migrations
                     b.Property<string>("PinHash")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Theme")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("football");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FamilyId");

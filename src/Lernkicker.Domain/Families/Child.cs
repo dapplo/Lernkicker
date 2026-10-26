@@ -15,14 +15,18 @@ public sealed class Child : IFamilyOwned
     /// <summary>An adult who learns for themselves (e.g. a parent or for work): no school year and no school marks.</summary>
     public bool IsAdult { get; private set; }
 
+    /// <summary>The look of the app on the child's devices, one of <see cref="ChildThemes.All"/>.</summary>
+    public string Theme { get; private set; } = ChildThemes.Default;
+
     public string? PinHash { get; private set; }
 
-    public Child(Guid familyId, string name, int? gradeLevel, bool isAdult = false)
+    public Child(Guid familyId, string name, int? gradeLevel, bool isAdult = false, string? theme = null)
     {
         FamilyId = familyId;
         Name = name.Trim();
         GradeLevel = gradeLevel;
         IsAdult = isAdult;
+        Theme = theme ?? ChildThemes.Default;
     }
 
     public static bool IsValidName(string? name) => !string.IsNullOrWhiteSpace(name) && name.Trim().Length <= MaxNameLength;
@@ -32,14 +36,37 @@ public sealed class Child : IFamilyOwned
     /// <summary>A school year only for a child; an adult has none.</summary>
     public static bool IsValidGradeLevel(int? gradeLevel, bool isAdult) => isAdult ? gradeLevel is null : IsValidGradeLevel(gradeLevel);
 
-    public void Update(string name, int? gradeLevel, bool isAdult)
+    public void Update(string name, int? gradeLevel, bool isAdult, string? theme = null)
     {
         Name = name.Trim();
         GradeLevel = gradeLevel;
         IsAdult = isAdult;
+        Theme = theme ?? Theme;
     }
 
     public void SetPinHash(string pinHash) => PinHash = pinHash;
+}
+
+/// <summary>
+/// The looks a profile can have. They set the colours of the whole app on the child's devices and the scenery of the
+/// games. The client knows how each one looks; the server only checks the name.
+/// </summary>
+public static class ChildThemes
+{
+    /// <summary>The green Lernkicker look with a football pitch.</summary>
+    public const string Football = "football";
+
+    /// <summary>Dark blue night sky with stars, planets and rockets.</summary>
+    public const string Space = "space";
+
+    /// <summary>Pastel pink and lilac with rainbows and unicorns.</summary>
+    public const string Unicorn = "unicorn";
+
+    public const string Default = Football;
+
+    public static readonly IReadOnlyList<string> All = [Football, Space, Unicorn];
+
+    public static bool IsValid(string? theme) => theme is null || All.Contains(theme);
 }
 
 /// <summary>A child's PIN: exactly four digits. It only works on a paired device.</summary>

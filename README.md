@@ -1,6 +1,6 @@
 # Lernkicker
 
-Lernkicker is a small self-hosted learning app for primary school children. Parents upload practice tests ("quizzes") and assign them to their children, the children practise on their phone, and the parents see the results. Several families can share one installation; each family only sees its own data. A parent can also add an adult profile (no grade, no school marks) to learn with their own quizzes and material. The UI is German and English.
+Lernkicker is a small self-hosted learning app for primary school children. Parents upload practice tests ("quizzes") and assign them to their children, the children practise on their phone, and the parents see the results. Several families can share one installation; each family only sees its own data. A parent can also add an adult profile (no grade, no school marks) to learn with their own quizzes and material. Each profile has a look (football, space or unicorn) that colours the app and the games on the child's devices. The UI is German and English.
 
 It runs as a Docker container on a Synology NAS and is reachable through Tailscale (optionally public via Tailscale Funnel).
 

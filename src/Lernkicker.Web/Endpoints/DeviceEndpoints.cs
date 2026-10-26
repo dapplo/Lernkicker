@@ -33,7 +33,7 @@ public static class DeviceEndpoints
                 MaxAge = TimeSpan.FromDays(400),
                 IsEssential = true,
             });
-            return Results.Json(new DeviceStatusResponse(true, paired.Value.ChildName, false), ApiJson.Options);
+            return Results.Json(new DeviceStatusResponse(true, paired.Value.ChildName, false, paired.Value.Theme), ApiJson.Options);
         }).RequireRateLimiting(RateLimits.Child);
 
         device.MapGet("/status", async (ChildDeviceUseCases uc, HttpContext http) =>

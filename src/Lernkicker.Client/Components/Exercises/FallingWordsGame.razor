@@ -1,0 +1,188 @@
+@* The falling words game: one word after the other falls down; the child taps the option it belongs to before it
+   hits the ground. The fall itself runs in js/start.js (lernkicker.fall), because the page CSP forbids inline
+   styles. Every word falls once per round; its answer goes into the draft like a matching row. The scenery comes
+   from the profile's theme (the theme-… class around the whole app, see app.css). *@
+@implements IAsyncDisposable
+@inject IJSRuntime Js
+@inject CurrentTheme Theme
+
+<div class="game" @ref="_game">
+    @if (_phase == Phase.Intro)
+    {
+        <p class="game-how" lang="@UiLanguage.Current">@L["Game.FallingHow"]</p>
+        <button type="button" class="btn goal" lang="@UiLanguage.Current" @onclick="Start">@(Draft.Fallen.Count > 0 ? L["Game.Continue"] : L["Game.Start"])</button>
+    }
+    else if (_phase == Phase.Done)
+    {
+        <div class="game-done" lang="@UiLanguage.Current">
+            <span class="icon" aria-hidden="true">@Theme.Value.Icon</span>
+            <p>@L["Game.Result", Caught, Sheet.Words.Count]</p>
+            <button type="button" class="btn quiet" @onclick="PlayAgain">@L["Game.PlayAgain"]</button>
+        </div>
+    }
+    else if (_word is { } word)
+    {
+        var landed = _phase == Phase.Landed;
+        var right = landed && FallingWords.IsRight(word, Chosen);
+        <p class="game-score" lang="@UiLanguage.Current" aria-live="polite">
+            <span>@L["Game.Word", Draft.Fallen.Count + (landed ? 0 : 1), Sheet.Words.Count]</span>
+            <span>@Theme.Value.Icon @Caught</span>
+        </p>
+        <div class="playfield">
+            @* The outer element falls (moved by script), the inner one slides over the chosen option (a class) *@
+            <div class="drop" @key="word.Index" @ref="_drop">
+                <div class="falling of-@_targets.Count @(_chosen is { } c ? $"at-{c}" : "") @(landed ? right ? "caught" : _chosen is null ? "crashed" : "missed" : "")">
+                    <Picture Image="@word.Image" Zoom="false" />
+                    <span>@word.Text</span>
+                </div>
+            </div>
+            @if (landed)
+            {
+                <p class="verdict @(right ? "right" : "wrong")" lang="@UiLanguage.Current" role="status">
+                    @(right ? L[$"Game.Caught.{Theme.Value.Id}"] : _chosen is null ? L["Game.TooLate"] : L["Game.Wrong"])
+                </p>
+            }
+        </div>
+        <div class="targets of-@_targets.Count">
+            @for (var i = 0; i < _targets.Count; i++)
+            {
+                var index = i;
+                var target = _targets[index];
+                var state = !landed ? (_chosen == index ? "chosen" : "") : target == word.Answer ? "right" : _chosen == index ? "wrong" : "";
+                <button type="button" class="target @state" disabled="@(landed || _chosen is not null)" @onclick="() => Choose(index)">@target</button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private enum Phase { Intro, Falling, Landed, Done }
+
+    private readonly CancellationTokenSource _gone = new();
+    private readonly Random _random = new();
+    private DotNetObjectReference<FallingWordsGame>? _self;
+    private Phase _phase = Phase.Intro;
+    private Queue<FallingWordDto> _queue = [];
+    private FallingWordDto? _word;
+    private IReadOnlyList<string> _targets = [];
+    private int? _chosen;
+    private bool _startFall;
+    private ElementReference _drop;
+    private ElementReference _game;
+
+    [Parameter, EditorRequired]
+    public required AnswerDraft Draft { get; set; }
+
+    private FallingWordsSheetDto Sheet => (FallingWordsSheetDto)Draft.Exercise;
+
+    private string? Chosen => _chosen is { } c ? _targets[c] : null;
+
+    private int Caught => Sheet.Words.Count(w => Draft.Fallen.Contains(w.Index) && FallingWords.IsRight(w, Draft.Texts[w.Index]));
+
+    protected override void OnInitialized()
+    {
+        if (Draft.Fallen.Count == Sheet.Words.Count)
+        {
+            _phase = Phase.Done;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_startFall)
+        {
+            _startFall = false;
+            // The whole playing field (the options at the bottom too) should be on the screen
+            await Js.InvokeVoidAsync("lernkicker.scrollIntoView", _game);
+            _self ??= DotNetObjectReference.Create(this);
+            await Js.InvokeVoidAsync("lernkicker.fall", _drop, FallingWords.FallMilliseconds(Sheet.FallSeconds, Caught), _self);
+        }
+    }
+
+    private void Start()
+    {
+        // Words that fell already in this round (before the child went to another exercise) stay done
+        _queue = new Queue<FallingWordDto>(Sheet.Words.Where(w => !Draft.Fallen.Contains(w.Index)));
+        Next();
+    }
+
+    private void PlayAgain()
+    {
+        Draft.Fallen.Clear();
+        Array.Clear(Draft.Texts);
+        Start();
+    }
+
+    private void Next()
+    {
+        if (!_queue.TryDequeue(out var word))
+        {
+            _word = null;
+            _phase = Phase.Done;
+            return;
+        }
+
+        _word = word;
+        _targets = FallingWords.Targets(Sheet, word, _random);
+        _chosen = null;
+        _phase = Phase.Falling;
+        _startFall = true;
+    }
+
+    private async Task Choose(int index)
+    {
+        if (_phase != Phase.Falling || _chosen is not null)
+        {
+            return;
+        }
+
+        _chosen = index;
+        await Js.InvokeVoidAsync("lernkicker.dropNow", _drop);
+    }
+
+    /// <summary>Called by the script when the word hits the ground.</summary>
+    [JSInvokable]
+    public async Task Landed()
+    {
+        if (_phase != Phase.Falling || _word is not { } word)
+        {
+            return;
+        }
+
+        Draft.Fallen.Add(word.Index);
+        Draft.Texts[word.Index] = Chosen;
+        _phase = Phase.Landed;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(1600, _gone.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        Next();
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _gone.CancelAsync();
+        if (_phase == Phase.Falling)
+        {
+            try
+            {
+                await Js.InvokeVoidAsync("lernkicker.stopFall", _drop);
+            }
+            catch (JSException)
+            {
+                // The element is gone already
+            }
+        }
+
+        _self?.Dispose();
+        _gone.Dispose();
+    }
+}

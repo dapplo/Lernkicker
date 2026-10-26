@@ -36,6 +36,7 @@ Lernkicker refuses a file that breaks one of these:
 - `multipleChoice`: `correct` is the index (from 0) of the correct option, or a list of indices; every index points to an existing option. 2–6 options.
 - `ordering`: list the `steps` in the **correct** order; the app shuffles them.
 - `wordSearch`: `words` are letters only (umlauts and ß are fine), no spaces or hyphens, 2–14 letters, each word once. The app builds a new grid every round; use `"level": "medium"` (diagonal, crossing words) or `"hard"` (also backwards) for older children; the default `easy` suits grades 1–3.
+- `fallingWords`: every word's `answer` is exactly one of the `options`. Keep options short (a word or a few), because up to four sit side by side on a phone.
 - Exercise ids are unique within a quiz, block ids unique within a lesson.
 - A quiz has at most 50 exercises; a lesson file is at most 256 KB.
 
@@ -46,7 +47,7 @@ Pictures are optional. Use them where the real test has them (maps, diagrams, ph
 - A picture is an `image` object: `{ "src": "water-cycle/clouds.svg", "alt": "…", "caption": "…", "credit": "…" }`. `src` and `alt` are required. `alt` says in the content language what matters in the picture for the task.
 - `src` is a path **relative to the JSON file**, e.g. `water-cycle/clouds.svg`. No URLs, no leading `/`, no `..`. Use letters, digits, `-`, `_` and `.` in file names.
 - Allowed: PNG, JPEG, GIF, WebP and SVG, at most 2 MB per picture and 20 MB per file together. The app removes scripts, links and anything else that is not drawing from an SVG.
-- Where pictures can go in a quiz: on any exercise (`image`), on a `matching` row, a `trueFalse` statement, a `multipleChoice` question, and as picture answers (an option `{ "image": {…}, "text": "optional" }` instead of a text).
+- Where pictures can go in a quiz: on any exercise (`image`), on a `matching` row or a `fallingWords` word, a `trueFalse` statement, a `multipleChoice` question, and as picture answers (an option `{ "image": {…}, "text": "optional" }` instead of a text).
 - Where pictures can go in a lesson: on `text` and `facts` blocks, on flashcards (`frontImage`, `backImage`), on `entries` and as an `image` block of its own.
 - If you draw pictures yourself, draw simple, clear SVGs (shapes, diagrams, a map sketch) with a `viewBox`, no text that gives the answer away, and no external fonts or links.
 - For pictures from the internet (e.g. Wikimedia Commons), fill in `credit` with the source and the licence, and only use pictures whose licence allows it.

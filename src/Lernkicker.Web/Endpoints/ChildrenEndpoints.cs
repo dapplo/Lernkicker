@@ -17,14 +17,14 @@ public static class ChildrenEndpoints
 
         children.MapPost("/", async (NewChild request, ClaimsPrincipal user, ChildrenUseCases uc) =>
         {
-            var created = await uc.CreateAsync(user.RequiredFamily(), request.Name, request.GradeLevel, request.Pin, request.IsAdult);
+            var created = await uc.CreateAsync(user.RequiredFamily(), request.Name, request.GradeLevel, request.Pin, request.IsAdult, request.Theme);
             return created.IsSuccess
                 ? Results.Json(created.Value.ToDto(), ApiJson.Options, statusCode: StatusCodes.Status201Created)
                 : ApiResults.Error(created.Error!);
         });
 
         children.MapPut("/{id:guid}", async (Guid id, ChildDetails request, ChildrenUseCases uc) =>
-            (await uc.UpdateAsync(id, request.Name, request.GradeLevel, request.IsAdult)).ToHttp());
+            (await uc.UpdateAsync(id, request.Name, request.GradeLevel, request.IsAdult, request.Theme)).ToHttp());
 
         children.MapPut("/{id:guid}/pin", async (Guid id, ChangePin request, ChildrenUseCases uc) =>
             (await uc.SetPinAsync(id, request.Pin)).ToHttp());

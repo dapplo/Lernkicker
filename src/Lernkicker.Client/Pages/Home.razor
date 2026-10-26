@@ -1,6 +1,7 @@
 @page "/"
 @inject Api Api
 @inject NavigationManager Navigation
+@inject CurrentTheme Theme
 
 <PageTitle>Lernkicker</PageTitle>
 
@@ -33,7 +34,7 @@ else
     @if (_assignments.Count == 0 && _lessons is not { Count: > 0 })
     {
         <div class="empty">
-            <div class="ball" aria-hidden="true">⚽</div>
+            <div class="ball" aria-hidden="true">@Theme.Value.Icon</div>
             <p>@L["Home.NothingToDo"]</p>
         </div>
     }
@@ -125,6 +126,7 @@ else
     {
         _error = null;
         _device = await Api.DeviceStatus();
+        Theme.Set(_device.Theme);
         if (!_device.Paired && await Api.SetupNeeded())
         {
             // A fresh server: the first visitor creates the admin

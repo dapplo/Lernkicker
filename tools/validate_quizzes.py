@@ -53,6 +53,10 @@ def content_errors(quiz):
                 correct = q["correct"] if isinstance(q["correct"], list) else [q["correct"]]
                 if any(c >= len(q["options"]) for c in correct):
                     errors.append(f"{where}/questions/{j}/correct: points to an option that does not exist")
+        elif kind == "fallingWords":
+            for j, w in enumerate(e["words"]):
+                if w["answer"] not in e["options"]:
+                    errors.append(f"{where}/words/{j}/answer: '{w['answer']}' is not one of the options")
         elif kind == "wordSearch":
             longest = e.get("size", MAX_GRID_SIZE)
             seen_words = set()

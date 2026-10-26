@@ -74,6 +74,13 @@ public abstract record ExerciseSheet(string Id, string Instruction, string? Hint
                 // A new grid every round; where the words are stays on the server
                 WordSearchGrid.Generate(w, random).Rows,
                 Numbered(w.Words.Select(x => (x, (ImageRef?)null)), shuffle)),
+            FallingWordsExercise f => new FallingWordsSheet(
+                f.Id, f.Instruction, f.Hint, f.MaxPoints,
+                f.Options,
+                // Always shuffled, so the words do not fall in the same order every round
+                Shuffled(f.Words.Select((w, i) => new FallingWordSheet(i, w.Text, w.Answer, w.Image)).ToList(), random),
+                f.TargetCount,
+                f.FallSeconds),
             _ => throw new NotSupportedException($"Unknown exercise type {exercise.GetType().Name}"),
         };
         return sheet with { Image = exercise.Image };
@@ -121,3 +128,13 @@ public sealed record QuestionSheet(int Index, string Text, IReadOnlyList<SheetIt
 /// <summary><c>Rows</c> is the letter grid, one string per row; the child finds each of the <c>Words</c> in it.</summary>
 public sealed record WordSearchSheet(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<string> Rows, IReadOnlyList<SheetItem> Words)
     : ExerciseSheet(Id, Instruction, Hint, MaxPoints);
+
+/// <summary>
+/// A falling words game. The answers are part of the sheet, because the game shows right away whether a word landed
+/// on the right option; it is practice, so that is fine.
+/// </summary>
+public sealed record FallingWordsSheet(string Id, string Instruction, string? Hint, int MaxPoints, IReadOnlyList<string> Options, IReadOnlyList<FallingWordSheet> Words, int TargetCount, int FallSeconds)
+    : ExerciseSheet(Id, Instruction, Hint, MaxPoints);
+
+/// <summary>A falling word; <c>Index</c> is its position in the original quiz.</summary>
+public sealed record FallingWordSheet(int Index, string Text, string Answer, ImageRef? Image = null);

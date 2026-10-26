@@ -66,7 +66,7 @@
       "type": "object",
       "required": ["type"],
       "properties": {
-        "type": { "enum": ["cloze", "matching", "ordering", "trueFalse", "freeText", "multipleChoice", "wordSearch"] }
+        "type": { "enum": ["cloze", "matching", "ordering", "trueFalse", "freeText", "multipleChoice", "wordSearch", "fallingWords"] }
       },
       "allOf": [
         { "$ref": "#/$defs/base" },
@@ -76,7 +76,8 @@
         { "if": { "properties": { "type": { "const": "trueFalse" } } }, "then": { "$ref": "#/$defs/trueFalse" } },
         { "if": { "properties": { "type": { "const": "freeText" } } }, "then": { "$ref": "#/$defs/freeText" } },
         { "if": { "properties": { "type": { "const": "multipleChoice" } } }, "then": { "$ref": "#/$defs/multipleChoice" } },
-        { "if": { "properties": { "type": { "const": "wordSearch" } } }, "then": { "$ref": "#/$defs/wordSearch" } }
+        { "if": { "properties": { "type": { "const": "wordSearch" } } }, "then": { "$ref": "#/$defs/wordSearch" } },
+        { "if": { "properties": { "type": { "const": "fallingWords" } } }, "then": { "$ref": "#/$defs/fallingWords" } }
       ]
     },
     "cloze": {
@@ -194,6 +195,34 @@
         "diagonal": { "type": "boolean", "description": "Words may also run diagonally. Default from level (medium and hard)." },
         "backwards": { "type": "boolean", "description": "Words may also run backwards (right to left, bottom to top). Default from level (hard)." },
         "overlap": { "type": "boolean", "description": "Words may cross and share a letter. Default from level (medium and hard)." }
+      },
+      "additionalProperties": false
+    },
+    "fallingWords": {
+      "description": "Game: the words fall down one after the other; the child taps the option at the bottom that each word belongs to before it hits the ground.",
+      "required": ["options", "words"],
+      "properties": {
+        "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
+        "options": {
+          "description": "The categories or short descriptions shown at the bottom. Keep them short: up to four share a phone's width.",
+          "type": "array", "minItems": 2, "maxItems": 12, "items": { "type": "string", "minLength": 1, "maxLength": 60 }
+        },
+        "words": {
+          "type": "array", "minItems": 1, "maxItems": 30,
+          "items": {
+            "type": "object", "required": ["text", "answer"], "additionalProperties": false,
+            "properties": {
+              "text": { "type": "string", "minLength": 1, "maxLength": 40 },
+              "answer": { "type": "string", "description": "Exactly one of the options." },
+              "explanation": { "$ref": "#/$defs/text" },
+              "image": { "$ref": "#/$defs/image" }
+            }
+          }
+        },
+        "level": {
+          "enum": ["easy", "medium", "hard"], "default": "easy",
+          "description": "easy: 2 options per word, the first word falls in 10 s. medium: 3 options, 8 s. hard: 4 options, 6 s. Every word caught makes the next one a little faster."
+        }
       },
       "additionalProperties": false
     },

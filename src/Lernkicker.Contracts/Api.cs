@@ -65,13 +65,13 @@ public sealed record QuizDeletedResponse(bool Archived);
 // Children (for parents)
 
 /// <summary><c>IsAdult</c>: an adult who learns for themselves; no grade level and no school marks.</summary>
-public sealed record NewChild(string Name, int? GradeLevel, string Pin, bool IsAdult = false);
+public sealed record NewChild(string Name, int? GradeLevel, string Pin, bool IsAdult = false, string? Theme = null);
 
-public sealed record ChildDetails(string Name, int? GradeLevel, bool IsAdult = false);
+public sealed record ChildDetails(string Name, int? GradeLevel, bool IsAdult = false, string? Theme = null);
 
 public sealed record ChangePin(string Pin);
 
-public sealed record ChildOverview(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult);
+public sealed record ChildOverview(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult, string Theme = "football");
 
 public sealed record PairingCodeResponse(string Code, string Link, DateTimeOffset ExpiresAt);
 
@@ -87,7 +87,8 @@ public sealed record AttemptOverview(Guid Id, string QuizId, string Title, strin
 
 public sealed record PairDevice(string Code, string? Label);
 
-public sealed record DeviceStatusResponse(bool Paired, string? ChildName, bool Locked);
+/// <summary><c>Theme</c>: the look of the paired child's profile (football, space, unicorn).</summary>
+public sealed record DeviceStatusResponse(bool Paired, string? ChildName, bool Locked, string? Theme = null);
 
 public sealed record PinLogin(string Pin);
 

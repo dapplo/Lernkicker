@@ -52,7 +52,7 @@ python3 tools/validate_quizzes.py my-quiz.json
 | Field | Required | Meaning |
 | --- | --- | --- |
 | `id` | yes | unique within the quiz |
-| `type` | yes | `cloze`, `matching`, `ordering`, `trueFalse`, `freeText`, `multipleChoice`, `wordSearch` |
+| `type` | yes | `cloze`, `matching`, `ordering`, `trueFalse`, `freeText`, `multipleChoice`, `wordSearch`, `fallingWords` |
 | `instruction` | yes | the task as written in the test |
 | `hint` | no | small usage hint below the instruction |
 | `points` | no | maximum points of the exercise (see grading) |
@@ -181,6 +181,33 @@ For example `"level": "easy", "diagonal": true` gives diagonal words that never 
 
 The filler letters are the alphabet plus the words' own letters, so an umlaut in the grid does not give a word away. The word list is shuffled like the other parts (see `shuffle`).
 
+### `fallingWords`: catch the falling words (game)
+
+A game for sorting terms into categories, or matching terms with their descriptions. The `words` fall from the top one after the other; at the bottom the app shows the word's `answer` and a few other `options`. The child taps the option the word belongs to, and the word drops onto it. A word that hits the ground before the child picks one counts as wrong. After each word the app shows the right option, so the game still teaches. Every word caught makes the next one fall a little faster (down to about half the time). Each word is a part, graded like a `matching` row.
+
+```json
+{ "id": "grain-or-not", "type": "fallingWords", "instruction": "Ist das ein Getreide?",
+  "options": ["Getreide", "kein Getreide"],
+  "words": [
+    { "text": "Weizen", "answer": "Getreide" },
+    { "text": "Kartoffel", "answer": "kein Getreide", "explanation": "Die Kartoffel ist eine Knolle." }
+  ] }
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `options` | yes | 2–12 categories or short descriptions, at most 60 characters. Up to four sit side by side on a phone, so keep them short |
+| `words` | yes | 1–30 words, each with `text` (at most 40 characters) and its `answer`, which is exactly one of the `options`. Optional: `explanation` (shown in the result) and an `image` that falls with the word |
+| `level` | no | `easy` (default), `medium` or `hard`, see below |
+
+| `level` | Options shown per word | First word falls in |
+| --- | --- | --- |
+| `easy` | 2 | 10 s |
+| `medium` | 3 | 8 s |
+| `hard` | 4 | 6 s |
+
+With fewer `options` than the level shows, all of them are shown. The words always fall in a new random order. The scenery follows the look of the child's profile (football, space or unicorn), which a parent sets on the child's page. Because the game shows right away whether a word was caught, the app sends the answers of this exercise to the child's device, unlike the other types.
+
 ## Pictures
 
 [`quizzes/other/showcase-pictures.json`](../quizzes/other/showcase-pictures.json) uses a picture in every place the format allows: on an exercise, on a `matching` row, on a `trueFalse` statement, on a `multipleChoice` question and as picture answers. Its pictures are in the folder next to it.
@@ -214,7 +241,7 @@ Rules:
 
 ## Grading
 
-- Every gap, row, step, statement, field, question and word (`wordSearch`) is a **part**. Without `points`, every correct part gives 1 point.
+- Every gap, row, step, statement, field, question and word (`wordSearch`, `fallingWords`) is a **part**. Without `points`, every correct part gives 1 point.
 - With `points`: points reached = round(correct parts ÷ all parts × `points`), rounding half away from zero. Example: 7 steps, `points: 4`, 5 correct → 2.86 → 3 points.
 - For `multipleChoice` with several correct options, a question counts only when exactly the correct options are selected.
 - The mark is only a rough guide on the German 1–6 scale: from 95 % → 1, 83 % → 2, 67 % → 3, 50 % → 4, 30 % → 5, below → 6.
@@ -226,6 +253,7 @@ Rules:
 - With a `wordBank`: every gap has at least one answer from the word bank.
 - `matching`: every `answer` is one of the `options`.
 - `multipleChoice`: every index in `correct` points to an existing option.
+- `fallingWords`: every word's `answer` is one of the `options`.
 - `wordSearch`: every word has only letters, is at most as long as `size` (or 14), and appears only once (ignoring case).
 - Exercise `id`s are unique within the quiz.
 

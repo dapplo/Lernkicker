@@ -38,7 +38,7 @@ public class QuizJsonTests
     public void Word_search_level_is_read_and_written_in_camel_case()
     {
         var quiz = _format.Read(File.ReadAllText(Examples.PathOf("other/showcase-all-exercise-types.json")));
-        var wordSearch = Assert.IsType<WordSearchExercise>(quiz.Exercises[^1]);
+        var wordSearch = quiz.Exercises.OfType<WordSearchExercise>().Single();
 
         Assert.Equal(WordSearchLevel.Medium, wordSearch.Level);
         Assert.Null(wordSearch.Diagonal);

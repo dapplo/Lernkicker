@@ -48,6 +48,7 @@ internal static class Examples
             FreeTextExercise f => new ExerciseAnswer { Texts = f.Fields.Select(x => (string?)x.Answers[0]).ToList() },
             MultipleChoiceExercise q => new ExerciseAnswer { Choices = q.Questions.Select(x => (IReadOnlyList<int>?)x.Correct).ToList() },
             WordSearchExercise w => new ExerciseAnswer { Texts = w.Words.Select(x => (string?)x).ToList() },
+            FallingWordsExercise f => new ExerciseAnswer { Texts = f.Words.Select(x => (string?)x.Answer).ToList() },
             _ => throw new NotSupportedException(),
         });
 }

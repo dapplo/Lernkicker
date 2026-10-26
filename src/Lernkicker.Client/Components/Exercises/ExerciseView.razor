@@ -185,6 +185,10 @@
             </ul>
             <button type="button" class="btn quiet" lang="@UiLanguage.Current" @onclick="ClearWordSearch">@L["Exercise.StartOver"]</button>
             break;
+
+        case FallingWordsSheetDto:
+            <FallingWordsGame Draft="@Draft" />
+            break;
     }
 </section>
 
