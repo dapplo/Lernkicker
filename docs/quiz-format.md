@@ -120,7 +120,7 @@ Each statement may have an `image`.
 
 ### `freeText`: type the answers
 
-One text input per entry in `fields`. Case and surrounding whitespace are ignored; list other spellings (e.g. endings) as further `answers`. With `anyOrder: true` every correct answer may be in any field, but each counts only once.
+One text input per entry in `fields`. Case and surrounding whitespace are ignored; list other spellings (e.g. endings) as further `answers`. With `anyOrder: true` every correct answer may be in any field, but each counts only once, and so does a word typed twice. So "Nenne vier Getreidesorten" works with four fields that each list every kind.
 
 ```json
 { "id": "principles", "type": "freeText", "instruction": "Schreibe die 5 Wahlgrundsätze auf.",

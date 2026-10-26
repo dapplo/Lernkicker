@@ -135,7 +135,7 @@
       "additionalProperties": false
     },
     "freeText": {
-      "description": "Text inputs. With anyOrder, every correct answer may be in any field, but each counts only once.",
+      "description": "Text inputs. With anyOrder, every correct answer may be in any field, but each counts only once, and so does a word typed twice.",
       "required": ["fields"],
       "properties": {
         "id": true, "type": true, "instruction": true, "hint": true, "points": true, "explanation": true, "solutionText": true, "image": true,
