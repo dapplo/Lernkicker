@@ -7,6 +7,7 @@ schema. Pictures named in "src" must exist next to the JSON file (same rules as 
 """
 import json
 import sys
+import unicodedata
 import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
@@ -19,6 +20,7 @@ VALIDATORS = {
 }
 GAP = "___"
 IMAGE_KEYS = ("image", "frontImage", "backImage")
+MAX_GRID_SIZE = 14
 MAX_IMAGE_BYTES = 2 * 1024 * 1024
 MAX_TOTAL_IMAGE_BYTES = 20 * 1024 * 1024
 
@@ -51,6 +53,18 @@ def content_errors(quiz):
                 correct = q["correct"] if isinstance(q["correct"], list) else [q["correct"]]
                 if any(c >= len(q["options"]) for c in correct):
                     errors.append(f"{where}/questions/{j}/correct: points to an option that does not exist")
+        elif kind == "wordSearch":
+            longest = e.get("size", MAX_GRID_SIZE)
+            seen_words = set()
+            for j, w in enumerate(e["words"]):
+                letters = unicodedata.normalize("NFC", w)
+                if not letters.isalpha():
+                    errors.append(f"{where}/words/{j}: '{w}' may only contain letters")
+                elif len(letters) > longest:
+                    errors.append(f"{where}/words/{j}: '{w}' is longer than the grid ({longest} letters)")
+                if letters.lower() in seen_words:
+                    errors.append(f"{where}/words/{j}: '{w}' is in the word list more than once")
+                seen_words.add(letters.lower())
     return errors
 
 

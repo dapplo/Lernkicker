@@ -35,6 +35,7 @@ Lernkicker refuses a file that breaks one of these:
 - `matching`: every row's `answer` is exactly one of the `options`.
 - `multipleChoice`: `correct` is the index (from 0) of the correct option, or a list of indices; every index points to an existing option. 2–6 options.
 - `ordering`: list the `steps` in the **correct** order; the app shuffles them.
+- `wordSearch`: `words` are letters only (umlauts and ß are fine), no spaces or hyphens, 2–14 letters, each word once. The app builds a new grid every round; set `diagonal: true` for older children.
 - Exercise ids are unique within a quiz, block ids unique within a lesson.
 - A quiz has at most 50 exercises; a lesson file is at most 256 KB.
 

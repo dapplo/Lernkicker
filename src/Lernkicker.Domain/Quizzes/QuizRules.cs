@@ -20,6 +20,9 @@ public static class QuizIssueCodes
     public const string GapNotInWordBank = "gapNotInWordBank";
     public const string AnswerNotInOptions = "answerNotInOptions";
     public const string CorrectOutOfRange = "correctOutOfRange";
+    public const string WordNotLetters = "wordNotLetters";
+    public const string WordTooLong = "wordTooLong";
+    public const string DuplicateWord = "duplicateWord";
     public const string MissingImage = "missingImage";
     public const string ImageType = "imageType";
     public const string ImageTooLarge = "imageTooLarge";
@@ -82,9 +85,36 @@ public static class QuizRules
                     }
 
                     break;
+                case WordSearchExercise wordSearch:
+                    CheckWordSearch(wordSearch, at, issues);
+                    break;
             }
         }
 
         return issues;
+    }
+
+    private static void CheckWordSearch(WordSearchExercise wordSearch, string at, List<QuizIssue> issues)
+    {
+        var maxLength = wordSearch.Size ?? WordSearchExercise.MaxSize;
+        var seen = new HashSet<string>();
+        for (var j = 0; j < wordSearch.Words.Count; j++)
+        {
+            var word = wordSearch.Words[j];
+            var letters = WordSearchGrid.Letters(word);
+            if (!letters.All(char.IsLetter))
+            {
+                issues.Add(QuizIssue.Of(QuizIssueCodes.WordNotLetters, $"{at}/words/{j}", ("word", word)));
+            }
+            else if (letters.Length > maxLength)
+            {
+                issues.Add(QuizIssue.Of(QuizIssueCodes.WordTooLong, $"{at}/words/{j}", ("word", word), ("size", maxLength)));
+            }
+
+            if (!seen.Add(letters))
+            {
+                issues.Add(QuizIssue.Of(QuizIssueCodes.DuplicateWord, $"{at}/words/{j}", ("word", word)));
+            }
+        }
     }
 }

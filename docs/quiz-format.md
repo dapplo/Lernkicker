@@ -52,7 +52,7 @@ python3 tools/validate_quizzes.py my-quiz.json
 | Field | Required | Meaning |
 | --- | --- | --- |
 | `id` | yes | unique within the quiz |
-| `type` | yes | `cloze`, `matching`, `ordering`, `trueFalse`, `freeText`, `multipleChoice` |
+| `type` | yes | `cloze`, `matching`, `ordering`, `trueFalse`, `freeText`, `multipleChoice`, `wordSearch` |
 | `instruction` | yes | the task as written in the test |
 | `hint` | no | small usage hint below the instruction |
 | `points` | no | maximum points of the exercise (see grading) |
@@ -152,6 +152,25 @@ Each question may have an `image`. An option is either a text or a **picture ans
   "correct": 1 }
 ```
 
+### `wordSearch`: find the words in a grid of letters
+
+The app hides the `words` in a square grid and fills the rest with random letters. The grid is **new every round**, so practising again means searching again, not remembering positions. The child taps the first and then the last letter of a word (either order works); a found word turns green and is crossed off the list under the grid. Each word is a part.
+
+```json
+{ "id": "grains", "type": "wordSearch", "instruction": "Finde die fünf Getreidesorten.",
+  "words": ["Weizen", "Roggen", "Gerste", "Hafer", "Mais"],
+  "diagonal": true }
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `words` | yes | 1–15 words, 2–14 letters each. Letters only (umlauts and `ß` are fine), no spaces, hyphens or digits. Shown in upper case in the grid |
+| `size` | no | rows and columns, 5–14. Without it the app picks 8 to 12, enough for the words; 12 still fits a phone. If the words do not fit, the grid grows |
+| `diagonal` | no | default `false`: words run left to right and top to bottom only. With `true` also diagonally |
+| `backwards` | no | default `false`. With `true` words may also run right to left and bottom to top (harder) |
+
+The filler letters are the alphabet plus the words' own letters, so an umlaut in the grid does not give a word away. The word list is shuffled like the other parts (see `shuffle`).
+
 ## Pictures
 
 [`quizzes/other/showcase-pictures.json`](../quizzes/other/showcase-pictures.json) uses a picture in every place the format allows: on an exercise, on a `matching` row, on a `trueFalse` statement, on a `multipleChoice` question and as picture answers. Its pictures are in the folder next to it.
@@ -185,7 +204,7 @@ Rules:
 
 ## Grading
 
-- Every gap, row, step, statement, field and question is a **part**. Without `points`, every correct part gives 1 point.
+- Every gap, row, step, statement, field, question and word (`wordSearch`) is a **part**. Without `points`, every correct part gives 1 point.
 - With `points`: points reached = round(correct parts ÷ all parts × `points`), rounding half away from zero. Example: 7 steps, `points: 4`, 5 correct → 2.86 → 3 points.
 - For `multipleChoice` with several correct options, a question counts only when exactly the correct options are selected.
 - The mark is only a rough guide on the German 1–6 scale: from 95 % → 1, 83 % → 2, 67 % → 3, 50 % → 4, 30 % → 5, below → 6.
@@ -197,6 +216,7 @@ Rules:
 - With a `wordBank`: every gap has at least one answer from the word bank.
 - `matching`: every `answer` is one of the `options`.
 - `multipleChoice`: every index in `correct` points to an existing option.
+- `wordSearch`: every word has only letters, is at most as long as `size` (or 14), and appears only once (ignoring case).
 - Exercise `id`s are unique within the quiz.
 
 ## Notes for authors (and for Claude)

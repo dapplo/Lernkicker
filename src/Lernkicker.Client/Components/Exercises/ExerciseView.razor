@@ -134,6 +134,35 @@
                 </fieldset>
             }
             break;
+
+        case WordSearchSheetDto wordSearch:
+            var foundCells = Draft.Found.Values.SelectMany(c => c).ToHashSet();
+            var missed = Draft.Missed?.ToHashSet() ?? [];
+            <p class="hint" lang="@UiLanguage.Current">@L["Exercise.WordSearchHow"]</p>
+            @* The page CSP forbids inline styles, so the size is a class *@
+            <div class="letter-grid size-@wordSearch.Rows.Count">
+                @for (var r = 0; r < wordSearch.Rows.Count; r++)
+                {
+                    @for (var c = 0; c < wordSearch.Rows[r].Length; c++)
+                    {
+                        var cell = new Cell(r, c);
+                        var letter = wordSearch.Rows[r][c];
+                        var start = Draft.Start == cell;
+                        <button type="button" class="letter @(foundCells.Contains(cell) ? "found" : "") @(start ? "start" : "") @(missed.Contains(cell) ? "miss" : "")"
+                                aria-pressed="@start" aria-label="@L["Exercise.Letter", letter, r + 1, c + 1]" @onclick="() => Tap(wordSearch, cell)">@letter</button>
+                    }
+                }
+            </div>
+            <p class="found-count" lang="@UiLanguage.Current" aria-live="polite">@L["Exercise.WordsFound", Draft.Found.Count, wordSearch.Words.Count]</p>
+            <ul class="words">
+                @foreach (var word in wordSearch.Words)
+                {
+                    var found = Draft.Found.ContainsKey(word.Index);
+                    <li class="@(found ? "found" : "")"><span aria-hidden="true">@(found ? "✓" : "○")</span> @word.Text</li>
+                }
+            </ul>
+            <button type="button" class="btn quiet" lang="@UiLanguage.Current" @onclick="ClearWordSearch">@L["Exercise.StartOver"]</button>
+            break;
     }
 </section>
 
@@ -153,6 +182,43 @@
         {
             Draft.Order.Add(index);
         }
+    }
+
+    private void Tap(WordSearchSheetDto sheet, Cell cell)
+    {
+        Draft.Missed = null;
+        if (Draft.Start is not { } start || start == cell)
+        {
+            // A first tap, or the same letter again to take it back
+            Draft.Start = Draft.Start is null ? cell : null;
+            return;
+        }
+
+        if (WordSearch.Line(start, cell) is not { } line)
+        {
+            // Not in a straight line: start again from this letter
+            Draft.Start = cell;
+            return;
+        }
+
+        Draft.Start = null;
+        if (WordSearch.Find(sheet.Rows, line, sheet.Words, Draft.Found.Keys) is { } word)
+        {
+            Draft.Found[word.Index] = line;
+            Draft.Texts[word.Index] = word.Text;
+        }
+        else
+        {
+            Draft.Missed = line;
+        }
+    }
+
+    private void ClearWordSearch()
+    {
+        Draft.Found.Clear();
+        Array.Clear(Draft.Texts);
+        Draft.Start = null;
+        Draft.Missed = null;
     }
 
     private void Select(int question, int option, bool multiple)

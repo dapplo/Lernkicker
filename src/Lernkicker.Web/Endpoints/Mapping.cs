@@ -98,6 +98,7 @@ public static class Mapping
             FreeTextSheet f => new FreeTextSheetDto(f.Id, f.Instruction, f.Hint, f.MaxPoints, f.FieldLabels),
             MultipleChoiceSheet mc => new MultipleChoiceSheetDto(mc.Id, mc.Instruction, mc.Hint, mc.MaxPoints,
                 mc.Questions.Select(q => new QuestionSheetDto(q.Index, q.Text, Items(q.Options), q.MultipleAnswers, q.Image.ToDto(images))).ToList()),
+            WordSearchSheet w => new WordSearchSheetDto(w.Id, w.Instruction, w.Hint, w.MaxPoints, w.Rows, Items(w.Words)),
             _ => throw new NotSupportedException($"Unknown sheet type {e.GetType().Name}"),
         };
         return sheet with { Image = e.Image.ToDto(images) };
