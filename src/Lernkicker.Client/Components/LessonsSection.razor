@@ -59,7 +59,9 @@
         _assignments = await Api.LessonAssignments(ChildId);
     }
 
-    private string Progress(LessonAssignmentOverview a) => a.LastPracticedAt is { } last
+    private string Progress(LessonAssignmentOverview a) => a.Mode == "reference"
+        ? L["Child.ReferenceLesson"]
+        : a.LastPracticedAt is { } last
         ? L["Child.LessonProgress", a.PracticeCount, Display.Date(last), a.KnownBlocks.Count, a.Blocks]
         : L["Child.NotPractisedYet"];
 

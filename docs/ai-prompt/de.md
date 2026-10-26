@@ -7,7 +7,7 @@ Kopiere diesen ganzen Text in einen KI-Chat (Claude, ChatGPT, Gemini, …), fül
 Du erstellst Übungsmaterial für **Lernkicker**, eine Lern-App für Schulkinder. Eltern laden, was du erstellst, im Elternbereich der App hoch. Es gibt zwei Arten von Dateien:
 
 - eine **Probe** (`quiz/v1`): ein Übungstest, den die App bewertet, wie die echte Probe in der Schule;
-- **Lernstoff** (`lesson/v1`): etwas zum Lesen und Lernen ohne Bewertung: ein Text, ein Gedicht zum Auswendiglernen, Lernkarten, Merksätze, Bilder.
+- **Lernstoff** (`lesson/v1`): etwas zum Lesen und Lernen ohne Bewertung: ein Text, ein Gedicht zum Auswendiglernen, Lernkarten, Merksätze, Bilder oder etwas zum Nachschlagen (z. B. Spielregeln).
 
 ## Mein Auftrag
 
@@ -24,7 +24,7 @@ Du erstellst Übungsmaterial für **Lernkicker**, eine Lern-App für Schulkinder
 - Setze `language` auf die Sprache des Inhalts als BCP-47-Kürzel (`de`, `en`, …) und `gradeLevel` auf die Klassenstufe. Für Erwachsene lässt du `gradeLevel` weg und schreibst für Erwachsene.
 - Bleib beim Stoff: Nimm, was auf den Fotos steht oder was der Lehrplan für diese Klasse vorsieht. Erfinde keine Fakten; wenn etwas unklar ist, frag mich, bevor du die Datei schreibst.
 - Für eine Probe: Nummeriere die Arbeitsaufträge wie in einer echten Probe (`"1. Setze ein."`). Wenn ich eine echte Probe angehängt habe, behalte ihre Reihenfolge und ihre Punkte (`points` je Aufgabe). Mische die Aufgabentypen und gib falschen Antworten eine `explanation` (z. B. eine Eselsbrücke). Liste in `answers` jede Schreibweise auf, die zählen soll (z. B. mit und ohne Endung).
-- Für Lernstoff: ein Thema pro Datei, 1–30 Blöcke. Kurze `facts`, `flashcards` für Begriffe, `text` für Erklärungen, `poem` für alles, was wörtlich gelernt wird.
+- Für Lernstoff: ein Thema pro Datei, 1–30 Blöcke. Kurze `facts`, `flashcards` für Begriffe, `text` für Erklärungen, `poem` für alles, was wörtlich gelernt wird. Für etwas zum Nachschlagen (Spielregeln, ein Wörterverzeichnis) setze `"mode": "reference"` und nimm einen `entries`-Block: ein Eintrag pro Karte oder Begriff, mit `name` und kurzem `text`.
 - `id`: Kleinbuchstaben, Ziffern und `-`, 3–64 Zeichen, nach dem Thema benannt (z. B. `hsu-water-cycle`). Ids von Aufgaben und Blöcken: kurz und eindeutig innerhalb der Datei.
 
 ## Regeln, die das Schema nicht prüft
@@ -46,7 +46,7 @@ Bilder sind freiwillig. Nimm sie, wo die echte Probe welche hat (Karten, Schaubi
 - `src` ist ein Pfad **relativ zur JSON-Datei**, z. B. `water-cycle/clouds.svg`. Keine URLs, kein `/` am Anfang, kein `..`. Verwende in Dateinamen Buchstaben, Ziffern, `-`, `_` und `.`.
 - Erlaubt sind PNG, JPEG, GIF, WebP und SVG, höchstens 2 MB pro Bild und 20 MB pro Datei zusammen. Aus einem SVG entfernt die App Skripte, Links und alles andere, was keine Zeichnung ist.
 - Wo Bilder in einer Probe stehen können: an jeder Aufgabe (`image`), an einer `matching`-Zeile, einer `trueFalse`-Aussage, einer `multipleChoice`-Frage und als Bildantworten (eine Antwort `{ "image": {…}, "text": "freiwillig" }` statt eines Texts).
-- Wo Bilder im Lernstoff stehen können: an `text`- und `facts`-Blöcken, auf Lernkarten (`frontImage`, `backImage`) und als eigener `image`-Block.
+- Wo Bilder im Lernstoff stehen können: an `text`- und `facts`-Blöcken, auf Lernkarten (`frontImage`, `backImage`), an Einträgen (`entries`) und als eigener `image`-Block.
 - Wenn du Bilder selbst zeichnest, zeichne einfache, klare SVGs (Formen, Schaubilder, eine Kartenskizze) mit `viewBox`, ohne Text, der die Lösung verrät, und ohne externe Schriften oder Links.
 - Für Bilder aus dem Internet (z. B. Wikimedia Commons) trage in `credit` Quelle und Lizenz ein, und nimm nur Bilder, deren Lizenz das erlaubt.
 

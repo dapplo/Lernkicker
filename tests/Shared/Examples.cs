@@ -25,6 +25,11 @@ internal static class Examples
 
     public static string PoemJson() => File.ReadAllText(LessonPathOf(PoemFile));
 
+    public const string ReferenceFile = "other/game-mau-mau.json";
+
+    /// <summary>A reference lesson (game rules) with a lookup block.</summary>
+    public static string ReferenceJson() => File.ReadAllText(LessonPathOf(ReferenceFile));
+
     public static Quiz Hsu()
     {
         var result = new QuizJson().Parse(HsuJson());

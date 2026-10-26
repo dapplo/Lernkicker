@@ -1,8 +1,8 @@
 # Lesson format `lesson/v1`
 
-Learning material is **one JSON file** (UTF-8): a poem to learn by heart, a text to read, flashcards, key facts. Unlike a quiz it is not graded. The child reads and practises it on the phone and marks each part they know with "Kann ich!", and parents see that progress.
+Learning material is **one JSON file** (UTF-8): a poem to learn by heart, a text to read, flashcards, key facts, or a guide to look things up in (e.g. the rules of a game). Unlike a quiz it is not graded. The child reads and practises it on the phone and marks each part they know with "Kann ich!", and parents see that progress.
 
-Parents upload a lesson under **Lernstoff verwalten / Manage learning material**, then give it to a child on the child's page, optionally with a due date (e.g. the day the poem is recited). The due date also shows up in the child's calendar. On upload, Lernkicker checks the file against [`schema/lesson-v1.schema.json`](../schema/lesson-v1.schema.json) and the rules below. The example is [`lessons/german/poem-septembermorgen.json`](../lessons/german/poem-septembermorgen.json).
+Parents upload a lesson under **Lernstoff verwalten / Manage learning material**, then give it to a child on the child's page, optionally with a due date (e.g. the day the poem is recited). The due date also shows up in the child's calendar. On upload, Lernkicker checks the file against [`schema/lesson-v1.schema.json`](../schema/lesson-v1.schema.json) and the rules below. The examples are [`lessons/german/poem-septembermorgen.json`](../lessons/german/poem-septembermorgen.json) and, for a guide to look things up in, [`lessons/other/game-mau-mau.json`](../lessons/other/game-mau-mau.json).
 
 As with quizzes, the keys are English and the **content** is in the lesson's `language` (default `de`).
 
@@ -41,8 +41,18 @@ python3 tools/validate_quizzes.py my-lesson.json
 | `subject` | yes | Same list as quizzes: `science` (HSU), `german`, `math`, `english`, `religion`, `ethics`, `music`, `art`, `sports`, `crafts`, `other` |
 | `gradeLevel` | no | School year, 1–13. Leave it out for material for adults (e.g. for work) |
 | `language` | no | BCP 47 tag of the content, default `de` |
+| `mode` | no | `learn` (default) or `reference`, see [Learning or looking up](#learning-or-looking-up) |
 | `topic`, `description`, `source` | no | Shown to the child (`topic`, `description`) or kept for parents (`source`, e.g. the worksheet) |
 | `blocks` | yes | 1–30 parts, shown in this order |
+
+## Learning or looking up
+
+`mode` says how the child uses the lesson:
+
+- **`learn`** (default): something to learn. Every part has a "Kann ich!" button, the child finishes with "Fertig für heute", and parents see how many parts the child knows.
+- **`reference`**: something to look things up in, e.g. the rules of a card game or a list of signs. There are no "Kann ich!" buttons and no progress; instead a row of the parts' titles at the top jumps to each part. The child's list and the parents' page show it as "Zum Nachschlagen".
+
+All block types work in both modes; an `entries` block fits a reference lesson best.
 
 Pictures work as in quizzes: see [Pictures](#pictures). [`lessons/math/shapes.json`](../lessons/math/shapes.json) uses each kind of picture once.
 
@@ -91,6 +101,18 @@ It works for any text to learn word for word, e.g. a times table rhyme or a shor
 ```
 
 1–30 short sentences, shown as a highlighted list, optionally with an `image` above them.
+
+### `entries`: things to look up
+
+```json
+{ "id": "cards", "type": "entries", "title": "Sonderkarten",
+  "entries": [
+    { "name": "7", "text": "Der Nächste zieht **2 Karten**." },
+    { "name": "Bube", "text": "Du wünschst dir eine Farbe.", "image": { "src": "cards/jack.svg", "alt": "Ein Bube" } }
+  ] }
+```
+
+1–100 entries, each with a `name` (at most 120 characters), a `text` (at most 2,000 characters, same formatting as a `text` block) and an optional small `image` next to it. The app shows them as a compact list; with more than five entries there is a search field that keeps the entries containing every word typed, in the name or the text. Use it for what each card of a game does, a glossary, or traffic signs.
 
 ### `image`: a picture on its own
 

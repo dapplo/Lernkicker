@@ -356,6 +356,11 @@ namespace Lernkicker.Persistence.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Mode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
                     b.Property<long?>("SharedAt")
                         .HasColumnType("INTEGER");
 

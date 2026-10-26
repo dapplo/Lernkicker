@@ -11,7 +11,7 @@ It runs as a Docker container on a Synology NAS and is reachable through Tailsca
 - [Operations](docs/operations.md): running it on a Synology with Tailscale (and Funnel)
 - [Security concept](docs/security.md): Funnel, login, family isolation, data protection, email
 - [Quiz format `quiz/v1`](docs/quiz-format.md): what a quiz looks like as JSON
-- [Lesson format `lesson/v1`](docs/lesson-format.md): learning material (poems, texts, flashcards, facts) as JSON
+- [Lesson format `lesson/v1`](docs/lesson-format.md): learning material (poems, texts, flashcards, facts, guides to look things up in) as JSON
 - [`schema/`](schema/): JSON Schema for quizzes and lessons, [`quizzes/`](quizzes/), [`lessons/`](lessons/): examples
 - [Prompt for AI assistants](docs/ai-prompt/README.md): lets parents have an AI write a quiz or lesson (German and English); the app offers it on the upload pages
 - [`tools/validate_quizzes.py`](tools/validate_quizzes.py): validates quizzes locally and in CI
@@ -75,7 +75,7 @@ Then open http://localhost:8080 and create the admin on the setup page. Login co
 | `/` | child | Pair the phone, PIN, list of quizzes with stars, learning material, dates of the next two weeks |
 | `/pair#<code>` | child | Opened from the QR code |
 | `/practice/<assignment>` | child | One exercise per screen, hand in, result with solutions |
-| `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, facts; mark parts as known |
+| `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, facts, entries to look up; mark parts as known (or jump between parts in a reference lesson) |
 | `/parents` | parent | Login, children, add a child or adult, connect Telegram |
 | `/parents/quizzes` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete quizzes |
 | `/parents/lessons` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete learning material |

@@ -64,10 +64,10 @@ public sealed record SharedSummary(
 /// <summary>A lesson given to a child, with the child's progress, for parents.</summary>
 public sealed record LessonAssignmentSummary(
     Guid Id, string LessonId, string Title, string Subject, DateOnly? DueOn, DateTimeOffset AssignedAt,
-    int PracticeCount, DateTimeOffset? LastPracticedAt, IReadOnlyList<string> KnownBlocks, int Blocks);
+    int PracticeCount, DateTimeOffset? LastPracticedAt, IReadOnlyList<string> KnownBlocks, int Blocks, string Mode);
 
 /// <summary>A lesson as the child sees it in the list.</summary>
-public sealed record ChildLesson(Guid AssignmentId, string Title, string Subject, string? Topic, DateOnly? DueOn, int KnownBlocks, int Blocks);
+public sealed record ChildLesson(Guid AssignmentId, string Title, string Subject, string? Topic, DateOnly? DueOn, int KnownBlocks, int Blocks, string Mode);
 
 /// <summary>
 /// A lesson to learn, with what the child already marked as known. <c>Images</c> maps each picture <c>src</c> to

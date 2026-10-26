@@ -48,6 +48,55 @@ public class LessonJsonTests
     }
 
     [Fact]
+    public void Lessons_are_for_learning_unless_they_say_otherwise()
+    {
+        Assert.Equal(LessonModes.Learn, _format.Parse(Examples.PoemJson()).Lesson!.Mode);
+    }
+
+    [Fact]
+    public void Reference_lesson_with_entries_is_read_completely()
+    {
+        var lesson = _format.Parse(Examples.ReferenceJson()).Lesson!;
+
+        Assert.Equal(LessonModes.Reference, lesson.Mode);
+        var entries = Assert.IsType<EntriesBlock>(lesson.Blocks[1]);
+        Assert.Equal(["7", "8", "Bube", "Mau!", "Mau-Mau!"], entries.Entries.Select(e => e.Name));
+        Assert.Contains("**2 Karten**", entries.Entries[0].Text);
+        Assert.Equal(LessonModes.Reference, _format.Read(Examples.ReferenceJson()).Mode);
+    }
+
+    [Fact]
+    public void Entry_pictures_are_listed_with_their_path()
+    {
+        var json = JsonNode.Parse(Examples.ReferenceJson())!;
+        json["blocks"]![1]!["entries"]![2]!["image"] = new JsonObject { ["src"] = "cards/jack.svg", ["alt"] = "Ein Bube" };
+
+        var lesson = _format.Parse(json.ToJsonString()).Lesson!;
+
+        var use = Assert.Single(lesson.Images());
+        Assert.Equal(("blocks/1/entries/2/image", "cards/jack.svg"), (use.Path, use.Image.Src));
+    }
+
+    [Theory]
+    [InlineData("mode", "\"quiz\"")]
+    [InlineData("entry", "{ \"name\": \"7\" }")]
+    public void Unknown_mode_and_entries_without_text_are_rejected(string what, string value)
+    {
+        var json = JsonNode.Parse(Examples.ReferenceJson())!;
+        if (what == "mode")
+        {
+            json["mode"] = JsonNode.Parse(value);
+        }
+        else
+        {
+            json["blocks"]![1]!["entries"]![0] = JsonNode.Parse(value);
+        }
+
+        var issue = Assert.Single(_format.Parse(json.ToJsonString()).Issues);
+        Assert.Equal(QuizIssueCodes.Schema, issue.Code);
+    }
+
+    [Fact]
     public void Stored_source_reads_back_the_same_lesson()
     {
         var lesson = _format.Read(Examples.PoemJson());

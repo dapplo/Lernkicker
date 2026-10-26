@@ -7,15 +7,15 @@ public sealed record NewLessonAssignment(string LessonId, DateOnly? DueOn);
 /// <summary>A lesson given to a child, with progress: <c>KnownBlocks</c> are the block ids the child marked as known.</summary>
 public sealed record LessonAssignmentOverview(
     Guid Id, string LessonId, string Title, string Subject, DateOnly? DueOn, DateTimeOffset AssignedAt,
-    int PracticeCount, DateTimeOffset? LastPracticedAt, IReadOnlyList<string> KnownBlocks, int Blocks);
+    int PracticeCount, DateTimeOffset? LastPracticedAt, IReadOnlyList<string> KnownBlocks, int Blocks, string Mode);
 
 /// <summary>A lesson in the child's list.</summary>
-public sealed record MyLesson(Guid AssignmentId, string Title, string Subject, string? Topic, DateOnly? DueOn, int KnownBlocks, int Blocks);
+public sealed record MyLesson(Guid AssignmentId, string Title, string Subject, string? Topic, DateOnly? DueOn, int KnownBlocks, int Blocks, string Mode);
 
-/// <summary>A lesson to learn. Each block has the fields of its <c>Type</c> (text, poem, flashcards, facts, image).</summary>
+/// <summary>A lesson to learn or look things up in (<c>Mode</c> learn or reference). Each block has the fields of its <c>Type</c> (text, poem, flashcards, facts, image, entries).</summary>
 public sealed record LessonDto(
     Guid AssignmentId, string Title, string Subject, string Language, string? Topic, string? Description, DateOnly? DueOn,
-    IReadOnlyList<string> KnownBlocks, IReadOnlyList<LessonBlockDto> Blocks);
+    IReadOnlyList<string> KnownBlocks, IReadOnlyList<LessonBlockDto> Blocks, string Mode = "learn");
 
 public sealed record LessonBlockDto
 {
@@ -29,7 +29,10 @@ public sealed record LessonBlockDto
     public IReadOnlyList<FlashcardDto>? Cards { get; init; }
     public IReadOnlyList<string>? Items { get; init; }
     public ImageDto? Image { get; init; }
+    public IReadOnlyList<EntryDto>? Entries { get; init; }
 }
+
+public sealed record EntryDto(string Name, string Text, ImageDto? Image = null);
 
 public sealed record FlashcardDto(string Front, string Back, ImageDto? FrontImage = null, ImageDto? BackImage = null);
 

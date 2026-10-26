@@ -173,7 +173,7 @@ public sealed class LessonUseCases(
     /// <summary>The child's lessons, the ones due soonest first.</summary>
     public async Task<IReadOnlyList<ChildLesson>> MyLessonsAsync(Guid childId) =>
         (await WithLessonsAsync(childId))
-            .Select(x => new ChildLesson(x.Assignment.Id, x.Lesson.Title, x.Lesson.Subject, x.Lesson.Topic, x.Assignment.DueOn, x.Assignment.KnownBlocks.Count, x.Lesson.BlockCount))
+            .Select(x => new ChildLesson(x.Assignment.Id, x.Lesson.Title, x.Lesson.Subject, x.Lesson.Topic, x.Assignment.DueOn, x.Assignment.KnownBlocks.Count, x.Lesson.BlockCount, x.Lesson.Mode))
             .OrderBy(l => l.DueOn ?? DateOnly.MaxValue)
             .ThenBy(l => l.Title, StringComparer.CurrentCulture)
             .ToList();
@@ -224,5 +224,5 @@ public sealed class LessonUseCases(
 
     private static LessonAssignmentSummary Summary(LessonAssignment assignment, StoredLesson lesson) =>
         new(assignment.Id, lesson.LessonId, lesson.Title, lesson.Subject, assignment.DueOn, assignment.AssignedAt,
-            assignment.PracticeCount, assignment.LastPracticedAt, assignment.KnownBlocks, lesson.BlockCount);
+            assignment.PracticeCount, assignment.LastPracticedAt, assignment.KnownBlocks, lesson.BlockCount, lesson.Mode);
 }

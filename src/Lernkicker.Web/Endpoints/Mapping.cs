@@ -40,7 +40,7 @@ public static class Mapping
         new(l.LessonId, l.Title, l.Subject, l.GradeLevel, l.Topic, l.Blocks, l.UploadedAt, l.Shared);
 
     public static LessonAssignmentOverview ToDto(this LessonAssignmentSummary a) =>
-        new(a.Id, a.LessonId, a.Title, a.Subject, a.DueOn, a.AssignedAt, a.PracticeCount, a.LastPracticedAt, a.KnownBlocks, a.Blocks);
+        new(a.Id, a.LessonId, a.Title, a.Subject, a.DueOn, a.AssignedAt, a.PracticeCount, a.LastPracticedAt, a.KnownBlocks, a.Blocks, a.Mode);
 
     public static TelegramStatusDto ToDto(this TelegramStatus s) => new(s.Enabled, s.BotUsername, s.LinkedAt);
 
@@ -51,11 +51,11 @@ public static class Mapping
     public static SharedOverview ToDto(this SharedSummary s) =>
         new(s.Id, s.Kind, s.ItemId, s.Title, s.Subject, s.GradeLevel, s.Topic, s.Size, s.SharedAt, s.InMyLibrary);
 
-    public static MyLesson ToDto(this ChildLesson l) => new(l.AssignmentId, l.Title, l.Subject, l.Topic, l.DueOn, l.KnownBlocks, l.Blocks);
+    public static MyLesson ToDto(this ChildLesson l) => new(l.AssignmentId, l.Title, l.Subject, l.Topic, l.DueOn, l.KnownBlocks, l.Blocks, l.Mode);
 
     public static LessonDto ToDto(this LessonToLearn l) =>
         new(l.AssignmentId, l.Lesson.Title, l.Lesson.Subject, l.Lesson.Language, l.Lesson.Topic, l.Lesson.Description, l.DueOn,
-            l.KnownBlocks, l.Lesson.Blocks.Select(b => ToDto(b, l.Images)).ToList());
+            l.KnownBlocks, l.Lesson.Blocks.Select(b => ToDto(b, l.Images)).ToList(), l.Lesson.Mode);
 
     private static LessonBlockDto ToDto(LessonBlock b, IReadOnlyDictionary<string, string> images) => b switch
     {
@@ -68,6 +68,11 @@ public static class Mapping
         },
         FactsBlock f => new LessonBlockDto { Id = f.Id, Type = "facts", Title = f.Title, Items = f.Items, Image = f.Image.ToDto(images) },
         ImageBlock i => new LessonBlockDto { Id = i.Id, Type = "image", Title = i.Title, Image = i.Image.ToDto(images) },
+        EntriesBlock e => new LessonBlockDto
+        {
+            Id = e.Id, Type = "entries", Title = e.Title,
+            Entries = e.Entries.Select(x => new EntryDto(x.Name, x.Text, x.Image.ToDto(images))).ToList(),
+        },
         _ => throw new NotSupportedException($"Unknown block type {b.GetType().Name}"),
     };
 

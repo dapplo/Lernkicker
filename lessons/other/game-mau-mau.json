@@ -1,0 +1,33 @@
+{
+  "$schema": "../../schema/lesson-v1.schema.json",
+  "format": "lesson/v1",
+  "id": "game-mau-mau",
+  "title": "Spielregeln: Mau-Mau",
+  "subject": "other",
+  "gradeLevel": 2,
+  "language": "de",
+  "mode": "reference",
+  "topic": "Spiele",
+  "description": "Zum Nachschauen beim Spielen: Was machen die Sonderkarten?",
+  "source": "Traditionelles Kartenspiel, eigene Worte",
+  "blocks": [
+    {
+      "id": "goal", "type": "text", "title": "So geht's",
+      "text": "Jeder bekommt **5 Karten**, eine Karte liegt offen in der Mitte.\n\n- Leg eine Karte mit **gleicher Farbe** oder **gleichem Wert** darauf.\n- Kannst du nicht? Dann zieh eine Karte.\n- Wer zuerst keine Karten mehr hat, gewinnt."
+    },
+    {
+      "id": "cards", "type": "entries", "title": "Sonderkarten",
+      "entries": [
+        { "name": "7", "text": "Der Nächste zieht **2 Karten**. Hat er auch eine 7, legt er sie, und der Übernächste zieht 4." },
+        { "name": "8", "text": "Der Nächste muss **aussetzen**." },
+        { "name": "Bube", "text": "Passt auf jede Karte. Du **wünschst dir eine Farbe**, und der Nächste muss sie legen." },
+        { "name": "Mau!", "text": "Rufe **„Mau!“**, wenn du nur noch eine Karte hast. Vergessen? Dann ziehst du eine Strafkarte." },
+        { "name": "Mau-Mau!", "text": "Rufe **„Mau-Mau!“**, wenn du deine letzte Karte legst." }
+      ]
+    },
+    {
+      "id": "facts", "type": "facts", "title": "Kurz gemerkt",
+      "items": ["7: zwei ziehen.", "8: aussetzen.", "Bube: Farbe wünschen."]
+    }
+  ]
+}

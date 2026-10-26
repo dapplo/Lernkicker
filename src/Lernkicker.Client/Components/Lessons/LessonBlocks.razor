@@ -1,9 +1,20 @@
-@* The parts of a lesson. With Toggle, each part has a "Kann ich!" button; without (the parents' preview) not. *@
+@inject IJSRuntime Js
+@* The parts of a lesson. With Toggle, each part has a "Kann ich!" button; without (the parents' preview) not.
+   A reference lesson (e.g. game rules) has no such buttons but a list of its parts to jump to. *@
+@if (IsReference)
+{
+    <nav class="lesson-toc" aria-label="@L["Learn.Contents"]">
+        @foreach (var block in Lesson.Blocks)
+        {
+            <button type="button" lang="@(block.Title is null ? null : Lesson.Language)" @onclick="() => JumpTo(block.Id)">@Title(block)</button>
+        }
+    </nav>
+}
 @foreach (var block in Lesson.Blocks)
 {
     var known = Known?.Contains(block.Id) == true;
-    <section class="lesson-block @(known ? "known" : "")" @key="block.Id">
-        <h2 lang="@(block.Title is null ? null : Lesson.Language)">@(block.Title ?? L[$"Learn.Type.{block.Type}"])</h2>
+    <section class="lesson-block @(known ? "known" : "")" id="@Anchor(block.Id)" @key="block.Id">
+        <h2 lang="@(block.Title is null ? null : Lesson.Language)">@Title(block)</h2>
         <div lang="@Lesson.Language">
             @switch (block.Type)
             {
@@ -29,9 +40,12 @@
                         }
                     </ul>
                     break;
+                case "entries":
+                    <EntriesView Entries="@(block.Entries!)" />
+                    break;
             }
         </div>
-        @if (Toggle.HasDelegate)
+        @if (Toggle.HasDelegate && !IsReference)
         {
             <button class="known-toggle @(known ? "on" : "")" aria-pressed="@(known ? "true" : "false")" @onclick="() => Toggle.InvokeAsync(block.Id)">
                 @(known ? L["Learn.KnowIt"] : L["Learn.MarkKnown"])
@@ -49,4 +63,12 @@
 
     [Parameter]
     public EventCallback<string> Toggle { get; set; }
+
+    private bool IsReference => Lesson.Mode == "reference";
+
+    private string Title(LessonBlockDto block) => block.Title ?? L[$"Learn.Type.{block.Type}"];
+
+    private static string Anchor(string blockId) => $"block-{blockId}";
+
+    private ValueTask JumpTo(string blockId) => Js.InvokeVoidAsync("lernkicker.scrollToId", Anchor(blockId));
 }

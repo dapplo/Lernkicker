@@ -1,8 +1,9 @@
 using Lernkicker.Client.Services;
+using Lernkicker.Contracts;
 
 namespace Lernkicker.Web.Tests;
 
-/// <summary>The client's helpers for lessons: text formatting and hiding words of a poem.</summary>
+/// <summary>The client's helpers for lessons: text formatting, hiding words of a poem and searching entries.</summary>
 public class LessonDisplayTests
 {
     [Fact]
@@ -15,6 +16,24 @@ public class LessonDisplayTests
         Assert.Equal(2, parts[1].Lines.Count);
         Assert.Equal(new MiniMarkdown.Span("zwei", Bold: true), Assert.Single(parts[1].Lines[1]));
         Assert.Equal("Danach weiter.", Assert.Single(parts[2].Lines[0]).Text);
+    }
+
+    [Theory]
+    [InlineData("", 3)]
+    [InlineData("tippen", 2)]
+    [InlineData("TIPPEN zwei", 1)]
+    [InlineData("möhre", 1)]
+    [InlineData("Banane", 0)]
+    public void Entries_are_filtered_by_every_word_in_name_or_text(string query, int found)
+    {
+        EntryDto[] entries =
+        [
+            new("Zahlenkarte", "So oft tippen, wie die Zahl zeigt."),
+            new("Spiel Zwei", "Der Nächste legt zwei Karten und muss für beide tippen."),
+            new("Möhre", "Ein Gemüse."),
+        ];
+
+        Assert.Equal(found, EntrySearch.Filter(entries, query).Count());
     }
 
     [Fact]
