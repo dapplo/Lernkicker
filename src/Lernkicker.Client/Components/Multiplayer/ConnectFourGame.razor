@@ -1,0 +1,51 @@
+@* Connect Four ("Vier gewinnt"): a tap on a column drops a disc; the server checks the move and finds the four in a
+   row. Seat 0 plays red, seat 1 yellow, the same on every device. *@
+
+<p class="game-how">
+    @(View.Over ? L["ConnectFour.Over"] : MyTurn ? L["ConnectFour.YourTurn"] : L["ConnectFour.TheirTurn", Opponent])
+    <span class="c4-me"><span class="c4-disc @Color(MySeat)" aria-hidden="true"></span> @L[MySeat == 0 ? "ConnectFour.YouRed" : "ConnectFour.YouYellow"]</span>
+</p>
+
+<div class="c4-board" role="grid" aria-label="@L["Play.Game.connectFour"]">
+    @for (var x = 0; x < Columns; x++)
+    {
+        var column = x;
+        var full = View.Cells[0][column] >= 0;
+        <button type="button" class="c4-column" aria-label="@L["ConnectFour.Column", column + 1]"
+                disabled="@(Busy || !MyTurn || full)" @onclick="() => Drop(column)">
+            @for (var y = 0; y < View.Cells.Count; y++)
+            {
+                var seat = View.Cells[y][column];
+                var cell = new CellDto(column, y);
+                <span class="c4-cell @(View.Line.Contains(cell) ? "line" : "") @(View.Last == cell ? "last" : "")">
+                    <span class="c4-disc @(seat < 0 ? "" : Color(seat))"></span>
+                </span>
+            }
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required ConnectFourViewDto View { get; set; }
+
+    [Parameter]
+    public int MySeat { get; set; }
+
+    [Parameter]
+    public string Opponent { get; set; } = "";
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public EventCallback<MoveDto> Move { get; set; }
+
+    private int Columns => View.Cells.Count > 0 ? View.Cells[0].Count : 0;
+
+    private bool MyTurn => !View.Over && View.Turn == MySeat;
+
+    private static string Color(int seat) => seat == 0 ? "red" : "yellow";
+
+    private Task Drop(int column) => Move.InvokeAsync(new ConnectFourDropDto(column));
+}

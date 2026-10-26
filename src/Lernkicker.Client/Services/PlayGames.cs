@@ -8,11 +8,15 @@ namespace Lernkicker.Client.Services;
 public static class PlayGames
 {
     /// <summary>The games for several players the server knows (MultiplayerGames on the server).</summary>
-    public static readonly IReadOnlyList<string> All = ["battleship"];
+    public static readonly IReadOnlyList<string> All = ["battleship", "connectFour", "checkers", "mauMau", "chess"];
 
     public static string Icon(string game) => game switch
     {
         "battleship" => "🚢",
+        "connectFour" => "🔴",
+        "checkers" => "⚪",
+        "mauMau" => "🃏",
+        "chess" => "♞",
         _ => "🎲",
     };
 
@@ -28,6 +32,7 @@ public static class PlayGames
         { Abandoned: true } => l["Play.Abandoned"],
         { Status: "finished", Winner: { } winner } when winner == match.MySeat => l["Play.YouWon"],
         { Status: "finished", Winner: { } winner } => l["Play.Won", match.Players.FirstOrDefault(p => p.Seat == winner)?.Name ?? "?"],
+        { Status: "finished" } => l["Play.Draw"],
         { MyTurn: true } => l["Play.YourTurn"],
         _ => l["Play.TheirTurn"],
     };

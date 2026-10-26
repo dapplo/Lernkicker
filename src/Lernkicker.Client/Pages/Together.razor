@@ -55,6 +55,10 @@ else
                     <div>
                         <b><span aria-hidden="true">@PlayGames.Icon(table.Game)</span> @L[$"Play.Game.{table.Game}"]</b>
                         <small>@L["Play.WantsToPlay", string.Join(", ", table.Players.Select(PlayGames.NameWithFamily))]</small>
+                        @if (table.Seats > 2)
+                        {
+                            <small>@L["Play.SeatsTaken", table.Players.Count, table.Seats]</small>
+                        }
                     </div>
                     <button class="btn" disabled="@_busy" @onclick="() => Join(table.Id)">@L["Play.Join"]</button>
                 </li>
@@ -137,7 +141,7 @@ else
     private Task MatchChanged(Guid _) => Changed();
 
     private string Opponents(MatchOverview match) =>
-        match.Players.Count <= 1
+        match.Status == "waiting"
             ? L["Play.WaitingForPlayers"]
             : L["Play.Against", string.Join(", ", match.Players.Where(p => p.Seat != match.MySeat).Select(PlayGames.Name))];
 

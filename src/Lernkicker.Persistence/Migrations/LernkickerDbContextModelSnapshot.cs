@@ -632,16 +632,16 @@ namespace Lernkicker.Persistence.Migrations
                     b.Property<Guid>("MatchId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Seat")
-                        .HasColumnType("INTEGER");
-
                     b.Property<Guid>("ChildId")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("MatchId", "Seat");
+                    b.Property<int>("Seat")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("MatchId", "ChildId");
 
                     b.HasIndex("ChildId");
 

@@ -276,7 +276,8 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
 
         builder.Entity<MatchPlayer>(e =>
         {
-            e.HasKey(x => new { x.MatchId, x.Seat });
+            // Keyed by the child: seats are numbered again when a host starts before the table is full
+            e.HasKey(x => new { x.MatchId, x.ChildId });
             e.HasIndex(x => x.ChildId);
             // A deleted child leaves the game; the match then counts as abandoned
             e.HasOne<Child>().WithMany().HasForeignKey(x => x.ChildId).OnDelete(DeleteBehavior.Cascade);
