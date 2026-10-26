@@ -83,6 +83,7 @@ public static class MessageTexts
     private static string Icon(string kind) => kind switch
     {
         "test" => "📝",
+        "lesson" => "📚",
         "football" => "⚽",
         _ => "📅",
     };

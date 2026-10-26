@@ -102,7 +102,7 @@ public sealed class LessonTests(LernkickerFactory factory) : IClassFixture<Lernk
         var assignment = await TestData.AssignLessonAsync(parent, child.Id, lesson.LessonId, Soon);
 
         var entry = Assert.Single(await LernkickerFactory.Json<List<CalendarEntryDto>>(await parent.GetAsync($"/api/children/{child.Id}/calendar")));
-        Assert.Equal(($"lesson-{assignment.Id}", "lesson", Soon, lesson.Title), (entry.Uid, entry.Source, entry.Date, entry.Title));
+        Assert.Equal(($"lesson-{assignment.Id}", "lesson", "lesson", Soon, lesson.Title, lesson.LessonId), (entry.Uid, entry.Kind, entry.Source, entry.Date, entry.Title, entry.ItemId));
 
         Assert.Equal(HttpStatusCode.NoContent, (await parent.DeleteAsync($"/api/lessons/{lesson.LessonId}")).StatusCode);
         Assert.Empty(await LernkickerFactory.Json<List<LessonAssignmentOverview>>(await parent.GetAsync($"/api/children/{child.Id}/lessons")));

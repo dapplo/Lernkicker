@@ -6,7 +6,8 @@ namespace Lernkicker.Contracts;
 /// Dates and times are in the family's local time; no start time means the whole day.
 /// </summary>
 public sealed record CalendarEntryDto(
-    string Uid, string Kind, string Title, DateOnly Date, TimeOnly? StartTime, TimeOnly? EndTime, string? Location, string Source, Guid? EventId);
+    string Uid, string Kind, string Title, DateOnly Date, TimeOnly? StartTime, TimeOnly? EndTime, string? Location, string Source, Guid? EventId,
+    string? ItemId = null);
 
 public sealed record EventRequest(string Kind, string Title, DateOnly Date, TimeOnly? StartTime, TimeOnly? EndTime, string? Location);
 

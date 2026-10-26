@@ -31,7 +31,7 @@ public static class Mapping
     public static DeviceStatusResponse ToDto(this DeviceStatus s) => new(s.Paired, s.ChildName, s.Locked);
 
     public static CalendarEntryDto ToDto(this CalendarEntry e) =>
-        new(e.Uid, e.Kind, e.Title, e.Date, e.StartTime, e.EndTime, e.Location, e.Source, e.EventId);
+        new(e.Uid, e.Kind, e.Title, e.Date, e.StartTime, e.EndTime, e.Location, e.Source, e.EventId, e.ItemId);
 
     public static SubscriptionOverview ToDto(this SubscriptionSummary s) =>
         new(s.Id, s.Label, s.Host, s.Kind, s.LastSyncedAt, s.LastError, s.EventCount);

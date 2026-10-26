@@ -76,7 +76,7 @@ public sealed class CalendarTests(LernkickerFactory factory) : IClassFixture<Ler
 
         var entry = Assert.Single(await LernkickerFactory.Json<List<CalendarEntryDto>>(await parent.GetAsync($"/api/children/{child.Id}/calendar")));
 
-        Assert.Equal(($"assignment-{assignment.Id}", "test", "assignment", Soon, quiz.Title), (entry.Uid, entry.Kind, entry.Source, entry.Date, entry.Title));
+        Assert.Equal(($"assignment-{assignment.Id}", "test", "assignment", Soon, quiz.Title, quiz.QuizId), (entry.Uid, entry.Kind, entry.Source, entry.Date, entry.Title, entry.ItemId));
         Assert.Null(entry.EventId);
     }
 
