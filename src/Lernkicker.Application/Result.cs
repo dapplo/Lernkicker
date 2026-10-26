@@ -74,6 +74,7 @@ public static class ErrorCodes
     public const string ChildNameInvalid = "child.nameInvalid";
     public const string GradeLevelInvalid = "child.gradeLevelInvalid";
     public const string ThemeInvalid = "child.themeInvalid";
+    public const string ChildNotOwnProfile = "child.notOwnProfile";
     public const string PinInvalid = "pin.invalid";
     public const string PinWrong = "pin.wrong";
     public const string DeviceNotPaired = "device.notPaired";

@@ -17,7 +17,8 @@ public static class Mapping
 
     public static QuizOverview ToDto(this QuizSummary q) => new(q.QuizId, q.Version, q.Title, q.Subject, q.GradeLevel, q.Topic, q.MaxPoints, q.UploadedAt, q.Shared);
 
-    public static ChildOverview ToDto(this ChildSummary c) => new(c.Id, c.Name, c.GradeLevel, c.HasPin, c.Devices, c.IsAdult, c.Theme);
+    public static ChildOverview ToDto(this ChildSummary c, Guid parentId) =>
+        new(c.Id, c.Name, c.GradeLevel, c.HasPin, c.Devices, c.IsAdult, c.Theme, c.LearnerParentId == parentId, c.LearnerParentId is not null && c.LearnerParentId != parentId);
 
     public static DeviceOverview ToDto(this DeviceSummary d) => new(d.Id, d.Label, d.PairedAt, d.LastUsedAt, d.Locked);
 
@@ -29,7 +30,7 @@ public static class Mapping
     public static MyAssignment ToDto(this ChildAssignment a) =>
         new(a.AssignmentId, a.Title, a.Subject, a.Topic, a.MaxPoints, a.DueOn, a.Attempts, a.BestPercent, a.Stars);
 
-    public static DeviceStatusResponse ToDto(this DeviceStatus s) => new(s.Paired, s.ChildName, s.Locked, s.Theme);
+    public static DeviceStatusResponse ToDto(this DeviceStatus s) => new(s.Paired, s.ChildName, s.Locked, s.Theme, s.Learner);
 
     public static CalendarEntryDto ToDto(this CalendarEntry e) =>
         new(e.Uid, e.Kind, e.Title, e.Date, e.StartTime, e.EndTime, e.Location, e.Source, e.EventId, e.ItemId);

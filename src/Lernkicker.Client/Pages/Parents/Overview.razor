@@ -45,6 +45,12 @@ else
                 }
             </ul>
 
+            <p class="learn-myself">
+                <button class="btn" @onclick="LearnMyself" disabled="@_busy">@L["Parents.LearnMyself"]</button>
+                <span class="hint">@L["Parents.LearnMyselfHint"]</span>
+            </p>
+            <Messages Errors="@_learnErrors" />
+
             <details class="box">
                 <summary>@L["Parents.AddChild"]</summary>
                 <form class="form" @onsubmit="AddChild" @onsubmit:preventDefault>
@@ -98,7 +104,7 @@ else
     private string _newName = "", _newPin = "";
     private int? _newGrade = 4;
     private bool _newAdult;
-    private IReadOnlyList<string>? _errors, _childErrors;
+    private IReadOnlyList<string>? _errors, _childErrors, _learnErrors;
     private bool _busy;
 
     protected override async Task OnInitializedAsync()
@@ -167,6 +173,26 @@ else
         catch (ApiException e)
         {
             _childErrors = Display.Errors(e);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    // Opens (and on first use creates) the parent's own adult profile, logged in with the parent login
+    private async Task LearnMyself()
+    {
+        _busy = true;
+        _learnErrors = null;
+        try
+        {
+            await Api.LearnMyself();
+            Navigation.NavigateTo("");
+        }
+        catch (ApiException e)
+        {
+            _learnErrors = Display.Errors(e);
         }
         finally
         {

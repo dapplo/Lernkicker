@@ -92,6 +92,9 @@ public interface IChildRepository
 
     Task<IReadOnlyList<ChildSummary>> ListSummariesAsync();
 
+    /// <summary>The adult profile a parent learns with, if they have one.</summary>
+    Task<Child?> FindLearnerProfileAsync(Guid parentId);
+
     Task<bool> DeleteAsync(Guid id);
 
     void Add(PairingCode code);

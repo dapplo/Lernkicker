@@ -12,6 +12,9 @@ public static class Claims
     public const string ChildId = "lk:child";
     public const string DeviceId = "lk:device";
 
+    /// <summary>On a child session: the parent learning with their own profile (instead of a device).</summary>
+    public const string Learner = "lk:learner";
+
     public static Guid? Family(this ClaimsPrincipal user) =>
         Guid.TryParse(user.FindFirstValue(FamilyId), out var id) ? id : null;
 
@@ -39,7 +42,7 @@ public static class Policies
 
 public static class Schemes
 {
-    /// <summary>Cookie scheme for a child logged in with PIN on a paired device.</summary>
+    /// <summary>Cookie scheme for a child logged in with PIN on a paired device, or a parent learning with their own profile.</summary>
     public const string Child = "Child";
 }
 
