@@ -10,6 +10,7 @@ public sealed class ChildrenUseCases(
     IChildRepository children,
     IQuizLibrary library,
     IPracticeRepository practice,
+    IParentAccounts parents,
     IPinHasher pinHasher,
     IUnitOfWork unitOfWork,
     TimeProvider time)
@@ -18,23 +19,66 @@ public sealed class ChildrenUseCases(
 
     public Task<IReadOnlyList<ChildSummary>> ListAsync() => children.ListSummariesAsync();
 
-    public async Task<Result<ChildSummary>> CreateAsync(Guid familyId, string name, int? gradeLevel, string pin, bool isAdult = false, string? theme = null)
+    /// <summary>The parents (with their own learner profile, if they learn) and the other learner profiles.</summary>
+    public async Task<IReadOnlyList<FamilyMemberSummary>> ListMembersAsync(Guid familyId)
+    {
+        var learners = await children.ListSummariesAsync();
+        var members = new List<FamilyMemberSummary>();
+        var linked = new HashSet<Guid>();
+        foreach (var parent in await parents.ListFamilyAsync(familyId))
+        {
+            var own = learners.FirstOrDefault(l => l.LearnerParentId == parent.Id);
+            if (own is not null)
+            {
+                linked.Add(own.Id);
+            }
+
+            members.Add(new FamilyMemberSummary(FamilyRoles.Parent, parent.DisplayName, parent.Id, own?.Id, null, own?.Theme));
+        }
+
+        members.AddRange(learners.Where(l => !linked.Contains(l.Id)).Select(l =>
+            new FamilyMemberSummary(l.IsAdult ? FamilyRoles.Adult : FamilyRoles.Child, l.Name, null, l.Id, l.GradeLevel, l.Theme)));
+        return members;
+    }
+
+    /// <summary>Lets a parent of the family learn: gives them their own adult profile, like "learn myself" does.</summary>
+    public async Task<Result<FamilyMemberSummary>> EnableLearningAsync(Guid familyId, Guid parentId)
+    {
+        var parent = await parents.FindAsync(parentId);
+        if (parent is null || parent.FamilyId != familyId)
+        {
+            return AppError.NotFound();
+        }
+
+        var child = await LearnerProfileAsync(familyId, parentId, parent.DisplayName);
+        return new FamilyMemberSummary(FamilyRoles.Parent, parent.DisplayName, parentId, child.Id, null, child.Theme);
+    }
+
+    /// <summary>
+    /// A null <paramref name="pin"/> leaves the profile without one: a parent sets it before pairing a phone, or a
+    /// parent learns with an adult profile through their own login, which needs no PIN.
+    /// </summary>
+    public async Task<Result<ChildSummary>> CreateAsync(Guid familyId, string name, int? gradeLevel, string? pin, bool isAdult = false, string? theme = null)
     {
         if (Validate(name, gradeLevel, isAdult, theme) is { } error)
         {
             return error;
         }
 
-        if (!Pin.IsValid(pin))
+        if (pin is not null && !Pin.IsValid(pin))
         {
             return AppError.Invalid(ErrorCodes.PinInvalid);
         }
 
         var child = new Child(familyId, name, gradeLevel, isAdult, theme);
-        child.SetPinHash(pinHasher.Hash(pin));
+        if (pin is not null)
+        {
+            child.SetPinHash(pinHasher.Hash(pin));
+        }
+
         children.Add(child);
         await unitOfWork.SaveChangesAsync();
-        return new ChildSummary(child.Id, child.Name, child.GradeLevel, true, 0, child.IsAdult, child.Theme);
+        return new ChildSummary(child.Id, child.Name, child.GradeLevel, pin is not null, 0, child.IsAdult, child.Theme);
     }
 
     /// <summary>A null <paramref name="theme"/> keeps the profile's look.</summary>
@@ -83,16 +127,7 @@ public sealed class ChildrenUseCases(
     /// </summary>
     public async Task<LearnerSession> LearnMyselfAsync(Guid familyId, Guid parentId, string parentName)
     {
-        var child = await children.FindLearnerProfileAsync(parentId);
-        if (child is null)
-        {
-            var name = parentName.Trim();
-            child = new Child(familyId, name[..Math.Min(name.Length, Child.MaxNameLength)], null, isAdult: true);
-            child.SetLearner(parentId);
-            children.Add(child);
-            await unitOfWork.SaveChangesAsync();
-        }
-
+        var child = await LearnerProfileAsync(familyId, parentId, parentName);
         return new LearnerSession(child.FamilyId, child.Id, child.Name);
     }
 
@@ -215,6 +250,21 @@ public sealed class ChildrenUseCases(
 
     public async Task<Result<QuizResult>> AttemptResultAsync(Guid childId, Guid attemptId) =>
         await practice.FindAttemptAsync(childId, attemptId) is { } attempt ? attempt.Result : AppError.NotFound();
+
+    private async Task<Child> LearnerProfileAsync(Guid familyId, Guid parentId, string parentName)
+    {
+        var child = await children.FindLearnerProfileAsync(parentId);
+        if (child is null)
+        {
+            var name = parentName.Trim();
+            child = new Child(familyId, name[..Math.Min(name.Length, Child.MaxNameLength)], null, isAdult: true);
+            child.SetLearner(parentId);
+            children.Add(child);
+            await unitOfWork.SaveChangesAsync();
+        }
+
+        return child;
+    }
 
     private static AppError? Validate(string? name, int? gradeLevel, bool isAdult, string? theme)
     {

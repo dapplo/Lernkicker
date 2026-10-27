@@ -13,6 +13,19 @@ public sealed record InvitationCreated(string Code, DateTimeOffset ExpiresAt);
 public sealed record ParentProfile(string Name, string Email, string FamilyName, bool IsAdmin, string Language);
 
 /// <summary><c>LearnerParentId</c>: the parent who learns with this profile from their own login.</summary>
+/// <summary>
+/// Someone in the family: a parent (<c>ParentId</c>), who can also learn with an own profile (<c>LearnerId</c>), or a
+/// child or adult learner without a login. <c>Role</c> is one of <see cref="FamilyRoles"/>.
+/// </summary>
+public sealed record FamilyMemberSummary(string Role, string Name, Guid? ParentId, Guid? LearnerId, int? GradeLevel, string? Theme);
+
+public static class FamilyRoles
+{
+    public const string Parent = "parent";
+    public const string Child = "child";
+    public const string Adult = "adult";
+}
+
 public sealed record ChildSummary(Guid Id, string Name, int? GradeLevel, bool HasPin, int Devices, bool IsAdult, string Theme, Guid? LearnerParentId = null);
 
 public sealed record DeviceSummary(Guid Id, string Label, DateTimeOffset PairedAt, DateTimeOffset? LastUsedAt, bool Locked)
