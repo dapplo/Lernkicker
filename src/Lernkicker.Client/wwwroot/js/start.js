@@ -25,11 +25,17 @@
     document.querySelectorAll('[data-text]').forEach(e => e.textContent = texts[language][e.dataset.text]);
 
     // The device's voice for a language: one for exactly that tag (e.g. nl-NL) if there is, else any of the language.
+    // Android reports some tags as nl_NL or with three-letter codes (nld).
+    const threeLetters = { nld: 'nl', deu: 'de', ger: 'de', eng: 'en', fra: 'fr', fre: 'fr', spa: 'es', ita: 'it' };
     function voiceFor(language) {
         const tag = language.toLowerCase();
         const base = tag.split('-')[0];
         const voices = speechSynthesis.getVoices();
-        const normal = v => v.lang.toLowerCase().replace('_', '-');
+        const normal = v => {
+            const parts = v.lang.toLowerCase().replaceAll('_', '-').split('-');
+            parts[0] = threeLetters[parts[0]] ?? parts[0];
+            return parts.join('-');
+        };
         return voices.find(v => normal(v) === tag)
             ?? voices.find(v => normal(v).split('-')[0] === base && v.default)
             ?? voices.find(v => normal(v).split('-')[0] === base);
@@ -167,8 +173,14 @@
             element?.getAnimations().forEach(a => a.cancel());
         },
 
-        // Reading words aloud uses the device's own voices (Web Speech API), so nothing is sent anywhere. Voices load
-        // late on some browsers, so wait a moment for them before saying there is none for the language.
+        // Reading words aloud uses the device's own voices (Web Speech API), so nothing is sent anywhere.
+        canSpeak() {
+            return 'speechSynthesis' in window;
+        },
+
+        // Whether the device lists a voice for the language: true, false, or null when it lists no voices at all.
+        // Voices load late on some browsers, and Chrome on Android often lists none or only some although speaking
+        // with just the language tag works, so only a list with voices but none for the language means "no".
         async hasVoice(language) {
             if (!('speechSynthesis' in window)) {
                 return false;
@@ -177,15 +189,18 @@
             if (speechSynthesis.getVoices().length === 0) {
                 await new Promise(resolve => {
                     speechSynthesis.addEventListener('voiceschanged', resolve, { once: true });
-                    setTimeout(resolve, 1500);
+                    setTimeout(resolve, 3000);
                 });
             }
 
-            return voiceFor(language) !== undefined;
+            return speechSynthesis.getVoices().length === 0 ? null : voiceFor(language) !== undefined;
         },
 
         speak(text, language) {
-            speechSynthesis.cancel();
+            // Cancelling right before speaking swallows the new word on some Android phones, so only when busy
+            if (speechSynthesis.speaking || speechSynthesis.pending) {
+                speechSynthesis.cancel();
+            }
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = language;
             try {

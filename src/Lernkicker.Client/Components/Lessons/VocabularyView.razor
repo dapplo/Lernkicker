@@ -2,7 +2,7 @@
 @* Words to learn in another language: a list to look at and listen to, cards to flip, and typing the answer.
    Practice is never stored; the child marks the whole block with "Kann ich!" like any other part. *@
 <p class="vocab-languages">@Direction</p>
-@if (!_hasVoice)
+@if (_hasVoice == false)
 {
     <p class="hint">🔇 @L["Vocabulary.NoVoice", _wordLanguageName]</p>
 }
@@ -118,7 +118,7 @@ else
     private AnswerCheck? _check;
     private ElementReference _input;
     private bool _focus;
-    private bool _hasVoice = true;
+    private bool? _hasVoice = true;
     private string _wordLanguageName = "";
     private string _translationLanguageName = "";
 

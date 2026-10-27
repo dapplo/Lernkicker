@@ -1,5 +1,5 @@
 @inject Speech Speech
-@* Reads a word aloud in its language; shown only when the device has a voice for that language *@
+@* Reads a word aloud in its language; shown whenever the browser can speak (the device picks the voice) *@
 @if (_hasVoice)
 {
     <button type="button" class="speak" aria-label="@L["Vocabulary.Speak", Text]" @onclick="() => Speech.Speak(Text, Language)">🔊</button>
@@ -15,5 +15,5 @@
     [Parameter, EditorRequired]
     public string Language { get; set; } = "";
 
-    protected override async Task OnParametersSetAsync() => _hasVoice = await Speech.HasVoice(Language);
+    protected override async Task OnInitializedAsync() => _hasVoice = await Speech.CanSpeak();
 }

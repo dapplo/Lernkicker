@@ -228,7 +228,7 @@ A vocabulary test: one list of words in the language being learned (`word`) with
 | `direction` | no | `both` (default), `wordToTranslation` (the word is shown, the translation typed) or `translationToWord` |
 | `words` | yes | 1–50 words, each with `word` and `translation` (at most 100 characters each). Optional: `wordAlternatives` and `translationAlternatives` (other answers that count, e.g. a synonym), and an `image` shown with the question |
 
-Each question is a part. An answer counts when it is **spelled right**: extra spaces and a `.`, `!` or `?` at the end don't matter, and a capital first letter is fine where the word starts small (phones capitalize it), but small letters where the answer has capitals ("hund" for "Hund") are wrong, and so is a missing or wrong article. List an answer without the article as an alternative if it should count. The read-aloud button uses the voices built into the child's device; it appears only when the device has a voice for the language.
+Each question is a part. An answer counts when it is **spelled right**: extra spaces and a `.`, `!` or `?` at the end don't matter, and a capital first letter is fine where the word starts small (phones capitalize it), but small letters where the answer has capitals ("hund" for "Hund") are wrong, and so is a missing or wrong article. List an answer without the article as an alternative if it should count. The read-aloud button uses the voices built into the child's device (see [`vocabulary` in lessons](lesson-format.md#vocabulary-words-in-another-language)).
 
 ## Pictures
 

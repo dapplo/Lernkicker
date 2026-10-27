@@ -718,7 +718,7 @@
   <data name="Error.upload.invalidPicture" xml:space="preserve"><value>Ein Bild ließ sich nicht lesen.</value></data>
   <data name="Learn.Type.vocabulary" xml:space="preserve"><value>Vokabeln</value></data>
   <data name="Vocabulary.Speak" xml:space="preserve"><value>„{0}“ vorlesen</value></data>
-  <data name="Vocabulary.NoVoice" xml:space="preserve"><value>Dieses Gerät hat keine Stimme für {0}. Damit du die Wörter hörst, installiere sie in den Einstellungen des Handys unter „Text-in-Sprache“.</value></data>
+  <data name="Vocabulary.NoVoice" xml:space="preserve"><value>Dieses Gerät meldet keine Stimme für {0}. Falls 🔊 stumm bleibt: Wähle in den Einstellungen des Handys unter „Text-in-Sprache“ die Engine „Sprachdienste von Google“, lade dort {0} herunter und starte den Browser neu.</value></data>
   <data name="Vocabulary.Mode.List" xml:space="preserve"><value>Wörter</value></data>
   <data name="Vocabulary.Mode.Cards" xml:space="preserve"><value>Karten</value></data>
   <data name="Vocabulary.Mode.Write" xml:space="preserve"><value>Schreiben</value></data>
