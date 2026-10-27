@@ -9,7 +9,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 // The culture is chosen in js/start.js before Blazor starts (stored choice, else the browser's language)
 builder.Services.AddLocalization();
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped<AppUpdate>();
+builder.Services.AddScoped(sp => new HttpClient(new BuildCheck(sp.GetRequiredService<AppUpdate>())) { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<Api>();
 builder.Services.AddScoped<Display>();
 builder.Services.AddScoped<CurrentTheme>();

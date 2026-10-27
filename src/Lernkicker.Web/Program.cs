@@ -217,6 +217,14 @@ app.Use((context, next) =>
 });
 
 app.UseSecurityHeaders();
+
+// Every answer names the build, so an app left open on a device notices that the server was updated (AppUpdate in the client)
+var build = BuildInfoDto.Of(typeof(Program).Assembly);
+app.Use((context, next) =>
+{
+    context.Response.Headers[BuildInfoDto.Header] = build.Id;
+    return next(context);
+});
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
@@ -249,7 +257,6 @@ app.MapFallbackToFile("index.html", new StaticFileOptions
     OnPrepareResponse = context => context.Context.Response.Headers.CacheControl = "no-cache",
 });
 
-var build = BuildInfoDto.Of(typeof(Program).Assembly);
 app.Logger.LogInformation("Lernkicker {Version}, commit {Commit}, built {BuiltAt}", build.Version, build.Commit ?? "unknown", build.BuiltAt?.ToString("u") ?? "unknown");
 
 await PersistenceSetup.InitializeAsync(app.Services, app.Configuration.GetSection("Admin").Get<AdminOptions>() ?? new(), app.Logger);

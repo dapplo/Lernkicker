@@ -35,7 +35,91 @@
             ?? voices.find(v => normal(v).split('-')[0] === base);
     }
 
+    // The service worker keeps serving the version it has cached, and a new one only takes over once every window of
+    // the app is closed, which an installed app on a phone hardly ever is. When the server runs another build
+    // (AppUpdate in the client), let the new worker take over at once and reload.
+    const updateKey = 'lk-update';
+
+    // The new worker once it is installed, or null if there is none (yet).
+    function installedWorker(registration, milliseconds) {
+        return new Promise(resolve => {
+            const worker = registration.installing;
+            if (!worker) {
+                resolve(registration.waiting);
+                return;
+            }
+
+            setTimeout(() => resolve(registration.waiting), milliseconds);
+            worker.addEventListener('statechange', () => {
+                if (worker.state === 'installed' || worker.state === 'redundant') {
+                    resolve(registration.waiting);
+                }
+            });
+        });
+    }
+
+    async function takeOver() {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (!registration) {
+            return;
+        }
+
+        await registration.update();
+        const worker = await installedWorker(registration, 60000);
+        if (worker) {
+            await new Promise(resolve => {
+                navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true });
+                setTimeout(resolve, 5000);
+                worker.postMessage('skipWaiting');
+            });
+        }
+    }
+
+    // Without the worker and its cache, the next load comes straight from the server.
+    async function forget() {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map(r => r.unregister()));
+        const keys = await caches.keys();
+        await Promise.all(keys.filter(k => k.startsWith('offline-cache-')).map(k => caches.delete(k)));
+    }
+
     window.lernkicker = {
+        // Loads the server's build. Reloads once per build and browser session; returns false instead when that reload
+        // already happened (or cannot be remembered), so a broken update never ends in a reload loop. force (a tap on
+        // the notice) drops the worker and its cache.
+        async update(build, force) {
+            try {
+                if (!force && sessionStorage.getItem(updateKey) === build) {
+                    return false;
+                }
+
+                sessionStorage.setItem(updateKey, build);
+            } catch {
+                if (!force) {
+                    return false;
+                }
+            }
+
+            try {
+                if ('serviceWorker' in navigator) {
+                    await (force ? forget() : takeOver());
+                }
+            } catch {
+                // Offline or no worker: the reload gets what it can
+            }
+
+            location.reload();
+            return true;
+        },
+
+        onVisible(notice) {
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    notice.invokeMethodAsync('Visible');
+                }
+            });
+        },
+
         setLanguage(code) {
             try {
                 localStorage.setItem(key, code);

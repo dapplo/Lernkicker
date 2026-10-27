@@ -1,5 +1,8 @@
 using System.Globalization;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Lernkicker.Contracts;
 
@@ -9,6 +12,17 @@ namespace Lernkicker.Contracts;
 /// </summary>
 public sealed record BuildInfoDto(string Version, string? Commit, DateTimeOffset? BuiltAt)
 {
+    /// <summary>The response header with the server's <see cref="Id"/>; the app compares it with its own build.</summary>
+    public const string Header = "X-Lernkicker-Build";
+
+    /// <summary>
+    /// One short code for the build (version, commit and build time). Server and app are built together, so they share it.
+    /// A hash, so the header that everyone gets does not tell which version runs; that stays on the admin page.
+    /// </summary>
+    [JsonIgnore]
+    public string Id => Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(
+        $"{Version}+{Commit}@{BuiltAt?.ToUnixTimeSeconds()}")))[..16];
+
     /// <summary>Reads what the build stamped into the assembly: the informational version and the BuildDate metadata.</summary>
     public static BuildInfoDto Of(Assembly assembly) => Parse(
         assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
