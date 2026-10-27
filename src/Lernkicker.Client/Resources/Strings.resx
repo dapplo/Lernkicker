@@ -718,7 +718,7 @@
   <data name="Error.upload.invalidPicture" xml:space="preserve"><value>A picture could not be read.</value></data>
   <data name="Learn.Type.vocabulary" xml:space="preserve"><value>Vocabulary</value></data>
   <data name="Vocabulary.Speak" xml:space="preserve"><value>Read “{0}” aloud</value></data>
-  <data name="Vocabulary.NoVoice" xml:space="preserve"><value>This device has no voice for {0}. To hear the words, install it in the phone's settings under “Text-to-speech”.</value></data>
+  <data name="Vocabulary.NoVoice" xml:space="preserve"><value>This device lists no voice for {0}. If 🔊 stays silent: in the phone's settings under “Text-to-speech”, choose “Speech Services by Google” as the engine, download {0} there and restart the browser.</value></data>
   <data name="Vocabulary.Mode.List" xml:space="preserve"><value>Words</value></data>
   <data name="Vocabulary.Mode.Cards" xml:space="preserve"><value>Cards</value></data>
   <data name="Vocabulary.Mode.Write" xml:space="preserve"><value>Write</value></data>

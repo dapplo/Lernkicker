@@ -113,7 +113,7 @@ The app offers three modes:
 - **Karten / Cards:** like flashcards. With `both`, each card shows a random side, and a card that comes again may show the other side.
 - **Schreiben / Write:** the child types the answer and taps "Prüfen". Right is done; "Fast!" (wrong capitals, a wrong or missing article, or one letter wrong, missing or extra) and wrong show the right answer, and the word comes again at the end. Spelling is checked like the quiz type [`vocabulary`](quiz-format.md#vocabulary-translate-words-one-way-or-both).
 
-A 🔊 button reads each word aloud in `wordLanguage`, with the voices built into the child's device: nothing is sent anywhere. iPhones and most Android phones have voices for the common languages; when a device has none for the language, the block says so and the voice can be installed in the phone's settings (text-to-speech). For a graded test of the same words, use the quiz type `vocabulary`.
+A 🔊 button reads each word aloud in `wordLanguage`, with the voices built into the child's device: nothing is sent anywhere. iPhones and most Android phones have voices for the common languages. The button shows whenever the browser can speak, because Chrome on Android often lists no voices although it speaks with the language tag alone. When a device lists voices but none for the language, the block shows a hint: in the phone's text-to-speech settings, pick Google's speech services as the engine, download the language and restart the browser. For a graded test of the same words, use the quiz type `vocabulary`.
 
 ### `facts`: remember this
 
