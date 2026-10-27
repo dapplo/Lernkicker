@@ -15,6 +15,7 @@ public sealed class McpTests(LernkickerFactory factory) : IClassFixture<Lernkick
     [
         "upload_quiz", "delete_quiz", "upload_lesson", "delete_lesson", "assign_quiz", "unassign_quiz", "assign_lesson", "unassign_lesson",
         "add_calendar_event", "update_calendar_event", "delete_calendar_event",
+        "create_child", "update_child", "delete_child", "set_child_pin", "create_pairing_link", "unlock_device", "remove_device",
     ];
 
     [Fact]
@@ -123,6 +124,43 @@ public sealed class McpTests(LernkickerFactory factory) : IClassFixture<Lernkick
     }
 
     [Fact]
+    public async Task Assistant_manages_the_familys_learner_profiles()
+    {
+        var parent = await factory.NewFamilyAsync("profiles@example.org");
+        var key = await CreateKeyAsync(parent);
+        await using var mcp = await ConnectAsync(key.Token);
+
+        // An adult who learns with their own parent login: no PIN, no phone
+        var adult = await CallAsync<JsonElement>(mcp, "create_child", new() { ["name"] = "Melanie", ["isAdult"] = true });
+        Assert.False(adult.GetProperty("hasPin").GetBoolean());
+        var adultId = adult.GetProperty("id").GetGuid();
+        var overview = Assert.Single(await LernkickerFactory.Json<List<ChildOverview>>(await parent.GetAsync("/api/children")));
+        Assert.True(overview.IsAdult);
+        Assert.Equal(HttpStatusCode.NoContent, (await parent.PostAsync($"/api/children/{adultId}/learn", null)).StatusCode);
+        Assert.True((await CallAsync<List<JsonElement>>(mcp, "list_children")).Single().GetProperty("parentLogin").GetBoolean());
+
+        var child = await CallAsync<JsonElement>(mcp, "create_child", new() { ["name"] = "Lena", ["gradeLevel"] = 2, ["pin"] = "1234", ["theme"] = "space" });
+        var childId = child.GetProperty("id").GetGuid();
+        Assert.True(child.GetProperty("hasPin").GetBoolean());
+
+        var updated = await CallAsync<JsonElement>(mcp, "update_child", new() { ["childId"] = childId, ["gradeLevel"] = 3 });
+        Assert.Equal("Lena", updated.GetProperty("name").GetString());
+        Assert.Equal(3, updated.GetProperty("gradeLevel").GetInt32());
+        Assert.Equal("space", updated.GetProperty("theme").GetString());
+
+        Assert.Contains("child.gradeLevelInvalid", Text(await mcp.CallToolAsync("update_child", new Dictionary<string, object?> { ["childId"] = childId, ["gradeLevel"] = 14 })));
+        Assert.Contains("pin.invalid", Text(await mcp.CallToolAsync("set_child_pin", new Dictionary<string, object?> { ["childId"] = childId, ["pin"] = "12" })));
+        await CallAsync<string>(mcp, "set_child_pin", new() { ["childId"] = childId, ["pin"] = "4321" });
+
+        var pairing = await CallAsync<JsonElement>(mcp, "create_pairing_link", new() { ["childId"] = childId });
+        Assert.EndsWith($"/pair#{pairing.GetProperty("code").GetString()}", pairing.GetProperty("link").GetString());
+        Assert.Empty(await CallAsync<List<DeviceOverview>>(mcp, "list_devices", new() { ["childId"] = childId }));
+
+        await CallAsync<string>(mcp, "delete_child", new() { ["childId"] = childId });
+        Assert.Equal(adultId, Assert.Single(await LernkickerFactory.Json<List<ChildOverview>>(await parent.GetAsync("/api/children"))).Id);
+    }
+
+    [Fact]
     public async Task Invalid_files_come_back_with_codes_and_issues()
     {
         var parent = await factory.NewFamilyAsync("invalid@example.org");
@@ -193,6 +231,14 @@ public sealed class McpTests(LernkickerFactory factory) : IClassFixture<Lernkick
         Assert.True((await mcp.CallToolAsync("add_calendar_event", new Dictionary<string, object?>
             { ["childId"] = child.Id, ["kind"] = "test", ["title"] = "x", ["date"] = "2026-11-20" })).IsError);
         Assert.True((await mcp.CallToolAsync("delete_quiz", new Dictionary<string, object?> { ["quizId"] = "does-not-exist" })).IsError);
+
+        // Nor see, change or remove A's child and its phones
+        Assert.True((await mcp.CallToolAsync("update_child", new Dictionary<string, object?> { ["childId"] = child.Id, ["name"] = "Mallory" })).IsError);
+        Assert.True((await mcp.CallToolAsync("set_child_pin", new Dictionary<string, object?> { ["childId"] = child.Id, ["pin"] = "0000" })).IsError);
+        Assert.True((await mcp.CallToolAsync("create_pairing_link", new Dictionary<string, object?> { ["childId"] = child.Id })).IsError);
+        Assert.True((await mcp.CallToolAsync("list_devices", new Dictionary<string, object?> { ["childId"] = child.Id })).IsError);
+        Assert.True((await mcp.CallToolAsync("delete_child", new Dictionary<string, object?> { ["childId"] = child.Id })).IsError);
+        Assert.Equal(child.Name, Assert.Single(await LernkickerFactory.Json<List<ChildOverview>>(await a.GetAsync("/api/children"))).Name);
 
         // Nor revoke A's key
         Assert.Equal(HttpStatusCode.NotFound, (await b.DeleteAsync($"/api/api-keys/{keyA.Key.Id}")).StatusCode);

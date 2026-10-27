@@ -37,7 +37,7 @@ public static class ChildrenEndpoints
 
         children.MapPost("/", async (NewChild request, ClaimsPrincipal user, ChildrenUseCases uc) =>
         {
-            var created = await uc.CreateAsync(user.RequiredFamily(), request.Name, request.GradeLevel, request.Pin, request.IsAdult, request.Theme);
+            var created = await uc.CreateAsync(user.RequiredFamily(), request.Name, request.GradeLevel, request.Pin ?? "", request.IsAdult, request.Theme);
             return created.IsSuccess
                 ? Results.Json(created.Value.ToDto(user.ParentId()), ApiJson.Options, statusCode: StatusCodes.Status201Created)
                 : ApiResults.Error(created.Error!);

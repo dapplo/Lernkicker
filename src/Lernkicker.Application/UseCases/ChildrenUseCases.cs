@@ -18,23 +18,31 @@ public sealed class ChildrenUseCases(
 
     public Task<IReadOnlyList<ChildSummary>> ListAsync() => children.ListSummariesAsync();
 
-    public async Task<Result<ChildSummary>> CreateAsync(Guid familyId, string name, int? gradeLevel, string pin, bool isAdult = false, string? theme = null)
+    /// <summary>
+    /// A null <paramref name="pin"/> leaves the profile without one: a parent sets it before pairing a phone, or a
+    /// parent learns with an adult profile through their own login, which needs no PIN.
+    /// </summary>
+    public async Task<Result<ChildSummary>> CreateAsync(Guid familyId, string name, int? gradeLevel, string? pin, bool isAdult = false, string? theme = null)
     {
         if (Validate(name, gradeLevel, isAdult, theme) is { } error)
         {
             return error;
         }
 
-        if (!Pin.IsValid(pin))
+        if (pin is not null && !Pin.IsValid(pin))
         {
             return AppError.Invalid(ErrorCodes.PinInvalid);
         }
 
         var child = new Child(familyId, name, gradeLevel, isAdult, theme);
-        child.SetPinHash(pinHasher.Hash(pin));
+        if (pin is not null)
+        {
+            child.SetPinHash(pinHasher.Hash(pin));
+        }
+
         children.Add(child);
         await unitOfWork.SaveChangesAsync();
-        return new ChildSummary(child.Id, child.Name, child.GradeLevel, true, 0, child.IsAdult, child.Theme);
+        return new ChildSummary(child.Id, child.Name, child.GradeLevel, pin is not null, 0, child.IsAdult, child.Theme);
     }
 
     /// <summary>A null <paramref name="theme"/> keeps the profile's look.</summary>

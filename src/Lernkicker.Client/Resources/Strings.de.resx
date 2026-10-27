@@ -695,7 +695,7 @@
   <data name="Home.StopLearning" xml:space="preserve"><value>Lernen beenden</value></data>
   <data name="Error.child.notOwnProfile" xml:space="preserve"><value>Nur ein Erwachsenen-Profil, das kein anderer Elternteil nutzt, kann dein eigenes sein.</value></data>
   <data name="ApiKeys.Title" xml:space="preserve"><value>KI-Assistenten (MCP)</value></data>
-  <data name="ApiKeys.Intro" xml:space="preserve"><value>Mit einem API-Schlüssel kann ein KI-Assistent wie Claude eure Proben und Lernstoffe hochladen und ändern, sie deinen Kindern mit einem Termin auf die Liste setzen, Termine in den Kalender eintragen und die Ergebnisse lesen, ohne dass du etwas tun musst. Er verbindet sich über MCP (Model Context Protocol).</value></data>
+  <data name="ApiKeys.Intro" xml:space="preserve"><value>Mit einem API-Schlüssel kann ein KI-Assistent wie Claude Profile für eure Kinder (und lernende Erwachsene) anlegen, eure Proben und Lernstoffe hochladen und ändern, sie deinen Kindern mit einem Termin auf die Liste setzen, Termine in den Kalender eintragen und die Ergebnisse lesen, ohne dass du etwas tun musst. Er verbindet sich über MCP (Model Context Protocol).</value></data>
   <data name="ApiKeys.ReadOnly" xml:space="preserve"><value>nur lesen</value></data>
   <data name="ApiKeys.ReadWrite" xml:space="preserve"><value>lesen und ändern</value></data>
   <data name="ApiKeys.CreatedOn" xml:space="preserve"><value>erstellt {0}</value></data>
