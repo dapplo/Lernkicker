@@ -41,6 +41,21 @@ public class ClientHostingTests(LernkickerFactory factory) : IClassFixture<Lernk
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    // The browser must ask the server again each time, or a device keeps the old app (AppUpdate needs a fresh service worker)
+    [Theory]
+    [InlineData("/")]
+    [InlineData("/index.html")]
+    [InlineData("/service-worker.js")]
+    [InlineData("/service-worker-assets.js")]
+    [InlineData("/js/start.js")]
+    public async Task The_entry_files_are_never_used_from_the_browser_cache_unchecked(string path)
+    {
+        var response = await factory.Client().GetAsync(path);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.Headers.CacheControl?.NoCache, $"{path}: {response.Headers.CacheControl}");
+    }
+
     [Fact]
     public async Task Unknown_api_paths_are_not_the_app()
     {

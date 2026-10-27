@@ -1,0 +1,64 @@
+@* Asks the server which build it runs (at start, every few minutes and when the app comes back to the screen) and
+   shows what AppUpdate is doing about a new version. *@
+@implements IAsyncDisposable
+@inject AppUpdate Update
+@inject Api Api
+@inject IJSRuntime JS
+
+@if (Update.Loading)
+{
+    <div class="update-notice" role="status"><p>@L["Update.Loading"]</p></div>
+}
+else if (Update.Stuck)
+{
+    <div class="update-notice" role="status">
+        <p>@L["Update.Stuck"]</p>
+        <button class="btn small" @onclick="Update.LoadNow">@L["Update.Retry"]</button>
+    </div>
+}
+else if (Update.Waiting)
+{
+    <div class="update-notice" role="status">
+        <p>@L["Update.Ready"]</p>
+        <button class="btn small quiet" @onclick="Update.LoadNow">@L["Update.Now"]</button>
+    </div>
+}
+
+@code {
+    private static readonly TimeSpan Every = TimeSpan.FromMinutes(10);
+    private DotNetObjectReference<UpdateNotice>? _self;
+    private Timer? _timer;
+
+    protected override void OnInitialized() => Update.Changed += Refresh;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _self = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("lernkicker.onVisible", _self);
+        _timer = new Timer(_ => _ = InvokeAsync(Check), null, TimeSpan.Zero, Every);
+    }
+
+    [JSInvokable]
+    public Task Visible() => Check();
+
+    // The answer carries the server's build; BuildCheck passes it on
+    private async Task Check() => await Api.IsUp();
+
+    private void Refresh() => _ = InvokeAsync(StateHasChanged);
+
+    public async ValueTask DisposeAsync()
+    {
+        Update.Changed -= Refresh;
+        if (_timer is not null)
+        {
+            await _timer.DisposeAsync();
+        }
+
+        _self?.Dispose();
+    }
+}
