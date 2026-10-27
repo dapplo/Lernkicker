@@ -49,6 +49,11 @@ public sealed class Api(HttpClient http)
     public Task<TelegramLinkDto> CreateTelegramLink() => Send<TelegramLinkDto>(HttpMethod.Post, "api/account/telegram/link");
     public Task UnlinkTelegram() => Send(HttpMethod.Delete, "api/account/telegram");
 
+    // API keys for AI assistants (MCP)
+    public Task<List<ApiKeyOverview>> ApiKeys() => Get<List<ApiKeyOverview>>("api/api-keys");
+    public Task<ApiKeyCreatedResponse> CreateApiKey(NewApiKey request) => Send<ApiKeyCreatedResponse>(HttpMethod.Post, "api/api-keys", request);
+    public Task RevokeApiKey(Guid id) => Send(HttpMethod.Delete, $"api/api-keys/{id}");
+
     /// <summary>The logged-in parent, or null.</summary>
     public async Task<Me?> Me()
     {

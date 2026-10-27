@@ -49,6 +49,7 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
     public DbSet<LessonAssignment> LessonAssignments => Set<LessonAssignment>();
     public DbSet<TelegramLink> TelegramLinks => Set<TelegramLink>();
     public DbSet<TelegramLinkCode> TelegramLinkCodes => Set<TelegramLinkCode>();
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
     public DbSet<StoredImage> Images => Set<StoredImage>();
     public DbSet<DocumentImage> DocumentImages => Set<DocumentImage>();
     public DbSet<ServerSecret> ServerSecrets => Set<ServerSecret>();
@@ -204,6 +205,16 @@ public sealed class LernkickerDbContext(DbContextOptions<LernkickerDbContext> op
         {
             e.HasIndex(x => x.CodeHash).IsUnique();
             e.Property(x => x.CodeHash).HasMaxLength(64);
+            e.HasOne<ParentUser>().WithMany().HasForeignKey(x => x.ParentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasQueryFilter(x => x.FamilyId == FamilyId);
+        });
+
+        builder.Entity<ApiKey>(e =>
+        {
+            e.HasIndex(x => x.TokenHash).IsUnique();
+            e.Property(x => x.TokenHash).HasMaxLength(64);
+            e.Property(x => x.Name).HasMaxLength(ApiKey.MaxNameLength);
+            e.Property(x => x.Hint).HasMaxLength(8);
             e.HasOne<ParentUser>().WithMany().HasForeignKey(x => x.ParentId).OnDelete(DeleteBehavior.Cascade);
             e.HasQueryFilter(x => x.FamilyId == FamilyId);
         });

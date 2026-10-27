@@ -31,6 +31,7 @@ public static class PersistenceSetup
         services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<IImageStore, ImageStore>();
         services.AddScoped<ITelegramRepository, TelegramRepository>();
+        services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
         services.AddScoped<IServerSecrets, ServerSecrets>();
         services.AddScoped<IServerSettings, ServerSettings>();
         services.AddScoped<IPlayRepository, PlayRepository>();

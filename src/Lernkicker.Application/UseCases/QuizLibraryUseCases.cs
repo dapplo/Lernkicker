@@ -18,24 +18,13 @@ public sealed class QuizLibraryUseCases(
     /// <summary>Adds a quiz version; <paramref name="files"/> are the pictures uploaded with it.</summary>
     public async Task<Result<QuizSummary>> UploadAsync(Guid familyId, string json, IReadOnlyList<UploadedFile>? files = null)
     {
-        if (Encoding.UTF8.GetByteCount(json) > QuizLimits.MaxBytes)
+        var checkedQuiz = Check(json, files);
+        if (!checkedQuiz.IsSuccess)
         {
-            return new AppError(ErrorKind.TooLarge, ErrorCodes.QuizTooLarge);
+            return checkedQuiz.Error!;
         }
 
-        var parsed = format.Parse(json);
-        if (!parsed.IsValid)
-        {
-            return AppError.Invalid(ErrorCodes.QuizInvalid, parsed.Issues);
-        }
-
-        var quiz = parsed.Quiz!;
-        var (attached, imageIssues) = images.Attach(quiz.Images(), files ?? []);
-        if (imageIssues.Count > 0)
-        {
-            return AppError.Invalid(ErrorCodes.QuizInvalid, imageIssues);
-        }
-
+        var (quiz, attached) = checkedQuiz.Value;
         var previous = await library.VersionsAsync(quiz.Id);
         var stored = StoredQuiz.Create(familyId, quiz, json, previous.Count == 0 ? 1 : previous.Max(q => q.Version) + 1, time.GetUtcNow());
         library.Add(stored);
@@ -64,6 +53,30 @@ public sealed class QuizLibraryUseCases(
 
         await unitOfWork.SaveChangesAsync();
         return QuizSummary.From(stored);
+    }
+
+    /// <summary>Checks a file and its pictures like an upload does, without storing anything.</summary>
+    public Result<string> Validate(string json, IReadOnlyList<UploadedFile>? files = null)
+    {
+        var checkedQuiz = Check(json, files);
+        return checkedQuiz.IsSuccess ? checkedQuiz.Value.Quiz.Id : checkedQuiz.Error!;
+    }
+
+    private Result<(Quiz Quiz, IReadOnlyList<AttachedImage> Images)> Check(string json, IReadOnlyList<UploadedFile>? files)
+    {
+        if (Encoding.UTF8.GetByteCount(json) > QuizLimits.MaxBytes)
+        {
+            return new AppError(ErrorKind.TooLarge, ErrorCodes.QuizTooLarge);
+        }
+
+        var parsed = format.Parse(json);
+        if (!parsed.IsValid)
+        {
+            return AppError.Invalid(ErrorCodes.QuizInvalid, parsed.Issues);
+        }
+
+        var (attached, imageIssues) = images.Attach(parsed.Quiz!.Images(), files ?? []);
+        return imageIssues.Count > 0 ? AppError.Invalid(ErrorCodes.QuizInvalid, imageIssues) : (parsed.Quiz, attached);
     }
 
     /// <summary>The current version's file, exactly as uploaded.</summary>

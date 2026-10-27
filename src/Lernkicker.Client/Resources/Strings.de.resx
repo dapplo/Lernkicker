@@ -694,6 +694,28 @@
   <data name="Home.BackToParents" xml:space="preserve"><value>Zur Elternseite</value></data>
   <data name="Home.StopLearning" xml:space="preserve"><value>Lernen beenden</value></data>
   <data name="Error.child.notOwnProfile" xml:space="preserve"><value>Nur ein Erwachsenen-Profil, das kein anderer Elternteil nutzt, kann dein eigenes sein.</value></data>
+  <data name="ApiKeys.Title" xml:space="preserve"><value>KI-Assistenten (MCP)</value></data>
+  <data name="ApiKeys.Intro" xml:space="preserve"><value>Mit einem API-Schlüssel kann ein KI-Assistent wie Claude eure Proben und Lernstoffe hochladen und ändern, sie deinen Kindern mit einem Termin auf die Liste setzen, Termine in den Kalender eintragen und die Ergebnisse lesen, ohne dass du etwas tun musst. Er verbindet sich über MCP (Model Context Protocol).</value></data>
+  <data name="ApiKeys.ReadOnly" xml:space="preserve"><value>nur lesen</value></data>
+  <data name="ApiKeys.ReadWrite" xml:space="preserve"><value>lesen und ändern</value></data>
+  <data name="ApiKeys.CreatedOn" xml:space="preserve"><value>erstellt {0}</value></data>
+  <data name="ApiKeys.LastUsed" xml:space="preserve"><value>zuletzt benutzt {0}</value></data>
+  <data name="ApiKeys.NeverUsed" xml:space="preserve"><value>noch nie benutzt</value></data>
+  <data name="ApiKeys.Revoke" xml:space="preserve"><value>Widerrufen</value></data>
+  <data name="ApiKeys.CopyNow" xml:space="preserve"><value>Kopier den Schlüssel jetzt: Er wird nur dieses eine Mal angezeigt.</value></data>
+  <data name="ApiKeys.Key" xml:space="preserve"><value>Schlüssel</value></data>
+  <data name="ApiKeys.Address" xml:space="preserve"><value>MCP-Adresse</value></data>
+  <data name="ApiKeys.ClaudeCode" xml:space="preserve"><value>Für Claude Code ausführen:</value></data>
+  <data name="ApiKeys.Done" xml:space="preserve"><value>Fertig, ich habe ihn kopiert</value></data>
+  <data name="ApiKeys.Create" xml:space="preserve"><value>Schlüssel erstellen</value></data>
+  <data name="ApiKeys.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="ApiKeys.NamePlaceholder" xml:space="preserve"><value>z. B. Claude</value></data>
+  <data name="ApiKeys.ReadOnlyOption" xml:space="preserve"><value>Nur lesen (kann alles ansehen, aber nichts ändern)</value></data>
+  <data name="ApiKeys.Warning" xml:space="preserve"><value>Wer einen Schlüssel hat, kann damit für eure ganze Familie tun, was er erlaubt. Halte ihn geheim und widerrufe ihn, wenn du ihn nicht mehr brauchst.</value></data>
+  <data name="Error.apiKey.nameInvalid" xml:space="preserve"><value>Bitte gib einen Namen mit höchstens 60 Zeichen ein.</value></data>
+  <data name="Error.apiKey.tooMany" xml:space="preserve"><value>Eure Familie hat schon 10 Schlüssel. Widerrufe zuerst einen.</value></data>
+  <data name="Error.apiKey.notFound" xml:space="preserve"><value>Diesen Schlüssel gibt es nicht (mehr).</value></data>
+  <data name="Error.upload.invalidPicture" xml:space="preserve"><value>Ein Bild ließ sich nicht lesen.</value></data>
   <data name="Learn.Type.vocabulary" xml:space="preserve"><value>Vokabeln</value></data>
   <data name="Vocabulary.Speak" xml:space="preserve"><value>„{0}“ vorlesen</value></data>
   <data name="Vocabulary.NoVoice" xml:space="preserve"><value>Dieses Gerät hat keine Stimme für {0}. Damit du die Wörter hörst, installiere sie in den Einstellungen des Handys unter „Text-in-Sprache“.</value></data>

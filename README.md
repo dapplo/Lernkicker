@@ -13,6 +13,7 @@ It runs as a Docker container on a Synology NAS and is reachable through Tailsca
 - [Quiz format `quiz/v1`](docs/quiz-format.md): what a quiz looks like as JSON
 - [Lesson format `lesson/v1`](docs/lesson-format.md): learning material (poems, texts, flashcards, vocabulary, facts, guides to look things up in) as JSON
 - [`schema/`](schema/): JSON Schema for quizzes and lessons, [`quizzes/`](quizzes/), [`lessons/`](lessons/): examples
+- [AI assistants (MCP)](docs/mcp.md): an AI such as Claude manages a family's quizzes, lessons, todo lists and calendar with an API key, without anyone clicking
 - [Prompt for AI assistants](docs/ai-prompt/README.md): lets parents have an AI write a quiz or lesson (German and English); the app offers it on the upload pages
 - [`tools/validate_quizzes.py`](tools/validate_quizzes.py): validates quizzes locally and in CI
 
@@ -27,7 +28,7 @@ It runs as a Docker container on a Synology NAS and is reachable through Tailsca
 | `src/Lernkicker.Telegram` | Adapter: the Telegram bot for parents (long polling) and its messages in German and English |
 | `src/Lernkicker.Persistence` | Adapter: EF Core + SQLite, ASP.NET Core Identity, migrations |
 | `src/Lernkicker.Contracts` | DTOs of the HTTP API, shared by server and client |
-| `src/Lernkicker.Web` | Adapter: Minimal API, cookies, security headers; composition root; hosts the client |
+| `src/Lernkicker.Web` | Adapter: Minimal API, cookies, security headers, the MCP server for AI assistants; composition root; hosts the client |
 | `src/Lernkicker.Client` | Blazor WebAssembly PWA for children and parents, localized (de, en) |
 | `tests/*` | Unit tests for domain and format, integration tests for the API, family isolation, architecture and localization |
 
@@ -53,6 +54,8 @@ Then open http://localhost:5208. On first start the server creates the database 
 | `Lernkicker:PublicUrl` | – | The address people use, e.g. `https://lernkicker.<tailnet>.ts.net`, for links in QR codes, invitations and the feed. Usually not needed: the setup page keeps the https address it was opened with. Wins over that |
 | `Lernkicker:TrustedProxies` | – | Networks of reverse proxies (CIDR, comma-separated) whose `X-Forwarded-For` is trusted; loopback is always trusted |
 | `Lernkicker:TimeZone` | `Europe/Berlin` | Time zone of all dates (IANA name) |
+| `Lernkicker:Limits:ApiKeyRequestsPerMinute` | `120` | Requests to `/mcp` per API key and minute |
+| `Lernkicker:Mcp:Enabled` | `true` | `false` turns off the MCP endpoint for AI assistants |
 | `Lernkicker:Calendar:SyncHours` | `6` | How often subscribed calendars are imported again; `0` turns it off |
 | `Lernkicker:Telegram:BotTokenFile` | – | File with the bot token from BotFather (a Docker secret). Usually not needed: the admin sets the token on `/admin`. A token from the configuration wins |
 | `Lernkicker:Telegram:BotToken` | – | The token itself, for development only (user secrets) |
@@ -78,7 +81,8 @@ Then open http://localhost:8080 and create the admin on the setup page. Login co
 | `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, vocabulary (list, cards, write, read aloud), facts, entries to look up; mark parts as known (or jump between parts in a reference lesson) |
 | `/play` | child | Play together: the games the parents unlocked, open tables to join, own games (with "your turn"), who is around |
 | `/play/<match>` | child | One game with others: battleship, Connect Four, checkers, Mau-Mau (2 to 5 players) or chess; updates live |
-| `/parents` | parent | Login, children, add a child or adult, connect Telegram |
+| `/parents` | parent | Login, children, add a child or adult |
+| `/parents/account` | parent | Connect Telegram, API keys for AI assistants (MCP), privacy, log out |
 | `/parents/quizzes` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete quizzes |
 | `/parents/lessons` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete learning material |
 | `/parents/preview/<quiz\|lesson>/<id>` | parent | Preview as the child sees it |
@@ -106,6 +110,8 @@ All endpoints are under `/api`, take and return JSON, and answer errors with `{ 
 | `GET/POST /api/children/{id}/calendar` (`?from=&to=`), `PUT/DELETE …/calendar/{eventId}`, `GET/POST …/subscriptions`, `POST …/subscriptions/{subscriptionId}/sync`, `DELETE …/subscriptions/{subscriptionId}`, `POST/DELETE …/feed` | parents |
 | `GET/PUT /api/children/{id}/play` (unlocked games and with whom), `GET …/play/partners` (families and children to pick) | parents |
 | `GET /api/play/lobby`, `POST /api/play/tables`, `POST /api/play/tables/{id}/join`, `POST /api/play/tables/{id}/start` (host, games for more players), `DELETE /api/play/tables/{id}`, `GET /api/play/matches/{id}`, `POST …/{id}/moves`, `POST …/{id}/resign`, `GET /api/play/battleship/random-fleet`; live connection (SignalR) at `/hubs/play` | child |
+| `GET/POST /api/api-keys`, `DELETE /api/api-keys/{id}` (the key is only in the answer to `POST`) | parents |
+| `POST /mcp` (MCP, Streamable HTTP; `Authorization: Bearer lk_…`), see [docs/mcp.md](docs/mcp.md) | AI assistants with an API key |
 | `GET /calendar/{token}.ics` | calendar apps (secret link, no login) |
 | `POST /api/device/pair`, `GET /api/device/status`, `POST /api/device/login`, `POST /api/device/logout` | child's device |
 | `GET /api/device/calendar`, `GET /api/device/assignments`, `GET /api/device/assignments/{id}`, `POST /api/device/assignments/{id}/submit`, `GET /api/device/lessons`, `GET /api/device/lessons/{id}`, `POST /api/device/lessons/{id}/practice` | child |

@@ -24,24 +24,13 @@ public sealed class LessonUseCases(
     /// </summary>
     public async Task<Result<LessonSummary>> UploadAsync(Guid familyId, string json, IReadOnlyList<UploadedFile>? files = null)
     {
-        if (Encoding.UTF8.GetByteCount(json) > LessonLimits.MaxBytes)
+        var checkedLesson = Check(json, files);
+        if (!checkedLesson.IsSuccess)
         {
-            return new AppError(ErrorKind.TooLarge, ErrorCodes.LessonTooLarge);
+            return checkedLesson.Error!;
         }
 
-        var parsed = format.Parse(json);
-        if (!parsed.IsValid)
-        {
-            return AppError.Invalid(ErrorCodes.LessonInvalid, parsed.Issues);
-        }
-
-        var lesson = parsed.Lesson!;
-        var (attached, imageIssues) = images.Attach(lesson.Images(), files ?? []);
-        if (imageIssues.Count > 0)
-        {
-            return AppError.Invalid(ErrorCodes.LessonInvalid, imageIssues);
-        }
-
+        var (lesson, attached) = checkedLesson.Value;
         var stored = await lessons.FindAsync(lesson.Id);
         if (stored is null)
         {
@@ -57,6 +46,30 @@ public sealed class LessonUseCases(
         await unitOfWork.SaveChangesAsync();
         await images.RemoveUnusedAsync();
         return Summary(stored);
+    }
+
+    /// <summary>Checks a file and its pictures like an upload does, without storing anything.</summary>
+    public Result<string> Validate(string json, IReadOnlyList<UploadedFile>? files = null)
+    {
+        var checkedLesson = Check(json, files);
+        return checkedLesson.IsSuccess ? checkedLesson.Value.Lesson.Id : checkedLesson.Error!;
+    }
+
+    private Result<(Lesson Lesson, IReadOnlyList<AttachedImage> Images)> Check(string json, IReadOnlyList<UploadedFile>? files)
+    {
+        if (Encoding.UTF8.GetByteCount(json) > LessonLimits.MaxBytes)
+        {
+            return new AppError(ErrorKind.TooLarge, ErrorCodes.LessonTooLarge);
+        }
+
+        var parsed = format.Parse(json);
+        if (!parsed.IsValid)
+        {
+            return AppError.Invalid(ErrorCodes.LessonInvalid, parsed.Issues);
+        }
+
+        var (attached, imageIssues) = images.Attach(parsed.Lesson!.Images(), files ?? []);
+        return imageIssues.Count > 0 ? AppError.Invalid(ErrorCodes.LessonInvalid, imageIssues) : (parsed.Lesson, attached);
     }
 
     /// <summary>The file exactly as uploaded.</summary>

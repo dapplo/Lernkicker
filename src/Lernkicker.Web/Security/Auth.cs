@@ -15,6 +15,15 @@ public static class Claims
     /// <summary>On a child session: the parent learning with their own profile (instead of a device).</summary>
     public const string Learner = "lk:learner";
 
+    /// <summary>On an API key login: the key's id.</summary>
+    public const string ApiKey = "lk:apikey";
+
+    /// <summary>On an API key login: <see cref="ReadAccess"/> or <see cref="WriteAccess"/>.</summary>
+    public const string Access = "lk:access";
+
+    public const string ReadAccess = "read";
+    public const string WriteAccess = "write";
+
     public static Guid? Family(this ClaimsPrincipal user) =>
         Guid.TryParse(user.FindFirstValue(FamilyId), out var id) ? id : null;
 
@@ -38,12 +47,21 @@ public static class Policies
 
     /// <summary>Calendar feeds and subscription imports (which fetch from the internet).</summary>
     public const string Calendar = nameof(Calendar);
+
+    /// <summary>A program with one of the family's API keys (the MCP endpoint).</summary>
+    public const string ApiKey = nameof(ApiKey);
+
+    /// <summary>An API key that may change things (not read-only).</summary>
+    public const string ApiKeyWrite = nameof(ApiKeyWrite);
 }
 
 public static class Schemes
 {
     /// <summary>Cookie scheme for a child logged in with PIN on a paired device, or a parent learning with their own profile.</summary>
     public const string Child = "Child";
+
+    /// <summary>A family's API key in the Authorization header, for programs such as AI assistants.</summary>
+    public const string ApiKey = "ApiKey";
 }
 
 public static class Cookies
@@ -112,4 +130,7 @@ public static class RateLimits
 
     /// <summary>Calendar feeds and subscription imports (which fetch from the internet).</summary>
     public const string Calendar = nameof(Calendar);
+
+    /// <summary>Requests with an API key (the MCP endpoint), per key.</summary>
+    public const string ApiKey = nameof(ApiKey);
 }
