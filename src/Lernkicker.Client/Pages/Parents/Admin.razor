@@ -81,7 +81,7 @@ else
         <section class="box">
             <h2>@L["Admin.Version.Title"]</h2>
             <p>@L["Admin.Version.Server", Display.Build(server)]</p>
-            @if (server.Version != _client.Version || server.Commit != _client.Commit)
+            @if (server.Id != _client.Id)
             {
                 <p class="hint">@L["Admin.Version.Outdated", Display.Build(_client)]</p>
             }
@@ -133,7 +133,7 @@ else
     private IReadOnlyList<string>? _errors, _botErrors;
     private TelegramBotDto? _bot;
     private BuildInfoDto? _server;
-    private readonly BuildInfoDto _client = BuildInfoDto.Of(typeof(Admin).Assembly);
+    private readonly BuildInfoDto _client = AppUpdate.Current;
     private string _token = "";
     private bool _busy;
 

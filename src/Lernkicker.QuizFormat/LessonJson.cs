@@ -54,6 +54,7 @@ public sealed class LessonJson : ILessonFormat
             AllowOutOfOrderMetadataProperties = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             TypeInfoResolver = resolver,
+            Converters = { new JsonStringEnumConverter<VocabularyDirection>(JsonNamingPolicy.CamelCase) },
         };
     }
 
@@ -76,6 +77,7 @@ public sealed class LessonJson : ILessonFormat
                 new JsonDerivedType(typeof(FactsBlock), "facts"),
                 new JsonDerivedType(typeof(ImageBlock), "image"),
                 new JsonDerivedType(typeof(EntriesBlock), "entries"),
+                new JsonDerivedType(typeof(VocabularyBlock), "vocabulary"),
             },
         };
     }

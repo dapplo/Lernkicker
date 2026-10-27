@@ -7,7 +7,7 @@ Kopiere diesen ganzen Text in einen KI-Chat (Claude, ChatGPT, Gemini, …), fül
 Du erstellst Übungsmaterial für **Lernkicker**, eine Lern-App für Schulkinder. Eltern laden, was du erstellst, im Elternbereich der App hoch. Es gibt zwei Arten von Dateien:
 
 - eine **Probe** (`quiz/v1`): ein Übungstest, den die App bewertet, wie die echte Probe in der Schule;
-- **Lernstoff** (`lesson/v1`): etwas zum Lesen und Lernen ohne Bewertung: ein Text, ein Gedicht zum Auswendiglernen, Lernkarten, Merksätze, Bilder oder etwas zum Nachschlagen (z. B. Spielregeln).
+- **Lernstoff** (`lesson/v1`): etwas zum Lesen und Lernen ohne Bewertung: ein Text, ein Gedicht zum Auswendiglernen, Lernkarten, Vokabeln einer Fremdsprache, Merksätze, Bilder oder etwas zum Nachschlagen (z. B. Spielregeln).
 
 ## Mein Auftrag
 
@@ -25,7 +25,8 @@ Du erstellst Übungsmaterial für **Lernkicker**, eine Lern-App für Schulkinder
 - Bleib beim Stoff: Nimm, was auf den Fotos steht oder was der Lehrplan für diese Klasse vorsieht. Erfinde keine Fakten; wenn etwas unklar ist, frag mich, bevor du die Datei schreibst.
 - Für eine Probe: Nummeriere die Arbeitsaufträge wie in einer echten Probe (`"1. Setze ein."`). Wenn ich eine echte Probe angehängt habe, behalte ihre Reihenfolge und ihre Punkte (`points` je Aufgabe). Mische die Aufgabentypen und gib falschen Antworten eine `explanation` (z. B. eine Eselsbrücke). Liste in `answers` jede Schreibweise auf, die zählen soll (z. B. mit und ohne Endung).
 - Für Lernstoff: ein Thema pro Datei, 1–30 Blöcke. Kurze `facts`, `flashcards` für Begriffe, `text` für Erklärungen, `poem` für alles, was wörtlich gelernt wird. Für etwas zum Nachschlagen (Spielregeln, ein Wörterverzeichnis) setze `"mode": "reference"` und nimm einen `entries`-Block: ein Eintrag pro Karte oder Begriff, mit `name` und kurzem `text`.
-- Spiele gibt es gratis dazu: Lernkarten und Einträge schalten in der App Spiele frei (Wörter fangen, Memory, Kreuzworträtsel, Suchsel), sobald es mindestens 4 sind. Schreib den Begriff auf der Vorderseite möglichst als **ein Wort** (ein Artikel wie „die Ähre“ ist in Ordnung) und halte die Rückseite **kurz (bis 60 Zeichen)**, z. B. „Weizen“ → „Getreide für helles Brot und Nudeln“.
+- Vokabeln (z. B. Niederländisch–Deutsch): im Lernstoff ein `vocabulary`-Block, in einer Probe eine `vocabulary`-Aufgabe. Beide haben dieselbe `words`-Liste: `word` in der Sprache, die gelernt wird (`wordLanguage` setzen, z. B. `nl`), und die Übersetzung `translation`. Schreib Nomen mit Artikel (`de hond` → `der Hund`) und liste weitere Antworten, die zählen sollen, in `wordAlternatives` / `translationAlternatives` auf. `direction: "both"` (voreingestellt) übt und fragt in beide Richtungen. Die App liest die Wörter vor, also schreib sie genau richtig.
+- Spiele gibt es gratis dazu: Lernkarten, Einträge und Vokabeln schalten in der App Spiele frei (Wörter fangen, Memory, Kreuzworträtsel, Suchsel), sobald es mindestens 4 sind. Schreib den Begriff auf der Vorderseite möglichst als **ein Wort** (ein Artikel wie „die Ähre“ ist in Ordnung) und halte die Rückseite **kurz (bis 60 Zeichen)**, z. B. „Weizen“ → „Getreide für helles Brot und Nudeln“.
 - `id`: Kleinbuchstaben, Ziffern und `-`, 3–64 Zeichen, nach dem Thema benannt (z. B. `hsu-water-cycle`). Ids von Aufgaben und Blöcken: kurz und eindeutig innerhalb der Datei.
 
 ## Regeln, die das Schema nicht prüft
@@ -38,6 +39,7 @@ Lernkicker lehnt eine Datei ab, die eine dieser Regeln verletzt:
 - `ordering`: Liste die `steps` in der **richtigen** Reihenfolge auf; die App mischt sie.
 - `wordSearch`: `words` bestehen nur aus Buchstaben (Umlaute und ß sind erlaubt), ohne Leerzeichen oder Bindestriche, 2–14 Buchstaben, jedes Wort nur einmal. Die App baut jede Runde ein neues Gitter; für ältere Kinder `"level": "medium"` (schräg, Wörter kreuzen sich) oder `"hard"` (auch rückwärts) setzen; das voreingestellte `easy` passt für die Klassen 1–3.
 - `fallingWords`: Die `answer` jedes Worts ist genau eine der `options`. Halte die Antworten kurz (ein Wort oder wenige), weil bis zu vier nebeneinander auf ein Handy passen müssen.
+- `vocabulary`: Antworten werden auf genaue Schreibweise geprüft, mit Groß- und Kleinschreibung und Artikel (nur ein großer Anfangsbuchstabe ist egal). Mit `both` gibt jedes Wort zwei Fragen, also höchstens etwa 10–20 Wörter pro Probe.
 - Aufgaben-Ids sind innerhalb einer Probe eindeutig, Block-Ids innerhalb eines Lernstoffs.
 - Eine Probe hat höchstens 50 Aufgaben; eine Lernstoff-Datei ist höchstens 256 KB groß.
 
@@ -48,8 +50,8 @@ Bilder sind freiwillig. Nimm sie, wo die echte Probe welche hat (Karten, Schaubi
 - Ein Bild ist ein `image`-Objekt: `{ "src": "water-cycle/clouds.svg", "alt": "…", "caption": "…", "credit": "…" }`. `src` und `alt` sind Pflicht. `alt` sagt in der Sprache des Inhalts, worauf es auf dem Bild für die Aufgabe ankommt.
 - `src` ist ein Pfad **relativ zur JSON-Datei**, z. B. `water-cycle/clouds.svg`. Keine URLs, kein `/` am Anfang, kein `..`. Verwende in Dateinamen Buchstaben, Ziffern, `-`, `_` und `.`.
 - Erlaubt sind PNG, JPEG, GIF, WebP und SVG, höchstens 2 MB pro Bild und 20 MB pro Datei zusammen. Aus einem SVG entfernt die App Skripte, Links und alles andere, was keine Zeichnung ist.
-- Wo Bilder in einer Probe stehen können: an jeder Aufgabe (`image`), an einer `matching`-Zeile oder einem `fallingWords`-Wort, einer `trueFalse`-Aussage, einer `multipleChoice`-Frage und als Bildantworten (eine Antwort `{ "image": {…}, "text": "freiwillig" }` statt eines Texts).
-- Wo Bilder im Lernstoff stehen können: an `text`- und `facts`-Blöcken, auf Lernkarten (`frontImage`, `backImage`), an Einträgen (`entries`) und als eigener `image`-Block.
+- Wo Bilder in einer Probe stehen können: an jeder Aufgabe (`image`), an einer `matching`-Zeile, einem `fallingWords`- oder `vocabulary`-Wort, einer `trueFalse`-Aussage, einer `multipleChoice`-Frage und als Bildantworten (eine Antwort `{ "image": {…}, "text": "freiwillig" }` statt eines Texts).
+- Wo Bilder im Lernstoff stehen können: an `text`- und `facts`-Blöcken, auf Lernkarten (`frontImage`, `backImage`), an Einträgen (`entries`), an Vokabeln und als eigener `image`-Block.
 - Wenn du Bilder selbst zeichnest, zeichne einfache, klare SVGs (Formen, Schaubilder, eine Kartenskizze) mit `viewBox`, ohne Text, der die Lösung verrät, und ohne externe Schriften oder Links.
 - Für Bilder aus dem Internet (z. B. Wikimedia Commons) trage in `credit` Quelle und Lizenz ein, und nimm nur Bilder, deren Lizenz das erlaubt.
 

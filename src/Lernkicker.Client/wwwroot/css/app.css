@@ -543,6 +543,10 @@ details.upload:not([open]) { padding-block: 12px; }
 details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .shared-badge { color: var(--green-dark) !important; font-weight: 600; }
 .shared-badge::before { content: "🌍 "; }
+/* A new version of the app (UpdateNotice) */
+.update-notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; background: #e7f5ff; border-radius: var(--radius); padding: 10px 16px; margin: 4px 0 12px; }
+.update-notice p { margin: 0; }
+
 .preview-banner { background: #fff8e1; border-radius: var(--radius); padding: 12px 16px; margin: 8px 0 16px; display: grid; gap: 8px; justify-items: start; }
 .preview-banner p { margin: 0; }
 .preview-exercise { margin-bottom: 16px; }
@@ -954,6 +958,49 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .fleet-left { margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; color: var(--muted); font-size: 0.95rem; }
 .fleet-ship { letter-spacing: -2px; color: var(--text); }
 .fleet-ship.gone { color: var(--muted); text-decoration: line-through; opacity: 0.5; }
+
+/* Vocabulary in lessons and quizzes */
+.speak {
+    flex: none;
+    width: auto;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 4px 8px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper);
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+.vocab-languages { color: var(--muted); margin: 0 0 8px; }
+.vocab-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.vocab-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+}
+.vocab-list li:last-child { border-bottom: none; }
+.vocab-list .picture { margin: 0; }
+.vocab-list .picture img { max-height: 56px; max-width: 72px; }
+.vocab-list .word { font-weight: 700; }
+.vocab-list .translation { flex-basis: 100%; color: var(--muted); }
+.vocab-ask { color: var(--muted); margin: 0 0 8px; font-size: 0.9rem; }
+.vocab-speak { display: flex; justify-content: center; min-height: 48px; margin: 8px 0; }
+.vocab-write .prompt { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 700; }
+.vocab-write form { display: grid; gap: 10px; }
+.vocab-write input { width: 100%; font-size: 1.1rem; }
+.vocab-write .picture img { max-height: 160px; }
+.vocab-result p { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; padding: 8px 12px; border-radius: 10px; }
+.vocab-result.right p { color: var(--green-dark); background: var(--green-light); }
+.vocab-result.almost p { border: 2px solid var(--gold); background: var(--paper); }
+.vocab-result.wrong p { color: var(--red); background: var(--red-light); }
+.vocab-questions li { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 8px; }
+.vocab-questions li .picture { grid-column: 1 / -1; margin: 0; }
+.vocab-questions li .picture img { max-height: 120px; }
+.vocab-questions .vocab-to { color: var(--muted); font-weight: 400; margin-left: 6px; }
 
 /* Connect Four: each column is one button; the discs sit in round holes of a blue frame */
 .c4-me, .checkers-me, .chess-me { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; color: var(--muted); font-weight: 600; }

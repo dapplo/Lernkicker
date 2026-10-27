@@ -107,7 +107,7 @@ Parents can let an AI assistant such as Claude manage their quizzes, lessons, to
 
 Container Manager → Project → `lernkicker` → Action → Build (pulls `latest`), or pin `LERNKICKER_TAG` to a version and change it. The database is migrated on start.
 
-To see what runs: the admin page shows the server's version, commit and build time, and the container log starts with the same line (`Lernkicker main, commit …, built …`). If the app on a device is older than the server, the admin page says so; closing the app and opening it again loads the new one.
+To see what runs: the admin page shows the server's version, commit and build time, and the container log starts with the same line (`Lernkicker main, commit …, built …`). The app on a device updates itself: every server answer carries a short hash of the build (version, commit, build time) in the `X-Lernkicker-Build` header, so it doesn't tell outsiders which version runs, and when it is not the app's own build (checked at start, every 10 minutes, when the app comes back to the screen and on every API call), the app lets the new service worker take over and reloads. During a quiz or a lesson game it waits until the child leaves that page (with an "Update now" button), so no answers are lost. It reloads at most once per build and browser session; if that did not help, it shows a button that drops the service worker and its cache and loads the app fresh from the server. `index.html`, `service-worker.js`, `service-worker-assets.js` and the other unfingerprinted files are served with `Cache-Control: no-cache`, the fingerprinted `_framework` files as immutable.
 
 ## Backup
 

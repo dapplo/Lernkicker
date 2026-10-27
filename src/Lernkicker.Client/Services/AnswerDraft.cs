@@ -41,13 +41,14 @@ public sealed class AnswerDraft
         MultipleChoiceSheetDto mc => mc.Questions.Count,
         WordSearchSheetDto w => w.Words.Count,
         FallingWordsSheetDto f => f.Words.Count,
+        VocabularySheetDto v => v.Questions.Count,
         _ => 0,
     });
 
     /// <summary>Number of parts the child has not answered yet.</summary>
     public int Open => Exercise switch
     {
-        ClozeSheetDto or MatchingSheetDto or FreeTextSheetDto or WordSearchSheetDto => Texts.Count(string.IsNullOrWhiteSpace),
+        ClozeSheetDto or MatchingSheetDto or FreeTextSheetDto or WordSearchSheetDto or VocabularySheetDto => Texts.Count(string.IsNullOrWhiteSpace),
         TrueFalseSheetDto => Truths.Count(t => t is null),
         OrderingSheetDto o => o.Steps.Count - Order.Count,
         MultipleChoiceSheetDto => Choices.Count(c => c.Count == 0),
@@ -58,7 +59,7 @@ public sealed class AnswerDraft
 
     public AnswerDto ToAnswer() => Exercise switch
     {
-        ClozeSheetDto or MatchingSheetDto or FreeTextSheetDto or WordSearchSheetDto or FallingWordsSheetDto => new AnswerDto { Texts = Texts },
+        ClozeSheetDto or MatchingSheetDto or FreeTextSheetDto or WordSearchSheetDto or FallingWordsSheetDto or VocabularySheetDto => new AnswerDto { Texts = Texts },
         TrueFalseSheetDto => new AnswerDto { Truths = Truths },
         OrderingSheetDto => new AnswerDto { Order = Order.ToList() },
         MultipleChoiceSheetDto => new AnswerDto { Choices = Choices.Select(c => (IReadOnlyList<int>?)c.ToList()).ToList() },

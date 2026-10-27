@@ -59,7 +59,7 @@ public static class Mapping
 
     public static LessonDto ToDto(this LessonToLearn l) =>
         new(l.AssignmentId, l.Lesson.Title, l.Lesson.Subject, l.Lesson.Language, l.Lesson.Topic, l.Lesson.Description, l.DueOn,
-            l.KnownBlocks, l.Lesson.Blocks.Select(b => ToDto(b, l.Images)).ToList(), l.Lesson.Mode)
+            l.KnownBlocks, l.Lesson.Blocks.Select(b => ToDto(b, l.Images, l.Lesson.Language)).ToList(), l.Lesson.Mode)
         {
             Games = LessonGames.Available(l.Lesson),
         };
@@ -79,7 +79,7 @@ public static class Mapping
         _ => throw new NotSupportedException($"Unknown game {g.Round.Kind}"),
     };
 
-    private static LessonBlockDto ToDto(LessonBlock b, IReadOnlyDictionary<string, string> images) => b switch
+    private static LessonBlockDto ToDto(LessonBlock b, IReadOnlyDictionary<string, string> images, string language) => b switch
     {
         TextBlock t => new LessonBlockDto { Id = t.Id, Type = "text", Title = t.Title, Text = t.Text, Image = t.Image.ToDto(images) },
         PoemBlock p => new LessonBlockDto { Id = p.Id, Type = "poem", Title = p.Title, Author = p.Author, Hint = p.Hint, Stanzas = p.Stanzas },
@@ -95,7 +95,20 @@ public static class Mapping
             Id = e.Id, Type = "entries", Title = e.Title,
             Entries = e.Entries.Select(x => new EntryDto(x.Name, x.Text, x.Image.ToDto(images))).ToList(),
         },
+        VocabularyBlock v => new LessonBlockDto
+        {
+            Id = v.Id, Type = "vocabulary", Title = v.Title,
+            WordLanguage = v.WordLanguage, TranslationLanguage = v.TranslationLanguage ?? language, Direction = v.Direction.ToCode(),
+            Words = v.Words.Select(w => new VocabularyWordDto(w.Word, w.Translation, w.WordAlternatives, w.TranslationAlternatives, w.Image.ToDto(images))).ToList(),
+        },
         _ => throw new NotSupportedException($"Unknown block type {b.GetType().Name}"),
+    };
+
+    private static string ToCode(this VocabularyDirection direction) => direction switch
+    {
+        VocabularyDirection.WordToTranslation => "wordToTranslation",
+        VocabularyDirection.TranslationToWord => "translationToWord",
+        _ => "both",
     };
 
     /// <summary>A picture with the link to its stored bytes, or without a link when it is missing.</summary>
@@ -123,6 +136,8 @@ public static class Mapping
             WordSearchSheet w => new WordSearchSheetDto(w.Id, w.Instruction, w.Hint, w.MaxPoints, w.Rows, Items(w.Words)),
             FallingWordsSheet f => new FallingWordsSheetDto(f.Id, f.Instruction, f.Hint, f.MaxPoints, f.Options,
                 f.Words.Select(w => new FallingWordDto(w.Index, w.Text, w.Answer, w.Image.ToDto(images))).ToList(), f.TargetCount, f.FallSeconds),
+            VocabularySheet v => new VocabularySheetDto(v.Id, v.Instruction, v.Hint, v.MaxPoints, v.WordLanguage, v.TranslationLanguage,
+                v.Questions.Select(q => new VocabularyQuestionDto(q.Index, q.Prompt, q.AsksWord, q.Image.ToDto(images))).ToList()),
             _ => throw new NotSupportedException($"Unknown sheet type {e.GetType().Name}"),
         };
         return sheet with { Image = e.Image.ToDto(images) };

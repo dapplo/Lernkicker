@@ -26,7 +26,7 @@ public sealed record QuizSheet(
     /// <summary>Builds the child's sheet. Pass a seeded <see cref="Random"/> for a reproducible order.</summary>
     public static QuizSheet For(Quiz quiz, Random random)
     {
-        var exercises = quiz.Exercises.Select(e => ExerciseSheet.For(e, quiz.Shuffle, random)).ToList();
+        var exercises = quiz.Exercises.Select(e => ExerciseSheet.For(e, quiz.Shuffle, random, quiz.Language)).ToList();
         return new QuizSheet(quiz.Id, quiz.Title, quiz.Subject, quiz.GradeLevel, quiz.Language, quiz.Topic, quiz.DurationMinutes, quiz.MaxPoints, exercises);
     }
 }
@@ -38,7 +38,7 @@ public abstract record ExerciseSheet(string Id, string Instruction, string? Hint
 {
     public ImageRef? Image { get; init; }
 
-    public static ExerciseSheet For(Exercise exercise, bool shuffle, Random random)
+    public static ExerciseSheet For(Exercise exercise, bool shuffle, Random random, string language = Quiz.DefaultLanguage)
     {
         List<SheetItem> Numbered(IEnumerable<(string Text, ImageRef? Image)> parts, bool mayShuffle)
         {
@@ -81,6 +81,10 @@ public abstract record ExerciseSheet(string Id, string Instruction, string? Hint
                 Shuffled(f.Words.Select((w, i) => new FallingWordSheet(i, w.Text, w.Answer, w.Image)).ToList(), random),
                 f.TargetCount,
                 f.FallSeconds),
+            VocabularyExercise v => new VocabularySheet(
+                v.Id, v.Instruction, v.Hint, v.MaxPoints,
+                v.WordLanguage, v.TranslationLanguage ?? language,
+                Shuffled(v.Questions.Select(q => new VocabularyQuestionSheet(q.Index, q.Prompt, q.AsksWord, q.Word.Image)).ToList(), random)),
             _ => throw new NotSupportedException($"Unknown exercise type {exercise.GetType().Name}"),
         };
         return sheet with { Image = exercise.Image };
@@ -138,3 +142,14 @@ public sealed record FallingWordsSheet(string Id, string Instruction, string? Hi
 
 /// <summary>A falling word; <c>Index</c> is its position in the original quiz.</summary>
 public sealed record FallingWordSheet(int Index, string Text, string Answer, ImageRef? Image = null);
+
+/// <summary>
+/// A vocabulary test: per question the word or translation shown (<c>Prompt</c>); <c>AsksWord</c> says whether the
+/// child types the word (in <c>WordLanguage</c>) or the translation (in <c>TranslationLanguage</c>). The questions are
+/// always shuffled, so the two directions of a word are not next to each other.
+/// </summary>
+public sealed record VocabularySheet(string Id, string Instruction, string? Hint, int MaxPoints, string WordLanguage, string TranslationLanguage, IReadOnlyList<VocabularyQuestionSheet> Questions)
+    : ExerciseSheet(Id, Instruction, Hint, MaxPoints);
+
+/// <summary>A vocabulary question; <c>Index</c> is its position in <see cref="VocabularyExercise.Questions"/>.</summary>
+public sealed record VocabularyQuestionSheet(int Index, string Prompt, bool AsksWord, ImageRef? Image = null);

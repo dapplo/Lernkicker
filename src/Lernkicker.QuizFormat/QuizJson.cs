@@ -61,7 +61,7 @@ public sealed class QuizJson : IQuizFormat
             AllowOutOfOrderMetadataProperties = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             TypeInfoResolver = resolver,
-            Converters = { new ChoiceOptionConverter(), new JsonStringEnumConverter<WordSearchLevel>(JsonNamingPolicy.CamelCase), new JsonStringEnumConverter<GameLevel>(JsonNamingPolicy.CamelCase) },
+            Converters = { new ChoiceOptionConverter(), new JsonStringEnumConverter<WordSearchLevel>(JsonNamingPolicy.CamelCase), new JsonStringEnumConverter<GameLevel>(JsonNamingPolicy.CamelCase), new JsonStringEnumConverter<VocabularyDirection>(JsonNamingPolicy.CamelCase) },
         };
     }
 
@@ -86,6 +86,7 @@ public sealed class QuizJson : IQuizFormat
                 new JsonDerivedType(typeof(MultipleChoiceExercise), "multipleChoice"),
                 new JsonDerivedType(typeof(WordSearchExercise), "wordSearch"),
                 new JsonDerivedType(typeof(FallingWordsExercise), "fallingWords"),
+                new JsonDerivedType(typeof(VocabularyExercise), "vocabulary"),
             },
         };
     }
@@ -98,7 +99,8 @@ public sealed class QuizJson : IQuizFormat
         }
 
         // Computed properties are not part of the format
-        foreach (var computed in info.Properties.Where(p => p.Name is "maxPoints" or "partCount" or "gapsInText" or "allowsDiagonal" or "allowsBackwards" or "allowsOverlap" or "targetCount" or "fallSeconds").ToList())
+        var vocabulary = info.Type == typeof(VocabularyExercise);
+        foreach (var computed in info.Properties.Where(p => p.Name is "maxPoints" or "partCount" or "gapsInText" or "allowsDiagonal" or "allowsBackwards" or "allowsOverlap" or "targetCount" or "fallSeconds" || (vocabulary && p.Name == "questions")).ToList())
         {
             info.Properties.Remove(computed);
         }

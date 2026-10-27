@@ -52,7 +52,7 @@ python3 tools/validate_quizzes.py my-quiz.json
 | Field | Required | Meaning |
 | --- | --- | --- |
 | `id` | yes | unique within the quiz |
-| `type` | yes | `cloze`, `matching`, `ordering`, `trueFalse`, `freeText`, `multipleChoice`, `wordSearch`, `fallingWords` |
+| `type` | yes | `cloze`, `matching`, `ordering`, `trueFalse`, `freeText`, `multipleChoice`, `wordSearch`, `fallingWords`, `vocabulary` |
 | `instruction` | yes | the task as written in the test |
 | `hint` | no | small usage hint below the instruction |
 | `points` | no | maximum points of the exercise (see grading) |
@@ -208,6 +208,28 @@ A game for sorting terms into categories, or matching terms with their descripti
 
 With fewer `options` than the level shows, all of them are shown. The words always fall in a new random order. The scenery follows the look of the child's profile (football, space or unicorn), which a parent sets on the child's page. Because the game shows right away whether a word was caught, the app sends the answers of this exercise to the child's device, unlike the other types.
 
+### `vocabulary`: translate words, one way or both
+
+A vocabulary test: one list of words in the language being learned (`word`) with their `translation`, asked as typed answers. With `direction: "both"` (the default) every word is asked twice, word → translation and translation → word, so the same list tests both ways. The questions always come in a new random order, so the two directions of a word are not next to each other. [`quizzes/other/dutch-animals-test.json`](../quizzes/other/dutch-animals-test.json) is an example (Dutch–German).
+
+```json
+{ "id": "animals", "type": "vocabulary", "instruction": "Übersetze. Schreibe den Artikel mit.",
+  "wordLanguage": "nl", "direction": "both",
+  "words": [
+    { "word": "de hond", "translation": "der Hund" },
+    { "word": "de kat", "translation": "die Katze", "translationAlternatives": ["der Kater"] }
+  ] }
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `wordLanguage` | yes | BCP 47 tag of the words, e.g. `nl`, `en`, `fr`. The child's device reads the words aloud in this language (🔊) |
+| `translationLanguage` | no | BCP 47 tag of the translations; default: the quiz's `language` |
+| `direction` | no | `both` (default), `wordToTranslation` (the word is shown, the translation typed) or `translationToWord` |
+| `words` | yes | 1–50 words, each with `word` and `translation` (at most 100 characters each). Optional: `wordAlternatives` and `translationAlternatives` (other answers that count, e.g. a synonym), and an `image` shown with the question |
+
+Each question is a part. An answer counts when it is **spelled right**: extra spaces and a `.`, `!` or `?` at the end don't matter, and a capital first letter is fine where the word starts small (phones capitalize it), but small letters where the answer has capitals ("hund" for "Hund") are wrong, and so is a missing or wrong article. List an answer without the article as an alternative if it should count. The read-aloud button uses the voices built into the child's device; it appears only when the device has a voice for the language.
+
 ## Pictures
 
 [`quizzes/other/showcase-pictures.json`](../quizzes/other/showcase-pictures.json) uses a picture in every place the format allows: on an exercise, on a `matching` row, on a `trueFalse` statement, on a `multipleChoice` question and as picture answers. Its pictures are in the folder next to it.
@@ -241,8 +263,9 @@ Rules:
 
 ## Grading
 
-- Every gap, row, step, statement, field, question and word (`wordSearch`, `fallingWords`) is a **part**. Without `points`, every correct part gives 1 point.
+- Every gap, row, step, statement, field, question and word (`wordSearch`, `fallingWords`, and each direction of a `vocabulary` word) is a **part**. Without `points`, every correct part gives 1 point.
 - With `points`: points reached = round(correct parts ÷ all parts × `points`), rounding half away from zero. Example: 7 steps, `points: 4`, 5 correct → 2.86 → 3 points.
+- `cloze`, `matching` and `freeText` answers ignore case; `vocabulary` answers do not (see above).
 - For `multipleChoice` with several correct options, a question counts only when exactly the correct options are selected.
 - The mark is only a rough guide on the German 1–6 scale: from 95 % → 1, 83 % → 2, 67 % → 3, 50 % → 4, 30 % → 5, below → 6.
 - An adult learner (a profile marked as adult) gets no mark, only points and percent.

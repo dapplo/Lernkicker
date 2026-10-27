@@ -1,0 +1,210 @@
+@inject Speech Speech
+@* Words to learn in another language: a list to look at and listen to, cards to flip, and typing the answer.
+   Practice is never stored; the child marks the whole block with "Kann ich!" like any other part. *@
+<p class="vocab-languages">@Direction</p>
+@if (!_hasVoice)
+{
+    <p class="hint">🔇 @L["Vocabulary.NoVoice", _wordLanguageName]</p>
+}
+
+<div class="modes" role="tablist">
+    @foreach (var mode in Modes)
+    {
+        <button role="tab" class="@(_mode == mode ? "on" : "")" aria-selected="@(_mode == mode ? "true" : "false")" @onclick="() => Switch(mode)">
+            @L[$"Vocabulary.Mode.{mode}"]
+        </button>
+    }
+</div>
+
+@if (_mode == "List")
+{
+    <ul class="vocab-list">
+        @foreach (var word in Block.Words!)
+        {
+            <li>
+                <Picture Image="@word.Image" Zoom="false" />
+                <span class="word" lang="@WordLanguage">@word.Word</span>
+                <SpeakButton Text="@word.Word" Language="@WordLanguage" />
+                <span class="translation" lang="@TranslationLanguage">@word.Translation</span>
+            </li>
+        }
+    </ul>
+}
+else if (_practice.Current is not { } card)
+{
+    <div class="cards-done">
+        <p>🎉 @L["Vocabulary.AllDone", _practice.Total]</p>
+        <button class="btn quiet" @onclick="Restart">@L["Learn.CardsAgain"]</button>
+    </div>
+}
+else
+{
+    <p class="counter">@L["Vocabulary.Left", _practice.Left, _practice.Total]</p>
+    <p class="vocab-ask">@L["Vocabulary.Ask", LanguageName(!card.AsksWord), LanguageName(card.AsksWord)]</p>
+    @if (_mode == "Cards")
+    {
+        <button class="flashcard @(_flipped ? "flipped" : "")" @onclick="() => _flipped = !_flipped" aria-live="polite">
+            <Picture Image="@card.Word.Image" Zoom="false" />
+            <span class="side" lang="@Language(_flipped == card.AsksWord)">@(_flipped ? card.Answer : card.Prompt)</span>
+            <small>@(_flipped ? L["Learn.Answer"] : L["Learn.TapToFlip"])</small>
+        </button>
+        <div class="vocab-speak">
+            @if (!card.AsksWord || _flipped)
+            {
+                <SpeakButton Text="@card.Word.Word" Language="@WordLanguage" />
+            }
+        </div>
+        @if (_flipped)
+        {
+            <div class="buttons">
+                <button class="btn" @onclick="() => Next(true)">@L["Learn.KnewIt"]</button>
+                <button class="btn quiet" @onclick="() => Next(false)">@L["Learn.Again"]</button>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="vocab-write">
+            <Picture Image="@card.Word.Image" Zoom="false" />
+            <p class="prompt">
+                <span lang="@Language(!card.AsksWord)">@card.Prompt</span>
+                @if (!card.AsksWord)
+                {
+                    <SpeakButton Text="@card.Word.Word" Language="@WordLanguage" />
+                }
+            </p>
+            <form @onsubmit="Submit">
+                <input @ref="_input" lang="@Language(card.AsksWord)" autocomplete="off" autocapitalize="off" spellcheck="false"
+                       aria-label="@L["Exercise.Answer"]" readonly="@(_check is not null)" @bind="_typed" @bind:event="oninput" />
+                @if (_check is null)
+                {
+                    <button class="btn" type="submit" disabled="@string.IsNullOrWhiteSpace(_typed)">@L["Vocabulary.Check"]</button>
+                }
+                else
+                {
+                    <div class="vocab-result @_check.Value.ToString().ToLowerInvariant()" role="status">
+                        <p>
+                            @(_check switch
+                            {
+                                AnswerCheck.Right => L["Vocabulary.Right"],
+                                AnswerCheck.Almost => L["Vocabulary.Almost"],
+                                _ => L["Vocabulary.Wrong"],
+                            })
+                            @if (_check != AnswerCheck.Right)
+                            {
+                                <strong lang="@Language(card.AsksWord)">@card.Answer</strong>
+                            }
+                            @if (card.AsksWord)
+                            {
+                                <SpeakButton Text="@card.Word.Word" Language="@WordLanguage" />
+                            }
+                        </p>
+                    </div>
+                    <button class="btn" type="submit">@L["Vocabulary.Next"]</button>
+                }
+            </form>
+        </div>
+    }
+}
+
+@code {
+    private static readonly string[] Modes = ["List", "Cards", "Write"];
+
+    private string _mode = "List";
+    private LessonBlockDto? _block;
+    private VocabularyPractice _practice = null!;
+    private bool _flipped;
+    private string? _typed;
+    private AnswerCheck? _check;
+    private ElementReference _input;
+    private bool _focus;
+    private bool _hasVoice = true;
+    private string _wordLanguageName = "";
+    private string _translationLanguageName = "";
+
+    [Parameter, EditorRequired]
+    public LessonBlockDto Block { get; set; } = null!;
+
+    private string WordLanguage => Block.WordLanguage!;
+
+    private string TranslationLanguage => Block.TranslationLanguage!;
+
+    private string Language(bool word) => word ? WordLanguage : TranslationLanguage;
+
+    private string LanguageName(bool word) => word ? _wordLanguageName : _translationLanguageName;
+
+    private string Direction => Block.Direction switch
+    {
+        "wordToTranslation" => $"{_wordLanguageName} → {_translationLanguageName}",
+        "translationToWord" => $"{_translationLanguageName} → {_wordLanguageName}",
+        _ => $"{_wordLanguageName} ⇄ {_translationLanguageName}",
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // The page re-renders when a part is marked as known; that must not start the practice again
+        if (ReferenceEquals(_block, Block))
+        {
+            return;
+        }
+
+        _block = Block;
+        _practice = new VocabularyPractice(Block.Words!, Block.Direction, Random.Shared);
+        _wordLanguageName = await Speech.LanguageName(WordLanguage);
+        _translationLanguageName = await Speech.LanguageName(TranslationLanguage);
+        _hasVoice = await Speech.HasVoice(WordLanguage);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focus)
+        {
+            _focus = false;
+            await _input.FocusAsync();
+        }
+    }
+
+    private void Switch(string mode)
+    {
+        _mode = mode;
+        Restart();
+    }
+
+    private void Restart()
+    {
+        _practice.Restart();
+        _flipped = false;
+        Reset();
+    }
+
+    private void Next(bool known)
+    {
+        _practice.Next(known);
+        _flipped = false;
+    }
+
+    /// <summary>Enter or the button: check the answer, then on to the next word. Only a right answer is done.</summary>
+    private void Submit()
+    {
+        if (_practice.Current is not { } card || string.IsNullOrWhiteSpace(_typed))
+        {
+            return;
+        }
+
+        if (_check is null)
+        {
+            _check = VocabularyPractice.Check(_typed, card);
+            return;
+        }
+
+        _practice.Next(_check == AnswerCheck.Right);
+        Reset();
+    }
+
+    private void Reset()
+    {
+        _typed = null;
+        _check = null;
+        _focus = _mode == "Write";
+    }
+}

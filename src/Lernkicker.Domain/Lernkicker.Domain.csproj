@@ -2,4 +2,8 @@
 
   <!-- The core of the hexagon: no package references, no framework beyond the BCL -->
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Lernkicker.Domain.Tests" />
+  </ItemGroup>
+
 </Project>

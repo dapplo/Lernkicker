@@ -89,6 +89,28 @@ public sealed record FlashcardsBlock : LessonBlock
     }
 }
 
+/// <summary>
+/// Words to learn in another language, e.g. Dutch with German translations: shown as a list, as cards and to type,
+/// one way or both (<see cref="Direction"/>), with the words read aloud by the device.
+/// </summary>
+public sealed record VocabularyBlock : LessonBlock
+{
+    /// <summary>BCP 47 tag of the words, e.g. "nl".</summary>
+    public required string WordLanguage { get; init; }
+
+    /// <summary>BCP 47 tag of the translations; null means the lesson's language.</summary>
+    public string? TranslationLanguage { get; init; }
+
+    public VocabularyDirection Direction { get; init; } = VocabularyDirection.Both;
+
+    public required IReadOnlyList<VocabularyWord> Words { get; init; }
+
+    public override IEnumerable<ImageUse> Images(string path) =>
+        Words.Select((w, i) => (w.Image, At: $"{path}/words/{i}/image"))
+            .Where(x => x.Image is not null)
+            .Select(x => new ImageUse(x.At, x.Image!));
+}
+
 public sealed record Flashcard(string Front, string Back, ImageRef? FrontImage = null, ImageRef? BackImage = null);
 
 /// <summary>Key facts to remember; optionally a picture above them.</summary>
