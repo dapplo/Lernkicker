@@ -1,6 +1,7 @@
 using Lernkicker.Application;
 using Lernkicker.Application.Ports;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lernkicker.Persistence;
 
@@ -40,6 +41,10 @@ internal sealed class ParentAccounts(UserManager<ParentUser> users) : IParentAcc
             ? null
             : new ParentAccount(user.Id, user.Email!, user.DisplayName, user.FamilyId, user.Language, await users.IsInRoleAsync(user, Roles.Admin));
     }
+
+    public async Task<IReadOnlyList<FamilyParent>> ListFamilyAsync(Guid familyId) =>
+        await users.Users.Where(u => u.FamilyId == familyId).OrderBy(u => u.DisplayName)
+            .Select(u => new FamilyParent(u.Id, u.DisplayName)).ToListAsync();
 
     public async Task<bool> AdminExistsAsync() => (await users.GetUsersInRoleAsync(Roles.Admin)).Count > 0;
 

@@ -9,7 +9,7 @@ namespace Lernkicker.Web.Mcp;
 
 /// <summary>
 /// The MCP endpoint (Model Context Protocol, Streamable HTTP): AI assistants manage a family's quizzes, lessons,
-/// assignments, calendar and learner profiles with one of the family's API keys. A driving adapter like the HTTP API; the tools
+/// assignments, calendar and family members with one of the family's API keys. A driving adapter like the HTTP API; the tools
 /// call the same use cases. See docs/mcp.md.
 /// </summary>
 public static class McpSetup
@@ -22,8 +22,8 @@ public static class McpSetup
         Quizzes (quiz/v1) and lessons (lesson/v1) are JSON files: call get_authoring_guide once for the rules and
         both JSON schemas, check a file with validate_quiz or validate_lesson, then upload it. Uploading a file with
         an existing id replaces it (a quiz gets a new version; open assignments move along).
-        Children are identified by id (list_children). Add a child or an adult learner (e.g. a parent learning a
-        language) with create_child; a parent learns with an adult profile through their own login. Assign a quiz or lesson to a child with a due date
+        Learners are identified by their learnerId (list_family_members): children, other adult learners and
+        parents who learn too (enable_learning, e.g. a parent learning a language). Assign a quiz or lesson to a child with a due date
         (yyyy-MM-dd); the due date shows in the child's todo list and calendar. Errors come as stable codes
         (e.g. quiz.invalid) with a list of issues (code, path, arguments).
         Quiz and lesson content is written in the language of the quiz (German for German schools).

@@ -17,7 +17,7 @@ public sealed class CalendarTools(CalendarUseCases calendar, ILocalClock clock)
     [McpServerTool(Name = "get_calendar", Title = "A child's calendar", ReadOnly = true, Idempotent = true)]
     [Description("A child's dates between two days: events (tests, football, other), imported dates and the due dates of quizzes and lessons. Without dates: from a week ago for 90 days.")]
     public async Task<IReadOnlyList<CalendarEntryDto>> GetCalendar(
-        [Description("The child's id (list_children).")] Guid childId,
+        [Description("The learner's id (learnerId from list_family_members).")] Guid childId,
         [Description("First day, yyyy-MM-dd.")] DateOnly? from = null,
         [Description("Last day, yyyy-MM-dd (at most 400 days after the first).")] DateOnly? to = null)
     {
@@ -35,7 +35,7 @@ public sealed class CalendarTools(CalendarUseCases calendar, ILocalClock clock)
     [Authorize(Policy = Policies.ApiKeyWrite)]
     [Description("Adds a date to a child's calendar, e.g. the day of a test. Times are the family's local time; without a start time it is a whole day.")]
     public async Task<CalendarEntryDto> AddCalendarEvent(
-        [Description("The child's id (list_children).")] Guid childId,
+        [Description("The learner's id (learnerId from list_family_members).")] Guid childId,
         [Description("test, football or other.")] string kind,
         [Description("Short title, e.g. \"HSU-Probe: Wahlen\".")] string title,
         [Description("The day, yyyy-MM-dd.")] DateOnly date,
@@ -48,7 +48,7 @@ public sealed class CalendarTools(CalendarUseCases calendar, ILocalClock clock)
     [Authorize(Policy = Policies.ApiKeyWrite)]
     [Description("Changes a date that was entered by hand or with add_calendar_event (its eventId from get_calendar). Imported dates can't be changed.")]
     public async Task<CalendarEntryDto> UpdateCalendarEvent(
-        [Description("The child's id.")] Guid childId,
+        [Description("The learner's id.")] Guid childId,
         [Description("The eventId from get_calendar.")] Guid eventId,
         [Description("test, football or other.")] string kind,
         [Description("Short title.")] string title,
@@ -62,7 +62,7 @@ public sealed class CalendarTools(CalendarUseCases calendar, ILocalClock clock)
     [Authorize(Policy = Policies.ApiKeyWrite)]
     [Description("Removes a date entered by hand or with add_calendar_event (its eventId from get_calendar). Imported dates can't be removed.")]
     public async Task<string> DeleteCalendarEvent(
-        [Description("The child's id.")] Guid childId,
+        [Description("The learner's id.")] Guid childId,
         [Description("The eventId from get_calendar.")] Guid eventId)
     {
         (await calendar.DeleteEventAsync(childId, eventId)).Check();

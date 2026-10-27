@@ -1,6 +1,6 @@
 # AI assistants (MCP)
 
-Lernkicker has an [MCP](https://modelcontextprotocol.io) server, so an AI assistant such as Claude can work for a family on its own: set up a learner profile, write a quiz or a lesson, check and upload it, put it on a child's todo list with a due date, add the test to the calendar, and look at the results afterwards to see what to practise next. Nobody has to click anything in between.
+Lernkicker has an [MCP](https://modelcontextprotocol.io) server, so an AI assistant such as Claude can work for a family on its own: let a parent learn or add a child, write a quiz or a lesson, check and upload it, put it on a child's todo list with a due date, add the test to the calendar, and look at the results afterwards to see what to practise next. Nobody has to click anything in between.
 
 The endpoint is `https://<your-lernkicker>/mcp` (Streamable HTTP, stateless). It is built with the official C# SDK ([`ModelContextProtocol.AspNetCore`](https://github.com/modelcontextprotocol/csharp-sdk)) as another driving adapter next to the HTTP API (`src/Lernkicker.Web/Mcp`); the tools call the same use cases, so the same rules, checks and family isolation apply.
 
@@ -13,7 +13,7 @@ Each family creates its own keys: **Eltern → Konto → KI-Assistenten (MCP) �
 - The key (`lk_…`) is shown **once**, together with the MCP address and a ready-made command for Claude Code. Copy it right away. Lernkicker only keeps a hash of it.
 - The list shows when each key was last used. **Revoke** stops a key at once. A family can have up to 10 keys; deleting the parent who created a key removes the key too.
 
-A key acts for the whole family, like a parent would, but only on `/mcp`: it does not open the parents' page or the HTTP API, and it can't invite parents, share with other families, subscribe calendars or touch Telegram. It can manage the family's learner profiles (children and adults), their PINs and paired phones; give an assistant a read-only key if it shouldn't.
+A key acts for the whole family, like a parent would, but only on `/mcp`: it does not open the parents' page or the HTTP API, and it can't invite parents, set PINs, pair phones, share with other families, subscribe calendars or touch Telegram. It can add children and let parents learn, but PINs and pairing phones stay with the parents in the app.
 
 ## 2. Connect an assistant
 
@@ -81,13 +81,11 @@ Connectors added in the claude.ai web or mobile app need OAuth, which Lernkicker
 
 | Tool | Changes data | What it does |
 | --- | --- | --- |
-| `list_children` | | The family's children and adult profiles: id, school year, look, whether a PIN is set, number of paired phones, and whether a parent learns with it through their own login |
-| `create_child` | yes | Adds a child (with school year) or an adult learner (`isAdult`, e.g. a parent learning Dutch), with optional PIN and look (`football`, `space`, `unicorn`). A parent then learns with an adult profile through their own login (*Das bin ich: hier lernen* on the profile's page), without PIN or phone |
-| `update_child` | yes | Changes name, school year, adult flag or look; omitted values stay |
-| `delete_child` | yes | Removes a profile with its phones, assignments, results and calendar |
-| `set_child_pin` | yes | Sets the four-digit PIN for the child's phone |
-| `create_pairing_link` | yes | A one-time link that pairs a phone (open it on the phone or show it as a QR code) |
-| `list_devices`, `unlock_device`, `remove_device` | (yes) | A profile's paired phones; unlock one after too many wrong PINs, or unpair a lost one |
+| `list_family_members` | | The parents (`parentId`, and `learnerId` once they learn themselves), children (with school year) and other adult learners. The `learnerId` is the id for assignments, results and the calendar (the `childId` argument of those tools) |
+| `enable_learning` | yes | Lets a parent learn too (e.g. one who learns Dutch): gives them their own learner profile, like *Selbst lernen* in the app. They learn with their own parent login; nothing else to set up |
+| `add_child` | yes | Adds a child with school year and look (`football`, `space`, `unicorn`). The PIN and the child's phone are set up by a parent in the app |
+| `update_family_member` | yes | Changes a learner's name, school year or look; omitted values stay |
+| `remove_family_member` | yes | Removes a learner profile with its assignments, results and calendar. For a parent it only ends their learning; the login stays |
 | `get_authoring_guide` | | The rules for writing quizzes and lessons (`docs/ai-prompt`, `en` or `de`) followed by both JSON schemas |
 | `list_quizzes`, `list_lessons` | | The family's quizzes and lessons |
 | `get_quiz`, `get_lesson` | | The JSON file exactly as uploaded, optionally with its pictures (base64) |
@@ -109,7 +107,7 @@ Results are JSON in the same shape as the HTTP API (camelCase). A failure is a t
 
 so the assistant can fix the file and try again. The codes are the ones in `ErrorCodes` and `QuizIssueCodes`; [`docs/quiz-format.md`](quiz-format.md) and [`docs/lesson-format.md`](lesson-format.md) explain the content rules behind them.
 
-A typical run: `get_authoring_guide` → write the file → `validate_quiz` until it passes → `upload_quiz` → `list_children` → `assign_quiz` with the test date → `add_calendar_event` for the test itself.
+A typical run: `get_authoring_guide` → write the file → `validate_quiz` until it passes → `upload_quiz` → `list_family_members` → `assign_quiz` with the test date → `add_calendar_event` for the test itself.
 
 ## 4. Settings
 

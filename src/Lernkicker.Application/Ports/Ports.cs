@@ -53,6 +53,9 @@ public interface IParentAccounts
 
     Task<ParentAccount?> FindAsync(Guid id);
 
+    /// <summary>The parents of one family, by name.</summary>
+    Task<IReadOnlyList<FamilyParent>> ListFamilyAsync(Guid familyId);
+
     Task SetLanguageAsync(Guid id, string language);
 
     Task<bool> AdminExistsAsync();
@@ -61,6 +64,8 @@ public interface IParentAccounts
 }
 
 public sealed record NewParent(string Email, string Password, string DisplayName, Guid FamilyId, string Language);
+
+public sealed record FamilyParent(Guid Id, string DisplayName);
 
 public sealed record ParentAccount(Guid Id, string Email, string DisplayName, Guid FamilyId, string Language, bool IsAdmin);
 

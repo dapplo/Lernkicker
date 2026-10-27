@@ -695,7 +695,7 @@
   <data name="Home.StopLearning" xml:space="preserve"><value>Stop learning</value></data>
   <data name="Error.child.notOwnProfile" xml:space="preserve"><value>Only an adult profile that no other parent uses can be your own.</value></data>
   <data name="ApiKeys.Title" xml:space="preserve"><value>AI assistants (MCP)</value></data>
-  <data name="ApiKeys.Intro" xml:space="preserve"><value>With an API key, an AI assistant such as Claude can set up profiles for your children (and adults who learn), upload and change your quizzes and lessons, put them on your children's lists with a due date, add dates to the calendar and read the results, without you doing anything. It connects through MCP (Model Context Protocol).</value></data>
+  <data name="ApiKeys.Intro" xml:space="preserve"><value>With an API key, an AI assistant such as Claude can add your children, let a parent learn too, upload and change your quizzes and lessons, put them on your children's lists with a due date, add dates to the calendar and read the results, without you doing anything. It connects through MCP (Model Context Protocol).</value></data>
   <data name="ApiKeys.ReadOnly" xml:space="preserve"><value>read only</value></data>
   <data name="ApiKeys.ReadWrite" xml:space="preserve"><value>read and change</value></data>
   <data name="ApiKeys.CreatedOn" xml:space="preserve"><value>created {0}</value></data>
