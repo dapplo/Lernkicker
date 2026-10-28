@@ -1,4 +1,7 @@
-@* Shows one exercise of a quiz and records the child's answers in the draft. Quiz texts keep the quiz's language. *@
+@* Shows one exercise of a quiz and records the child's answers in the draft. Quiz texts keep the quiz's language.
+   Text fields record every keystroke (oninput), not only on blur: on phones the field often keeps focus while the
+   child taps "Next" or "Hand in", so a change event would come too late or never. Autocorrect and spellcheck are off,
+   so the keyboard does not suggest (and give away) the right spelling. *@
 
 <section class="exercise" lang="@Language">
     @if (!Game)
@@ -33,8 +36,8 @@
                         }
                         else
                         {
-                            <input class="gap" aria-label="@L["Exercise.Gap", index + 1]" autocomplete="off" autocapitalize="off" spellcheck="false"
-                                   value="@Draft.Texts[index]" @onchange="e => Set(index, e)" />
+                            <input class="gap" aria-label="@L["Exercise.Gap", index + 1]" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                   value="@Draft.Texts[index]" @oninput="e => Set(index, e)" />
                         }
                     }
                 }
@@ -111,7 +114,7 @@
                                 <span lang="@promptLanguage">@question.Prompt</span>
                                 <small class="vocab-to" lang="@UiLanguage.Current">→ @answerLanguage.ToUpperInvariant()</small>
                             </span>
-                            <input lang="@answerLanguage" autocomplete="off" autocapitalize="off" spellcheck="false" value="@Draft.Texts[index]" @onchange="e => Set(index, e)" />
+                            <input lang="@answerLanguage" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="@Draft.Texts[index]" @oninput="e => Set(index, e)" />
                         </label>
                         @if (!question.AsksWord)
                         {
@@ -132,7 +135,7 @@
                             {
                                 <span>@label</span>
                             }
-                            <input autocomplete="off" autocapitalize="off" spellcheck="false" value="@Draft.Texts[index]" @onchange="e => Set(index, e)" />
+                            <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="@Draft.Texts[index]" @oninput="e => Set(index, e)" />
                         </label>
                     </li>
                 }

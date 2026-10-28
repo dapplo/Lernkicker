@@ -1,6 +1,7 @@
 @page "/practice/{AssignmentId:guid}"
 @inject Api Api
 @inject NavigationManager Navigation
+@inject IJSRuntime Js
 
 <PageTitle>@L["Practice.Title"] · Lernkicker</PageTitle>
 
@@ -26,6 +27,7 @@ else
 {
     var draft = _drafts[_index];
     var open = _drafts.Sum(d => d.Open);
+    var last = _index == _drafts.Count - 1;
     <header class="practice-header">
         <a href="" class="close" aria-label="@L["Practice.ToOverview"]">✕</a>
         <span lang="@_sheet.Language">@_sheet.Title</span>
@@ -33,23 +35,40 @@ else
     <progress class="progress" max="@_drafts.Count" value="@(_index + 1)"></progress>
     <p class="counter">@L["Practice.Counter", _index + 1, _drafts.Count]</p>
 
-    <ExerciseView @key="draft" Draft="@draft" Language="@_sheet.Language" />
+    @* Every exercise as a number to jump to; open ones stand out, so nothing has to be searched by scrolling *@
+    <nav class="exercise-nav" aria-label="@L["Practice.Exercises"]">
+        @for (var i = 0; i < _drafts.Count; i++)
+        {
+            var number = i;
+            var missing = _drafts[number].Open;
+            <button type="button" class="@(number == _index ? "current" : "") @(missing > 0 ? "open" : "done")"
+                    aria-current="@(number == _index ? "step" : null)"
+                    aria-label="@(missing > 0 ? L["Practice.GoToOpen", number + 1, missing] : L["Practice.GoToDone", number + 1])"
+                    @onclick="() => Show(number)">@(number + 1)</button>
+        }
+    </nav>
 
-    <div class="buttons">
+    @* The answers live in the draft, which ExerciseView fills. Its events bubble up here, so the numbers above and
+       the "missing" hint below are redrawn with every answer instead of showing an old count. *@
+    <div @onclick="Changed" @oninput="Changed" @onchange="Changed">
+        <ExerciseView @key="draft" Draft="@draft" Language="@_sheet.Language" />
+    </div>
+
+    @if (last && open > 0)
+    {
+        <p class="hint">@(open == 1 ? L["Practice.OneOpen"] : L["Practice.SomeOpen", open])</p>
+    }
+    <div class="practice-bar">
         @if (_index > 0)
         {
-            <button class="btn quiet" @onclick="() => Go(-1)">@L["Common.Back"]</button>
+            <button class="btn quiet" @onclick="() => Show(_index - 1)">@L["Common.Back"]</button>
         }
-        @if (_index < _drafts.Count - 1)
+        @if (!last)
         {
-            <button class="btn" @onclick="() => Go(1)">@L["Practice.Next"]</button>
+            <button class="btn" @onclick="() => Show(_index + 1)">@L["Practice.Next"]</button>
         }
         else
         {
-            @if (open > 0)
-            {
-                <p class="hint">@(open == 1 ? L["Practice.OneOpen"] : L["Practice.SomeOpen", open])</p>
-            }
             <button class="btn goal" disabled="@_busy" @onclick="Submit">@L["Practice.Submit"]</button>
         }
     </div>
@@ -62,6 +81,7 @@ else
     private IReadOnlyList<string>? _errors;
     private int _index;
     private bool _busy;
+    private bool _scrollUp;
 
     [Parameter]
     public Guid AssignmentId { get; set; }
@@ -87,7 +107,26 @@ else
         }
     }
 
-    private void Go(int direction) => _index = Math.Clamp(_index + direction, 0, _drafts!.Count - 1);
+    private void Show(int index)
+    {
+        _index = Math.Clamp(index, 0, _drafts!.Count - 1);
+        // Otherwise the next exercise starts where the last one ended: far down, at the buttons
+        _scrollUp = true;
+    }
+
+    // Nothing to do: handling the event is what redraws the page
+    private void Changed()
+    {
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_scrollUp)
+        {
+            _scrollUp = false;
+            await Js.InvokeVoidAsync("lernkicker.scrollToTop");
+        }
+    }
 
     private async Task Submit()
     {
@@ -96,6 +135,7 @@ else
         {
             var answers = _drafts!.ToDictionary(d => d.Exercise.Id, d => d.ToAnswer());
             _result = await Api.Submit(AssignmentId, answers);
+            _scrollUp = true;
         }
         catch (ApiException e)
         {

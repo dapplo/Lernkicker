@@ -1,4 +1,6 @@
-@* The result of a handed-in quiz: score, stars and per exercise what was right and what the solution is. *@
+@inject IJSRuntime Js
+@* The result of a handed-in quiz: score, stars and per exercise what was right and what the solution is.
+   Exercises with mistakes are listed at the top to jump to, or the list can be cut down to them. *@
 
 <section class="result" lang="@Language">
     <div class="stars big" aria-label="@L["Stars.Label", StarCount]">@Display.Stars(StarCount)</div>
@@ -8,11 +10,31 @@
         <p class="praise" lang="@UiLanguage.Current">@Display.Praise(Result.Percent)</p>
     }
 
-    @foreach (var exercise in Result.Exercises)
+    @if (Mistakes.Count > 0)
     {
+        <nav class="mistakes" lang="@UiLanguage.Current" aria-label="@L["Result.Mistakes"]">
+            <span>@L["Result.Mistakes"]</span>
+            @foreach (var number in Mistakes)
+            {
+                <button type="button" aria-label="@L["Result.JumpTo", number]" @onclick="() => JumpTo(number)">@number</button>
+            }
+            <button type="button" class="filter" aria-pressed="@(_onlyMistakes ? "true" : "false")" @onclick="() => _onlyMistakes = !_onlyMistakes">
+                @(_onlyMistakes ? L["Result.ShowAll"] : L["Result.OnlyMistakes"])
+            </button>
+        </nav>
+    }
+
+    @for (var i = 0; i < Result.Exercises.Count; i++)
+    {
+        var exercise = Result.Exercises[i];
+        var number = i + 1;
         var full = exercise.Points == exercise.MaxPoints;
-        <article class="exercise-result @(full ? "full" : "")">
-            <h3>@exercise.Instruction <span class="points" lang="@UiLanguage.Current">@L["Points.Of", exercise.Points, exercise.MaxPoints]</span></h3>
+        if (full && _onlyMistakes)
+        {
+            continue;
+        }
+        <article class="exercise-result @(full ? "full" : "")" id="@Anchor(number)" @key="exercise.Id">
+            <h3><span class="number">@number.</span> @exercise.Instruction <span class="points" lang="@UiLanguage.Current">@L["Points.Of", exercise.Points, exercise.MaxPoints]</span></h3>
             <ul>
                 @foreach (var part in exercise.Parts)
                 {
@@ -52,6 +74,19 @@
 
     [Parameter]
     public bool ShowPraise { get; set; } = true;
+
+    private bool _onlyMistakes;
+
+    /// <summary>Numbers (from 1) of the exercises that did not get full points.</summary>
+    private List<int> Mistakes => Result.Exercises
+        .Select((exercise, index) => (exercise, number: index + 1))
+        .Where(e => e.exercise.Points < e.exercise.MaxPoints)
+        .Select(e => e.number)
+        .ToList();
+
+    private static string Anchor(int number) => $"result-{number}";
+
+    private ValueTask JumpTo(int number) => Js.InvokeVoidAsync("lernkicker.scrollToId", Anchor(number));
 
     // Same thresholds as the server's stars (50 / 70 / 90 %)
     private int StarCount => Result.Percent switch { >= 90 => 3, >= 70 => 2, >= 50 => 1, _ => 0 };

@@ -55,9 +55,12 @@
   <data name="Practice.ToOverview" xml:space="preserve"><value>Zur Übersicht</value></data>
   <data name="Practice.Counter" xml:space="preserve"><value>Aufgabe {0} von {1}</value></data>
   <data name="Practice.Next" xml:space="preserve"><value>Weiter</value></data>
-  <data name="Practice.OneOpen" xml:space="preserve"><value>Noch 1 Antwort fehlt. Du kannst trotzdem abgeben.</value></data>
-  <data name="Practice.SomeOpen" xml:space="preserve"><value>Noch {0} Antworten fehlen. Du kannst trotzdem abgeben.</value></data>
+  <data name="Practice.OneOpen" xml:space="preserve"><value>Noch 1 Antwort fehlt. Die gelben Nummern zeigen, wo. Du kannst trotzdem abgeben.</value></data>
+  <data name="Practice.SomeOpen" xml:space="preserve"><value>Noch {0} Antworten fehlen. Die gelben Nummern zeigen, wo. Du kannst trotzdem abgeben.</value></data>
   <data name="Practice.Submit" xml:space="preserve"><value>Abgeben</value></data>
+  <data name="Practice.Exercises" xml:space="preserve"><value>Aufgaben</value></data>
+  <data name="Practice.GoToOpen" xml:space="preserve"><value>Aufgabe {0}: {1} offen</value></data>
+  <data name="Practice.GoToDone" xml:space="preserve"><value>Aufgabe {0}: fertig</value></data>
   <data name="Points.Max" xml:space="preserve"><value>{0} Punkte</value></data>
   <data name="Points.Of" xml:space="preserve"><value>{0} / {1} Punkte</value></data>
   <data name="Exercise.Gap" xml:space="preserve"><value>Lücke {0}</value></data>
@@ -109,6 +112,10 @@
   <data name="Result.Total" xml:space="preserve"><value>{0} von {1} Punkten · Note {2}</value></data>
   <data name="Result.TotalWithoutMark" xml:space="preserve"><value>{0} von {1} Punkten</value></data>
   <data name="Result.CorrectWouldBe" xml:space="preserve"><value>Richtig wäre:</value></data>
+  <data name="Result.Mistakes" xml:space="preserve"><value>Fehler in:</value></data>
+  <data name="Result.JumpTo" xml:space="preserve"><value>Zu Aufgabe {0}</value></data>
+  <data name="Result.OnlyMistakes" xml:space="preserve"><value>Nur Fehler zeigen</value></data>
+  <data name="Result.ShowAll" xml:space="preserve"><value>Alle zeigen</value></data>
   <data name="Praise.Perfect" xml:space="preserve"><value>Super! Alles richtig!</value></data>
   <data name="Praise.Great" xml:space="preserve"><value>Sehr gut gemacht!</value></data>
   <data name="Praise.Good" xml:space="preserve"><value>Gut gemacht!</value></data>

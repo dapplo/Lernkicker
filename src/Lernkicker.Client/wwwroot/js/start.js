@@ -228,6 +228,10 @@
         scrollToId(id) {
             document.getElementById(id)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
         },
+
+        scrollToTop() {
+            window.scrollTo({ top: 0 });
+        },
     };
 
     Blazor.start({ applicationCulture: language });
