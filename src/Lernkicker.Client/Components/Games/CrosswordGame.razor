@@ -34,7 +34,7 @@
     <form class="cw-entry" @onsubmit="Enter" @onsubmit:preventDefault>
         <label>
             <span><strong lang="@UiLanguage.Current">@word.Number @(word.Down ? L["Crossword.Down"] : L["Crossword.Across"]):</strong> <span lang="@Language">@word.Clue</span></span>
-            <input @ref="_input" @bind="_entry" maxlength="@word.Answer.Length" autocomplete="off" autocapitalize="characters" spellcheck="false"
+            <input @ref="_input" @bind="_entry" @bind:event="oninput" maxlength="@word.Answer.Length" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
                    lang="@Language" placeholder="@L["Crossword.Letters", word.Answer.Length]" />
         </label>
         <button class="btn small" type="submit" lang="@UiLanguage.Current">@L["Crossword.Enter"]</button>

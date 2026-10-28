@@ -74,7 +74,7 @@ else
                 }
             </p>
             <form @onsubmit="Submit">
-                <input @ref="_input" lang="@Language(card.AsksWord)" autocomplete="off" autocapitalize="off" spellcheck="false"
+                <input @ref="_input" lang="@Language(card.AsksWord)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                        aria-label="@L["Exercise.Answer"]" readonly="@(_check is not null)" @bind="_typed" @bind:event="oninput" />
                 @if (_check is null)
                 {

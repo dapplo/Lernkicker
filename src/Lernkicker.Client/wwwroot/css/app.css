@@ -202,6 +202,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .practice-header .close { text-decoration: none; font-size: 1.3rem; color: var(--muted); }
 .progress { width: 100%; height: 10px; margin-top: 10px; accent-color: var(--green); }
 .counter { color: var(--muted); margin: 4px 0 12px; }
+/* Jump to any exercise; open ones in gold, finished ones in green */
+.exercise-nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.exercise-nav button {
+    min-width: 40px; min-height: 40px; padding: 4px 8px; border-radius: 999px; cursor: pointer;
+    font: inherit; font-weight: 600; color: var(--text); background: var(--paper); border: 2px solid var(--gold);
+}
+.exercise-nav button.done { border-color: var(--green); background: var(--green-light); }
+.exercise-nav button.current { outline: 3px solid var(--text); outline-offset: 1px; }
+/* Back / Next / Hand in stay in reach at the bottom of the screen instead of below a long exercise */
+.practice-bar {
+    position: sticky; bottom: 0; z-index: 1;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end;
+    margin: 16px 0 0; padding: 10px 0 max(10px, env(safe-area-inset-bottom));
+    background: var(--background); border-top: 1px solid var(--line);
+}
 
 .exercise { background: var(--paper); border-radius: var(--radius); padding: 18px; box-shadow: 0 1px 3px rgb(0 0 0 / 8%); }
 .exercise h2, .exercise-result h3 { display: flex; gap: 12px; align-items: baseline; }
@@ -499,6 +514,18 @@ input.gap { width: 9em; }
 .result .praise { text-align: center; color: var(--green-dark); font-weight: 600; }
 .exercise-result { background: var(--paper); border-radius: var(--radius); padding: 14px 16px; margin-top: 12px; border-left: 6px solid var(--red); }
 .exercise-result.full { border-left-color: var(--green); }
+.exercise-result { scroll-margin-top: 110px; }
+.exercise-result h3 .number { color: var(--muted); }
+.result .mistakes {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    position: sticky; top: 0; z-index: 1; margin: 12px 0 0; padding: 8px 0; background: var(--background);
+}
+.result .mistakes > span { font-weight: 600; margin-right: 4px; }
+.result .mistakes button {
+    min-width: 40px; min-height: 40px; padding: 4px 10px; border-radius: 999px; cursor: pointer;
+    font: inherit; font-weight: 600; color: var(--red); background: var(--red-light); border: 2px solid var(--red);
+}
+.result .mistakes button.filter { margin-left: auto; color: var(--green-dark); background: var(--paper); border-color: var(--line); font-weight: 400; }
 .exercise-result ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
 .exercise-result li { display: grid; grid-template-columns: 1.4em 1fr; }
 .exercise-result li small { grid-column: 2; color: var(--muted); }
