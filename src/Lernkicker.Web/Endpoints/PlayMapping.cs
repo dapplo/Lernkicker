@@ -39,6 +39,10 @@ public static class PlayMapping
             m.Last is { } a ? new MauMauActionDto(a.Seat, a.Kind, a.Card, a.Count, a.Suit) : null, m.Over),
         ChessView c => new ChessViewDto(
             c.Board, c.IAmWhite, c.WhiteToMove, c.Moves.Select(ToDto).ToList(), c.Check, c.Last?.ToDto(), c.Ending, c.Over),
+        ReactionView r => new ReactionViewDto(
+            r.Game, r.Round.Select(t => new ReactionTargetDto(t.Id, t.Place, t.At, t.Duration, t.Kind)).ToList(),
+            r.Seats.Select(s => new ReactionSeatDto(s.Played, s.Result is { } x ? new ReactionResultDto(x.Points, x.Hits, x.Wrong) : null, s.Out)).ToList(),
+            r.Over),
         _ => throw new NotSupportedException(view.GetType().Name),
     };
 
@@ -63,6 +67,7 @@ public static class PlayMapping
         MauMauDrawDto => new MauMauDraw(),
         MauMauPassDto => new MauMauPass(),
         ChessMoveRequestDto { From: { } from, To: { } to } chess => new ChessMove(from.ToDomain(), to.ToDomain(), chess.Promotion),
+        ReactionPlayDto { Hits: { } hits } => new ReactionPlay(hits.Where(h => h is not null).Select(h => new ReactionHit(h.Id, h.At)).ToList()),
         _ => null,
     };
 }

@@ -1,0 +1,77 @@
+@* A reaction game with others: everyone plays the same round when they like; the server scores the taps. Before the
+   own round the others' points stay hidden, so nobody knows what to beat. *@
+
+@if (Playing)
+{
+    <ReactionPlayer Game="@View.Game" Round="@View.Round" Done="Send" />
+}
+else
+{
+    var me = View.Seats[MySeat];
+    @if (me.Result is { } mine)
+    {
+        <div class="rx-result">
+            <div class="rx-result-points">@L["Reaction.YourPoints", mine.Points]</div>
+            <p>@L["Reaction.HitsAndWrong", mine.Hits, mine.Wrong]</p>
+        </div>
+    }
+    else if (_sending)
+    {
+        <p class="loading-text">@L["Common.OneMoment"]</p>
+    }
+
+    <ol class="rx-scores">
+        @foreach (var (seat, index) in Ranked)
+        {
+            var name = index == MySeat ? L["Play.You"].Value : Players.FirstOrDefault(p => p.Seat == index)?.Name ?? "?";
+            <li class="@(index == MySeat ? "me" : "")">
+                <span>@name</span>
+                <b>
+                    @(seat.Out ? L["Reaction.GaveUp"]
+                        : seat.Result is { } r ? L["Reaction.PointsShort", r.Points]
+                        : seat.Played ? L["Reaction.PlayedHidden"]
+                        : L["Reaction.NotPlayed"])
+                </b>
+            </li>
+        }
+    </ol>
+    @if (!View.Over && me.Result is not null)
+    {
+        <p class="hint">@L["Reaction.WaitForOthers"]</p>
+    }
+}
+
+@code {
+    private bool _sending;
+
+    [Parameter, EditorRequired]
+    public required ReactionViewDto View { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<SeatDto> Players { get; set; }
+
+    [Parameter]
+    public int MySeat { get; set; }
+
+    [Parameter]
+    public EventCallback<MoveDto> Move { get; set; }
+
+    private bool Playing => !_sending && !View.Over && !View.Seats[MySeat].Played && !View.Seats[MySeat].Out;
+
+    /// <summary>The seats with points first, best on top.</summary>
+    private IEnumerable<(ReactionSeatDto Seat, int Index)> Ranked =>
+        View.Seats.Select((s, i) => (s, i)).OrderByDescending(x => x.s.Result?.Points ?? -1).ThenBy(x => x.i);
+
+    private async Task Send(IReadOnlyList<ReactionHitDto> hits)
+    {
+        _sending = true;
+        try
+        {
+            await Move.InvokeAsync(new ReactionPlayDto(hits));
+        }
+        finally
+        {
+            _sending = false;
+        }
+    }
+}

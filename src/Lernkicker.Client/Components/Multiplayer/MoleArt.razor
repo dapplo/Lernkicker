@@ -1,0 +1,53 @@
+@* A mole, a golden mole or a hedgehog peeking out of a hole (drawn here, so it is ours to use) *@
+<svg class="rx-art" viewBox="0 0 100 100" aria-hidden="true">
+    @if (Kind == "hedgehog")
+    {
+        <g class="rx-spikes">
+            @for (var i = 0; i < 11; i++)
+            {
+                var a = Math.PI * (0.05 + 0.9 * i / 10);
+                var x = 50 - Math.Cos(a) * 46;
+                var y = 66 - Math.Sin(a) * 52;
+                <polygon points="@F(50 - Math.Cos(a - 0.16) * 30),@F(66 - Math.Sin(a - 0.16) * 34) @F(x),@F(y) @F(50 - Math.Cos(a + 0.16) * 30),@F(66 - Math.Sin(a + 0.16) * 34)" fill="#5c3d2e" />
+            }
+        </g>
+        <ellipse cx="50" cy="70" rx="34" ry="34" fill="#7a5233" />
+        <ellipse cx="50" cy="76" rx="22" ry="22" fill="#e9c9a0" />
+        <circle cx="41" cy="66" r="4" fill="#1d1d1d" />
+        <circle cx="59" cy="66" r="4" fill="#1d1d1d" />
+        <ellipse cx="50" cy="78" rx="6" ry="4.5" fill="#1d1d1d" />
+        <path d="M43 86 Q50 90 57 86" stroke="#1d1d1d" stroke-width="2" fill="none" />
+    }
+    else
+    {
+        var fur = Kind == "golden" ? "#f5b301" : "#6d4c41";
+        var belly = Kind == "golden" ? "#ffe8a3" : "#a1887f";
+        <ellipse cx="50" cy="72" rx="32" ry="36" fill="@fur" />
+        <ellipse cx="22" cy="44" rx="8" ry="7" fill="@fur" />
+        <ellipse cx="78" cy="44" rx="8" ry="7" fill="@fur" />
+        <ellipse cx="50" cy="82" rx="20" ry="22" fill="@belly" />
+        <circle cx="39" cy="58" r="5.5" fill="#fff" />
+        <circle cx="61" cy="58" r="5.5" fill="#fff" />
+        <circle cx="40" cy="59" r="3" fill="#1d1d1d" />
+        <circle cx="60" cy="59" r="3" fill="#1d1d1d" />
+        <ellipse cx="50" cy="70" rx="9" ry="6.5" fill="#f48fb1" />
+        <rect x="45" y="78" width="4.5" height="7" rx="1" fill="#fff" />
+        <rect x="50.5" y="78" width="4.5" height="7" rx="1" fill="#fff" />
+        <g stroke="#3e2723" stroke-width="1.5">
+            <line x1="38" y1="70" x2="22" y2="66" /><line x1="38" y1="73" x2="22" y2="75" />
+            <line x1="62" y1="70" x2="78" y2="66" /><line x1="62" y1="73" x2="78" y2="75" />
+        </g>
+        @if (Kind == "golden")
+        {
+            <polygon points="36,36 40,22 46,32 50,18 54,32 60,22 64,36" fill="#ffd43b" stroke="#c47f00" stroke-width="2" />
+        }
+    }
+</svg>
+
+@code {
+    /// <summary>"mole", "golden" or "hedgehog".</summary>
+    [Parameter, EditorRequired]
+    public required string Kind { get; set; }
+
+    private static string F(double v) => v.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+}

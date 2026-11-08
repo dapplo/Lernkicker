@@ -10,6 +10,7 @@ paths, ellipses, rectangles, solid and gradient fills, strokes, transforms) and 
 - explosion, splash: a hit and a miss, played once on the cell.
 - victory, defeat, draw: played once over any game's board when the game ends.
 - sparkle, poof: a winning line or a promotion, and a captured piece in board games.
+- bonk, pop, zap: the reaction games: a mole hit on the head, a balloon bursting, the reflex light turning green.
 """
 import json
 import math
@@ -390,9 +391,75 @@ def draw():
     return animation("draw", size, size, op, layers)
 
 
+def bonk():
+    """A mole is hit: an impact flash, short lines flying out and stars circling over its head."""
+    random.seed(23)
+    size, op, c = 200, 30, 100
+    layers = []
+    # Stars going round in a flat circle, like in a cartoon
+    for i in range(3):
+        phase = i * 120
+        star = group([star_shape(13, 5, 5), fill(rgb("#ffd43b")), stroke(rgb("#e67700"), 2)])
+        angle = [(t, phase + t * 14) for t in range(0, op + 1, 5)]
+        xs = [(t, c + math.cos(math.radians(a)) * 46) for t, a in angle]
+        ys = [(t, c - 40 + math.sin(math.radians(a)) * 12) for t, a in angle]
+        layers.append(layer(0, "star", [star], op, p=split_position(anim(xs, LINEAR), anim(ys, LINEAR)),
+                            s=anim([(0, [0, 0]), (5, [110, 110]), (op - 6, [100, 100]), (op, [0, 0])]),
+                            o=anim([(0, 100), (op - 6, 100), (op, 0)])))
+    for i in range(8):
+        a = 2 * math.pi * i / 8 + random.uniform(-0.15, 0.15)
+        line = group([path([[0, 0], [16, 0]], [[0, 0], [0, 0]], [[0, 0], [0, 0]]), stroke(rgb("#ffffff"), 5)],
+                     r=math.degrees(a))
+        layers.append(layer(0, "line", [line], op,
+                            p=split_position(anim([(0, c + math.cos(a) * 24), (10, c + math.cos(a) * 70)], OUT_EASE),
+                                             anim([(0, c + math.sin(a) * 24), (10, c + math.sin(a) * 70)], OUT_EASE)),
+                            o=anim([(0, 100), (6, 100), (11, 0)])))
+    burst = group([star_shape(52, 26, 8), fill(rgb("#fff3bf"))])
+    layers.append(layer(0, "burst", [burst], op, p=(c, c), s=anim([(0, [30, 30]), (5, [110, 110]), (10, [0, 0])], [OUT_EASE, IN_EASE])))
+    return animation("bonk", size, size, op, layers)
+
+
+def pop():
+    """A balloon bursts: a ring, shreds of rubber flying out and falling, a few sparks."""
+    random.seed(29)
+    size, op, c = 200, 28, 100
+    layers = []
+    for i in range(10):
+        a = 2 * math.pi * i / 10 + random.uniform(-0.2, 0.2)
+        dist = random.uniform(40, 75)
+        shred = group([polygon([(-6, -3), (6, -5), (5, 4), (-5, 3)]), fill(rgb(random.choice(["#e03131", "#f59f00", "#1c7ed6", "#ae3ec9", "#37b24d"])))],
+                      r=anim([(0, 0), (op, random.uniform(-360, 360))], LINEAR))
+        layers.append(layer(0, "shred", [shred], op,
+                            p=split_position(anim([(0, c), (op, c + math.cos(a) * dist)], OUT_EASE),
+                                             anim([(0, c), (12, c + math.sin(a) * dist), (op, c + math.sin(a) * dist + 30)], [OUT_EASE, IN_EASE])),
+                            o=anim([(0, 100), (op - 8, 100), (op, 0)])))
+    for i in range(6):
+        a = 2 * math.pi * i / 6 + 0.3
+        spark = group([star_shape(9, 3), fill(rgb("#ffffff"))])
+        layers.append(layer(0, "spark", [spark], op,
+                            p=split_position(anim([(0, c + math.cos(a) * 20), (10, c + math.cos(a) * 62)], OUT_EASE),
+                                             anim([(0, c + math.sin(a) * 20), (10, c + math.sin(a) * 62)], OUT_EASE)),
+                            s=anim([(0, [60, 60]), (5, [120, 120]), (12, [0, 0])])))
+    layers.append(layer(0, "ring", [group([ellipse(120, 120), stroke(rgb("#ffffff"), 4)])], op, p=(c, c),
+                        s=anim([(0, [15, 15]), (10, [100, 100])], OUT_EASE), o=anim([(0, 100), (10, 0)])))
+    return animation("pop", size, size, op, layers)
+
+
+def zap():
+    """The light turns green: a lightning bolt flashes up with a glow."""
+    size, op, c = 200, 20, 100
+    bolt = [group([polygon([(8, -70), (-34, 8), (-4, 8), (-14, 70), (34, -14), (4, -14), (20, -70)]), fill(rgb("#ffe066")),
+                   stroke(rgb("#ffffff"), 4)])]
+    layers = [layer(0, "bolt", bolt, op, p=(c, c), s=anim([(0, [40, 40]), (4, [115, 115]), (8, [100, 100]), (op, [100, 100])]),
+                    o=anim([(0, 100), (op - 8, 100), (op, 0)]))]
+    layers.append(layer(0, "glow", [group([ellipse(170, 170), fill(rgb("#d3f9d8"))])], op, p=(c, c),
+                        s=anim([(0, [30, 30]), (8, [100, 100])], OUT_EASE), o=anim([(0, 80), (op, 0)])))
+    return animation("zap", size, size, op, layers)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    for build in (sea, explosion, splash, victory, defeat, draw, sparkle, poof):
+    for build in (sea, explosion, splash, victory, defeat, draw, sparkle, poof, bonk, pop, zap):
         data = build()
         (OUT / f"{data['nm']}.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
         print(data["nm"], len(data["layers"]), "layers")

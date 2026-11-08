@@ -1,0 +1,143 @@
+@page "/play/alone/{Game}"
+@using Lernkicker.Client.Reaction
+@inject Api Api
+@inject NavigationManager Navigation
+@inject IJSRuntime Js
+
+@* A reaction game alone: the round is made and scored on the device (the same rules as with others) and the best
+   points are kept on the device. Only for games a parent unlocked. *@
+
+<PageTitle>@L[$"Play.Game.{Game}"] · Lernkicker</PageTitle>
+
+<header class="practice-header">
+    <a href="play" class="close" aria-label="@L["Play.BackToLobby"]">✕</a>
+    <span>@L["Play.Alone"]</span>
+</header>
+
+@if (!_allowed)
+{
+    <p class="loading-text">@L["Common.OneMoment"]</p>
+}
+else
+{
+    <h1><span aria-hidden="true">@PlayGames.Icon(Game)</span> @L[$"Play.Game.{Game}"]</h1>
+    @if (_result is { } result)
+    {
+        <div class="match-board">
+            <div class="rx-result">
+                <div class="rx-result-points">@L["Reaction.YourPoints", result.Points]</div>
+                <p>@L["Reaction.HitsAndWrong", result.Hits, result.Wrong]</p>
+                <p class="rx-best">@(_newBest ? L["Reaction.NewBest"] : L["Reaction.Best", _best ?? result.Points])</p>
+            </div>
+            @if (_newBest)
+            {
+                <div class="game-ending victory" data-lottie="victory" aria-hidden="true"></div>
+            }
+        </div>
+        <div class="buttons">
+            <button class="btn" @onclick="Again">@L["Reaction.Again"]</button>
+            <a class="btn quiet" href="play">@L["Play.BackToLobby"]</a>
+        </div>
+    }
+    else
+    {
+        <div class="match-board">
+            <ReactionPlayer @key="_attempt" Game="@Game" Round="@_round" Done="Finished" />
+        </div>
+        @if (_best is { } best)
+        {
+            <p class="hint">@L["Reaction.Best", best]</p>
+        }
+    }
+
+    <details class="play-rules">
+        <summary>@L["Reaction.HowToPlay"]</summary>
+        @foreach (var line in L[$"Play.Rules.{Game}"].Value.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            <p>@line</p>
+        }
+    </details>
+}
+
+@code {
+    private bool _allowed;
+    private int _attempt;
+    private IReadOnlyList<ReactionTargetDto> _round = [];
+    private ReactionResult? _result;
+    private int? _best;
+    private bool _newBest;
+
+    [Parameter]
+    public string Game { get; set; } = "";
+
+    private string BestKey => $"lk-best-{Game}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _allowed = false;
+        try
+        {
+            var lobby = await Api.Lobby();
+            if (lobby is null || !PlayGames.CanPlayAlone(Game) || !lobby.Games.Contains(Game))
+            {
+                Navigation.NavigateTo(lobby is null ? "" : "play");
+                return;
+            }
+        }
+        catch (ApiException)
+        {
+            Navigation.NavigateTo("play");
+            return;
+        }
+
+        _best = await Best();
+        NewRound();
+        _allowed = true;
+    }
+
+    private void NewRound()
+    {
+        _round = ReactionRounds.Round(Game, Random.Shared).Select(t => new ReactionTargetDto(t.Id, t.Place, t.At, t.Duration, t.Kind)).ToList();
+        _attempt++;
+        _result = null;
+        _newBest = false;
+    }
+
+    private void Again() => NewRound();
+
+    private async Task Finished(IReadOnlyList<ReactionHitDto> hits)
+    {
+        var round = _round.Select(t => new ReactionTarget(t.Id, t.Place, t.At, t.Duration, t.Kind)).ToList();
+        _result = ReactionRounds.Score(round, hits.Select(h => new ReactionHit(h.Id, h.At)));
+        _newBest = _result.Points > 0 && (_best is null || _result.Points > _best);
+        if (_newBest)
+        {
+            _best = _result.Points;
+            await Remember(_result.Points);
+        }
+    }
+
+    private async Task<int?> Best()
+    {
+        try
+        {
+            return int.TryParse(await Js.InvokeAsync<string?>("localStorage.getItem", BestKey), out var best) ? best : null;
+        }
+        catch (JSException)
+        {
+            return null;
+        }
+    }
+
+    private async Task Remember(int points)
+    {
+        try
+        {
+            await Js.InvokeVoidAsync("localStorage.setItem", BestKey, points.ToString());
+        }
+        catch (JSException)
+        {
+            // Private mode: the best points are not kept, the game still works
+        }
+    }
+}

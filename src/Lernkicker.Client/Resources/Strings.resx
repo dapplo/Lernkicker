@@ -604,6 +604,49 @@
   <data name="Play.Game.chess" xml:space="preserve"><value>Chess</value></data>
   <data name="Play.Draw" xml:space="preserve"><value>Draw</value></data>
   <data name="Play.SeatsTaken" xml:space="preserve"><value>{0} of {1} players</value></data>
+  <data name="Play.Game.moles" xml:space="preserve"><value>Whack the mole</value></data>
+  <data name="Play.Game.balloons" xml:space="preserve"><value>Pop the balloons</value></data>
+  <data name="Play.Game.reflex" xml:space="preserve"><value>Lightning fast</value></data>
+  <data name="Play.About.moles" xml:space="preserve"><value>Tap the moles as they pop out of their holes, but leave the hedgehogs alone!</value></data>
+  <data name="Play.About.balloons" xml:space="preserve"><value>Pop the balloons before they fly away, but not the black ones!</value></data>
+  <data name="Play.About.reflex" xml:space="preserve"><value>Wait for the green light, then tap as fast as you can.</value></data>
+  <data name="Play.Rules.moles" xml:space="preserve"><value>Moles pop out of nine holes for 30 seconds. Tap a mole while you can see it: 10 points.
+A golden mole with a crown is quick and worth 25 points.
+Hedgehogs are prickly: tapping one costs 15 points.
+Everyone at the table gets the same moles. Whoever has the most points when everyone has played wins. You can also play alone and beat your best score.</value></data>
+  <data name="Play.Rules.balloons" xml:space="preserve"><value>For 30 seconds balloons float up into the sky. Tap a balloon to pop it: 10 points.
+Golden balloons with a star rise fastest and are worth 25 points.
+Black balloons are grumpy: popping one costs 15 points.
+Everyone at the table gets the same balloons. Whoever has the most points when everyone has played wins. You can also play alone and beat your best score.</value></data>
+  <data name="Play.Rules.reflex" xml:space="preserve"><value>The light is red. Wait! When it turns green, tap it as fast as you can.
+The quicker you are, the more points you get: up to 100 per light. Tapping while it is still red is too early and brings nothing.
+There are six lights. Everyone at the table waits the same times. Whoever has the most points when everyone has played wins. You can also play alone and beat your best score.</value></data>
+  <data name="Play.Alone" xml:space="preserve"><value>Play alone</value></data>
+  <data name="Reaction.Start" xml:space="preserve"><value>I'm ready!</value></data>
+  <data name="Reaction.Go" xml:space="preserve"><value>Go!</value></data>
+  <data name="Reaction.Points" xml:space="preserve"><value>{0} points</value></data>
+  <data name="Reaction.LightRound" xml:space="preserve"><value>Light {0} of {1}</value></data>
+  <data name="Reaction.Hole" xml:space="preserve"><value>Hole {0}</value></data>
+  <data name="Reaction.Kind.balloon" xml:space="preserve"><value>Balloon</value></data>
+  <data name="Reaction.Kind.goldenBalloon" xml:space="preserve"><value>Golden balloon</value></data>
+  <data name="Reaction.Kind.blackBalloon" xml:space="preserve"><value>Black balloon</value></data>
+  <data name="Reaction.Wait" xml:space="preserve"><value>Wait …</value></data>
+  <data name="Reaction.Tap" xml:space="preserve"><value>Now!</value></data>
+  <data name="Reaction.TooEarly" xml:space="preserve"><value>Too early!</value></data>
+  <data name="Reaction.TooSlow" xml:space="preserve"><value>Too slow!</value></data>
+  <data name="Reaction.Milliseconds" xml:space="preserve"><value>{0} ms: +{1}</value></data>
+  <data name="Reaction.TimeUp" xml:space="preserve"><value>Time's up!</value></data>
+  <data name="Reaction.YourPoints" xml:space="preserve"><value>You scored {0} points</value></data>
+  <data name="Reaction.HitsAndWrong" xml:space="preserve"><value>{0} hits, {1} wrong</value></data>
+  <data name="Reaction.PointsShort" xml:space="preserve"><value>{0} points</value></data>
+  <data name="Reaction.PlayedHidden" xml:space="preserve"><value>has played</value></data>
+  <data name="Reaction.NotPlayed" xml:space="preserve"><value>not played yet</value></data>
+  <data name="Reaction.GaveUp" xml:space="preserve"><value>gave up</value></data>
+  <data name="Reaction.WaitForOthers" xml:space="preserve"><value>As soon as everyone has played, you will see who won.</value></data>
+  <data name="Reaction.NewBest" xml:space="preserve"><value>New best score!</value></data>
+  <data name="Reaction.Best" xml:space="preserve"><value>Your best: {0} points</value></data>
+  <data name="Reaction.Again" xml:space="preserve"><value>Play again</value></data>
+  <data name="Reaction.HowToPlay" xml:space="preserve"><value>How to play</value></data>
   <data name="Play.WaitingHintMany" xml:space="preserve"><value>Up to the full table can join. Once at least {0} are here, you can start; whoever opened the game decides when.</value></data>
   <data name="Play.StartNow" xml:space="preserve"><value>Start now</value></data>
   <data name="ConnectFour.YourTurn" xml:space="preserve"><value>Tap a column to drop your disc. Four in a row wins, across, down or slanting.</value></data>

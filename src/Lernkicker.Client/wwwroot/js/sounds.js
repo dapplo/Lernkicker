@@ -118,6 +118,38 @@
         lose(ctx, t) {
             [392, 330, 262].forEach((f, i) => tone(ctx, t + i * 0.25, 0.35, 'triangle', f, f * 0.97, 0.25));
         },
+        // Reaction games: a mole is hit on the head (a hollow knock)
+        bonk(ctx, t) {
+            tone(ctx, t, 0.12, 'square', 420, 160, 0.12);
+            noiseBurst(ctx, t, 0.08, 'lowpass', 1800, 300, 0.2);
+        },
+        // A golden mole or balloon: a bright double chime
+        gold(ctx, t) {
+            tone(ctx, t, 0.12, 'triangle', 988, 988, 0.22);
+            tone(ctx, t + 0.09, 0.3, 'triangle', 1319, 1319, 0.22);
+        },
+        // A balloon bursts: a sharp crack of noise
+        pop(ctx, t) {
+            noiseBurst(ctx, t, 0.09, 'highpass', 3000, 900, 0.5, 0.002);
+            tone(ctx, t, 0.05, 'sine', 900, 200, 0.15);
+        },
+        // Ouch: a hedgehog or a black balloon (a low buzz going down)
+        ouch(ctx, t) {
+            tone(ctx, t, 0.3, 'sawtooth', 220, 110, 0.12);
+        },
+        // The light turns green
+        go(ctx, t) {
+            tone(ctx, t, 0.15, 'sine', 880, 880, 0.25);
+        },
+        // Tapped before the light turned green
+        early(ctx, t) {
+            tone(ctx, t, 0.12, 'square', 180, 170, 0.1);
+            tone(ctx, t + 0.15, 0.18, 'square', 160, 150, 0.1);
+        },
+        // The countdown before a round
+        tick(ctx, t) {
+            tone(ctx, t, 0.06, 'sine', 660, 660, 0.15);
+        },
     };
 
     function stored() {

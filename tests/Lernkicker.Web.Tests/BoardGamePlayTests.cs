@@ -126,6 +126,44 @@ public sealed class BoardGamePlayTests(LernkickerFactory factory) : IClassFixtur
         Assert.Equal(view.IAmWhite ? 1 : 0, end.Match.Winner);
     }
 
+    [Fact]
+    public async Task Both_play_the_same_mole_round_and_the_server_scores_the_taps()
+    {
+        var parent = await factory.NewFamilyAsync("moles@example.org");
+        var calvin = await TestData.CreateChildAsync(parent);
+        var lena = await TestData.CreateChildAsync(parent, "Lena");
+        await UnlockAsync(parent, calvin.Id, "moles");
+        await UnlockAsync(parent, lena.Id, "moles");
+        var phones = new[] { await TestData.ChildPhoneAsync(factory, parent, calvin.Id), await TestData.ChildPhoneAsync(factory, parent, lena.Id) };
+
+        var table = await LernkickerFactory.Json<MatchDto>(await phones[0].PostAsJsonAsync("/api/play/tables", new NewTable("moles")));
+        Assert.Equal((4, 2), (table.Match.Seats, table.Match.MinPlayers));
+        var id = table.Match.Id;
+        await LernkickerFactory.Json<MatchDto>(await phones[1].PostAsync($"/api/play/tables/{id}/join", null));
+        var started = await LernkickerFactory.Json<MatchDto>(await phones[0].PostAsync($"/api/play/tables/{id}/start", null));
+        var view = Assert.IsType<ReactionViewDto>(started.View);
+        Assert.Equal(("moles", 2), (view.Game, view.Seats.Count));
+
+        // Calvin hits every mole; claiming a mole that is not there, or at the wrong time, counts for nothing
+        var moles = view.Round.Where(t => t.Kind is "mole" or "golden").ToList();
+        List<ReactionHitDto> taps = [.. moles.Select(t => new ReactionHitDto(t.Id, t.At + 50)), new(999, 100), new(moles[0].Id, 0)];
+        var played = await LernkickerFactory.Json<MatchDto>(await phones[0].PostAsJsonAsync<MoveDto>($"/api/play/matches/{id}/moves", new ReactionPlayDto(taps)));
+        var mine = ((ReactionViewDto)played.View!).Seats[0].Result!;
+        Assert.Equal(moles.Count, mine.Hits);
+        Assert.Equal(moles.Sum(t => t.Kind == "golden" ? 25 : 10), mine.Points);
+        Assert.False(played.Match.MyTurn);
+
+        var lenas = (ReactionViewDto)(await LernkickerFactory.Json<MatchDto>(await phones[1].GetAsync($"/api/play/matches/{id}"))).View!;
+        Assert.Equal(view.Round, lenas.Round);
+        Assert.True(lenas.Seats[0].Played);
+        Assert.Null(lenas.Seats[0].Result);
+
+        var end = await LernkickerFactory.Json<MatchDto>(await phones[1].PostAsJsonAsync<MoveDto>(
+            $"/api/play/matches/{id}/moves", new ReactionPlayDto([new(moles[0].Id, moles[0].At + 10)])));
+        Assert.Equal(("finished", 0), (end.Match.Status, end.Match.Winner));
+        Assert.Equal(mine.Points, ((ReactionViewDto)end.View!).Seats[0].Result!.Points);
+    }
+
     /// <summary>Two siblings at a table for two: the second one joining starts the game. The view is seat 0's.</summary>
     private async Task<(HttpClient[] Phones, Guid Id, T View)> StartAsync<T>(string email, string game) where T : GameViewDto
     {

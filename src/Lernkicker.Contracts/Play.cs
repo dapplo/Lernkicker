@@ -45,6 +45,7 @@ public sealed record MatchDto(MatchOverview Match, GameViewDto? View, int? Resig
 [JsonDerivedType(typeof(CheckersViewDto), "checkers")]
 [JsonDerivedType(typeof(MauMauViewDto), "mauMau")]
 [JsonDerivedType(typeof(ChessViewDto), "chess")]
+[JsonDerivedType(typeof(ReactionViewDto), "reaction")]
 public abstract record GameViewDto;
 
 /// <summary>A square on a board: column and row (row 0 is the top).</summary>
@@ -101,6 +102,25 @@ public sealed record ChessViewDto(
     IReadOnlyList<string> Board, bool IAmWhite, bool WhiteToMove, IReadOnlyList<ChessMoveDto> Moves, bool Check,
     ChessMoveDto? Last, string? Ending, bool Over) : GameViewDto;
 
+/// <summary>
+/// Something to tap in a reaction game: the hole (moles) or lane (balloons) in <c>Place</c>, shown from <c>At</c>
+/// for <c>Duration</c> milliseconds after the round starts (in the reflex game: how long the light stays red, and
+/// the slowest reaction that counts). <c>Kind</c>: "mole", "golden", "hedgehog", "balloon", "goldenBalloon",
+/// "blackBalloon" or "light".
+/// </summary>
+public sealed record ReactionTargetDto(int Id, int Place, int At, int Duration, string Kind);
+
+public sealed record ReactionResultDto(int Points, int Hits, int Wrong);
+
+/// <summary><c>Result</c> shows once the own round is played (or the game is over); <c>Out</c>: gave up.</summary>
+public sealed record ReactionSeatDto(bool Played, ReactionResultDto? Result, bool Out);
+
+/// <summary>
+/// A reaction game ("moles", "balloons" or "reflex"): the round every player plays, and the seats. The server scores
+/// the taps; the most points win.
+/// </summary>
+public sealed record ReactionViewDto(string Game, IReadOnlyList<ReactionTargetDto> Round, IReadOnlyList<ReactionSeatDto> Seats, bool Over) : GameViewDto;
+
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(BattleshipPlaceDto), "battleship.place")]
 [JsonDerivedType(typeof(BattleshipShootDto), "battleship.shoot")]
@@ -110,6 +130,7 @@ public sealed record ChessViewDto(
 [JsonDerivedType(typeof(MauMauDrawDto), "mauMau.draw")]
 [JsonDerivedType(typeof(MauMauPassDto), "mauMau.pass")]
 [JsonDerivedType(typeof(ChessMoveRequestDto), "chess.move")]
+[JsonDerivedType(typeof(ReactionPlayDto), "reaction.play")]
 public abstract record MoveDto;
 
 public sealed record BattleshipPlaceDto(IReadOnlyList<ShipDto> Ships) : MoveDto;
@@ -128,6 +149,12 @@ public sealed record MauMauDrawDto : MoveDto;
 public sealed record MauMauPassDto : MoveDto;
 
 public sealed record ChessMoveRequestDto(CellDto From, CellDto To, string? Promotion = null) : MoveDto;
+
+/// <summary>A tap on target <c>Id</c>, <c>At</c> ms into the round (reflex: the reaction time, -1 for too early).</summary>
+public sealed record ReactionHitDto(int Id, int At);
+
+/// <summary>The own round of a reaction game: every tap, in order.</summary>
+public sealed record ReactionPlayDto(IReadOnlyList<ReactionHitDto> Hits) : MoveDto;
 
 /// <summary>
 /// The live connection of the play pages (SignalR). The server only says that something changed; the page then
