@@ -333,3 +333,133 @@ public class ChessTests
         return new Chess.Position(board, parts[1] == "w", parts[2] == "-" ? "" : parts[2], enPassant, 0);
     }
 }
+
+public class NumberTowersTests
+{
+    private static readonly NumberTowers Rules = new();
+
+    [Fact]
+    public void Everyone_gets_a_stock_and_the_first_player_five_cards()
+    {
+        var state = Rules.Start(3, new Random(7));
+        var turn = Rules.ToMove(state).Single();
+        var views = Enumerable.Range(0, 3).Select(seat => (NumberTowersView)Rules.View(state, seat)).ToList();
+        Assert.All(views, v => Assert.All(v.Seats, s => Assert.Equal(NumberTowers.StockSize, s.StockCount)));
+        Assert.Equal(5, views[turn].Hand.Count);
+        Assert.All(views.Where((_, seat) => seat != turn), v => Assert.Empty(v.Hand));
+        Assert.Equal(162 - 3 * NumberTowers.StockSize - 5, views[0].DeckSize);
+        Assert.Equal([0, 0, 0, 0], views[0].Towers);
+    }
+
+    [Fact]
+    public void Towers_go_up_one_by_one_and_stars_fit_anywhere()
+    {
+        var state = With(stocks: [[9, 3], [5]], hands: [[1, 2, 0, 7, 7], []]);
+        Assert.Equal(GameErrors.CardDoesNotFit, Rules.Play(state, 0, new NumberTowersPlay("hand", 0, Card: 2)).Error);
+        Assert.Equal(GameErrors.MoveInvalid, Rules.Play(state, 0, new NumberTowersPlay("hand", 0, Card: 4)).Error);
+        Assert.Equal(GameErrors.NotYourTurn, Rules.Play(state, 1, new NumberTowersPlay("stock", 0)).Error);
+
+        state = Ok(Rules.Play(state, 0, new NumberTowersPlay("hand", 0, Card: 1)));
+        state = Ok(Rules.Play(state, 0, new NumberTowersPlay("hand", 0, Card: 2)));
+        state = Ok(Rules.Play(state, 0, new NumberTowersPlay("stock", 0)));
+        state = Ok(Rules.Play(state, 0, new NumberTowersPlay("hand", 1, Card: 0)));
+        var view = (NumberTowersView)Rules.View(state, 0);
+        Assert.Equal([3, 1, 0, 0], view.Towers);
+        Assert.Equal([3, 0, 0, 0], view.TowerTops);
+        Assert.Equal(9, view.Seats[0].StockTop);
+        Assert.Equal([7, 7], view.Hand);
+    }
+
+    [Fact]
+    public void Discarding_ends_the_turn_and_the_next_player_fills_the_hand()
+    {
+        var state = With(stocks: [[9], [5]], hands: [[7, 8], [1]]);
+        state = Ok(Rules.Play(state, 0, new NumberTowersDiscard(7, 2)));
+        Assert.Equal([1], Rules.ToMove(state));
+        var view = (NumberTowersView)Rules.View(state, 1);
+        Assert.Equal(5, view.Hand.Count);
+        Assert.Equal([7], view.Seats[0].Discards[2]);
+
+        // The top of a discard pile can be played later
+        state = With(stocks: [[9], [5]], hands: [[4], [1]], discards: [[[], [1], [], []], [[], [], [], []]]);
+        state = Ok(Rules.Play(state, 0, new NumberTowersPlay("discard", 3, Pile: 1)));
+        Assert.Equal(1, ((NumberTowersView)Rules.View(state, 0)).Towers[3]);
+    }
+
+    [Fact]
+    public void A_full_tower_is_cleared_and_an_empty_hand_draws_five_new_cards()
+    {
+        var state = With(stocks: [[9], [5]], hands: [[12], []], towers: [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], [], [], []]);
+        var step = Rules.Play(state, 0, new NumberTowersPlay("hand", 0, Card: 12));
+        var view = (NumberTowersView)Rules.View(Ok(step), 0);
+        Assert.Equal(0, view.Towers[0]);
+        Assert.Equal(5, view.Hand.Count);
+        Assert.True(view.Last!.Done);
+    }
+
+    [Fact]
+    public void The_first_with_an_empty_stock_wins_and_giving_up_leaves_the_others_playing()
+    {
+        var state = With(stocks: [[1], [5], [6]], hands: [[3], [2], [4]]);
+        var resigned = Rules.Resign(state, 2);
+        Assert.False(resigned.Over);
+        Assert.Equal([0], Rules.ToMove(resigned.State!));
+
+        var won = Rules.Play(resigned.State!, 0, new NumberTowersPlay("stock", 0));
+        Assert.Equal(0, won.Winner);
+        Assert.True(won.Over);
+    }
+
+    [Theory]
+    [InlineData(2, 1)]
+    [InlineData(3, 2)]
+    [InlineData(4, 3)]
+    public void A_simple_strategy_plays_a_whole_game_to_the_end(int players, int seed)
+    {
+        var state = Rules.Start(players, new Random(seed));
+        for (var moves = 0; moves < 5000; moves++)
+        {
+            var turn = Rules.ToMove(state).Single();
+            var view = (NumberTowersView)Rules.View(state, turn);
+            var tower = (int card) => Enumerable.Range(0, 4).FirstOrDefault(t => NumberTowers.Fits(card, view.Towers[t]), -1);
+            var pile = view.Seats[turn].Discards.Select((p, i) => (p, i)).FirstOrDefault(x => x.p.Count > 0 && x.p[^1] != 0 && tower(x.p[^1]) >= 0, (null!, -1)).Item2;
+            GameMove move = view.Seats[turn].StockTop is { } top && tower(top) >= 0 ? new NumberTowersPlay("stock", tower(top))
+                : view.Hand.FirstOrDefault(c => c != 0 && tower(c) >= 0, -1) is var hand and >= 0 ? new NumberTowersPlay("hand", tower(hand), hand)
+                : pile >= 0 ? new NumberTowersPlay("discard", tower(view.Seats[turn].Discards[pile][^1]), Pile: pile)
+                : view.Hand.Count > 0 ? new NumberTowersDiscard(view.Hand.Max(), view.Hand.Max() % 4)
+                : new NumberTowersPass();
+            var step = Rules.Play(state, turn, move);
+            state = Ok(step);
+            if (step.Over)
+            {
+                Assert.NotNull(step.Winner);
+                Assert.Equal(0, ((NumberTowersView)Rules.View(state, 0)).Seats[step.Winner!.Value].StockCount);
+                return;
+            }
+        }
+
+        Assert.Fail("The game did not end.");
+    }
+
+    private static string Ok(GameStep step)
+    {
+        Assert.True(step.IsValid, step.Error);
+        return step.State!;
+    }
+
+    private static string With(List<int>[] stocks, List<int>[] hands, List<int>[][]? discards = null, List<int>[]? towers = null) =>
+        JsonSerializer.Serialize(new
+        {
+            stocks,
+            hands,
+            discards = discards ?? stocks.Select(_ => new[] { new List<int>(), [], [], [] }).ToArray(),
+            towers = towers ?? [[], [], [], []],
+            deck = Enumerable.Range(1, 12).SelectMany(n => Enumerable.Repeat(n, 3)).ToList(),
+            done = Array.Empty<int>(),
+            turn = 0,
+            @out = Array.Empty<int>(),
+            last = (object?)null,
+            over = false,
+            seed = 1,
+        }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+}

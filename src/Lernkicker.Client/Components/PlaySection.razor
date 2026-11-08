@@ -19,7 +19,7 @@
                 {
                     <label class="check">
                         <input type="checkbox" checked="@_games.Contains(game)" @onchange="e => Toggle(_games, game, e)" />
-                        <span><span aria-hidden="true">@PlayGames.Icon(game)</span> @L[$"Play.Game.{game}"]</span>
+                        <span><span aria-hidden="true">@PlayGames.Icon(game)</span> @L[$"Play.Game.{game}"] <small>@L[$"Play.About.{game}"]</small></span>
                     </label>
                 }
             </fieldset>

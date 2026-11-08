@@ -80,7 +80,7 @@ Then open http://localhost:8080 and create the admin on the setup page. Login co
 | `/practice/<assignment>` | child | One exercise per screen, hand in, result with solutions |
 | `/learn/<assignment>` | child | Read and practise learning material: poem (read, practise, recite), flashcards, vocabulary (list, cards, write, read aloud), facts, entries to look up; mark parts as known (or jump between parts in a reference lesson) |
 | `/play` | child | Play together: the games the parents unlocked, open tables to join, own games (with "your turn"), who is around |
-| `/play/<match>` | child | One game with others: battleship, Connect Four, checkers, Mau-Mau (2 to 5 players) or chess; updates live |
+| `/play/<match>` | child | One game with others: battleship, Connect Four, checkers, Mau-Mau (2 to 5 players), chess or Number Towers (2 to 4); updates live. Each game has its rules under "How to play" |
 | `/parents` | parent | Login, children, add a child or adult |
 | `/parents/account` | parent | Connect Telegram, API keys for AI assistants (MCP), privacy, log out |
 | `/parents/quizzes` | parent | Upload (JSON with its pictures, a zip, or paste), preview, share and delete quizzes |

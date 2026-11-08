@@ -39,6 +39,10 @@ public static class PlayMapping
             m.Last is { } a ? new MauMauActionDto(a.Seat, a.Kind, a.Card, a.Count, a.Suit) : null, m.Over),
         ChessView c => new ChessViewDto(
             c.Board, c.IAmWhite, c.WhiteToMove, c.Moves.Select(ToDto).ToList(), c.Check, c.Last?.ToDto(), c.Ending, c.Over),
+        NumberTowersView t => new NumberTowersViewDto(
+            t.Hand, t.Seats.Select(p => new NumberTowersSeatDto(p.Seat, p.StockTop, p.StockCount, p.HandCount, p.Discards)).ToList(),
+            t.Towers, t.TowerTops, t.Turn, t.DeckSize, t.Out,
+            t.Last is { } a ? new NumberTowersActionDto(a.Seat, a.Kind, a.Card, a.From, a.Tower, a.Pile, a.Done) : null, t.Over),
         _ => throw new NotSupportedException(view.GetType().Name),
     };
 
@@ -63,6 +67,9 @@ public static class PlayMapping
         MauMauDrawDto => new MauMauDraw(),
         MauMauPassDto => new MauMauPass(),
         ChessMoveRequestDto { From: { } from, To: { } to } chess => new ChessMove(from.ToDomain(), to.ToDomain(), chess.Promotion),
+        NumberTowersPlayDto { From: { } from } play => new NumberTowersPlay(from, play.Tower, play.Card, play.Pile),
+        NumberTowersDiscardDto discard => new NumberTowersDiscard(discard.Card, discard.Pile),
+        NumberTowersPassDto => new NumberTowersPass(),
         _ => null,
     };
 }

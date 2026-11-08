@@ -126,6 +126,47 @@ public sealed class BoardGamePlayTests(LernkickerFactory factory) : IClassFixtur
         Assert.Equal(view.IAmWhite ? 1 : 0, end.Match.Winner);
     }
 
+    [Fact]
+    public async Task Number_towers_are_played_until_someone_empties_the_stock()
+    {
+        var (phones, id, first) = await StartAsync<NumberTowersViewDto>("towers@example.org", "numberTowers");
+        Assert.All(first.Seats, s => Assert.Equal(20, s.StockCount));
+        Assert.Equal([0, 0, 0, 0], first.Towers);
+
+        // Each turn: play whatever fits (stock first), then discard the highest hand card; give up after a long time
+        MatchDto state = null!;
+        for (var moves = 0; moves < 3000; moves++)
+        {
+            state = await LernkickerFactory.Json<MatchDto>(await phones[0].GetAsync($"/api/play/matches/{id}"));
+            if (state.Match.Status == "finished")
+            {
+                break;
+            }
+
+            var turn = ((NumberTowersViewDto)state.View!).Turn;
+            var view = (NumberTowersViewDto)(await LernkickerFactory.Json<MatchDto>(await phones[turn].GetAsync($"/api/play/matches/{id}"))).View!;
+            Assert.Equal(view.Hand.Count, view.Seats[turn].HandCount);
+            var me = view.Seats[turn];
+            var tower = (int card) => Enumerable.Range(0, 4).FirstOrDefault(t => card == 0 || view.Towers[t] + 1 == card, -1);
+            MoveDto move = me.StockTop is { } top && tower(top) >= 0 ? new NumberTowersPlayDto("stock", tower(top))
+                : view.Hand.FirstOrDefault(c => c != 0 && tower(c) >= 0, -1) is var hand and >= 0 ? new NumberTowersPlayDto("hand", tower(hand), Card: hand)
+                : view.Hand.Count > 0 ? new NumberTowersDiscardDto(view.Hand.Max(), moves % 4)
+                : new NumberTowersPassDto();
+            await LernkickerFactory.Json<MatchDto>(await phones[turn].PostAsJsonAsync($"/api/play/matches/{id}/moves", move));
+        }
+
+        if (state.Match.Status != "finished")
+        {
+            state = await LernkickerFactory.Json<MatchDto>(await phones[1].PostAsync($"/api/play/matches/{id}/resign", null));
+            Assert.Equal(0, state.Match.Winner);
+        }
+
+        Assert.Equal("finished", state.Match.Status);
+        Assert.NotNull(state.Match.Winner);
+        var refused = await phones[0].PostAsJsonAsync<MoveDto>($"/api/play/matches/{id}/moves", new NumberTowersPassDto());
+        Assert.False(refused.IsSuccessStatusCode);
+    }
+
     /// <summary>Two siblings at a table for two: the second one joining starts the game. The view is seat 0's.</summary>
     private async Task<(HttpClient[] Phones, Guid Id, T View)> StartAsync<T>(string email, string game) where T : GameViewDto
     {
@@ -136,7 +177,7 @@ public sealed class BoardGamePlayTests(LernkickerFactory factory) : IClassFixtur
         await UnlockAsync(parent, lena.Id, game);
         var phones = new[] { await TestData.ChildPhoneAsync(factory, parent, calvin.Id), await TestData.ChildPhoneAsync(factory, parent, lena.Id) };
 
-        var table = await LernkickerFactory.Json<MatchDto>(await phones[0].PostAsJsonAsync("/api/play/tables", new NewTable(game)));
+        var table = await LernkickerFactory.Json<MatchDto>(await phones[0].PostAsJsonAsync("/api/play/tables", new NewTable(game, 2)));
         Assert.Equal(2, table.Match.Seats);
         var started = await LernkickerFactory.Json<MatchDto>(await phones[1].PostAsync($"/api/play/tables/{table.Match.Id}/join", null));
         Assert.Equal("playing", started.Match.Status);

@@ -94,6 +94,17 @@ public partial class LocalizationTests
     }
 
     [Fact]
+    public void Every_game_for_several_players_has_its_rules_and_player_count()
+    {
+        foreach (var rules in Lernkicker.Domain.Multiplayer.MultiplayerGames.All)
+        {
+            Assert.True(English.ContainsKey($"Play.About.{rules.Game}"), rules.Game);
+            Assert.True(English.ContainsKey($"Play.Rules.{rules.Game}"), rules.Game);
+            Assert.Equal((rules.MinPlayers, rules.MaxPlayers), Client.Services.PlayGames.Seats(rules.Game));
+        }
+    }
+
+    [Fact]
     public void Every_play_reach_has_a_name() =>
         Assert.DoesNotContain(Lernkicker.Domain.Multiplayer.PlayReach.All, r => !English.ContainsKey($"PlaySettings.Reach.{r}") || !English.ContainsKey($"PlaySettings.Reach.{r}.Hint"));
 

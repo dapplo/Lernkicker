@@ -1,0 +1,334 @@
+@inject Sounds Sounds
+
+@* Number Towers for two to four: everyone builds on four shared towers from 1 to 12 and tries to empty their own stock
+   first. Tap a card (stock top, hand card or the top of a discard pile), then a tower that lights up; a hand card on
+   one of the own discard piles ends the turn. The others' hands and stocks stay hidden except for the open top card.
+   The cards are our own: a big number, a colour per group of three and a little tower that grows with the number;
+   stars stand in for any number. *@
+
+<div class="towers-game">
+    <ul class="towers-players">
+        @foreach (var seat in View.Seats.Where(s => s.Seat != MySeat))
+        {
+            var gone = View.Out.Contains(seat.Seat);
+            <li class="@(seat.Seat == View.Turn && !View.Over ? "turn" : "") @(gone ? "out" : "")">
+                <b>@NameOf(seat.Seat)</b>
+                @if (gone)
+                {
+                    <small>@L["Towers.Out"]</small>
+                }
+                else
+                {
+                    <span class="tw-other">
+                        @if (seat.StockTop is { } top)
+                        {
+                            @Card(top, "mini", L["Towers.StockLeft", seat.StockCount])
+                        }
+                        <small>@L["Towers.StockLeft", seat.StockCount] · @L["Towers.InHand", seat.HandCount]</small>
+                    </span>
+                    <span class="tw-other-piles" aria-label="@L["Towers.Piles"]">
+                        @for (var i = 0; i < seat.Discards.Count; i++)
+                        {
+                            var pile = seat.Discards[i];
+                            @if (pile.Count > 0)
+                            {
+                                @Card(pile[^1], "mini", L["Towers.Pile", i + 1, CardName(pile[^1])])
+                            }
+                            else
+                            {
+                                <span class="tw-card mini empty" role="img" aria-label="@L["Towers.PileEmpty", i + 1]"></span>
+                            }
+                        }
+                    </span>
+                }
+            </li>
+        }
+    </ul>
+
+    @if (View.Last is { } last)
+    {
+        <p class="tw-last" aria-live="polite">@LastText(last)</p>
+    }
+
+    <div class="tw-table" aria-label="@L["Towers.Towers"]">
+        @for (var t = 0; t < View.Towers.Count; t++)
+        {
+            var tower = t;
+            var height = View.Towers[tower];
+            var fits = _pick is { } p && Fits(p.Card, height);
+            <button type="button" class="tw-tower @(fits ? "fits" : "")" disabled="@(Busy || !fits)" @onclick="() => PlayOn(tower)"
+                    aria-label="@(height == 0 ? L["Towers.TowerEmpty", tower + 1] : L["Towers.Tower", tower + 1, TowerName(tower)])">
+                @if (height == 0)
+                {
+                    <span class="tw-card slot" aria-hidden="true"><span class="tw-num">1</span></span>
+                }
+                else
+                {
+                    @Face(View.TowerTops[tower], height)
+                }
+                @if (_sparkle is { } sparkle && sparkle.Tower == tower)
+                {
+                    <span class="board-fx" data-lottie="sparkle" aria-hidden="true" @key="sparkle.Round"></span>
+                }
+            </button>
+        }
+        <span class="tw-deck" role="img" aria-label="@L["Towers.Deck", View.DeckSize]"><small>@View.DeckSize</small></span>
+    </div>
+
+    <p class="game-how">@Hint</p>
+
+    <div class="tw-mine">
+        <div class="tw-stock">
+            <small>@L["Towers.Stock"] · @Me.StockCount</small>
+            @if (Me.StockTop is { } stockTop)
+            {
+                <button type="button" class="@CardCss(stockTop, Picked("stock", 0) ? "picked" : "") @(MyTurn && FitsAnywhere(stockTop) ? "hot" : "")"
+                        disabled="@(Busy || !MyTurn)" aria-label="@L["Towers.MyStock", Me.StockCount]: @CardName(stockTop)"
+                        @onclick="() => Pick(Stock(stockTop))">
+                    @Inner(stockTop)
+                </button>
+            }
+        </div>
+        <div class="tw-piles" aria-label="@L["Towers.MyPiles"]">
+            @for (var i = 0; i < Me.Discards.Count; i++)
+            {
+                var pileIndex = i;
+                var pile = Me.Discards[pileIndex];
+                var canDiscard = MyTurn && _pick is { From: "hand" };
+                var canPick = MyTurn && pile.Count > 0 && !canDiscard;
+                <button type="button" class="tw-pile @(canDiscard ? "tw-drop" : "") @(Picked("discard", pileIndex) ? "picked" : "")"
+                        disabled="@(Busy || !(canDiscard || canPick))" @onclick="() => TapPile(pileIndex)"
+                        aria-label="@(pile.Count == 0 ? L["Towers.PileEmpty", pileIndex + 1] : L["Towers.Pile", pileIndex + 1, CardName(pile[^1])])">
+                    @if (pile.Count == 0)
+                    {
+                        <span class="tw-card slot" aria-hidden="true"></span>
+                    }
+                    else
+                    {
+                        @* The cards under the top peek out, so a child can plan *@
+                        @foreach (var card in pile.TakeLast(4))
+                        {
+                            <span class="@CardCss(card, "")" aria-hidden="true">@Inner(card)</span>
+                        }
+                    }
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="tw-hand" aria-label="@L["Towers.MyHand"]">
+        @foreach (var card in View.Hand.Distinct())
+        {
+            var value = card;
+            var count = View.Hand.Count(c => c == value);
+            @for (var n = 0; n < count; n++)
+            {
+                <button type="button" class="@CardCss(value, Picked("hand", 0) && _pick!.Card == value && n == 0 ? "picked" : "")"
+                        disabled="@(Busy || !MyTurn)" aria-label="@CardName(value)" @onclick="() => Pick(Hand(value))">
+                    @Inner(value)
+                </button>
+            }
+        }
+    </div>
+
+    @if (MyTurn && View.Hand.Count == 0)
+    {
+        <div class="buttons">
+            <button type="button" class="btn" disabled="@Busy" @onclick="Pass">@L["Towers.PassButton"]</button>
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>The card the child tapped: where it comes from, its number (0 a star) and which discard pile.</summary>
+    private sealed record Choice(string From, int Card, int Pile);
+
+    private static Choice Stock(int card) => new("stock", card, 0);
+
+    private static Choice Hand(int card) => new("hand", card, 0);
+
+    private Choice? _pick;
+    private NumberTowersActionDto? _seenLast;
+    private bool _seen;
+    private (int Tower, int Round)? _sparkle;
+    private int _round;
+
+    [Parameter, EditorRequired]
+    public required NumberTowersViewDto View { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<SeatDto> Players { get; set; }
+
+    [Parameter]
+    public int MySeat { get; set; }
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public EventCallback<MoveDto> Move { get; set; }
+
+    private bool MyTurn => !View.Over && View.Turn == MySeat && !View.Out.Contains(MySeat);
+
+    private NumberTowersSeatDto Me => View.Seats.First(s => s.Seat == MySeat);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!MyTurn || _pick is not null && !StillThere(_pick))
+        {
+            _pick = null;
+        }
+
+        // A sound for each new card, and sparkles on a tower that was just finished (not for what the page opens on)
+        var last = View.Last;
+        if (_seen && last is not null && last != _seenLast)
+        {
+            if (last is { Kind: "play", Done: true })
+            {
+                _sparkle = (last.Tower, ++_round);
+            }
+
+            await Sounds.Play(("place", 0));
+        }
+
+        _seen = true;
+        _seenLast = last;
+    }
+
+    private bool StillThere(Choice pick) => pick.From switch
+    {
+        "stock" => Me.StockTop == pick.Card,
+        "hand" => View.Hand.Contains(pick.Card),
+        _ => Me.Discards[pick.Pile] is { Count: > 0 } pile && pile[^1] == pick.Card,
+    };
+
+    private string Hint
+    {
+        get
+        {
+            if (View.Over)
+            {
+                return L["Towers.Over"];
+            }
+
+            if (!MyTurn)
+            {
+                return L["Towers.TheirTurn", NameOf(View.Turn)];
+            }
+
+            if (View.Hand.Count == 0)
+            {
+                return L["Towers.Pass"];
+            }
+
+            if (_pick is { } pick)
+            {
+                return !FitsAnywhere(pick.Card) && pick.From != "hand" ? L["Towers.FitsNowhere"]
+                    : pick.From == "hand" ? L["Towers.PickedHand"]
+                    : L["Towers.Picked"];
+            }
+
+            return Me.StockTop is { } top && FitsAnywhere(top) ? L["Towers.StockFits"] : L["Towers.YourTurn"];
+        }
+    }
+
+    private static bool Fits(int card, int height) => height < 12 && (card == 0 || card == height + 1);
+
+    private bool FitsAnywhere(int card) => View.Towers.Any(h => Fits(card, h));
+
+    private bool Picked(string from, int pile) => _pick is { } p && p.From == from && (from != "discard" || p.Pile == pile);
+
+    private void Pick(Choice choice) => _pick = _pick == choice ? null : choice;
+
+    private Task TapPile(int pile)
+    {
+        if (_pick is { From: "hand" } pick)
+        {
+            _pick = null;
+            return Move.InvokeAsync(new NumberTowersDiscardDto(pick.Card, pile));
+        }
+
+        var cards = Me.Discards[pile];
+        if (cards.Count > 0)
+        {
+            Pick(new Choice("discard", cards[^1], pile));
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task PlayOn(int tower)
+    {
+        if (_pick is not { } pick)
+        {
+            return Task.CompletedTask;
+        }
+
+        _pick = null;
+        return Move.InvokeAsync(new NumberTowersPlayDto(pick.From, tower, pick.Card, pick.Pile));
+    }
+
+    private Task Pass() => Move.InvokeAsync(new NumberTowersPassDto());
+
+    private string NameOf(int seat) => seat == MySeat ? L["Play.You"] : Players.FirstOrDefault(p => p.Seat == seat)?.Name ?? "?";
+
+    private string CardName(int card) => card == 0 ? L["Towers.Star"] : card.ToString();
+
+    /// <summary>The top of a tower: its number, or "star as 5".</summary>
+    private string TowerName(int tower) =>
+        View.TowerTops[tower] == 0 ? L["Towers.StarAs", View.Towers[tower]] : View.Towers[tower].ToString();
+
+    private static string Group(int card) => card == 0 ? "star" : $"g{(card - 1) / 3 + 1}";
+
+    private static string CardCss(int card, string extra) => $"tw-card {Group(card)} {extra}".TrimEnd();
+
+    /// <summary>A card's face: the number (or a star) and a tower of blocks as high as the number.</summary>
+    private RenderFragment Inner(int card) => builder =>
+    {
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", "tw-num");
+        builder.AddContent(2, card == 0 ? "★" : card.ToString());
+        builder.CloseElement();
+        builder.OpenElement(3, "span");
+        builder.AddAttribute(4, "class", $"tw-level l{card}");
+        builder.AddAttribute(5, "aria-hidden", "true");
+        builder.CloseElement();
+    };
+
+    /// <summary>A card on a tower: a star shows the number it stands for in its corner.</summary>
+    private RenderFragment Face(int card, int height) => builder =>
+    {
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", CardCss(card, ""));
+        builder.AddAttribute(2, "aria-hidden", "true");
+        builder.AddContent(3, Inner(card == 0 ? 0 : height));
+        if (card == 0)
+        {
+            builder.OpenElement(4, "small");
+            builder.AddAttribute(5, "class", "tw-as");
+            builder.AddContent(6, height);
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+    };
+
+    private RenderFragment Card(int card, string extra, string label) => builder =>
+    {
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", CardCss(card, extra));
+        builder.AddAttribute(2, "role", "img");
+        builder.AddAttribute(3, "aria-label", label);
+        builder.AddContent(4, Inner(card));
+        builder.CloseElement();
+    };
+
+    private string LastText(NumberTowersActionDto last) => last.Kind switch
+    {
+        "play" when last.Done => L["Towers.Did.Done", NameOf(last.Seat), CardName(last.Card), last.Tower + 1],
+        "play" => L["Towers.Did.Play", NameOf(last.Seat), CardName(last.Card), last.Tower + 1],
+        "discard" => L["Towers.Did.Discard", NameOf(last.Seat), CardName(last.Card)],
+        "pass" => L["Towers.Did.Pass", NameOf(last.Seat)],
+        _ => L["Towers.Did.Resign", NameOf(last.Seat)],
+    };
+}

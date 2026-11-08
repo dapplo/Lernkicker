@@ -63,6 +63,7 @@ public static class GameErrors
     public const string CardNotPlayable = "mauMau.cardNotPlayable";
     public const string MustDraw = "mauMau.mustDraw";
     public const string ChessMoveInvalid = "chess.moveInvalid";
+    public const string CardDoesNotFit = "numberTowers.cardDoesNotFit";
 }
 
 public static class MatchStatus
