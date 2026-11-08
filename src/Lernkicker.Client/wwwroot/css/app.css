@@ -915,6 +915,19 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .play-settings .check small { display: block; color: var(--muted); }
 
 /* Battleship. The bar above the seas has a fixed height, so the boards stay where they are whatever it says. */
+.battleship { position: relative; }
+/* Victory or defeat, for a few seconds over the boards */
+.battleship-ending {
+    position: absolute;
+    z-index: 5;
+    top: 40px;
+    left: 50%;
+    width: min(90vw, 360px);
+    aspect-ratio: 1;
+    transform: translateX(-50%);
+    pointer-events: none;
+    filter: drop-shadow(0 4px 12px rgb(0 0 0 / 30%));
+}
 .battleship-bar {
     height: calc(3em + 14px);
     margin: 4px 0 10px;
@@ -974,6 +987,10 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
     opacity: 0.3;
     animation: waves-drift-back 11s linear infinite, waves-swell 4s ease-in-out infinite alternate;
 }
+/* The Lottie sea takes over from these CSS waves once it runs */
+.sea-motion { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.sea-motion svg { display: block; }
+.sea-frame:has(.sea-motion.lottie-on)::before, .sea-frame:has(.sea-motion.lottie-on)::after { display: none; }
 @keyframes waves-drift { to { background-position: 72px 0; } }
 @keyframes waves-drift-back { to { background-position: -110px 0; } }
 @keyframes waves-swell { to { transform: translateY(6px); } }
@@ -1091,36 +1108,8 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 /* What a shot leaves on a cell */
 .sea .fx { position: absolute; pointer-events: none; }
 .sea .fx i { position: absolute; display: block; }
-/* A miss: rings on the water, and for the last one a splash of drops */
+/* A miss: rings on the water */
 .sea .fx.ripple { inset: 32%; border-radius: 50%; border: 2px solid rgb(255 255 255 / 75%); box-shadow: 0 0 0 3px rgb(255 255 255 / 18%); }
-.sea .fx.splash { inset: 0; }
-.sea .fx.splash::before, .sea .fx.splash::after { content: ""; position: absolute; border-radius: 50%; }
-.sea .fx.splash::before { inset: 10%; border: 2px solid #fff; animation: splash-ring 0.9s ease-out both; }
-.sea .fx.splash::after {
-    left: 30%; right: 30%; bottom: 40%; height: 90%;
-    border-radius: 50% 50% 20% 20%;
-    background: linear-gradient(to top, rgb(255 255 255 / 90%), rgb(220 240 255 / 0));
-    transform-origin: 50% 100%;
-    animation: splash-column 0.8s ease-out both;
-}
-.sea .fx.splash i {
-    left: 42%; bottom: 45%; width: 16%; height: 22%;
-    border-radius: 50%;
-    background: #fff;
-    animation: splash-drop 0.9s ease-out both;
-}
-.sea .fx.splash i:nth-child(1) { --dx: -110%; --dy: -230%; }
-.sea .fx.splash i:nth-child(2) { --dx: -40%; --dy: -320%; }
-.sea .fx.splash i:nth-child(3) { --dx: 40%; --dy: -300%; }
-.sea .fx.splash i:nth-child(4) { --dx: 120%; --dy: -210%; }
-.sea .fx.splash i:nth-child(5) { --dx: 0%; --dy: -380%; }
-@keyframes splash-ring { from { transform: scale(0.2); opacity: 1; } to { transform: scale(1.9); opacity: 0; } }
-@keyframes splash-column { 0% { transform: scaleY(0); opacity: 1; } 45% { transform: scaleY(1); opacity: 0.9; } 100% { transform: scaleY(0.2); opacity: 0; } }
-@keyframes splash-drop {
-    0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
-    50% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 1; }
-    100% { transform: translate(calc(var(--dx) * 1.5), 40%) scale(0.5); opacity: 0; }
-}
 /* A hit: a burning wreck piece with smoke */
 .sea .fx.debris { left: 18%; right: 18%; bottom: 22%; height: 20%; border-radius: 40% 60% 30% 50%; background: #2b2f33; transform: rotate(-8deg); }
 .sea .fx.fire { left: 22%; right: 22%; top: 14%; bottom: 30%; }
@@ -1142,34 +1131,13 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 }
 .sea .fx.smoke i:nth-child(2) { animation-delay: -1.3s; }
 @keyframes smoke { from { transform: translate(0, 30%) scale(0.5); opacity: 0.9; } to { transform: translate(25%, -140%) scale(1.9); opacity: 0; } }
-/* The last hit: a flash, a ring of air and sparks */
-.sea .fx.boom { inset: -45%; z-index: 3; }
-.sea .fx.boom::before, .sea .fx.boom::after { content: ""; position: absolute; inset: 0; border-radius: 50%; }
-.sea .fx.boom::before {
-    background: radial-gradient(circle, #fff 0 12%, #ffe066 24%, #ff922b 42%, rgb(224 49 49 / 70%) 56%, transparent 68%);
-    animation: boom 0.75s ease-out both;
-}
-.sea .fx.boom::after { border: 3px solid rgb(255 255 255 / 80%); animation: shockwave 0.7s ease-out both; }
-.sea .fx.boom i {
-    left: 46%; top: 46%; width: 8%; height: 8%;
-    border-radius: 50%;
-    background: #ffd43b;
-    box-shadow: 0 0 4px #ff922b;
-    animation: spark 0.8s ease-out both;
-}
-.sea .fx.boom i:nth-child(1) { --dx: -380%; --dy: -300%; }
-.sea .fx.boom i:nth-child(2) { --dx: 380%; --dy: -320%; }
-.sea .fx.boom i:nth-child(3) { --dx: 0%; --dy: -480%; }
-.sea .fx.boom i:nth-child(4) { --dx: -440%; --dy: 120%; }
-.sea .fx.boom i:nth-child(5) { --dx: 440%; --dy: 160%; }
-.sea .fx.boom i:nth-child(6) { --dx: 60%; --dy: 380%; }
-@keyframes boom { 0% { transform: scale(0.1); opacity: 1; } 60% { opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
-@keyframes shockwave { from { transform: scale(0.2); opacity: 1; } to { transform: scale(1.1); opacity: 0; } }
-@keyframes spark { from { transform: translate(0, 0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+/* The last shot's splash or blast: a Lottie animation (wwwroot/animations) over the cell and its neighbours */
+.sea .fx.lottie-fx { inset: -100%; z-index: 3; display: block; }
+.sea .fx.lottie-fx svg { display: block; }
 
 @media (prefers-reduced-motion: reduce) {
     .sea-frame::before, .sea-frame::after, .ship-art .ship-svg, .sea .fx i, .ship-art.sinking::before { animation: none !important; }
-    .sea .fx.splash, .sea .fx.boom, .ship-art.sinking::before { display: none; }
+    .ship-art.sinking::before { display: none; }
 }
 
 /* The fleet under each sea: little ships, the sunk ones faded */

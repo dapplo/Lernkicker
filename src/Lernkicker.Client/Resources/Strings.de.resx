@@ -590,6 +590,8 @@
   <data name="Battleship.Hit" xml:space="preserve"><value>Treffer</value></data>
   <data name="Battleship.Miss" xml:space="preserve"><value>Wasser</value></data>
   <data name="Battleship.Sunk" xml:space="preserve"><value>versenkt</value></data>
+  <data name="Battleship.FleetSunk" xml:space="preserve"><value>Alle Schiffe von {0} sind versenkt!</value></data>
+  <data name="Battleship.FleetLost" xml:space="preserve"><value>Deine Flotte ist untergegangen. Beim nächsten Mal!</value></data>
   <data name="Sound.Off" xml:space="preserve"><value>Ton aus</value></data>
   <data name="Sound.On" xml:space="preserve"><value>Ton an</value></data>
   <data name="Battleship.MissThenThey" xml:space="preserve"><value>Wasser! Jetzt schießt {0} …</value></data>
