@@ -521,6 +521,7 @@
   <data name="Play.Game.battleship" xml:space="preserve"><value>Battleship</value></data>
   <data name="Play.NothingUnlocked" xml:space="preserve"><value>No games unlocked yet. Ask your parents!</value></data>
   <data name="Play.MyGames" xml:space="preserve"><value>My games</value></data>
+  <data name="Play.FinishedGames" xml:space="preserve"><value>Finished games ({0})</value></data>
   <data name="Play.OpenTables" xml:space="preserve"><value>Who wants to play?</value></data>
   <data name="Play.WantsToPlay" xml:space="preserve"><value>{0} is waiting for a partner</value></data>
   <data name="Play.Join" xml:space="preserve"><value>Join in</value></data>
@@ -569,8 +570,8 @@
   <data name="Battleship.PlaceNext" xml:space="preserve"><value>Next: {0}</value></data>
   <data name="Battleship.AllPlaced" xml:space="preserve"><value>All ships are on the sea.</value></data>
   <data name="Battleship.Ship" xml:space="preserve"><value>ship</value></data>
-  <data name="Battleship.Ship5" xml:space="preserve"><value>battleship (5)</value></data>
-  <data name="Battleship.Ship4" xml:space="preserve"><value>cruiser (4)</value></data>
+  <data name="Battleship.Ship5" xml:space="preserve"><value>aircraft carrier (5)</value></data>
+  <data name="Battleship.Ship4" xml:space="preserve"><value>battleship (4)</value></data>
   <data name="Battleship.Ship3" xml:space="preserve"><value>destroyer (3)</value></data>
   <data name="Battleship.Ship2" xml:space="preserve"><value>submarine (2)</value></data>
   <data name="Battleship.Across" xml:space="preserve"><value>Across</value></data>
@@ -578,9 +579,9 @@
   <data name="Battleship.Mix" xml:space="preserve"><value>Mix</value></data>
   <data name="Battleship.Clear" xml:space="preserve"><value>Start over</value></data>
   <data name="Battleship.Ready" xml:space="preserve"><value>Ready!</value></data>
-  <data name="Battleship.DoesNotFit" xml:space="preserve"><value>The ship does not fit there. It has to stay on the sea and must not touch another ship.</value></data>
+  <data name="Battleship.DoesNotFit" xml:space="preserve"><value>Doesn't fit: stay on the sea and don't touch another ship.</value></data>
   <data name="Battleship.WaitingForFleet" xml:space="preserve"><value>Waiting for {0} to place their ships …</value></data>
-  <data name="Battleship.Shoot" xml:space="preserve"><value>Your turn: tap a field on the other sea. A hit lets you shoot again.</value></data>
+  <data name="Battleship.Shoot" xml:space="preserve"><value>Your turn! Tap a field on {0}'s sea.</value></data>
   <data name="Battleship.TheyShoot" xml:space="preserve"><value>{0} is shooting …</value></data>
   <data name="Battleship.TheirSea" xml:space="preserve"><value>{0}'s sea</value></data>
   <data name="Battleship.MySea" xml:space="preserve"><value>My sea</value></data>
@@ -589,6 +590,12 @@
   <data name="Battleship.Hit" xml:space="preserve"><value>hit</value></data>
   <data name="Battleship.Miss" xml:space="preserve"><value>miss</value></data>
   <data name="Battleship.Sunk" xml:space="preserve"><value>sunk</value></data>
+  <data name="Sound.Off" xml:space="preserve"><value>Sound off</value></data>
+  <data name="Sound.On" xml:space="preserve"><value>Sound on</value></data>
+  <data name="Battleship.MissThenThey" xml:space="preserve"><value>Miss! Now {0} is shooting …</value></data>
+  <data name="Battleship.TheyHit" xml:space="preserve"><value>{0} hit and shoots again …</value></data>
+  <data name="Battleship.SunkAgain" xml:space="preserve"><value>Sunk: {0}! Shoot again.</value></data>
+  <data name="Battleship.HitAgain" xml:space="preserve"><value>Hit! Shoot again.</value></data>
   <data name="Play.Game.connectFour" xml:space="preserve"><value>Connect Four</value></data>
   <data name="Play.Game.checkers" xml:space="preserve"><value>Checkers</value></data>
   <data name="Play.Game.mauMau" xml:space="preserve"><value>Mau-Mau</value></data>

@@ -1,0 +1,114 @@
+@* A ship seen from the side, drawn as one SVG over all its cells: the aircraft carrier (5), the battleship (4), the
+   destroyer (3) and the submarine (2). It is drawn lying across with the bow to the right; a ship lying down is the
+   same drawing turned by a quarter, bow at the bottom. One unit of the drawing is a hundredth of a cell; the
+   waterline is at 72, and the drawing reaches up to -20 for the masts. Colours are presentation attributes, which the CSP allows (unlike style attributes). *@
+
+<svg class="ship-svg" viewBox="@ViewBox" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <g transform="@Turn">
+        @switch (Length)
+        {
+            case >= 5:
+                @* Aircraft carrier: a long flat flight deck with planes, the island with bridge and radar on the right *@
+                <polygon points="36,72 466,72 446,90 62,90" fill="#8f2f2f" />
+                <polygon points="12,50 492,46 468,72 34,72" fill="#5d6873" />
+                <polygon points="12,50 492,46 486,54 18,58" fill="#4c5660" />
+                <rect x="2" y="42" width="496" height="8" rx="2" fill="#3f4851" />
+                <rect x="2" y="42" width="496" height="2" fill="#8a96a1" />
+                @for (var i = 0; i < 9; i++)
+                {
+                    <rect x="@(60 + i * 46)" y="57" width="18" height="6" rx="1" fill="#39424a" />
+                }
+                @foreach (var x in new[] { 40, 112, 184, 256, 420 })
+                {
+                    <polygon points="@($"{x},40 {x + 34},39 {x + 42},36 {x + 44},40 {x + 40},42 {x + 4},42")" fill="#a6b1bb" />
+                    <polygon points="@($"{x + 2},40 {x + 8},31 {x + 13},31 {x + 12},40")" fill="#a6b1bb" />
+                    <polygon points="@($"{x + 16},41 {x + 30},41 {x + 22},46")" fill="#8b97a2" />
+                }
+                <rect x="326" y="16" width="56" height="26" rx="2" fill="#7c8994" />
+                <rect x="330" y="21" width="48" height="5" fill="#26303a" />
+                <rect x="340" y="6" width="22" height="10" fill="#6c7984" />
+                <line x1="352" y1="6" x2="352" y2="-14" stroke="#4c5660" stroke-width="3" />
+                <line x1="340" y1="-6" x2="364" y2="-6" stroke="#4c5660" stroke-width="2.5" />
+                <rect x="343" y="-18" width="18" height="5" rx="2" fill="#9aa5af" />
+                break;
+            case 4:
+                @* Battleship: raised bow, two gun turrets in front, the tall tower with funnel, one turret at the back *@
+                <polygon points="44,72 378,72 352,88 72,88" fill="#8f2f2f" />
+                <polygon points="10,56 60,59 296,59 394,46 380,72 32,72" fill="#5d6873" />
+                <polygon points="10,56 60,59 296,59 394,46 392,51 296,64 60,64 12,61" fill="#48525c" />
+                @for (var i = 0; i < 8; i++)
+                {
+                    <circle cx="@(80 + i * 30)" cy="66" r="2.6" fill="#2f3840" />
+                }
+                @* Turrets with their barrels *@
+                <path d="M 278 59 L 282 49 L 308 49 L 312 59 Z" fill="#6c7984" />
+                <line x1="306" y1="52" x2="348" y2="47" stroke="#3a434c" stroke-width="3.5" stroke-linecap="round" />
+                <path d="M 314 56 L 318 44 L 346 44 L 350 54 Z" fill="#6c7984" />
+                <line x1="344" y1="47" x2="384" y2="40" stroke="#3a434c" stroke-width="3.5" stroke-linecap="round" />
+                <path d="M 76 59 L 80 49 L 106 49 L 110 59 Z" fill="#6c7984" />
+                <line x1="80" y1="52" x2="40" y2="48" stroke="#3a434c" stroke-width="3.5" stroke-linecap="round" />
+                @* Superstructure *@
+                <rect x="150" y="44" width="110" height="15" fill="#7c8994" />
+                <rect x="168" y="30" width="78" height="14" fill="#8794a0" />
+                <rect x="190" y="14" width="40" height="16" fill="#7c8994" />
+                <rect x="194" y="18" width="32" height="4" fill="#26303a" />
+                <rect x="172" y="34" width="70" height="3" fill="#3a434c" />
+                <polygon points="146,44 150,22 170,22 168,44" fill="#6c7984" />
+                <rect x="148" y="18" width="24" height="5" fill="#2a3138" />
+                <line x1="210" y1="14" x2="210" y2="-12" stroke="#4c5660" stroke-width="3" />
+                <line x1="196" y1="-2" x2="224" y2="-2" stroke="#4c5660" stroke-width="2.5" />
+                <circle cx="210" cy="-13" r="3" fill="#9aa5af" />
+                <rect x="124" y="50" width="16" height="9" fill="#6c7984" />
+                <line x1="138" y1="53" x2="148" y2="51" stroke="#3a434c" stroke-width="2" />
+                <rect x="266" y="50" width="12" height="9" fill="#6c7984" />
+                break;
+            case 3:
+                @* Destroyer: a slim hull, a gun forward, bridge, funnel and a mast with radar *@
+                <polygon points="32,72 284,72 262,86 52,86" fill="#8f2f2f" />
+                <polygon points="8,60 220,60 296,50 282,72 26,72" fill="#64707b" />
+                <polygon points="8,60 220,60 296,50 294,55 220,65 10,65" fill="#4f5964" />
+                <path d="M 222 59 L 226 50 L 244 50 L 248 58 Z" fill="#7c8994" />
+                <line x1="242" y1="53" x2="274" y2="49" stroke="#3a434c" stroke-width="3" stroke-linecap="round" />
+                <rect x="110" y="44" width="92" height="16" fill="#8794a0" />
+                <rect x="160" y="28" width="38" height="16" fill="#7c8994" />
+                <rect x="164" y="32" width="30" height="4" fill="#26303a" />
+                <polygon points="120,44 124,26 142,26 144,44" fill="#6c7984" />
+                <rect x="122" y="22" width="20" height="5" fill="#2a3138" />
+                <line x1="176" y1="28" x2="176" y2="2" stroke="#4c5660" stroke-width="2.5" />
+                <line x1="166" y1="10" x2="186" y2="10" stroke="#4c5660" stroke-width="2" />
+                <ellipse cx="176" cy="2" rx="9" ry="3" fill="#9aa5af" />
+                <rect x="40" y="50" width="34" height="10" rx="2" fill="#7c8994" />
+                <rect x="46" y="46" width="22" height="4" fill="#5d6873" />
+                break;
+            default:
+                @* Submarine: the round hull lies low in the water, only the sail with periscope stands up *@
+                <path d="M 14 66 Q 14 58 30 58 L 168 58 Q 196 60 196 70 Q 196 82 168 84 L 30 84 Q 14 84 14 74 Z" fill="#3c454e" />
+                <path d="M 14 66 Q 14 58 30 58 L 168 58 Q 190 59 194 64 L 30 64 Q 18 64 14 66 Z" fill="#59646f" />
+                <polygon points="2,56 16,62 16,80 2,86" fill="#343c44" />
+                <path d="M 80 58 L 84 34 Q 86 30 92 30 L 118 30 Q 124 30 126 36 L 130 58 Z" fill="#4a545e" />
+                <rect x="86" y="44" width="16" height="3" fill="#2a3138" />
+                <line x1="110" y1="30" x2="110" y2="8" stroke="#3a434c" stroke-width="3" />
+                <line x1="110" y1="9" x2="118" y2="9" stroke="#3a434c" stroke-width="3" />
+                <line x1="98" y1="30" x2="98" y2="16" stroke="#3a434c" stroke-width="2" />
+                <polygon points="104,42 140,42 140,45 104,45" fill="#39424a" />
+                break;
+        }
+    </g>
+</svg>
+
+@code {
+    /// <summary>The ship's length in cells: 5, 4, 3 or 2.</summary>
+    [Parameter]
+    public int Length { get; set; }
+
+    /// <summary>Lying across (bow right) or down (bow at the bottom).</summary>
+    [Parameter]
+    public bool Horizontal { get; set; } = true;
+
+    private int Units => Math.Clamp(Length, 2, 5) * 100;
+
+    private string ViewBox => Horizontal ? $"0 -20 {Units} 120" : $"0 0 120 {Units}";
+
+    // Down: the side view turned clockwise, so the top of the ship (mast) points right and the bow down
+    private string Turn => Horizontal ? "" : "translate(100,0) rotate(90)";
+}
