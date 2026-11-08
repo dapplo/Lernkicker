@@ -28,21 +28,19 @@ else if (_lobby.Games.Count == 0 && _lobby.MyMatches.Count == 0)
 }
 else
 {
-    @if (_lobby.MyMatches.Count > 0)
+    @* Starting a game comes first; games still running follow (my turn first), finished ones are folded away *@
+    @if (_lobby.Games.Count > 0)
     {
-        <h2>@L["Play.MyGames"]</h2>
-        <ul class="cards play-list">
-            @foreach (var match in _lobby.MyMatches)
+        <h2>@L["Play.NewGame"]</h2>
+        <div class="buttons play-games">
+            @foreach (var game in _lobby.Games)
             {
-                <li>
-                    <a class="card play-card @(match.MyTurn ? "my-turn" : "") @match.Status" href="play/@match.Id">
-                        <span class="subject"><span aria-hidden="true">@PlayGames.Icon(match.Game)</span> @L[$"Play.Game.{match.Game}"]</span>
-                        <span class="title">@Opponents(match)</span>
-                        <span class="due">@PlayGames.Status(L, match)</span>
-                    </a>
-                </li>
+                <button class="btn" disabled="@_busy" @onclick="() => Open(game)">
+                    <span aria-hidden="true">@PlayGames.Icon(game)</span> @L["Play.OpenTable", L[$"Play.Game.{game}"]]
+                </button>
             }
-        </ul>
+        </div>
+        <p class="hint">@L["Play.OpenTableHint"]</p>
     }
 
     @if (_lobby.Tables.Count > 0)
@@ -66,19 +64,25 @@ else
         </ul>
     }
 
+    @if (Running.Count > 0)
+    {
+        <h2>@L["Play.MyGames"]</h2>
+        <ul class="cards play-list">
+            @foreach (var match in Running)
+            {
+                <li>
+                    <a class="card play-card @(match.MyTurn ? "my-turn" : "") @match.Status" href="play/@match.Id">
+                        <span class="subject"><span aria-hidden="true">@PlayGames.Icon(match.Game)</span> @L[$"Play.Game.{match.Game}"]</span>
+                        <span class="title">@Opponents(match)</span>
+                        <span class="due">@PlayGames.Status(L, match)</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
     @if (_lobby.Games.Count > 0)
     {
-        <h2>@L["Play.NewGame"]</h2>
-        <div class="buttons play-games">
-            @foreach (var game in _lobby.Games)
-            {
-                <button class="btn" disabled="@_busy" @onclick="() => Open(game)">
-                    <span aria-hidden="true">@PlayGames.Icon(game)</span> @L["Play.OpenTable", L[$"Play.Game.{game}"]]
-                </button>
-            }
-        </div>
-        <p class="hint">@L["Play.OpenTableHint"]</p>
-
         <h2>@L["Play.Online"]</h2>
         @if (_lobby.Online.Count == 0)
         {
@@ -93,6 +97,25 @@ else
                 }
             </ul>
         }
+    }
+
+    @if (Finished.Count > 0)
+    {
+        <details class="play-finished">
+            <summary>@L["Play.FinishedGames", Finished.Count]</summary>
+            <ul class="cards play-list">
+                @foreach (var match in Finished)
+                {
+                    <li>
+                        <a class="card play-card @(match.MyTurn ? "my-turn" : "") @match.Status" href="play/@match.Id">
+                            <span class="subject"><span aria-hidden="true">@PlayGames.Icon(match.Game)</span> @L[$"Play.Game.{match.Game}"]</span>
+                            <span class="title">@Opponents(match)</span>
+                            <span class="due">@PlayGames.Status(L, match)</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </details>
     }
 }
 
@@ -139,6 +162,11 @@ else
     });
 
     private Task MatchChanged(Guid _) => Changed();
+
+    private List<MatchOverview> Running =>
+        _lobby?.MyMatches.Where(m => m.Status != "finished").OrderByDescending(m => m.MyTurn).ToList() ?? [];
+
+    private List<MatchOverview> Finished => _lobby?.MyMatches.Where(m => m.Status == "finished").ToList() ?? [];
 
     private string Opponents(MatchOverview match) =>
         match.Status == "waiting"

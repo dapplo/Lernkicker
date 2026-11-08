@@ -18,5 +18,6 @@ builder.Services.AddScoped<UiLanguage>();
 builder.Services.AddScoped<UploadFiles>();
 builder.Services.AddScoped<PlayConnection>();
 builder.Services.AddScoped<Speech>();
+builder.Services.AddScoped<Sounds>();
 
 await builder.Build().RunAsync();

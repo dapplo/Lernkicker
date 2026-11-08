@@ -901,6 +901,9 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .play-card.finished { opacity: 0.75; }
 .play-games { flex-wrap: wrap; }
 .play-tables li { align-items: center; }
+.play-finished { margin-top: 20px; }
+.play-finished summary { cursor: pointer; font-weight: 700; color: var(--muted); padding: 6px 0; }
+.play-finished .play-list { margin-top: 8px; }
 .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .chips li { background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
 .chips small { color: var(--muted); }
@@ -911,80 +914,271 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .play-settings legend { font-weight: 700; padding: 0 6px; }
 .play-settings .check small { display: block; color: var(--muted); }
 
+/* Battleship. The bar above the seas has a fixed height, so the boards stay where they are whatever it says. */
+.battleship-bar {
+    height: calc(3em + 14px);
+    margin: 4px 0 10px;
+    padding: 7px 12px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    border-left: 5px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-weight: 700;
+}
+.battleship-bar.go { border-left-color: var(--gold); }
+.battleship-bar.warn { border-left-color: var(--red); color: var(--red); }
+.battleship .sound-toggle { min-width: 0; }
 .seas { display: grid; gap: 16px; }
 @media (min-width: 700px) { .seas { grid-template-columns: 1fr 1fr; } }
 .sea-box { background: var(--paper); border-radius: var(--radius); padding: 12px; box-shadow: 0 1px 3px rgb(0 0 0 / 8%); }
 .sea-box.my-turn { box-shadow: 0 0 0 3px var(--gold); }
 .sea-box h2 { font-size: 1.05rem; margin-bottom: 8px; }
-.battleship-next { font-weight: 700; }
-.sea {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 2px;
+
+/* The water: deep blue with light from above, and two layers of waves drifting against each other */
+.sea-frame {
+    --water-top: #1d84bb;
+    --water-deep: #0b3a5e;
+    --wave: rgb(255 255 255 / 30%);
+    position: relative;
     width: 100%;
     max-width: 420px;
-    padding: 3px;
-    border-radius: 10px;
-    background: #2f6fa3;
-}
-.sea .cell {
     aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 12px;
+    background:
+        radial-gradient(ellipse at 30% 15%, rgb(255 255 255 / 22%), transparent 55%),
+        radial-gradient(ellipse at 80% 85%, rgb(0 30 60 / 35%), transparent 60%),
+        linear-gradient(170deg, var(--water-top), var(--water-deep));
+    box-shadow: inset 0 0 18px rgb(0 20 40 / 45%);
+}
+.sea-frame::before, .sea-frame::after {
+    content: "";
+    position: absolute;
+    inset: -20px 0 0 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40' viewBox='0 0 120 40'%3E%3Cpath d='M0 10 Q15 3 30 10 T60 10 T90 10 T120 10' fill='none' stroke='%23fff' stroke-opacity='.5' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M-15 30 Q0 23 15 30 T45 30 T75 30 T105 30 T135 30' fill='none' stroke='%23fff' stroke-opacity='.3' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-size: 72px 24px;
+    opacity: 0.55;
+    animation: waves-drift 7s linear infinite;
+}
+.sea-frame::after {
+    background-size: 110px 36px;
+    opacity: 0.3;
+    animation: waves-drift-back 11s linear infinite, waves-swell 4s ease-in-out infinite alternate;
+}
+@keyframes waves-drift { to { background-position: 72px 0; } }
+@keyframes waves-drift-back { to { background-position: -110px 0; } }
+@keyframes waves-swell { to { transform: translateY(6px); } }
+.shell.theme-space .sea-frame { --water-top: #1b3f7a; --water-deep: #060f2b; }
+.shell.theme-unicorn .sea-frame { --water-top: #22b8cf; --water-deep: #1864ab; }
+.sea-frame.placing { --water-top: #2a8fc4; }
+
+/* The ships and the cells lie over the water in the same 10 × 10 grid */
+.sea-ships, .sea {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+}
+.sea-ships { z-index: 1; pointer-events: none; }
+.sea { z-index: 2; }
+.sea .cell {
+    position: relative;
+    display: block;
     min-width: 0;
+    min-height: 0;
     padding: 0;
     border: 0;
-    border-radius: 4px;
-    background: #a9d6f5;
-    color: #12385a;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 16%);
+    color: #fff;
     font: inherit;
-    font-weight: 700;
-    line-height: 1;
 }
 .sea button.cell:not(:disabled) { cursor: pointer; }
-.sea button.cell:not(:disabled):hover { background: #d4ecfc; }
-.sea .cell.hit { background: #f08c00; color: #fff; }
-.sea .cell.miss { color: #2f6fa3; }
-.sea .cell.last { outline: 3px solid var(--gold); outline-offset: -3px; }
-.sea .cell .mark { position: relative; z-index: 2; }
+.sea button.cell:not(:disabled):hover, .sea button.cell:focus-visible { background: rgb(255 255 255 / 25%); outline: none; }
+.sea .cell.hit, .sea .cell.sunk { z-index: 1; }
+.sea .cell.last { z-index: 2; box-shadow: inset 0 0 0 2px var(--gold); }
 
-/* Ships are drawn over the water of their cells: one hull across the cells (it reaches over the gaps), a rounded
-   stern on the first cell, a pointed bow on the last and a deck house on the cells between. */
-.sea .cell.ship { position: relative; background: #a9d6f5; color: #fff; }
-.sea .cell.ship::before { content: ""; position: absolute; z-index: 0; background: var(--hull, #5f6b76); }
-.sea .cell.ship.h::before { top: 20%; bottom: 20%; left: -1px; right: -1px; }
-.sea .cell.ship.v::before { left: 20%; right: 20%; top: -1px; bottom: -1px; }
-.sea .cell.ship.h.stern::before { left: 8%; border-radius: 45% 0 0 45%; }
-.sea .cell.ship.v.stern::before { top: 8%; border-radius: 45% 45% 0 0; }
-.sea .cell.ship.h.bow::before { right: 2%; clip-path: polygon(0 0, 45% 0, 100% 50%, 45% 100%, 0 100%); }
-.sea .cell.ship.v.bow::before { bottom: 2%; clip-path: polygon(0 0, 100% 0, 100% 45%, 50% 100%, 0 45%); }
-.sea .cell.ship.deck::after {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    inset: 36%;
-    border-radius: 3px;
-    background: var(--deck, #c3ccd4);
+/* A ship spans its cells: c-N/r-N is where it starts, s-N how many cells it covers */
+/* The drawing reaches above its row (masts, island), so it stands tall enough to see; only below the water is it cut off */
+.ship-art { position: relative; min-width: 0; min-height: 0; }
+.ship-art.h { clip-path: inset(-200% 0 0 0); }
+.ship-art.v { clip-path: inset(0 -200% 0 0); }
+.ship-art.c-0 { grid-column-start: 1; } .ship-art.c-1 { grid-column-start: 2; } .ship-art.c-2 { grid-column-start: 3; }
+.ship-art.c-3 { grid-column-start: 4; } .ship-art.c-4 { grid-column-start: 5; } .ship-art.c-5 { grid-column-start: 6; }
+.ship-art.c-6 { grid-column-start: 7; } .ship-art.c-7 { grid-column-start: 8; } .ship-art.c-8 { grid-column-start: 9; }
+.ship-art.c-9 { grid-column-start: 10; }
+.ship-art.r-0 { grid-row-start: 1; } .ship-art.r-1 { grid-row-start: 2; } .ship-art.r-2 { grid-row-start: 3; }
+.ship-art.r-3 { grid-row-start: 4; } .ship-art.r-4 { grid-row-start: 5; } .ship-art.r-5 { grid-row-start: 6; }
+.ship-art.r-6 { grid-row-start: 7; } .ship-art.r-7 { grid-row-start: 8; } .ship-art.r-8 { grid-row-start: 9; }
+.ship-art.r-9 { grid-row-start: 10; }
+.ship-art.h { grid-row-end: span 1; }
+.ship-art.v { grid-column-end: span 1; }
+.ship-art.h.s-2 { grid-column-end: span 2; } .ship-art.h.s-3 { grid-column-end: span 3; }
+.ship-art.h.s-4 { grid-column-end: span 4; } .ship-art.h.s-5 { grid-column-end: span 5; }
+.ship-art.v.s-2 { grid-row-end: span 2; } .ship-art.v.s-3 { grid-row-end: span 3; }
+.ship-art.v.s-4 { grid-row-end: span 4; } .ship-art.v.s-5 { grid-row-end: span 5; }
+.ship-art .ship-svg { position: absolute; display: block; width: auto; height: auto; }
+.ship-art.h .ship-svg { inset: -70% 0 0 0; width: 100%; height: 170%; }
+.ship-art.v .ship-svg { inset: 0 -70% 0 0; width: 170%; height: 100%; }
+/* The hull below the waterline shows through the water; the waterline lies at 60 % of the cell (40 % from the left when down) */
+.ship-art::after { content: ""; position: absolute; z-index: 1; pointer-events: none; }
+.ship-art.h::after {
+    left: 0; right: 0; bottom: 0; height: 40%;
+    background: linear-gradient(rgb(225 245 255 / 85%) 0 1.5px, rgb(29 132 187 / 55%) 2px, rgb(11 58 94 / 85%));
 }
-.sea .cell.ship.stern::after {
+.ship-art.v::after {
+    top: 0; bottom: 0; left: 0; width: 40%;
+    background: linear-gradient(270deg, rgb(225 245 255 / 85%) 0 1.5px, rgb(29 132 187 / 55%) 2px, rgb(11 58 94 / 85%));
+}
+/* Afloat, the ships rock gently */
+.ship-art.h:not(.sunk) .ship-svg { animation: ship-rock-h 3.4s ease-in-out infinite; }
+.ship-art.v:not(.sunk) .ship-svg { animation: ship-rock-v 3.4s ease-in-out infinite; }
+.ship-art:nth-child(2n) .ship-svg { animation-delay: -1.3s; }
+.ship-art:nth-child(3n) .ship-svg { animation-delay: -2.2s; }
+@keyframes ship-rock-h { 50% { transform: translateY(3%) rotate(0.6deg); } }
+@keyframes ship-rock-v { 50% { transform: translateX(-3%) rotate(-0.6deg); } }
+/* Sunk: the wreck lies deep in the water, dark. The last shot's ship goes down before your eyes, with bubbles */
+.ship-art.sunk .ship-svg { filter: brightness(0.55) saturate(0.5); opacity: 0.85; }
+.ship-art.h.sunk .ship-svg { transform: translateY(16%) rotate(4deg); }
+.ship-art.v.sunk .ship-svg { transform: translateX(-16%) rotate(4deg); }
+.ship-art.h.sinking .ship-svg { animation: ship-sink-h 3.2s ease-in both; }
+.ship-art.v.sinking .ship-svg { animation: ship-sink-v 3.2s ease-in both; }
+@keyframes ship-sink-h {
+    0% { transform: none; filter: none; opacity: 1; }
+    20% { transform: translateY(4%) rotate(-4deg); filter: brightness(0.85); }
+    55% { transform: translateY(8%) rotate(7deg); filter: brightness(0.7) saturate(0.7); opacity: 0.95; }
+    100% { transform: translateY(16%) rotate(4deg); filter: brightness(0.5) saturate(0.5); opacity: 0.8; }
+}
+@keyframes ship-sink-v {
+    0% { transform: none; filter: none; opacity: 1; }
+    20% { transform: translateX(-4%) rotate(-4deg); filter: brightness(0.85); }
+    55% { transform: translateX(-8%) rotate(7deg); filter: brightness(0.7) saturate(0.7); opacity: 0.95; }
+    100% { transform: translateX(-16%) rotate(4deg); filter: brightness(0.5) saturate(0.5); opacity: 0.8; }
+}
+.ship-art.sinking::before {
     content: "";
     position: absolute;
-    z-index: 1;
-    width: 22%;
-    height: 22%;
-    top: 39%;
-    left: 39%;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 20% 70%, rgb(255 255 255 / 80%) 0 2px, transparent 3px),
+        radial-gradient(circle at 45% 80%, rgb(255 255 255 / 70%) 0 3px, transparent 4px),
+        radial-gradient(circle at 65% 65%, rgb(255 255 255 / 75%) 0 2px, transparent 3px),
+        radial-gradient(circle at 85% 85%, rgb(255 255 255 / 70%) 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 35% 90%, rgb(255 255 255 / 60%) 0 1.5px, transparent 2.5px);
+    animation: bubbles 3.4s ease-out 0.6s both;
+}
+@keyframes bubbles {
+    0% { transform: translateY(30%); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(-40%); opacity: 0; }
+}
+/* Ships nobody found, shown when the game is over */
+.ship-art.revealed .ship-svg { opacity: 0.6; filter: grayscale(0.6); animation: none; }
+
+/* What a shot leaves on a cell */
+.sea .fx { position: absolute; pointer-events: none; }
+.sea .fx i { position: absolute; display: block; }
+/* A miss: rings on the water, and for the last one a splash of drops */
+.sea .fx.ripple { inset: 32%; border-radius: 50%; border: 2px solid rgb(255 255 255 / 75%); box-shadow: 0 0 0 3px rgb(255 255 255 / 18%); }
+.sea .fx.splash { inset: 0; }
+.sea .fx.splash::before, .sea .fx.splash::after { content: ""; position: absolute; border-radius: 50%; }
+.sea .fx.splash::before { inset: 10%; border: 2px solid #fff; animation: splash-ring 0.9s ease-out both; }
+.sea .fx.splash::after {
+    left: 30%; right: 30%; bottom: 40%; height: 90%;
+    border-radius: 50% 50% 20% 20%;
+    background: linear-gradient(to top, rgb(255 255 255 / 90%), rgb(220 240 255 / 0));
+    transform-origin: 50% 100%;
+    animation: splash-column 0.8s ease-out both;
+}
+.sea .fx.splash i {
+    left: 42%; bottom: 45%; width: 16%; height: 22%;
     border-radius: 50%;
-    background: var(--deck, #c3ccd4);
+    background: #fff;
+    animation: splash-drop 0.9s ease-out both;
 }
-.sea.placing .cell.ship { --hull: #495057; }
-.sea .cell.ship.hit { background: #a9d6f5; --hull: #e8590c; --deck: #ffc078; }
-.sea .cell.ship.sunk { --hull: #9b2c2c; --deck: #e8a0a0; }
-.sea .cell.ship.revealed { --hull: #8c99a6; --deck: #d5dbe0; }
+.sea .fx.splash i:nth-child(1) { --dx: -110%; --dy: -230%; }
+.sea .fx.splash i:nth-child(2) { --dx: -40%; --dy: -320%; }
+.sea .fx.splash i:nth-child(3) { --dx: 40%; --dy: -300%; }
+.sea .fx.splash i:nth-child(4) { --dx: 120%; --dy: -210%; }
+.sea .fx.splash i:nth-child(5) { --dx: 0%; --dy: -380%; }
+@keyframes splash-ring { from { transform: scale(0.2); opacity: 1; } to { transform: scale(1.9); opacity: 0; } }
+@keyframes splash-column { 0% { transform: scaleY(0); opacity: 1; } 45% { transform: scaleY(1); opacity: 0.9; } 100% { transform: scaleY(0.2); opacity: 0; } }
+@keyframes splash-drop {
+    0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+    50% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 1; }
+    100% { transform: translate(calc(var(--dx) * 1.5), 40%) scale(0.5); opacity: 0; }
+}
+/* A hit: a burning wreck piece with smoke */
+.sea .fx.debris { left: 18%; right: 18%; bottom: 22%; height: 20%; border-radius: 40% 60% 30% 50%; background: #2b2f33; transform: rotate(-8deg); }
+.sea .fx.fire { left: 22%; right: 22%; top: 14%; bottom: 30%; }
+.sea .fx.fire i {
+    inset: 0;
+    border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%;
+    background: radial-gradient(circle at 50% 78%, #fff3bf 0 14%, #ffd43b 30%, #ff922b 52%, rgb(240 62 62 / 85%) 70%, transparent 74%);
+    transform-origin: 50% 100%;
+    animation: flame 0.45s ease-in-out infinite alternate;
+}
+.sea .fx.fire i:nth-child(2) { inset: 25% -18% 0 45%; animation-duration: 0.6s; animation-delay: -0.2s; }
+@keyframes flame { from { transform: scale(0.88, 0.8) rotate(-4deg); } to { transform: scale(1.04, 1.12) rotate(4deg); } }
+.sea .fx.smoke { left: 25%; right: 25%; top: -10%; height: 50%; }
+.sea .fx.smoke i {
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(60 60 60 / 70%), rgb(60 60 60 / 0) 70%);
+    animation: smoke 2.6s linear infinite;
+}
+.sea .fx.smoke i:nth-child(2) { animation-delay: -1.3s; }
+@keyframes smoke { from { transform: translate(0, 30%) scale(0.5); opacity: 0.9; } to { transform: translate(25%, -140%) scale(1.9); opacity: 0; } }
+/* The last hit: a flash, a ring of air and sparks */
+.sea .fx.boom { inset: -45%; z-index: 3; }
+.sea .fx.boom::before, .sea .fx.boom::after { content: ""; position: absolute; inset: 0; border-radius: 50%; }
+.sea .fx.boom::before {
+    background: radial-gradient(circle, #fff 0 12%, #ffe066 24%, #ff922b 42%, rgb(224 49 49 / 70%) 56%, transparent 68%);
+    animation: boom 0.75s ease-out both;
+}
+.sea .fx.boom::after { border: 3px solid rgb(255 255 255 / 80%); animation: shockwave 0.7s ease-out both; }
+.sea .fx.boom i {
+    left: 46%; top: 46%; width: 8%; height: 8%;
+    border-radius: 50%;
+    background: #ffd43b;
+    box-shadow: 0 0 4px #ff922b;
+    animation: spark 0.8s ease-out both;
+}
+.sea .fx.boom i:nth-child(1) { --dx: -380%; --dy: -300%; }
+.sea .fx.boom i:nth-child(2) { --dx: 380%; --dy: -320%; }
+.sea .fx.boom i:nth-child(3) { --dx: 0%; --dy: -480%; }
+.sea .fx.boom i:nth-child(4) { --dx: -440%; --dy: 120%; }
+.sea .fx.boom i:nth-child(5) { --dx: 440%; --dy: 160%; }
+.sea .fx.boom i:nth-child(6) { --dx: 60%; --dy: 380%; }
+@keyframes boom { 0% { transform: scale(0.1); opacity: 1; } 60% { opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+@keyframes shockwave { from { transform: scale(0.2); opacity: 1; } to { transform: scale(1.1); opacity: 0; } }
+@keyframes spark { from { transform: translate(0, 0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+    .sea-frame::before, .sea-frame::after, .ship-art .ship-svg, .sea .fx i, .ship-art.sinking::before { animation: none !important; }
+    .sea .fx.splash, .sea .fx.boom, .ship-art.sinking::before { display: none; }
+}
+
+/* The fleet under each sea: little ships, the sunk ones faded */
 .fleet-left { margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; color: var(--muted); font-size: 0.95rem; }
-.fleet-ship { letter-spacing: -2px; color: var(--text); }
-.fleet-ship.gone { color: var(--muted); text-decoration: line-through; opacity: 0.5; }
+.fleet-ship { display: inline-flex; align-items: flex-end; height: 22px; }
+.fleet-ship .ship-svg { height: 22px; }
+.fleet-ship.s-5 .ship-svg { width: 74px; } .fleet-ship.s-4 .ship-svg { width: 60px; }
+.fleet-ship.s-3 .ship-svg { width: 46px; } .fleet-ship.s-2 .ship-svg { width: 32px; }
+.fleet-ship.gone { opacity: 0.3; filter: grayscale(1); }
 
 /* Vocabulary in lessons and quizzes */
 .speak {
