@@ -144,6 +144,7 @@ public static class ErrorCodes
     public const string CardNotPlayable = Domain.Multiplayer.GameErrors.CardNotPlayable;
     public const string MustDraw = Domain.Multiplayer.GameErrors.MustDraw;
     public const string ChessMoveInvalid = Domain.Multiplayer.GameErrors.ChessMoveInvalid;
+    public const string CardDoesNotFit = Domain.Multiplayer.GameErrors.CardDoesNotFit;
 
     /// <summary>Prefix for account errors from the identity adapter, e.g. "account.DuplicateEmail".</summary>
     public const string AccountPrefix = "account.";

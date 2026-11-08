@@ -1,0 +1,35 @@
+@* How a game for several players goes, folded away until a child (or parent) opens it. The texts are
+   Play.About.<game> (one sentence) and Play.Rules.<game> (one paragraph per line). *@
+
+<details class="game-rules" open="@Open">
+    <summary>
+        <span aria-hidden="true">@(WithName ? PlayGames.Icon(Game) : "📖")</span>
+        @(WithName ? L[$"Play.Game.{Game}"] : L["Play.HowToPlay"])
+    </summary>
+    <p class="game-rules-about"><b>@L[$"Play.About.{Game}"]</b> <small>@Players</small></p>
+    @foreach (var paragraph in L[$"Play.Rules.{Game}"].Value.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+    {
+        <p>@paragraph</p>
+    }
+</details>
+
+@code {
+    [Parameter, EditorRequired]
+    public required string Game { get; set; }
+
+    /// <summary>Shows the game's icon and name instead of "How to play" (in a list of all games).</summary>
+    [Parameter]
+    public bool WithName { get; set; }
+
+    [Parameter]
+    public bool Open { get; set; }
+
+    private string Players
+    {
+        get
+        {
+            var (min, max) = PlayGames.Seats(Game);
+            return min == max ? L["Play.PlayersExactly", min] : L["Play.Players", min, max];
+        }
+    }
+}

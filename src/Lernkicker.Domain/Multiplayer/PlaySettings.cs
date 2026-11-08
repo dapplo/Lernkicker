@@ -10,8 +10,9 @@ public static class MultiplayerGames
     public const string Checkers = "checkers";
     public const string MauMau = "mauMau";
     public const string Chess = "chess";
+    public const string NumberTowers = "numberTowers";
 
-    public static readonly IReadOnlyList<IGameRules> All = [new Battleship(), new ConnectFour(), new Checkers(), new MauMau(), new Chess()];
+    public static readonly IReadOnlyList<IGameRules> All = [new Battleship(), new ConnectFour(), new Checkers(), new MauMau(), new Chess(), new NumberTowers()];
 
     public static IGameRules? Find(string? game) => All.FirstOrDefault(g => g.Game == game);
 }

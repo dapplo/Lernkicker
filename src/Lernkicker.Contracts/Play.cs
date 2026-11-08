@@ -45,6 +45,7 @@ public sealed record MatchDto(MatchOverview Match, GameViewDto? View, int? Resig
 [JsonDerivedType(typeof(CheckersViewDto), "checkers")]
 [JsonDerivedType(typeof(MauMauViewDto), "mauMau")]
 [JsonDerivedType(typeof(ChessViewDto), "chess")]
+[JsonDerivedType(typeof(NumberTowersViewDto), "numberTowers")]
 public abstract record GameViewDto;
 
 /// <summary>A square on a board: column and row (row 0 is the top).</summary>
@@ -101,6 +102,23 @@ public sealed record ChessViewDto(
     IReadOnlyList<string> Board, bool IAmWhite, bool WhiteToMove, IReadOnlyList<ChessMoveDto> Moves, bool Check,
     ChessMoveDto? Last, string? Ending, bool Over) : GameViewDto;
 
+/// <summary>
+/// What happened last in Number Towers. <c>Kind</c>: "play", "discard", "pass" or "resign"; <c>From</c>: "stock",
+/// "hand" or "discard"; <c>Done</c>: the card finished its tower.
+/// </summary>
+public sealed record NumberTowersActionDto(int Seat, string Kind, int Card, string? From, int Tower, int Pile, bool Done);
+
+/// <summary>A player in Number Towers: open stock top (null when empty), stock and hand sizes, the four discard piles (top last).</summary>
+public sealed record NumberTowersSeatDto(int Seat, int? StockTop, int StockCount, int HandCount, IReadOnlyList<IReadOnlyList<int>> Discards);
+
+/// <summary>
+/// Number Towers for one player. Cards are 1 to 12, 0 is a star (wild). <c>Towers</c>: the height of each of the four
+/// towers (the number on top, 0 when empty); <c>TowerTops</c>: the card on top (0 when a star stands in).
+/// </summary>
+public sealed record NumberTowersViewDto(
+    IReadOnlyList<int> Hand, IReadOnlyList<NumberTowersSeatDto> Seats, IReadOnlyList<int> Towers, IReadOnlyList<int> TowerTops,
+    int Turn, int DeckSize, IReadOnlyList<int> Out, NumberTowersActionDto? Last, bool Over) : GameViewDto;
+
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(BattleshipPlaceDto), "battleship.place")]
 [JsonDerivedType(typeof(BattleshipShootDto), "battleship.shoot")]
@@ -110,6 +128,9 @@ public sealed record ChessViewDto(
 [JsonDerivedType(typeof(MauMauDrawDto), "mauMau.draw")]
 [JsonDerivedType(typeof(MauMauPassDto), "mauMau.pass")]
 [JsonDerivedType(typeof(ChessMoveRequestDto), "chess.move")]
+[JsonDerivedType(typeof(NumberTowersPlayDto), "numberTowers.play")]
+[JsonDerivedType(typeof(NumberTowersDiscardDto), "numberTowers.discard")]
+[JsonDerivedType(typeof(NumberTowersPassDto), "numberTowers.pass")]
 public abstract record MoveDto;
 
 public sealed record BattleshipPlaceDto(IReadOnlyList<ShipDto> Ships) : MoveDto;
@@ -128,6 +149,13 @@ public sealed record MauMauDrawDto : MoveDto;
 public sealed record MauMauPassDto : MoveDto;
 
 public sealed record ChessMoveRequestDto(CellDto From, CellDto To, string? Promotion = null) : MoveDto;
+
+/// <summary><c>From</c>: "stock", "hand" (with <c>Card</c>) or "discard" (with <c>Pile</c>); <c>Tower</c>: 0 to 3.</summary>
+public sealed record NumberTowersPlayDto(string From, int Tower, int Card = 0, int Pile = 0) : MoveDto;
+
+public sealed record NumberTowersDiscardDto(int Card, int Pile) : MoveDto;
+
+public sealed record NumberTowersPassDto : MoveDto;
 
 /// <summary>
 /// The live connection of the play pages (SignalR). The server only says that something changed; the page then
