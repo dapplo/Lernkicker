@@ -17,7 +17,7 @@ public sealed class Sounds(IJSRuntime js)
         _on = await Ask("lernkickerSounds.setOn", !await IsOn(), !await IsOn());
     }
 
-    /// <summary>Plays sounds by name ("shot", "splash", "hit", "sink", "place", "win", "lose"), each after its delay.</summary>
+    /// <summary>Plays sounds by name ("shot", "splash", "hit", "sink", "place", "win", "lose"; for reaction games "bonk", "gold", "pop", "ouch", "go", "early", "tick"), each after its delay.</summary>
     public async Task Play(params (string Name, double Delay)[] steps)
     {
         if (!await IsOn())

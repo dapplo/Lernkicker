@@ -45,6 +45,7 @@ public sealed record MatchDto(MatchOverview Match, GameViewDto? View, int? Resig
 [JsonDerivedType(typeof(CheckersViewDto), "checkers")]
 [JsonDerivedType(typeof(MauMauViewDto), "mauMau")]
 [JsonDerivedType(typeof(ChessViewDto), "chess")]
+[JsonDerivedType(typeof(ReactionViewDto), "reaction")]
 [JsonDerivedType(typeof(NumberTowersViewDto), "numberTowers")]
 public abstract record GameViewDto;
 
@@ -103,6 +104,23 @@ public sealed record ChessViewDto(
     ChessMoveDto? Last, string? Ending, bool Over) : GameViewDto;
 
 /// <summary>
+/// Something to tap in a reaction game: the hole (moles) or lane (balloons) in <c>Place</c>, shown from <c>At</c>
+/// for <c>Duration</c> milliseconds after the round starts (in the reflex game: how long the light stays red, and
+/// the slowest reaction that counts). <c>Kind</c>: "mole", "golden", "hedgehog", "balloon", "goldenBalloon",
+/// "blackBalloon" or "light".
+/// </summary>
+public sealed record ReactionTargetDto(int Id, int Place, int At, int Duration, string Kind);
+
+public sealed record ReactionResultDto(int Points, int Hits, int Wrong);
+
+/// <summary><c>Result</c> shows once the own round is played (or the game is over); <c>Out</c>: gave up.</summary>
+public sealed record ReactionSeatDto(bool Played, ReactionResultDto? Result, bool Out);
+
+/// <summary>
+/// A reaction game ("moles", "balloons" or "reflex"): the round every player plays, and the seats. The server scores
+/// the taps; the most points win.
+/// </summary>
+public sealed record ReactionViewDto(string Game, IReadOnlyList<ReactionTargetDto> Round, IReadOnlyList<ReactionSeatDto> Seats, bool Over) : GameViewDto;
 /// What happened last in Number Towers. <c>Kind</c>: "play", "discard", "pass" or "resign"; <c>From</c>: "stock",
 /// "hand" or "discard"; <c>Done</c>: the card finished its tower.
 /// </summary>
@@ -128,6 +146,7 @@ public sealed record NumberTowersViewDto(
 [JsonDerivedType(typeof(MauMauDrawDto), "mauMau.draw")]
 [JsonDerivedType(typeof(MauMauPassDto), "mauMau.pass")]
 [JsonDerivedType(typeof(ChessMoveRequestDto), "chess.move")]
+[JsonDerivedType(typeof(ReactionPlayDto), "reaction.play")]
 [JsonDerivedType(typeof(NumberTowersPlayDto), "numberTowers.play")]
 [JsonDerivedType(typeof(NumberTowersDiscardDto), "numberTowers.discard")]
 [JsonDerivedType(typeof(NumberTowersPassDto), "numberTowers.pass")]
@@ -150,6 +169,11 @@ public sealed record MauMauPassDto : MoveDto;
 
 public sealed record ChessMoveRequestDto(CellDto From, CellDto To, string? Promotion = null) : MoveDto;
 
+/// <summary>A tap on target <c>Id</c>, <c>At</c> ms into the round (reflex: the reaction time, -1 for too early).</summary>
+public sealed record ReactionHitDto(int Id, int At);
+
+/// <summary>The own round of a reaction game: every tap, in order.</summary>
+public sealed record ReactionPlayDto(IReadOnlyList<ReactionHitDto> Hits) : MoveDto;
 /// <summary><c>From</c>: "stock", "hand" (with <c>Card</c>) or "discard" (with <c>Pile</c>); <c>Tower</c>: 0 to 3.</summary>
 public sealed record NumberTowersPlayDto(string From, int Tower, int Card = 0, int Pile = 0) : MoveDto;
 

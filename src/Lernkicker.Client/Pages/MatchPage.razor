@@ -64,6 +64,9 @@ else
         case ChessViewDto chess:
             <ChessGame View="@chess" Opponent="@Opponent" Busy="@_busy" Move="Move" />
             break;
+        case ReactionViewDto reaction:
+            <ReactionMatch View="@reaction" Players="@match.Players" MySeat="@(match.MySeat ?? 0)" Move="Move" />
+            break;
         case null when match.Status == "waiting":
             <div class="empty">
                 <div class="ball" aria-hidden="true">⏳</div>
@@ -92,7 +95,8 @@ else
     </div>
 
     @if (match.Status == "playing" && !match.Abandoned && !(_match.View is MauMauViewDto { } mau && mau.Out.Contains(match.MySeat ?? -1))
-        && !(_match.View is NumberTowersViewDto { } towersView && towersView.Out.Contains(match.MySeat ?? -1)))
+         && !(_match.View is ReactionViewDto { } rx && (rx.Seats[match.MySeat ?? 0].Out || rx.Seats[match.MySeat ?? 0].Played))
+         && !(_match.View is NumberTowersViewDto { } towersView && towersView.Out.Contains(match.MySeat ?? -1)))
     {
         @* Tucked away with a second step, so nobody gives up by accident *@
         <details class="grown-ups">

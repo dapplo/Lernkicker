@@ -604,6 +604,48 @@
   <data name="Play.Game.chess" xml:space="preserve"><value>Schach</value></data>
   <data name="Play.Draw" xml:space="preserve"><value>Unentschieden</value></data>
   <data name="Play.SeatsTaken" xml:space="preserve"><value>{0} von {1} Spielern</value></data>
+  <data name="Play.Game.moles" xml:space="preserve"><value>Maulwurf hauen</value></data>
+  <data name="Play.Game.balloons" xml:space="preserve"><value>Ballons platzen</value></data>
+  <data name="Play.Game.reflex" xml:space="preserve"><value>Blitzschnell</value></data>
+  <data name="Play.About.moles" xml:space="preserve"><value>Hau auf die Maulwürfe, wenn sie aus ihren Löchern schauen, aber lass die Igel in Ruhe!</value></data>
+  <data name="Play.About.balloons" xml:space="preserve"><value>Lass die Ballons platzen, bevor sie davonfliegen, aber nicht die schwarzen!</value></data>
+  <data name="Play.About.reflex" xml:space="preserve"><value>Warte auf das grüne Licht und tippe dann so schnell du kannst.</value></data>
+  <data name="Play.Rules.moles" xml:space="preserve"><value>30 Sekunden lang schauen Maulwürfe aus neun Löchern. Tippe einen Maulwurf an, solange du ihn siehst: 10 Punkte.
+Ein goldener Maulwurf mit Krone ist schnell wieder weg und bringt 25 Punkte.
+Igel sind stachelig: Wer einen antippt, verliert 15 Punkte.
+Alle am Tisch bekommen dieselben Maulwürfe. Wenn alle gespielt haben, gewinnt, wer die meisten Punkte hat. Du kannst auch allein spielen und deinen Rekord knacken.</value></data>
+  <data name="Play.Rules.balloons" xml:space="preserve"><value>30 Sekunden lang steigen Ballons in den Himmel. Tippe einen Ballon an, dann platzt er: 10 Punkte.
+Goldene Ballons mit Stern steigen am schnellsten und bringen 25 Punkte.
+Schwarze Ballons sind grimmig: Wer einen platzen lässt, verliert 15 Punkte.
+Alle am Tisch bekommen dieselben Ballons. Wenn alle gespielt haben, gewinnt, wer die meisten Punkte hat. Du kannst auch allein spielen und deinen Rekord knacken.</value></data>
+  <data name="Play.Rules.reflex" xml:space="preserve"><value>Das Licht ist rot. Warte! Sobald es grün wird, tippst du so schnell du kannst darauf.
+Je schneller du bist, desto mehr Punkte bekommst du: bis zu 100 pro Licht. Wer tippt, solange es noch rot ist, war zu früh und bekommt nichts.
+Es gibt sechs Lichter. Alle am Tisch warten gleich lang. Wenn alle gespielt haben, gewinnt, wer die meisten Punkte hat. Du kannst auch allein spielen und deinen Rekord knacken.</value></data>
+  <data name="Play.Alone" xml:space="preserve"><value>Allein spielen</value></data>
+  <data name="Reaction.Start" xml:space="preserve"><value>Ich bin bereit!</value></data>
+  <data name="Reaction.Go" xml:space="preserve"><value>Los!</value></data>
+  <data name="Reaction.Points" xml:space="preserve"><value>{0} Punkte</value></data>
+  <data name="Reaction.LightRound" xml:space="preserve"><value>Licht {0} von {1}</value></data>
+  <data name="Reaction.Hole" xml:space="preserve"><value>Loch {0}</value></data>
+  <data name="Reaction.Kind.balloon" xml:space="preserve"><value>Ballon</value></data>
+  <data name="Reaction.Kind.goldenBalloon" xml:space="preserve"><value>Goldener Ballon</value></data>
+  <data name="Reaction.Kind.blackBalloon" xml:space="preserve"><value>Schwarzer Ballon</value></data>
+  <data name="Reaction.Wait" xml:space="preserve"><value>Warte …</value></data>
+  <data name="Reaction.Tap" xml:space="preserve"><value>Jetzt!</value></data>
+  <data name="Reaction.TooEarly" xml:space="preserve"><value>Zu früh!</value></data>
+  <data name="Reaction.TooSlow" xml:space="preserve"><value>Zu langsam!</value></data>
+  <data name="Reaction.Milliseconds" xml:space="preserve"><value>{0} ms: +{1}</value></data>
+  <data name="Reaction.TimeUp" xml:space="preserve"><value>Die Zeit ist um!</value></data>
+  <data name="Reaction.YourPoints" xml:space="preserve"><value>Du hast {0} Punkte</value></data>
+  <data name="Reaction.HitsAndWrong" xml:space="preserve"><value>{0} Treffer, {1} daneben</value></data>
+  <data name="Reaction.PointsShort" xml:space="preserve"><value>{0} Punkte</value></data>
+  <data name="Reaction.PlayedHidden" xml:space="preserve"><value>hat gespielt</value></data>
+  <data name="Reaction.NotPlayed" xml:space="preserve"><value>hat noch nicht gespielt</value></data>
+  <data name="Reaction.GaveUp" xml:space="preserve"><value>hat aufgegeben</value></data>
+  <data name="Reaction.WaitForOthers" xml:space="preserve"><value>Sobald alle gespielt haben, siehst du, wer gewonnen hat.</value></data>
+  <data name="Reaction.NewBest" xml:space="preserve"><value>Neuer Rekord!</value></data>
+  <data name="Reaction.Best" xml:space="preserve"><value>Dein Rekord: {0} Punkte</value></data>
+  <data name="Reaction.Again" xml:space="preserve"><value>Nochmal</value></data>
   <data name="Play.WaitingHintMany" xml:space="preserve"><value>Bis der Tisch voll ist, können noch andere dazukommen. Sobald mindestens {0} da sind, könnt ihr loslegen: Wer das Spiel aufgemacht hat, entscheidet, wann.</value></data>
   <data name="Play.StartNow" xml:space="preserve"><value>Jetzt anfangen</value></data>
   <data name="ConnectFour.YourTurn" xml:space="preserve"><value>Tipp auf eine Spalte, um deinen Stein einzuwerfen. Vier in einer Reihe gewinnen, waagrecht, senkrecht oder schräg.</value></data>

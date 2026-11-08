@@ -1,0 +1,314 @@
+@using Lernkicker.Client.Reaction
+@implements IDisposable
+@inject Sounds Sounds
+
+@* One round of a reaction game, with others or alone: a start button, a countdown, the round, then the taps go to
+   Done. The points shown while playing are worked out the same way the server scores them (ReactionRounds). *@
+
+<div class="rx rx-@Game">
+    @switch (_phase)
+    {
+        case Phase.Ready:
+            <div class="rx-ready">
+                <div class="rx-ready-icon" aria-hidden="true">@PlayGames.Icon(Game)</div>
+                <p>@L[$"Play.About.{Game}"]</p>
+                <button type="button" class="btn" @onclick="Begin">@L["Reaction.Start"]</button>
+            </div>
+            break;
+        case Phase.Countdown:
+            <div class="rx-ready" role="status">
+                <div class="rx-count" @key="_count">@(_count > 0 ? _count.ToString() : L["Reaction.Go"].Value)</div>
+            </div>
+            break;
+        default:
+            <div class="rx-bar" role="status">
+                <span>@L["Reaction.Points", _points]</span>
+                @if (Game == ReactionRounds.Reflex)
+                {
+                    <span>@L["Reaction.LightRound", Math.Min(_light + 1, Round.Count), Round.Count]</span>
+                }
+                else
+                {
+                    <span>⏱ @Math.Max(0, (ReactionRounds.Length - _now + 999) / 1000)</span>
+                }
+            </div>
+            @if (Game == ReactionRounds.Moles)
+            {
+                <div class="rx-holes">
+                    @for (var hole = 0; hole < ReactionRounds.Holes; hole++)
+                    {
+                        var place = hole;
+                        var target = Showing(place);
+                        <button type="button" class="rx-hole" aria-label="@L["Reaction.Hole", place + 1]" @onpointerdown="() => TapHole(place)">
+                            @if (target is not null)
+                            {
+                                var hit = _hit.Contains(target.Id);
+                                <span class="rx-pit" aria-hidden="true">
+                                    <span class="rx-mole @target.Kind @(hit ? "hit" : "")" @key="target.Id">
+                                        <MoleArt Kind="@target.Kind" />
+                                    </span>
+                                </span>
+                                @if (hit)
+                                {
+                                    <span class="rx-fx" data-lottie="@(ReactionRounds.Value(target.Kind) < 0 ? "poof" : "bonk")" aria-hidden="true"></span>
+                                    <span class="rx-gain @(ReactionRounds.Value(target.Kind) < 0 ? "minus" : "")" aria-hidden="true">@Gain(target.Kind)</span>
+                                }
+                            }
+                            <span class="rx-hole-rim" aria-hidden="true"></span>
+                        </button>
+                    }
+                </div>
+            }
+            else if (Game == ReactionRounds.Balloons)
+            {
+                <div class="rx-sky" aria-label="@L["Play.Game.balloons"]">
+                    @foreach (var target in Visible())
+                    {
+                        var balloon = target;
+                        var hit = _hit.Contains(balloon.Id);
+                        <button type="button" @key="balloon.Id" aria-label="@L[$"Reaction.Kind.{balloon.Kind}"]"
+                                class="rx-balloon lane-@balloon.Place rise-@Rise(balloon) @balloon.Kind color-@(balloon.Id % 5) @(hit ? "popped" : "")"
+                                disabled="@hit" @onpointerdown="() => TapBalloon(balloon)">
+                            <BalloonArt Kind="@balloon.Kind" Color="@(balloon.Id % 5)" />
+                            @if (hit)
+                            {
+                                <span class="rx-fx" data-lottie="@(ReactionRounds.Value(balloon.Kind) < 0 ? "poof" : "pop")" aria-hidden="true"></span>
+                                <span class="rx-gain @(ReactionRounds.Value(balloon.Kind) < 0 ? "minus" : "")" aria-hidden="true">@Gain(balloon.Kind)</span>
+                            }
+                        </button>
+                    }
+                </div>
+            }
+            else
+            {
+                <button type="button" class="rx-lamp @_lamp" @onpointerdown="TapLamp">
+                    <span class="rx-lamp-light" aria-hidden="true"></span>
+                    @if (_lamp == "go" && _zap)
+                    {
+                        <span class="rx-fx" data-lottie="zap" aria-hidden="true"></span>
+                    }
+                    <span class="rx-lamp-text">
+                        @(_lamp switch
+                        {
+                            "go" => L["Reaction.Tap"].Value,
+                            "early" => L["Reaction.TooEarly"].Value,
+                            "slow" => L["Reaction.TooSlow"].Value,
+                            "done" => L["Reaction.Milliseconds", _lastReaction, ReactionRounds.LightPoints(_lastReaction)].Value,
+                            _ => L["Reaction.Wait"].Value,
+                        })
+                    </span>
+                </button>
+            }
+            @if (_phase == Phase.Over)
+            {
+                <p class="rx-over" role="status">@L["Reaction.TimeUp"]</p>
+            }
+            break;
+    }
+</div>
+
+@code {
+    private enum Phase { Ready, Countdown, Playing, Over }
+
+    private readonly System.Diagnostics.Stopwatch _clock = new();
+    private readonly List<ReactionHitDto> _hits = [];
+    private readonly HashSet<int> _hit = [];
+    private readonly CancellationTokenSource _stop = new();
+    private Phase _phase = Phase.Ready;
+    private int _count;
+    private int _now;
+    private int _points;
+
+    // The reflex game: which light, its state ("wait", "go", "early", "slow", "done"), when it turned green
+    private int _light;
+    private string _lamp = "wait";
+    private long _greenAt;
+    private int _lastReaction;
+    private bool _zap;
+    private TaskCompletionSource<long>? _tap;
+
+    /// <summary>"moles", "balloons" or "reflex".</summary>
+    [Parameter, EditorRequired]
+    public required string Game { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<ReactionTargetDto> Round { get; set; }
+
+    /// <summary>Gets every tap once the round is over.</summary>
+    [Parameter]
+    public EventCallback<IReadOnlyList<ReactionHitDto>> Done { get; set; }
+
+    private async Task Begin()
+    {
+        _phase = Phase.Countdown;
+        for (_count = 3; _count >= 0; _count--)
+        {
+            StateHasChanged();
+            await Sounds.Play(_count > 0 ? ("tick", 0) : ("go", 0));
+            if (!await Wait(_count > 0 ? 800 : 500))
+            {
+                return;
+            }
+        }
+
+        _phase = Phase.Playing;
+        _clock.Restart();
+        if (Game == ReactionRounds.Reflex)
+        {
+            await Lights();
+        }
+        else
+        {
+            // Twenty frames a second are plenty: moles and balloons move by CSS, this only adds and removes them
+            while (_clock.ElapsedMilliseconds < ReactionRounds.Length)
+            {
+                _now = (int)_clock.ElapsedMilliseconds;
+                StateHasChanged();
+                if (!await Wait(50))
+                {
+                    return;
+                }
+            }
+        }
+
+        _now = ReactionRounds.Length;
+        _phase = Phase.Over;
+        StateHasChanged();
+        if (await Wait(900))
+        {
+            await Done.InvokeAsync(_hits.ToList());
+        }
+    }
+
+    private async Task Lights()
+    {
+        for (_light = 0; _light < Round.Count; _light++)
+        {
+            var target = Round[_light];
+            _lamp = "wait";
+            _zap = false;
+            StateHasChanged();
+            _tap = new TaskCompletionSource<long>();
+            var tapped = _tap.Task;
+            var waited = Task.Delay(target.At, _stop.Token);
+            if (await Task.WhenAny(tapped, waited) == tapped)
+            {
+                // Too early: the light was still red
+                Record(target.Id, -1);
+                _lamp = "early";
+                await Sounds.Play(("early", 0));
+            }
+            else
+            {
+                if (_stop.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                _tap = new TaskCompletionSource<long>();
+                tapped = _tap.Task;
+                _lamp = "go";
+                _zap = true;
+                StateHasChanged();
+                _greenAt = _clock.ElapsedMilliseconds;
+                await Sounds.Play(("go", 0));
+                if (await Task.WhenAny(tapped, Task.Delay(target.Duration, _stop.Token)) == tapped)
+                {
+                    _lastReaction = (int)(tapped.Result - _greenAt);
+                    Record(target.Id, _lastReaction);
+                    _points += _lastReaction >= ReactionRounds.FastestReaction ? ReactionRounds.LightPoints(_lastReaction) : 0;
+                    _lamp = "done";
+                    await Sounds.Play((_lastReaction < 350 ? "gold" : "bonk", 0));
+                }
+                else
+                {
+                    _lamp = "slow";
+                }
+            }
+
+            _tap = null;
+            StateHasChanged();
+            if (!await Wait(1300))
+            {
+                return;
+            }
+        }
+    }
+
+    private void TapLamp() => _tap?.TrySetResult(_clock.ElapsedMilliseconds);
+
+    private ReactionTargetDto? Showing(int hole)
+    {
+        // A mole that was hit stays a moment longer, so its bonk can be seen
+        return Round.FirstOrDefault(t => t.Place == hole && t.At <= _now && _now < t.At + t.Duration + (_hit.Contains(t.Id) ? 300 : 0)
+                                         && (!_hit.Contains(t.Id) || _hitAt.GetValueOrDefault(t.Id) + 500 > _now));
+    }
+
+    private readonly Dictionary<int, int> _hitAt = [];
+
+    private IEnumerable<ReactionTargetDto> Visible() => Round.Where(t => t.At <= _now && _now < t.At + t.Duration);
+
+    private static int Rise(ReactionTargetDto balloon) => Math.Max(0, Array.IndexOf(ReactionRounds.RiseTimes, balloon.Duration));
+
+    private async Task TapHole(int hole)
+    {
+        if (_phase != Phase.Playing)
+        {
+            return;
+        }
+
+        var at = (int)_clock.ElapsedMilliseconds;
+        var target = Round.FirstOrDefault(t => t.Place == hole && !_hit.Contains(t.Id) && t.At <= at && at < t.At + t.Duration + 100);
+        if (target is not null)
+        {
+            await Hit(target, at);
+        }
+    }
+
+    private async Task TapBalloon(ReactionTargetDto balloon)
+    {
+        if (_phase == Phase.Playing && !_hit.Contains(balloon.Id))
+        {
+            await Hit(balloon, (int)_clock.ElapsedMilliseconds);
+        }
+    }
+
+    private async Task Hit(ReactionTargetDto target, int at)
+    {
+        Record(target.Id, at);
+        _hitAt[target.Id] = at;
+        _points = Math.Max(0, _points + ReactionRounds.Value(target.Kind));
+        _now = at;
+        StateHasChanged();
+        var value = ReactionRounds.Value(target.Kind);
+        await Sounds.Play(value < 0 ? ("ouch", 0) : value > 10 ? ("gold", 0) : (Game == ReactionRounds.Balloons ? "pop" : "bonk", 0));
+    }
+
+    private void Record(int id, int at)
+    {
+        _hit.Add(id);
+        _hits.Add(new ReactionHitDto(id, at));
+    }
+
+    private static string Gain(string kind) => ReactionRounds.Value(kind) switch
+    {
+        > 0 and var v => $"+{v}",
+        var v => v.ToString(),
+    };
+
+    private async Task<bool> Wait(int milliseconds)
+    {
+        try
+        {
+            await Task.Delay(milliseconds, _stop.Token);
+            return true;
+        }
+        catch (TaskCanceledException)
+        {
+            return false;
+        }
+    }
+
+    // Not disposed: a loop may still look at the token once more after the page has gone
+    public void Dispose() => _stop.Cancel();
+}

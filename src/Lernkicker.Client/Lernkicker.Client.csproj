@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);LINKED_IN_CLIENT</DefineConstants>
+  </PropertyGroup>
+
   <!-- Driving adapter for people: the PWA for children and parents. Talks to the server only through Lernkicker.Contracts. -->
 
   <PropertyGroup>
@@ -21,6 +25,9 @@
     <ProjectReference Include="..\Lernkicker.Contracts\Lernkicker.Contracts.csproj" />
     <!-- Lesson practice checks typed vocabulary the same way as the quiz grader; the client references no domain -->
     <Compile Include="..\Lernkicker.Domain\Quizzes\Spelling.cs" Link="Services\Spelling.cs" />
+    <!-- Reaction games played alone make their rounds and points on the device, the same way the server does
+         (in the namespace Lernkicker.Client.Reaction, see LINKED_IN_CLIENT) -->
+    <Compile Include="..\Lernkicker.Domain\Multiplayer\ReactionRounds.cs" Link="Services\ReactionRounds.cs" />
   </ItemGroup>
 
   <ItemGroup>

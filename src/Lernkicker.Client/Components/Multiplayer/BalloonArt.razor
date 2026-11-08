@@ -1,0 +1,35 @@
+@* A balloon on its string: coloured, golden with a star, or black with a skull-free frown (do not pop!) *@
+<svg class="rx-art" viewBox="0 0 60 110" aria-hidden="true">
+    <path d="M30 72 Q24 84 32 94 Q38 102 30 110" stroke="#868e96" stroke-width="1.5" fill="none" />
+    <polygon points="26,74 34,74 30,68" fill="@Fill" />
+    <ellipse cx="30" cy="36" rx="26" ry="34" fill="@Fill" />
+    <ellipse cx="20" cy="22" rx="6" ry="10" fill="#fff" opacity="0.45" />
+    @if (Kind == "goldenBalloon")
+    {
+        <polygon points="30,24 34,33 44,34 36,41 39,51 30,45 21,51 24,41 16,34 26,33" fill="#fff9db" />
+    }
+    else if (Kind == "blackBalloon")
+    {
+        <circle cx="22" cy="34" r="3.5" fill="#fff" />
+        <circle cx="38" cy="34" r="3.5" fill="#fff" />
+        <path d="M20 50 Q30 42 40 50" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" />
+    }
+</svg>
+
+@code {
+    private static readonly string[] Colors = ["#e03131", "#1c7ed6", "#37b24d", "#f59f00", "#ae3ec9"];
+
+    /// <summary>"balloon", "goldenBalloon" or "blackBalloon".</summary>
+    [Parameter, EditorRequired]
+    public required string Kind { get; set; }
+
+    [Parameter]
+    public int Color { get; set; }
+
+    private string Fill => Kind switch
+    {
+        "goldenBalloon" => "#f5b301",
+        "blackBalloon" => "#343a40",
+        _ => Colors[Color % Colors.Length],
+    };
+}

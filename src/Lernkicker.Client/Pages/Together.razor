@@ -50,6 +50,17 @@ else
         </details>
     }
 
+    @if (Alone.Count > 0)
+    {
+        <h2>@L["Play.Alone"]</h2>
+        <div class="buttons play-games">
+            @foreach (var game in Alone)
+            {
+                <a class="btn quiet" href="play/alone/@game"><span aria-hidden="true">@PlayGames.Icon(game)</span> @L[$"Play.Game.{game}"]</a>
+            }
+        </div>
+    }
+
     @if (_lobby.Tables.Count > 0)
     {
         <h2>@L["Play.OpenTables"]</h2>
@@ -172,6 +183,8 @@ else
 
     private List<MatchOverview> Running =>
         _lobby?.MyMatches.Where(m => m.Status != "finished").OrderByDescending(m => m.MyTurn).ToList() ?? [];
+
+    private List<string> Alone => _lobby?.Games.Where(PlayGames.CanPlayAlone).ToList() ?? [];
 
     private List<MatchOverview> Finished => _lobby?.MyMatches.Where(m => m.Status == "finished").ToList() ?? [];
 
