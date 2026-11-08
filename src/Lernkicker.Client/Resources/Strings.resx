@@ -646,7 +646,6 @@ There are six lights. Everyone at the table waits the same times. Whoever has th
   <data name="Reaction.NewBest" xml:space="preserve"><value>New best score!</value></data>
   <data name="Reaction.Best" xml:space="preserve"><value>Your best: {0} points</value></data>
   <data name="Reaction.Again" xml:space="preserve"><value>Play again</value></data>
-  <data name="Reaction.HowToPlay" xml:space="preserve"><value>How to play</value></data>
   <data name="Play.WaitingHintMany" xml:space="preserve"><value>Up to the full table can join. Once at least {0} are here, you can start; whoever opened the game decides when.</value></data>
   <data name="Play.StartNow" xml:space="preserve"><value>Start now</value></data>
   <data name="ConnectFour.YourTurn" xml:space="preserve"><value>Tap a column to drop your disc. Four in a row wins, across, down or slanting.</value></data>
@@ -789,4 +788,74 @@ There are six lights. Everyone at the table waits the same times. Whoever has th
   <data name="Vocabulary.Almost" xml:space="preserve"><value>Almost! Look closely:</value></data>
   <data name="Vocabulary.Wrong" xml:space="preserve"><value>Not quite. It is:</value></data>
   <data name="Vocabulary.Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Play.HowToPlay" xml:space="preserve"><value>How to play</value></data>
+  <data name="Play.GamesExplained" xml:space="preserve"><value>Which games are there?</value></data>
+  <data name="Play.Players" xml:space="preserve"><value>{0} to {1} players</value></data>
+  <data name="Play.About.battleship" xml:space="preserve"><value>Hide your ships and sink the other fleet by guessing where it is.</value></data>
+  <data name="Play.Rules.battleship" xml:space="preserve"><value>For two players. Each has a sea of 10 × 10 squares and a fleet of five ships (5, 4, 3, 3 and 2 squares long).
+First everyone places their ships, straight across or down. Ships must not touch each other, not even at the corners. The other player never sees where they are.
+Then you take turns shooting at a square of the other sea. A splash means miss, fire means hit. After a hit you may shoot again.
+When every square of a ship is hit, it sinks. Whoever sinks the whole other fleet first wins.</value></data>
+  <data name="Play.About.connectFour" xml:space="preserve"><value>Drop discs into the frame and be the first with four in a row.</value></data>
+  <data name="Play.Rules.connectFour" xml:space="preserve"><value>For two players: one plays red, the other yellow. The frame has 7 columns and 6 rows.
+You take turns dropping one disc into a column. It falls down to the lowest free place.
+Whoever first gets four of their discs in a row wins: across, up and down, or slanting.
+If the frame is full and nobody has four in a row, it is a draw.</value></data>
+  <data name="Play.About.checkers" xml:space="preserve"><value>Jump over the other pieces and capture them all.</value></data>
+  <data name="Play.Rules.checkers" xml:space="preserve"><value>For two players, white and black, each with twelve pieces on the dark squares of an 8 × 8 board. White begins.
+Pieces move one square diagonally forward. If an enemy piece is right next to yours and the square behind it is free, you jump over it and capture it. You may capture forward and backward, and you keep jumping as long as you can.
+Capturing is a must: if you can capture, you have to.
+A piece that reaches the far row becomes a king. A king moves and captures diagonally as far as it likes.
+Whoever cannot move any more (because all pieces are gone or stuck) loses. 40 moves without capturing and without a normal piece moving forward are a draw.</value></data>
+  <data name="Play.About.mauMau" xml:space="preserve"><value>Get rid of all your cards by matching suit or rank.</value></data>
+  <data name="Play.Rules.mauMau" xml:space="preserve"><value>For two to five players with 32 cards (7 to ace in clubs ♣, spades ♠, hearts ♥ and diamonds ♦). Everyone gets five cards; one card lies open in the middle.
+On your turn you put a card on the pile that has the same suit or the same rank as the top card, for example a ♥ on a ♥, or a 9 on a 9.
+If you cannot or do not want to, draw a card. If it fits, you may play it right away, otherwise you pass.
+Special cards: a 7 makes the next player draw two cards, unless they play a 7 too; then the next one draws four, and so on. An 8 makes the next player miss a turn. A jack fits on everything except another jack, and you wish for the suit that must come next.
+Whoever is rid of all cards first wins.</value></data>
+  <data name="Play.About.chess" xml:space="preserve"><value>Trap the other king so it cannot escape: checkmate!</value></data>
+  <data name="Play.Rules.chess" xml:space="preserve"><value>For two players, white and black, on an 8 × 8 board. White begins.
+Every piece moves its own way. King: one square in any direction. Queen: as far as she likes straight or diagonally. Rook: straight. Bishop: diagonally. Knight: an L shape (two squares one way, one to the side) and it may jump over pieces. Pawn: one square forward (two on its first move) and captures one square diagonally forward.
+You capture by moving onto a square with an enemy piece. A pawn that reaches the far row becomes a queen, rook, bishop or knight.
+If your king is attacked, that is check, and you must protect it. If it cannot escape any more, that is checkmate, and whoever gave it wins.
+The app only offers moves that are allowed, also castling and en passant. A game is a draw when nobody can move without being in check (stalemate), when the same position comes three times, after 50 moves without a capture or a pawn move, or when there are too few pieces left to checkmate.</value></data>
+  <data name="Play.About.numberTowers" xml:space="preserve"><value>Build towers from 1 to 12 and be the first to empty your stock.</value></data>
+  <data name="Play.Rules.numberTowers" xml:space="preserve"><value>For two to four players. The cards show the numbers 1 to 12; stars ⭐ can stand for any number. Everyone gets a stock of 20 cards; only its top card is open. Whoever empties their stock first wins.
+In the middle there are four towers that everybody builds on together. A tower starts with a 1, then comes 2, 3 and so on up to 12. When a tower reaches 12, it is cleared and can start again.
+When it is your turn, you get cards until you have five in your hand. Then you put as many cards on the towers as you can or want: from your hand, the top card of your stock, or the top card of one of your four discard piles.
+Tip: your stock card is the most important. Every card from the stock brings you closer to winning! If you use up all five hand cards, you get five new ones and go on.
+You end your turn by putting one hand card on one of your discard piles. Plan well: only the top card of a discard pile can be played later.</value></data>
+  <data name="Play.Game.numberTowers" xml:space="preserve"><value>Number Towers</value></data>
+  <data name="Error.numberTowers.cardDoesNotFit" xml:space="preserve"><value>This card does not fit on that tower.</value></data>
+  <data name="Towers.Out" xml:space="preserve"><value>gave up</value></data>
+  <data name="Towers.StockLeft" xml:space="preserve"><value>Stock: {0}</value></data>
+  <data name="Towers.InHand" xml:space="preserve"><value>{0} in hand</value></data>
+  <data name="Towers.Stock" xml:space="preserve"><value>Stock</value></data>
+  <data name="Towers.MyStock" xml:space="preserve"><value>My stock, {0} cards left</value></data>
+  <data name="Towers.Towers" xml:space="preserve"><value>Towers</value></data>
+  <data name="Towers.Tower" xml:space="preserve"><value>Tower {0}: {1}</value></data>
+  <data name="Towers.TowerEmpty" xml:space="preserve"><value>Tower {0}: empty, starts with 1</value></data>
+  <data name="Towers.Deck" xml:space="preserve"><value>{0} cards to draw</value></data>
+  <data name="Towers.MyHand" xml:space="preserve"><value>My cards</value></data>
+  <data name="Towers.MyPiles" xml:space="preserve"><value>My discard piles</value></data>
+  <data name="Towers.Piles" xml:space="preserve"><value>Discard piles</value></data>
+  <data name="Towers.Pile" xml:space="preserve"><value>Discard pile {0}: {1}</value></data>
+  <data name="Towers.PileEmpty" xml:space="preserve"><value>Discard pile {0}: empty</value></data>
+  <data name="Towers.Star" xml:space="preserve"><value>star</value></data>
+  <data name="Towers.StarAs" xml:space="preserve"><value>star as {0}</value></data>
+  <data name="Towers.YourTurn" xml:space="preserve"><value>Tap a card, then a tower it fits on. End your turn by putting a hand card on a discard pile.</value></data>
+  <data name="Towers.StockFits" xml:space="preserve"><value>Your stock card fits! Tap it, then the tower.</value></data>
+  <data name="Towers.PickedHand" xml:space="preserve"><value>Tap a tower that lights up, or one of your discard piles to end your turn.</value></data>
+  <data name="Towers.Picked" xml:space="preserve"><value>Tap a tower that lights up.</value></data>
+  <data name="Towers.FitsNowhere" xml:space="preserve"><value>This card fits on no tower right now.</value></data>
+  <data name="Towers.Pass" xml:space="preserve"><value>No cards left in your hand and none to draw. End your turn.</value></data>
+  <data name="Towers.PassButton" xml:space="preserve"><value>End turn</value></data>
+  <data name="Towers.TheirTurn" xml:space="preserve"><value>{0} is playing …</value></data>
+  <data name="Towers.Over" xml:space="preserve"><value>The game is over.</value></data>
+  <data name="Towers.Did.Play" xml:space="preserve"><value>{0} put {1} on tower {2}.</value></data>
+  <data name="Towers.Did.Done" xml:space="preserve"><value>{0} put {1} on tower {2}: the tower is complete!</value></data>
+  <data name="Towers.Did.Discard" xml:space="preserve"><value>{0} put {1} on a discard pile. Turn over.</value></data>
+  <data name="Towers.Did.Pass" xml:space="preserve"><value>{0} ended the turn.</value></data>
+  <data name="Towers.Did.Resign" xml:space="preserve"><value>{0} gave up.</value></data>
+  <data name="Play.PlayersExactly" xml:space="preserve"><value>{0} players</value></data>
 </root>

@@ -8,7 +8,7 @@ namespace Lernkicker.Client.Services;
 public static class PlayGames
 {
     /// <summary>The games for several players the server knows (MultiplayerGames on the server).</summary>
-    public static readonly IReadOnlyList<string> All = ["battleship", "connectFour", "checkers", "mauMau", "chess", "moles", "balloons", "reflex"];
+    public static readonly IReadOnlyList<string> All = ["battleship", "connectFour", "checkers", "mauMau", "chess", "numberTowers", "moles", "balloons", "reflex"];
 
     /// <summary>The games that can be played alone as well (everyone plays the same round, the points count).</summary>
     public static bool CanPlayAlone(string game) => Lernkicker.Client.Reaction.ReactionRounds.Games.Contains(game);
@@ -20,10 +20,19 @@ public static class PlayGames
         "checkers" => "⚪",
         "mauMau" => "🃏",
         "chess" => "♞",
+        "numberTowers" => "🗼",
         "moles" => "🔨",
         "balloons" => "🎈",
         "reflex" => "⚡",
         _ => "🎲",
+    };
+
+    /// <summary>How many can play (IGameRules.MinPlayers and MaxPlayers on the server), for the rules.</summary>
+    public static (int Min, int Max) Seats(string game) => game switch
+    {
+        "mauMau" => (2, 5),
+        "numberTowers" or "moles" or "balloons" or "reflex" => (2, 4),
+        _ => (2, 2),
     };
 
     public static string Name(SeatDto player) => player.Name;

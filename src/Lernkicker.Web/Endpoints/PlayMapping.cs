@@ -43,6 +43,10 @@ public static class PlayMapping
             r.Game, r.Round.Select(t => new ReactionTargetDto(t.Id, t.Place, t.At, t.Duration, t.Kind)).ToList(),
             r.Seats.Select(s => new ReactionSeatDto(s.Played, s.Result is { } x ? new ReactionResultDto(x.Points, x.Hits, x.Wrong) : null, s.Out)).ToList(),
             r.Over),
+        NumberTowersView t => new NumberTowersViewDto(
+            t.Hand, t.Seats.Select(p => new NumberTowersSeatDto(p.Seat, p.StockTop, p.StockCount, p.HandCount, p.Discards)).ToList(),
+            t.Towers, t.TowerTops, t.Turn, t.DeckSize, t.Out,
+            t.Last is { } a ? new NumberTowersActionDto(a.Seat, a.Kind, a.Card, a.From, a.Tower, a.Pile, a.Done) : null, t.Over),
         _ => throw new NotSupportedException(view.GetType().Name),
     };
 
@@ -68,6 +72,9 @@ public static class PlayMapping
         MauMauPassDto => new MauMauPass(),
         ChessMoveRequestDto { From: { } from, To: { } to } chess => new ChessMove(from.ToDomain(), to.ToDomain(), chess.Promotion),
         ReactionPlayDto { Hits: { } hits } => new ReactionPlay(hits.Where(h => h is not null).Select(h => new ReactionHit(h.Id, h.At)).ToList()),
+        NumberTowersPlayDto { From: { } from } play => new NumberTowersPlay(from, play.Tower, play.Card, play.Pile),
+        NumberTowersDiscardDto discard => new NumberTowersDiscard(discard.Card, discard.Pile),
+        NumberTowersPassDto => new NumberTowersPass(),
         _ => null,
     };
 }

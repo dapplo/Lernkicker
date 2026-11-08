@@ -58,6 +58,9 @@ else
         case MauMauViewDto mauMau:
             <MauMauGame View="@mauMau" Players="@match.Players" MySeat="@(match.MySeat ?? 0)" Busy="@_busy" Move="Move" />
             break;
+        case NumberTowersViewDto towers:
+            <NumberTowersGame View="@towers" Players="@match.Players" MySeat="@(match.MySeat ?? 0)" Busy="@_busy" Move="Move" />
+            break;
         case ChessViewDto chess:
             <ChessGame View="@chess" Opponent="@Opponent" Busy="@_busy" Move="Move" />
             break;
@@ -77,6 +80,8 @@ else
     }
     </div>
 
+    <GameRules Game="@match.Game" Open="@(match.Status == "waiting")" />
+
     <div class="buttons">
         <a class="btn quiet" href="play">@L["Play.BackToLobby"]</a>
         @if (match.Status == "waiting" && match.MySeat == 0 && match.Seats > 2)
@@ -90,7 +95,8 @@ else
     </div>
 
     @if (match.Status == "playing" && !match.Abandoned && !(_match.View is MauMauViewDto { } mau && mau.Out.Contains(match.MySeat ?? -1))
-         && !(_match.View is ReactionViewDto { } rx && (rx.Seats[match.MySeat ?? 0].Out || rx.Seats[match.MySeat ?? 0].Played)))
+         && !(_match.View is ReactionViewDto { } rx && (rx.Seats[match.MySeat ?? 0].Out || rx.Seats[match.MySeat ?? 0].Played))
+         && !(_match.View is NumberTowersViewDto { } towersView && towersView.Out.Contains(match.MySeat ?? -1)))
     {
         @* Tucked away with a second step, so nobody gives up by accident *@
         <details class="grown-ups">

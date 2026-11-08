@@ -50,13 +50,7 @@ else
         }
     }
 
-    <details class="play-rules">
-        <summary>@L["Reaction.HowToPlay"]</summary>
-        @foreach (var line in L[$"Play.Rules.{Game}"].Value.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-        {
-            <p>@line</p>
-        }
-    </details>
+    <GameRules Game="@Game" />
 }
 
 @code {

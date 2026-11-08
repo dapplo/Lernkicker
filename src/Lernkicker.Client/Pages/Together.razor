@@ -41,6 +41,13 @@ else
             }
         </div>
         <p class="hint">@L["Play.OpenTableHint"]</p>
+        <details class="play-explained">
+            <summary>@L["Play.GamesExplained"]</summary>
+            @foreach (var game in _lobby.Games)
+            {
+                <GameRules Game="@game" WithName="true" />
+            }
+        </details>
     }
 
     @if (Alone.Count > 0)

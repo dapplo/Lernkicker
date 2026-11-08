@@ -10,6 +10,7 @@ public static class MultiplayerGames
     public const string Checkers = "checkers";
     public const string MauMau = "mauMau";
     public const string Chess = "chess";
+    public const string NumberTowers = "numberTowers";
 
     // Reaction games: everyone plays the same round, the most points win (ReactionGame); they can be played alone too
     public const string Moles = ReactionRounds.Moles;
@@ -18,7 +19,7 @@ public static class MultiplayerGames
 
     public static readonly IReadOnlyList<IGameRules> All =
     [
-        new Battleship(), new ConnectFour(), new Checkers(), new MauMau(), new Chess(),
+        new Battleship(), new ConnectFour(), new Checkers(), new MauMau(), new Chess(), new NumberTowers(),
         new ReactionGame(Moles), new ReactionGame(Balloons), new ReactionGame(Reflex),
     ];
 

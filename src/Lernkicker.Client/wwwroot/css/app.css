@@ -1436,5 +1436,82 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .rx-scores { list-style: none; padding: 0; margin: 0 0 12px; max-width: 420px; }
 .rx-scores li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .rx-scores li.me { font-weight: 700; }
-.play-rules { margin: 16px 0; }
-.play-rules p { margin: 6px 0; }
+
+/* Number Towers. Our own cards: white with a colour per group of three (amber, teal, violet, tomato), a big number and
+   a little tower of blocks on the side that grows with the number; stars are rainbow cards that stand for any number. */
+.towers-game { display: flex; flex-direction: column; gap: 10px; }
+.towers-players { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.towers-players li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 14px; background: var(--paper); border: 1px solid var(--line); }
+.towers-players li.turn { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); }
+.towers-players li.out { opacity: 0.5; }
+.towers-players small { color: var(--muted); }
+.tw-other, .tw-other-piles { display: inline-flex; align-items: center; gap: 4px; }
+.tw-last { margin: 0; color: var(--muted); font-weight: 600; }
+.tw-table { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: var(--radius); background: linear-gradient(160deg, #3d5a80, #293d5a); }
+.tw-tower { position: relative; padding: 4px; border: 0; border-radius: 12px; background: rgb(255 255 255 / 12%); font: inherit; }
+.tw-tower.fits { cursor: pointer; background: rgb(255 214 102 / 45%); box-shadow: 0 0 0 3px var(--gold); animation: tw-glow 1.2s ease-in-out infinite alternate; }
+.tw-tower:disabled { opacity: 1; }
+@keyframes tw-glow { to { box-shadow: 0 0 0 5px var(--gold); } }
+.tw-deck { display: inline-flex; align-items: flex-end; justify-content: center; width: 52px; height: 76px; padding-bottom: 6px; border-radius: 8px; border: 3px solid #fff;
+    background: repeating-linear-gradient(0deg, #f4a300 0 9px, #0f9d8a 9px 18px, #7b4fd6 18px 27px, #e0542d 27px 36px); }
+.tw-deck small { padding: 1px 6px; border-radius: 6px; background: rgb(255 255 255 / 90%); color: #1d1d1d; font-weight: 700; }
+.tw-mine { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+.tw-stock { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; border-radius: 12px; background: var(--paper); border: 2px dashed var(--gold); }
+.tw-stock small { font-weight: 700; color: var(--muted); }
+.tw-piles { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+.tw-pile { display: flex; flex-direction: column; align-items: center; padding: 4px; min-height: 92px; border: 0; border-radius: 12px; background: rgb(0 0 0 / 5%); font: inherit; }
+.tw-pile .tw-card + .tw-card { margin-top: -52px; }
+.tw-pile:not(:disabled) { cursor: pointer; }
+.tw-pile.tw-drop { background: rgb(255 214 102 / 35%); box-shadow: 0 0 0 3px var(--gold); }
+.tw-pile:disabled { opacity: 1; }
+.tw-hand { display: flex; flex-wrap: wrap; gap: 6px; }
+.tw-card {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 76px;
+    padding: 0;
+    border: 1px solid #c9c9c9;
+    border-top: 8px solid var(--tw, #999);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--tw, #333);
+    font: inherit;
+    font-weight: 800;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 15%);
+}
+.tw-card.g1 { --tw: #d98e00; }
+.tw-card.g2 { --tw: #0f8f7e; }
+.tw-card.g3 { --tw: #6c43c9; }
+.tw-card.g4 { --tw: #d14a24; }
+.tw-card.star { --tw: #fff; border-top-width: 1px; color: #fff; background: conic-gradient(from 30deg, #f4a300, #e0542d, #7b4fd6, #0f9d8a, #f4a300); text-shadow: 0 1px 2px rgb(0 0 0 / 45%); }
+.tw-card .tw-num { font-size: 1.7rem; line-height: 1; margin-bottom: 6px; }
+.tw-card.star .tw-num { font-size: 2rem; }
+.tw-card .tw-as { position: absolute; top: 2px; left: 5px; font-size: 0.85rem; }
+/* The little tower lying down: one block per number along the bottom edge, so 12 is a full row */
+.tw-level { position: absolute; left: 5px; bottom: 5px; height: 6px; border-radius: 2px; background: repeating-linear-gradient(90deg, var(--tw, #999) 0 3px, transparent 3px 3.5px); opacity: 0.75; }
+.tw-card.star .tw-level { display: none; }
+.tw-level.l1 { width: 3.5px; } .tw-level.l2 { width: 7px; } .tw-level.l3 { width: 10.5px; } .tw-level.l4 { width: 14px; }
+.tw-level.l5 { width: 17.5px; } .tw-level.l6 { width: 21px; } .tw-level.l7 { width: 24.5px; } .tw-level.l8 { width: 28px; }
+.tw-level.l9 { width: 31.5px; } .tw-level.l10 { width: 35px; } .tw-level.l11 { width: 38.5px; } .tw-level.l12 { width: 42px; }
+.tw-card.slot { border: 2px dashed rgb(255 255 255 / 55%); background: transparent; box-shadow: none; color: rgb(255 255 255 / 55%); }
+.tw-piles .tw-card.slot { border-color: var(--line); color: var(--muted); }
+.tw-card.mini { width: 26px; height: 38px; border-top-width: 4px; border-radius: 5px; }
+.tw-card.mini .tw-num { font-size: 0.95rem; }
+.tw-card.mini .tw-level { display: none; }
+.tw-card.mini.empty { border: 1px dashed var(--line); background: transparent; box-shadow: none; }
+button.tw-card:not(:disabled) { cursor: pointer; }
+button.tw-card:disabled { opacity: 1; }
+.tw-card.hot { box-shadow: 0 0 0 3px var(--gold), 0 4px 6px rgb(0 0 0 / 20%); }
+.tw-card.picked, .tw-pile.picked .tw-card:last-child { transform: translateY(-8px); box-shadow: 0 0 0 3px var(--green), 0 6px 8px rgb(0 0 0 / 25%); }
+
+/* How a game goes (GameRules): on the match page and, for all games, in the lobby */
+.game-rules { margin: 12px 0; padding: 10px 14px; border-radius: var(--radius); background: var(--paper); border: 1px solid var(--line); }
+.game-rules > summary { cursor: pointer; font-weight: 700; }
+.game-rules[open] > summary { margin-bottom: 6px; }
+.game-rules p { margin: 6px 0; line-height: 1.45; }
+.game-rules-about small { display: block; color: var(--muted); }
+.play-explained { margin: 8px 0 16px; }
+.play-explained > summary { cursor: pointer; font-weight: 700; color: var(--muted); }

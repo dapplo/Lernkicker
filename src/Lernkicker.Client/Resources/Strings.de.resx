@@ -646,7 +646,6 @@ Es gibt sechs Lichter. Alle am Tisch warten gleich lang. Wenn alle gespielt habe
   <data name="Reaction.NewBest" xml:space="preserve"><value>Neuer Rekord!</value></data>
   <data name="Reaction.Best" xml:space="preserve"><value>Dein Rekord: {0} Punkte</value></data>
   <data name="Reaction.Again" xml:space="preserve"><value>Nochmal</value></data>
-  <data name="Reaction.HowToPlay" xml:space="preserve"><value>So geht's</value></data>
   <data name="Play.WaitingHintMany" xml:space="preserve"><value>Bis der Tisch voll ist, können noch andere dazukommen. Sobald mindestens {0} da sind, könnt ihr loslegen: Wer das Spiel aufgemacht hat, entscheidet, wann.</value></data>
   <data name="Play.StartNow" xml:space="preserve"><value>Jetzt anfangen</value></data>
   <data name="ConnectFour.YourTurn" xml:space="preserve"><value>Tipp auf eine Spalte, um deinen Stein einzuwerfen. Vier in einer Reihe gewinnen, waagrecht, senkrecht oder schräg.</value></data>
@@ -789,4 +788,74 @@ Es gibt sechs Lichter. Alle am Tisch warten gleich lang. Wenn alle gespielt habe
   <data name="Vocabulary.Almost" xml:space="preserve"><value>Fast! Schau genau:</value></data>
   <data name="Vocabulary.Wrong" xml:space="preserve"><value>Leider nicht. Richtig ist:</value></data>
   <data name="Vocabulary.Next" xml:space="preserve"><value>Weiter</value></data>
+  <data name="Play.HowToPlay" xml:space="preserve"><value>So wird gespielt</value></data>
+  <data name="Play.GamesExplained" xml:space="preserve"><value>Welche Spiele gibt es?</value></data>
+  <data name="Play.Players" xml:space="preserve"><value>{0} bis {1} Spieler</value></data>
+  <data name="Play.About.battleship" xml:space="preserve"><value>Versteck deine Schiffe und versenke die andere Flotte, indem du rätst, wo sie liegt.</value></data>
+  <data name="Play.Rules.battleship" xml:space="preserve"><value>Für zwei. Jeder hat ein Meer mit 10 × 10 Feldern und eine Flotte aus fünf Schiffen (5, 4, 3, 3 und 2 Felder lang).
+Zuerst stellt jeder seine Schiffe auf, gerade quer oder längs. Schiffe dürfen sich nicht berühren, auch nicht an den Ecken. Der andere sieht nie, wo sie liegen.
+Dann schießt ihr abwechselnd auf ein Feld im anderen Meer. Ein Platscher heißt daneben, Feuer heißt Treffer. Nach einem Treffer darfst du noch einmal schießen.
+Sind alle Felder eines Schiffs getroffen, geht es unter. Wer zuerst die ganze andere Flotte versenkt, gewinnt.</value></data>
+  <data name="Play.About.connectFour" xml:space="preserve"><value>Wirf Steine in das Gitter und hab als Erster vier in einer Reihe.</value></data>
+  <data name="Play.Rules.connectFour" xml:space="preserve"><value>Für zwei: einer spielt Rot, der andere Gelb. Das Gitter hat 7 Spalten und 6 Reihen.
+Ihr werft abwechselnd einen Stein in eine Spalte. Er fällt ganz nach unten auf den untersten freien Platz.
+Wer zuerst vier eigene Steine in einer Reihe hat, gewinnt: waagerecht, senkrecht oder schräg.
+Ist das Gitter voll und niemand hat vier in einer Reihe, ist es unentschieden.</value></data>
+  <data name="Play.About.checkers" xml:space="preserve"><value>Spring über die anderen Steine und schlag sie alle.</value></data>
+  <data name="Play.Rules.checkers" xml:space="preserve"><value>Für zwei, Weiß und Schwarz, mit je zwölf Steinen auf den dunklen Feldern eines Bretts mit 8 × 8 Feldern. Weiß fängt an.
+Steine ziehen ein Feld schräg nach vorn. Steht ein fremder Stein direkt neben deinem und das Feld dahinter ist frei, springst du darüber und schlägst ihn. Schlagen geht nach vorn und nach hinten, und du springst weiter, solange es geht.
+Schlagen ist Pflicht: Wenn du schlagen kannst, musst du.
+Ein Stein, der die gegenüberliegende Reihe erreicht, wird zur Dame. Eine Dame zieht und schlägt schräg so weit sie will.
+Wer nicht mehr ziehen kann (weil keine Steine mehr da sind oder alle festsitzen), verliert. 40 Züge ohne Schlagen und ohne dass ein einfacher Stein vorrückt sind unentschieden.</value></data>
+  <data name="Play.About.mauMau" xml:space="preserve"><value>Werde alle deine Karten los, indem du gleiche Farbe oder gleichen Wert legst.</value></data>
+  <data name="Play.Rules.mauMau" xml:space="preserve"><value>Für zwei bis fünf mit 32 Karten (7 bis Ass in Kreuz ♣, Pik ♠, Herz ♥ und Karo ♦). Jeder bekommt fünf Karten, eine Karte liegt offen in der Mitte.
+Wenn du dran bist, legst du eine Karte auf den Stapel, die die gleiche Farbe oder den gleichen Wert hat wie die oberste, zum Beispiel ein ♥ auf ein ♥ oder eine 9 auf eine 9.
+Kannst oder willst du nicht, ziehst du eine Karte. Passt sie, darfst du sie gleich legen, sonst setzt du aus.
+Besondere Karten: Eine 7 heißt, der Nächste muss zwei Karten ziehen, außer er legt auch eine 7; dann zieht der Nächste vier und so weiter. Eine 8 heißt, der Nächste muss einmal aussetzen. Ein Bube passt auf alles außer einen Buben, und du wünschst dir die Farbe, die als Nächstes kommen muss.
+Wer zuerst alle Karten los ist, gewinnt.</value></data>
+  <data name="Play.About.chess" xml:space="preserve"><value>Fang den anderen König, sodass er nicht mehr entkommt: Schachmatt!</value></data>
+  <data name="Play.Rules.chess" xml:space="preserve"><value>Für zwei, Weiß und Schwarz, auf einem Brett mit 8 × 8 Feldern. Weiß fängt an.
+Jede Figur zieht anders. König: ein Feld in jede Richtung. Dame: gerade oder schräg so weit sie will. Turm: gerade. Läufer: schräg. Springer: wie ein L (zwei Felder in eine Richtung, eins zur Seite), und er darf über Figuren springen. Bauer: ein Feld vorwärts (beim ersten Zug zwei) und schlägt ein Feld schräg nach vorn.
+Du schlägst, indem du auf ein Feld mit einer fremden Figur ziehst. Ein Bauer, der die letzte Reihe erreicht, wird zu Dame, Turm, Läufer oder Springer.
+Wird dein König angegriffen, ist das Schach, und du musst ihn schützen. Kann er nicht mehr entkommen, ist das Schachmatt, und wer es gesetzt hat, gewinnt.
+Die App bietet nur erlaubte Züge an, auch Rochade und en passant. Unentschieden ist es, wenn keiner ziehen kann, ohne im Schach zu stehen (Patt), wenn dieselbe Stellung dreimal vorkommt, nach 50 Zügen ohne Schlagen oder Bauernzug, oder wenn zu wenig Figuren für ein Schachmatt übrig sind.</value></data>
+  <data name="Play.About.numberTowers" xml:space="preserve"><value>Bau Türme von 1 bis 12 und werde als Erster deinen Vorrat los.</value></data>
+  <data name="Play.Rules.numberTowers" xml:space="preserve"><value>Für zwei bis vier. Auf den Karten stehen die Zahlen 1 bis 12; Sterne ⭐ können für jede Zahl stehen. Jeder bekommt einen Vorrat aus 20 Karten, nur die oberste liegt offen. Wer zuerst seinen Vorrat los ist, gewinnt.
+In der Mitte gibt es vier Türme, an denen alle gemeinsam bauen. Ein Turm fängt mit einer 1 an, dann kommen 2, 3 und so weiter bis 12. Hat ein Turm die 12 erreicht, wird er abgeräumt und kann neu anfangen.
+Wenn du dran bist, bekommst du Karten, bis du fünf auf der Hand hast. Dann legst du so viele Karten auf die Türme, wie du kannst oder willst: von der Hand, die oberste Karte deines Vorrats oder die oberste Karte einer deiner vier Ablagen.
+Tipp: Die Karte von deinem Vorrat ist die wichtigste. Jede Vorratskarte bringt dich näher an den Sieg! Hast du alle fünf Handkarten gelegt, bekommst du fünf neue und spielst weiter.
+Du beendest deinen Zug, indem du eine Handkarte auf eine deiner Ablagen legst. Plane gut: Später kannst du nur die oberste Karte einer Ablage spielen.</value></data>
+  <data name="Play.Game.numberTowers" xml:space="preserve"><value>Zahlentürme</value></data>
+  <data name="Error.numberTowers.cardDoesNotFit" xml:space="preserve"><value>Diese Karte passt nicht auf den Turm.</value></data>
+  <data name="Towers.Out" xml:space="preserve"><value>hat aufgegeben</value></data>
+  <data name="Towers.StockLeft" xml:space="preserve"><value>Vorrat: {0}</value></data>
+  <data name="Towers.InHand" xml:space="preserve"><value>{0} auf der Hand</value></data>
+  <data name="Towers.Stock" xml:space="preserve"><value>Vorrat</value></data>
+  <data name="Towers.MyStock" xml:space="preserve"><value>Mein Vorrat, noch {0} Karten</value></data>
+  <data name="Towers.Towers" xml:space="preserve"><value>Türme</value></data>
+  <data name="Towers.Tower" xml:space="preserve"><value>Turm {0}: {1}</value></data>
+  <data name="Towers.TowerEmpty" xml:space="preserve"><value>Turm {0}: leer, fängt mit 1 an</value></data>
+  <data name="Towers.Deck" xml:space="preserve"><value>{0} Karten zum Ziehen</value></data>
+  <data name="Towers.MyHand" xml:space="preserve"><value>Meine Karten</value></data>
+  <data name="Towers.MyPiles" xml:space="preserve"><value>Meine Ablagen</value></data>
+  <data name="Towers.Piles" xml:space="preserve"><value>Ablagen</value></data>
+  <data name="Towers.Pile" xml:space="preserve"><value>Ablage {0}: {1}</value></data>
+  <data name="Towers.PileEmpty" xml:space="preserve"><value>Ablage {0}: leer</value></data>
+  <data name="Towers.Star" xml:space="preserve"><value>Stern</value></data>
+  <data name="Towers.StarAs" xml:space="preserve"><value>Stern als {0}</value></data>
+  <data name="Towers.YourTurn" xml:space="preserve"><value>Tipp eine Karte an, dann einen Turm, auf den sie passt. Zum Schluss legst du eine Handkarte auf eine Ablage.</value></data>
+  <data name="Towers.StockFits" xml:space="preserve"><value>Deine Vorratskarte passt! Tipp sie an, dann den Turm.</value></data>
+  <data name="Towers.PickedHand" xml:space="preserve"><value>Tipp einen leuchtenden Turm an, oder eine deiner Ablagen, um den Zug zu beenden.</value></data>
+  <data name="Towers.Picked" xml:space="preserve"><value>Tipp einen leuchtenden Turm an.</value></data>
+  <data name="Towers.FitsNowhere" xml:space="preserve"><value>Diese Karte passt gerade auf keinen Turm.</value></data>
+  <data name="Towers.Pass" xml:space="preserve"><value>Keine Karten mehr auf der Hand und keine zum Ziehen. Beende deinen Zug.</value></data>
+  <data name="Towers.PassButton" xml:space="preserve"><value>Zug beenden</value></data>
+  <data name="Towers.TheirTurn" xml:space="preserve"><value>{0} ist dran …</value></data>
+  <data name="Towers.Over" xml:space="preserve"><value>Das Spiel ist aus.</value></data>
+  <data name="Towers.Did.Play" xml:space="preserve"><value>{0} hat {1} auf Turm {2} gelegt.</value></data>
+  <data name="Towers.Did.Done" xml:space="preserve"><value>{0} hat {1} auf Turm {2} gelegt: Der Turm ist fertig!</value></data>
+  <data name="Towers.Did.Discard" xml:space="preserve"><value>{0} hat {1} abgelegt. Zug vorbei.</value></data>
+  <data name="Towers.Did.Pass" xml:space="preserve"><value>{0} hat den Zug beendet.</value></data>
+  <data name="Towers.Did.Resign" xml:space="preserve"><value>{0} hat aufgegeben.</value></data>
+  <data name="Play.PlayersExactly" xml:space="preserve"><value>{0} Spieler</value></data>
 </root>
