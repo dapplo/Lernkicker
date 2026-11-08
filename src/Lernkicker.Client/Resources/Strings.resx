@@ -590,6 +590,8 @@
   <data name="Battleship.Hit" xml:space="preserve"><value>hit</value></data>
   <data name="Battleship.Miss" xml:space="preserve"><value>miss</value></data>
   <data name="Battleship.Sunk" xml:space="preserve"><value>sunk</value></data>
+  <data name="Battleship.FleetSunk" xml:space="preserve"><value>All of {0}'s ships are sunk!</value></data>
+  <data name="Battleship.FleetLost" xml:space="preserve"><value>Your fleet went down. Next time!</value></data>
   <data name="Sound.Off" xml:space="preserve"><value>Sound off</value></data>
   <data name="Sound.On" xml:space="preserve"><value>Sound on</value></data>
   <data name="Battleship.MissThenThey" xml:space="preserve"><value>Miss! Now {0} is shooting …</value></data>

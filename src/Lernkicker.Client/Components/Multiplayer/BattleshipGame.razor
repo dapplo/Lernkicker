@@ -9,12 +9,18 @@
    fixed height (two lines) above the seas, so the boards never move. *@
 
 <div class="battleship">
+    @if (_ending is { } ending)
+    {
+        @* Over the boards for a few seconds when the game ends while you watch *@
+        <div class="battleship-ending @ending" data-lottie="@ending" aria-hidden="true" @key="ending"></div>
+    }
     <p class="battleship-bar @BarTone" role="status" aria-live="polite">@BarText</p>
 
     @if (Placing)
     {
         <p class="game-how">@L["Battleship.HowToPlace"]</p>
         <div class="sea-frame placing">
+            <SeaMotion />
             <div class="sea-ships" aria-hidden="true">
                 @foreach (var ship in _placed)
                 {
@@ -53,6 +59,7 @@
                 <section class="sea-box @(MyTurn ? "my-turn" : "")">
                     <h2>@L["Battleship.TheirSea", Opponent]</h2>
                     <div class="sea-frame">
+                        <SeaMotion />
                         <div class="sea-ships" aria-hidden="true">
                             @foreach (var ship in View.SunkShips)
                             {
@@ -85,6 +92,7 @@
             <section class="sea-box">
                 <h2>@L["Battleship.MySea"]</h2>
                 <div class="sea-frame mine">
+                    <SeaMotion />
                     <div class="sea-ships" aria-hidden="true">
                         @foreach (var ship in myShips)
                         {
@@ -118,6 +126,7 @@
     private bool _horizontal = true;
     private string? _hint;
     private bool _soundOn = true;
+    private string? _ending;
 
     // What the last view showed, to find out what the new one brings (and which sound goes with it)
     private BattleshipViewDto? _seen;
@@ -160,7 +169,12 @@
         {
             var shot = View.MyShots[^1];
             var sunk = View.SunkShips.Count(s => Sunk(s, View.MyShots)) > before.SunkShips.Count(s => Sunk(s, before.MyShots));
-            await Sounds.Play(Steps(shot, sunk, won: View.Phase == "over" && sunk));
+            var won = View.Phase == "over" && sunk;
+            await Sounds.Play(Steps(shot, sunk, won));
+            if (won)
+            {
+                ShowEnding("victory");
+            }
         }
         else if (View.TheirShots.Count > before.TheirShots.Count && View.MyShips is { } mine)
         {
@@ -168,7 +182,28 @@
             var sunk = mine.Count(s => Sunk(s, View.TheirShots)) > mine.Count(s => Sunk(s, before.TheirShots));
             var lost = mine.All(s => Sunk(s, View.TheirShots));
             await Sounds.Play(Steps(shot, sunk, won: false, lost));
+            if (lost)
+            {
+                ShowEnding("defeat");
+            }
         }
+    }
+
+    /// <summary>The victory or defeat animation, after the last ship has gone down, then it goes away again.</summary>
+    private void ShowEnding(string ending)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await Task.Delay(1800);
+            _ending = ending;
+            StateHasChanged();
+            await Task.Delay(3600);
+            if (_ending == ending)
+            {
+                _ending = null;
+                StateHasChanged();
+            }
+        });
     }
 
     private static (string, double)[] Steps(ShotDto shot, bool sunk, bool won, bool lost = false)
@@ -219,7 +254,8 @@
 
             if (View.Phase != "shooting")
             {
-                return "";
+                var myFleetGone = View.MyShips is { Count: > 0 } mine && mine.All(s => Sunk(s, View.TheirShots));
+                return myFleetGone ? L["Battleship.FleetLost"] : L["Battleship.FleetSunk", Opponent];
             }
 
             if (MyTurn)
@@ -272,7 +308,7 @@
 
     /// <summary>
     /// What a shot left behind: rings on the water for a miss, fire and smoke for a hit. The last shot also shows its
-    /// splash or blast, which plays once.
+    /// splash or blast, a Lottie animation that plays once.
     /// </summary>
     private static RenderFragment Effects(ShotDto? shot, bool sunk, bool last) => builder =>
     {
@@ -296,12 +332,22 @@
             builder.CloseElement();
         }
 
+        // Played once by wwwroot/js/lottie.js as soon as the span is on the page
+        void Lottie(string name)
+        {
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", $"fx lottie-fx {name}");
+            builder.AddAttribute(seq++, "aria-hidden", "true");
+            builder.AddAttribute(seq++, "data-lottie", name);
+            builder.CloseElement();
+        }
+
         if (!shot.Hit)
         {
             Span("ripple");
             if (last)
             {
-                Span("splash", 5);
+                Lottie("splash");
             }
 
             return;
@@ -316,7 +362,7 @@
 
         if (last)
         {
-            Span("boom", 6);
+            Lottie("explosion");
         }
     };
 
