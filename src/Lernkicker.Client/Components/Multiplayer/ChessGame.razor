@@ -35,6 +35,10 @@
                 {
                     <span class="piece @(char.IsUpper(piece) ? "white" : "black")" aria-hidden="true">@Glyph(piece)</span>
                 }
+                @if (_effects.Effects.TryGetValue(cell, out var effect))
+                {
+                    <span class="board-fx" data-lottie="@effect" aria-hidden="true" @key="(_effects.Round, cell)"></span>
+                }
                 @if (col == 0)
                 {
                     <span class="rank-label" aria-hidden="true">@(Size - cell.Y)</span>
@@ -69,6 +73,7 @@
     private CellDto? _from;
     private ChessMoveDto? _promotion;
     private IReadOnlyList<ChessMoveDto>? _moves;
+    private readonly BoardEffects _effects = new();
 
     [Parameter, EditorRequired]
     public required ChessViewDto View { get; set; }
@@ -92,6 +97,9 @@
             _from = null;
             _promotion = null;
         }
+
+        // A dust puff where a piece was taken, sparkles where a pawn became a queen (or another piece)
+        _effects.Update(View.Board, View.Last?.From, View.Last?.To, (before, after) => char.ToLowerInvariant(before) == 'p' && char.ToLowerInvariant(after) is not ('p' or '.'));
     }
 
     /// <summary>White sees rank 1 at the bottom, black the board turned around.</summary>

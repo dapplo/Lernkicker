@@ -8,7 +8,8 @@ paths, ellipses, rectangles, solid and gradient fills, strokes, transforms) and 
 - sea: the moving water under a battleship board, a loop of waves, light patches and glints. It draws only light on a
   transparent background, so the board's own (themed) blue shows through.
 - explosion, splash: a hit and a miss, played once on the cell.
-- victory, defeat: played once over the board when a game ends.
+- victory, defeat, draw: played once over any game's board when the game ends.
+- sparkle, poof: a winning line or a promotion, and a captured piece in board games.
 """
 import json
 import math
@@ -317,9 +318,81 @@ def defeat():
     return animation("defeat", size, size, op, layers)
 
 
+def star_shape(r_out, r_in, points=4):
+    pts = []
+    for i in range(points * 2):
+        r = r_out if i % 2 == 0 else r_in
+        a = math.pi * i / points - math.pi / 2
+        pts.append((round(math.cos(a) * r, 2), round(math.sin(a) * r, 2)))
+    return polygon(pts)
+
+
+def sparkle():
+    """Twinkling stars around a square or a disc: a winning line, a piece that became a king or queen."""
+    random.seed(17)
+    size, op, c = 200, 36, 100
+    layers = []
+    for i in range(9):
+        angle = 2 * math.pi * i / 9 + random.uniform(-0.3, 0.3)
+        dist = random.uniform(45, 80)
+        t0 = random.randint(0, 10)
+        r = random.uniform(8, 14)
+        star = group([star_shape(r, r * 0.3), fill(rgb(random.choice(["#fff3bf", "#ffd43b", "#ffffff"])))],
+                     s=anim([(t0, [0, 0]), (t0 + 8, [120, 120]), (t0 + 22, [0, 0])], [OUT_EASE, IN_EASE]),
+                     r=anim([(t0, 0), (t0 + 22, 90)], LINEAR))
+        layers.append(layer(0, "star", [star], op,
+                            p=split_position(anim([(t0, c), (t0 + 22, c + math.cos(angle) * dist)], OUT_EASE),
+                                             anim([(t0, c), (t0 + 22, c + math.sin(angle) * dist)], OUT_EASE))))
+    layers.append(layer(0, "glow", [group([ellipse(90, 90), fill(rgb("#fff9db"))])], op, p=(c, c),
+                        s=anim([(0, [20, 20]), (8, [100, 100])], OUT_EASE), o=anim([(0, 80), (16, 0)])))
+    return animation("sparkle", size, size, op, layers)
+
+
+def poof():
+    """A puff of dust where a piece was taken."""
+    random.seed(19)
+    size, op, c = 200, 24, 100
+    layers = []
+    for i in range(8):
+        angle = 2 * math.pi * i / 8 + random.uniform(-0.2, 0.2)
+        dist = random.uniform(30, 55)
+        puff = group([ellipse(random.uniform(26, 38), random.uniform(26, 38)), fill(rgb(random.choice(["#adb5bd", "#ced4da", "#868e96"])))])
+        layers.append(layer(0, "puff", [puff], op,
+                            p=split_position(anim([(0, c), (op - 2, c + math.cos(angle) * dist)], OUT_EASE),
+                                             anim([(0, c), (op - 2, c + math.sin(angle) * dist - 8)], OUT_EASE)),
+                            s=anim([(0, [40, 40]), (op - 2, [110, 110])], OUT_EASE), o=anim([(0, 90), (8, 90), (op - 2, 0)])))
+    layers.append(layer(0, "ring", [group([ellipse(110, 110), stroke(rgb("#ffffff"), 3)])], op, p=(c, c),
+                        s=anim([(0, [20, 20]), (12, [110, 110])], OUT_EASE), o=anim([(0, 80), (12, 0)])))
+    return animation("poof", size, size, op, layers)
+
+
+def draw():
+    """Nobody won: two medals swing together and touch, with a few stars."""
+    size, op, c = 300, 100, 150
+    layers = confetti(op, 20, 14, ["#ffd43b", "#ffffff", "#74c0fc"], size)
+    fade = anim([(0, 0), (6, 100), (op - 14, 100), (op - 4, 0)])
+
+    def medal(color, ribbon, x0, x1, tilt):
+        shapes = [
+            group([polygon([(-14, -95), (0, -95), (8, -30), (-6, -30)]), fill(rgb(ribbon))]),
+            group([polygon([(0, -95), (14, -95), (6, -30), (-8, -30)]), fill(rgb(ribbon), 80)]),
+            group([ellipse(76, 76), fill(rgb("#c47f00"))]),
+            group([ellipse(64, 64), fill(rgb(color))]),
+            group([star_shape(22, 9, 5), fill(rgb("#fff9db"))]),
+        ]
+        return layer(0, "medal", shapes[::-1], op, p=split_position(anim([(0, x0), (22, x1)], OUT_EASE), c + 20),
+                     r=anim([(0, tilt), (22, 0), (30, -tilt / 3), (38, 0)]), o=fade)
+
+    layers.append(medal("#f5b301", "#1c7ed6", c - 120, c - 38, -25))
+    layers.append(medal("#f5b301", "#e03131", c + 120, c + 38, 25))
+    layers.append(layer(0, "touch", [group([star_shape(26, 8), fill(rgb("#ffffff"))])], op, p=(c, c + 10),
+                        s=anim([(18, [0, 0]), (24, [130, 130]), (36, [0, 0])], [OUT_EASE, IN_EASE])))
+    return animation("draw", size, size, op, layers)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    for build in (sea, explosion, splash, victory, defeat):
+    for build in (sea, explosion, splash, victory, defeat, draw, sparkle, poof):
         data = build()
         (OUT / f"{data['nm']}.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
         print(data["nm"], len(data["layers"]), "layers")

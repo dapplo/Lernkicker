@@ -3,6 +3,7 @@
 @inject Api Api
 @inject PlayConnection Connection
 @inject NavigationManager Navigation
+@inject Sounds Sounds
 
 @* One game with others. The server checks every move; this page shows what the child may see and updates itself *@
 
@@ -37,6 +38,12 @@ else
     </p>
     <Messages Errors="@_errors" />
 
+    <div class="match-board">
+    @if (_ending is { } ending)
+    {
+        @* For a few seconds over the board when the game ends while the child watches (wwwroot/animations) *@
+        <div class="game-ending @ending" data-lottie="@ending" aria-hidden="true" @key="ending"></div>
+    }
     @switch (_match.View)
     {
         case BattleshipViewDto battleship:
@@ -65,6 +72,7 @@ else
             </div>
             break;
     }
+    </div>
 
     <div class="buttons">
         <a class="btn quiet" href="play">@L["Play.BackToLobby"]</a>
@@ -94,6 +102,7 @@ else
     private IReadOnlyList<string>? _errors;
     private bool _busy;
     private bool _connected;
+    private string? _ending;
 
     [Parameter]
     public Guid Id { get; set; }
@@ -113,7 +122,7 @@ else
     {
         try
         {
-            _match = await Api.Match(Id);
+            Arrive(await Api.Match(Id));
         }
         catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized)
         {
@@ -130,7 +139,7 @@ else
         // A closed table is gone; back to the lobby
         try
         {
-            _match = await Api.Match(Id);
+            Arrive(await Api.Match(Id));
         }
         catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.NotFound)
         {
@@ -145,11 +154,48 @@ else
         StateHasChanged();
     });
 
-    private Task Move(MoveDto move) => Run(async () => _match = await Api.Move(Id, move));
+    private Task Move(MoveDto move) => Run(async () => Arrive(await Api.Move(Id, move)));
+
+    /// <summary>
+    /// Takes a new state of the match. When it just ended while the child watched, a victory, defeat or draw animation
+    /// with its tune plays over the board. Not for the one who gave up, not for a table nobody finished, and with three
+    /// or more players only for the winner.
+    /// </summary>
+    private void Arrive(MatchDto next)
+    {
+        var before = _match;
+        _match = next;
+        var m = next.Match;
+        if (before?.Match.Status != "playing" || m.Status != "finished" || m.Abandoned || next.Resigned is { } r && r == m.MySeat)
+        {
+            return;
+        }
+
+        var ending = m.Winner is null ? "draw" : m.Winner == m.MySeat ? "victory" : m.Seats > 2 ? null : "defeat";
+        if (ending is not null)
+        {
+            // Battleship lets the last ship sink first
+            _ = Celebrate(ending, next.View is BattleshipViewDto ? 1800 : 500);
+        }
+    }
+
+    private async Task Celebrate(string ending, int delay)
+    {
+        await Task.Delay(delay);
+        _ending = ending;
+        await InvokeAsync(StateHasChanged);
+        await Sounds.Play(ending switch { "victory" => ("win", 0), "defeat" => ("lose", 0), _ => ("place", 0) });
+        await Task.Delay(3600);
+        if (_ending == ending)
+        {
+            _ending = null;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
     private Task Start() => Run(async () => _match = await Api.StartTable(Id));
 
-    private Task Resign() => Run(async () => _match = await Api.Resign(Id));
+    private Task Resign() => Run(async () => Arrive(await Api.Resign(Id)));
 
     private Task Leave() => Run(async () =>
     {

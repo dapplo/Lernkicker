@@ -915,9 +915,12 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 .play-settings .check small { display: block; color: var(--muted); }
 
 /* Battleship. The bar above the seas has a fixed height, so the boards stay where they are whatever it says. */
-.battleship { position: relative; }
-/* Victory or defeat, for a few seconds over the boards */
-.battleship-ending {
+/* Victory, defeat or draw, for a few seconds over any game's board (MatchPage) */
+.match-board { position: relative; }
+/* A one-off Lottie effect on a square or disc of a board game (BoardEffects): wider than the square, never in the way */
+.board-fx { position: absolute; inset: -60%; z-index: 3; pointer-events: none; }
+.board-fx svg { display: block; }
+.game-ending {
     position: absolute;
     z-index: 5;
     top: 40px;
@@ -1215,7 +1218,7 @@ details.upload[open] > summary { margin-bottom: 8px; font-size: 1.15rem; }
 }
 .c4-column:not(:disabled) { cursor: pointer; }
 .c4-column:not(:disabled):hover { background: rgb(255 255 255 / 18%); }
-.c4-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #0f3f86; }
+.c4-cell { position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #0f3f86; }
 .c4-cell .c4-disc { width: 86%; height: 86%; }
 .c4-disc { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 50%; background: #f4f8ff; }
 .c4-disc.red { background: radial-gradient(circle at 35% 35%, #ff8a80, #d62828 60%); }
