@@ -19,6 +19,10 @@
                 var cell = new CellDto(column, y);
                 <span class="c4-cell @(View.Line.Contains(cell) ? "line" : "") @(View.Last == cell ? "last" : "")">
                     <span class="c4-disc @(seat < 0 ? "" : Color(seat))"></span>
+                    @if (_sparkle && View.Line.Contains(cell))
+                    {
+                        <span class="board-fx" data-lottie="sparkle" aria-hidden="true"></span>
+                    }
                 </span>
             }
         </button>
@@ -42,6 +46,17 @@
     public EventCallback<MoveDto> Move { get; set; }
 
     private int Columns => View.Cells.Count > 0 ? View.Cells[0].Count : 0;
+
+    // Sparkles on the four in a row, when they appear while the children watch (not when the page opens on a finished game)
+    private bool _sparkle;
+    private bool? _hadLine;
+
+    protected override void OnParametersSet()
+    {
+        var hasLine = View.Line.Count > 0;
+        _sparkle = _sparkle || (_hadLine == false && hasLine);
+        _hadLine = hasLine;
+    }
 
     private bool MyTurn => !View.Over && View.Turn == MySeat;
 

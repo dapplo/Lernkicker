@@ -9,11 +9,6 @@
    fixed height (two lines) above the seas, so the boards never move. *@
 
 <div class="battleship">
-    @if (_ending is { } ending)
-    {
-        @* Over the boards for a few seconds when the game ends while you watch *@
-        <div class="battleship-ending @ending" data-lottie="@ending" aria-hidden="true" @key="ending"></div>
-    }
     <p class="battleship-bar @BarTone" role="status" aria-live="polite">@BarText</p>
 
     @if (Placing)
@@ -126,7 +121,6 @@
     private bool _horizontal = true;
     private string? _hint;
     private bool _soundOn = true;
-    private string? _ending;
 
     // What the last view showed, to find out what the new one brings (and which sound goes with it)
     private BattleshipViewDto? _seen;
@@ -162,65 +156,25 @@
         }
     }
 
-    /// <summary>The sound for the newest shot on either sea, and a tune when a fleet is gone.</summary>
+    /// <summary>The sound for the newest shot on either sea (the tune at the end comes from the match page).</summary>
     private async Task PlayNews(BattleshipViewDto before)
     {
         if (View.MyShots.Count > before.MyShots.Count)
         {
             var shot = View.MyShots[^1];
             var sunk = View.SunkShips.Count(s => Sunk(s, View.MyShots)) > before.SunkShips.Count(s => Sunk(s, before.MyShots));
-            var won = View.Phase == "over" && sunk;
-            await Sounds.Play(Steps(shot, sunk, won));
-            if (won)
-            {
-                ShowEnding("victory");
-            }
+            await Sounds.Play(Steps(shot, sunk));
         }
         else if (View.TheirShots.Count > before.TheirShots.Count && View.MyShips is { } mine)
         {
             var shot = View.TheirShots[^1];
             var sunk = mine.Count(s => Sunk(s, View.TheirShots)) > mine.Count(s => Sunk(s, before.TheirShots));
-            var lost = mine.All(s => Sunk(s, View.TheirShots));
-            await Sounds.Play(Steps(shot, sunk, won: false, lost));
-            if (lost)
-            {
-                ShowEnding("defeat");
-            }
+            await Sounds.Play(Steps(shot, sunk));
         }
     }
 
-    /// <summary>The victory or defeat animation, after the last ship has gone down, then it goes away again.</summary>
-    private void ShowEnding(string ending)
-    {
-        _ = InvokeAsync(async () =>
-        {
-            await Task.Delay(1800);
-            _ending = ending;
-            StateHasChanged();
-            await Task.Delay(3600);
-            if (_ending == ending)
-            {
-                _ending = null;
-                StateHasChanged();
-            }
-        });
-    }
-
-    private static (string, double)[] Steps(ShotDto shot, bool sunk, bool won, bool lost = false)
-    {
-        List<(string, double)> steps = [shot.Hit ? ("hit", 0) : ("splash", 0)];
-        if (sunk)
-        {
-            steps.Add(("sink", 0.7));
-        }
-
-        if (won || lost)
-        {
-            steps.Add((won ? "win" : "lose", 2.6));
-        }
-
-        return [.. steps];
-    }
+    private static (string, double)[] Steps(ShotDto shot, bool sunk) =>
+        sunk ? [("hit", 0), ("sink", 0.7)] : [(shot.Hit ? "hit" : "splash", 0)];
 
     private RenderFragment SoundToggle => @<button type="button" class="btn quiet sound-toggle" aria-pressed="@(_soundOn ? "true" : "false")" @onclick="ToggleSound">
         <span aria-hidden="true">@(_soundOn ? "🔊" : "🔇")</span> @(_soundOn ? L["Sound.On"] : L["Sound.Off"])

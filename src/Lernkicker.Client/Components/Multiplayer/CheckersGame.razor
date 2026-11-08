@@ -38,6 +38,10 @@
                     {
                         <span class="piece @(char.ToLowerInvariant(piece) == 'w' ? "white" : "black") @(char.IsUpper(piece) ? "king" : "")"></span>
                     }
+                    @if (_effects.Effects.TryGetValue(cell, out var effect))
+                    {
+                        <span class="board-fx" data-lottie="@effect" aria-hidden="true" @key="(_effects.Round, cell)"></span>
+                    }
                 </button>
             }
             else
@@ -58,6 +62,7 @@
 @code {
     private const int Size = 8;
     private readonly List<CellDto> _path = [];
+    private readonly BoardEffects _effects = new();
     private IReadOnlyList<IReadOnlyList<CellDto>>? _moves;
 
     [Parameter, EditorRequired]
@@ -82,6 +87,10 @@
             _moves = View.Moves;
             _path.Clear();
         }
+
+        // A dust puff on each piece jumped over, sparkles when a piece became a king
+        _effects.Update(View.Board, View.Last.Count > 0 ? View.Last[0] : null, View.Last.Count > 0 ? View.Last[^1] : null,
+            (before, after) => char.IsLower(before) && char.IsUpper(after));
     }
 
     /// <summary>White sees the board as it is (white at the bottom), black turned around.</summary>
